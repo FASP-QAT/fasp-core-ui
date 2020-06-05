@@ -782,6 +782,7 @@
     "static.common.receivedate":"Receiving Date",
     "static.report.supplyplanversionandreviewReport":"Supply Plan Version and Review",
     "static.report.version":"Version",
+    "static.report.versiontype":"Version Type",
     "static.report.veruploaddate":"Date Version Uploaded",
     "static.report.veruploaduser":"Version Uploaded by User",
     "static.report.issupplyplanapprove":"Supply Plan Approved?",
@@ -795,6 +796,7 @@
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
     "static.program.validstatus":"Please select Status",
-    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed."
+    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed.",
+    "static.report.supplyplan":"Supply Plan"
 
 }

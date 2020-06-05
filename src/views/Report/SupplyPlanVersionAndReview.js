@@ -299,7 +299,7 @@ class SupplyPlanVersionAndReview extends Component {
 
         var A = [headers]
 
-        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, elt.createdDate.replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate.replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
+        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId,(elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.createdDate.replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate.replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
         ]));
 
 
@@ -396,7 +396,7 @@ class SupplyPlanVersionAndReview extends Component {
         columns.map((item, idx) => { headers[idx] = item.text });
         const header = [headers];
         console.log(header);
-        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.createdDate, elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate : '', elt.notes]);
+        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId,elt.versionType.label.label_en, elt.createdDate, elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate : '', elt.notes]);
 
         let content = {
             startY: 200,
@@ -532,7 +532,7 @@ class SupplyPlanVersionAndReview extends Component {
             },
             {
                 dataField: 'versionType.label',
-                text: i18n.t('static.report.version'),
+                text: i18n.t('static.report.versiontype'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

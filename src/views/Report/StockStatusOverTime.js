@@ -55,7 +55,10 @@ const options = {
     }
 }
 
-
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 class StockStatusOverTime extends Component {
 
     constructor(props) {
@@ -99,6 +102,12 @@ class StockStatusOverTime extends Component {
         this.getPrograms = this.getPrograms.bind(this);
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
     }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+      }
+
     roundN = num => {
         return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
@@ -380,8 +389,8 @@ class StockStatusOverTime extends Component {
     exportCSV() {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year).replaceAll(' ', '%20'))
-        this.state.programLabels.map(ele => csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push((i18n.t('static.report.dateRange')+' , '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
+     this.state.programLabels.map(ele => csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("mosPast").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("mosFuture").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
@@ -460,9 +469,9 @@ class StockStatusOverTime extends Component {
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
-                    })
+                      })
                     var planningText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString()), doc.internal.pageSize.width * 3 / 4);
 
                     doc.text(doc.internal.pageSize.width / 8, 110, planningText)
@@ -470,15 +479,15 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("mosPast").selectedOptions[0].text, doc.internal.pageSize.width / 8, 140, {
+                    doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("mosPast").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("mosFuture").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("mosFuture").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
                     planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
 
-                    doc.text(doc.internal.pageSize.width / 8, 160, planningText)
+                    doc.text(doc.internal.pageSize.width / 8, 190, planningText)
                 }
 
             }
@@ -503,7 +512,7 @@ class StockStatusOverTime extends Component {
         var aspectwidth1 = (width - h1);
 
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
-        doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 220, 750, 290, 'CANVAS');
 
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
