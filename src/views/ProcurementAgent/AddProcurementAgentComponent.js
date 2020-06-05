@@ -294,7 +294,7 @@ class AddProcurementAgentComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
-                                                        <FormGroup check inline>
+                                                        <FormGroup check inline className="ml-12">
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="radio"
