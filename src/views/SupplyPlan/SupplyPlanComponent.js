@@ -3,7 +3,7 @@ import React from "react";
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
-    Input, InputGroup, Label, FormGroup, Form, Row
+    Input, InputGroup, Label, FormGroup, Form, Row, Nav, NavItem, NavLink,TabPane,TabContent
 } from 'reactstrap';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -21,8 +21,48 @@ import { Link } from "react-router-dom";
 import NumberFormat from 'react-number-format';
 import SupplyPlanComparisionComponent from "./SupplyPlanComparisionComponent";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { Bar, Line, Pie } from 'react-chartjs-2';
+import pdfIcon from '../../assets/img/pdf.png';
+import { LOGO } from '../../CommonComponent/Logo.js'
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import csvicon from '../../assets/img/csv.png'
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
+
+const chartOptions = {
+    title: {
+        display: true,
+        text: i18n.t('static.dashboard.stockstatus')
+    },
+    scales: {
+        yAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: i18n.t('static.dashboard.unit')
+            },
+            stacked: false,
+            ticks: {
+                beginAtZero: true
+            }
+        }]
+    },
+    tooltips: {
+        enabled: false,
+        custom: CustomTooltips
+    },
+    maintainAspectRatio: false
+    ,
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+        }
+    }
+}
+
 
 export default class SupplyPlanComponent extends React.Component {
 
@@ -63,7 +103,11 @@ export default class SupplyPlanComponent extends React.Component {
             nonPsmShipmentsTotalData: [],
             artmisShipmentsTotalData: [],
             plannedPsmChangedFlag: 0,
-            message: ''
+            message: '',
+            activeTab: new Array(3).fill('1'),
+            jsonArrForGraph: [],
+            display:'none'
+
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -106,6 +150,742 @@ export default class SupplyPlanComponent extends React.Component {
         this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
 
         this.budgetDropdownFilter = this.budgetDropdownFilter.bind(this);
+    }
+
+ 
+    toggle = (tabPane, tab) => {
+        console.log('In togglee'+tab)
+        const newArray = this.state.activeTab.slice()
+        newArray[tabPane] = tab
+        this.setState({
+            activeTab: newArray,
+        });
+    }
+    tabPane=()=> {
+        const MyMenu = (props) => (
+            <Menu id='menu_id'>
+                <Item disabled>Yes-Account</Item>
+                <Item onClick={this.onClick}>No-Skip</Item>
+            </Menu>
+        );
+        
+        const NoSkip = () => (
+            <Menu id='no_skip'>
+                <Item onClick={this.onClick}>Yes-Account</Item>
+                <Item disabled>No-Skip</Item>
+            </Menu>
+        );
+        const exportCSV=()=> {
+
+            var csvRow = [];
+              csvRow.push(i18n.t('static.program.program') + ' , ' + (( document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+              csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (( document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+              csvRow.push('')
+              csvRow.push('')
+              csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+              csvRow.push('')
+         
+            const header=[...[""],... (this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                item.month
+            ))
+             )] 
+            var A = [header]
+        
+            var openningArr=[...[("Opening Balance").replaceAll(' ', '%20')],... this.state.openingBalanceArray]
+             var consumptionArr=[...["Consumption"],...this.state.consumptionTotalData]
+             var suggestedArr= [...[("Suggested Shipments").replaceAll(' ', '%20')],...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+             var psmShipmentArr=[...[("PSM Shipments in QAT").replaceAll(' ', '%20')],...this.state.psmShipmentsTotalData.map(item => item.qty)]
+             var artmisShipmentArr=[...[("PSM Shipments from ARTMIS").replaceAll(' ', '%20')],...this.state.artmisShipmentsTotalData.map(item => item.qty)]
+             var nonPsmShipmentArr=[...[("Non PSM Shipment").replaceAll(' ', '%20')],...this.state.nonPsmShipmentsTotalData.map(item => item.qty)]
+             var inventoryArr=[...["Adjustments"],...this.state.inventoryTotalData]
+             var closingBalanceArr=[...[("Ending Balance").replaceAll(' ', '%20')],...this.state.closingBalanceArray]
+             var amcgArr=[...["AMC"],...this.state.amcTotalData]
+             var monthsOfStockArr=[...[("Months of Stock").replaceAll(' ', '%20')],... this.state.monthsOfStockArray]
+             var minStockArr=[...[("Min stock").replaceAll(' ', '%20')],...this.state.minStockArray]
+             var maxStockArr=[...[("Max stock").replaceAll(' ', '%20')],...this.state.maxStockArray]
+             
+             A.push(openningArr)
+            A.push(consumptionArr)
+            A.push(suggestedArr)
+            A.push(psmShipmentArr)
+            A.push(artmisShipmentArr)
+            A.push(nonPsmShipmentArr)
+            A.push(inventoryArr)
+            A.push(closingBalanceArr)
+            A.push(amcgArr)
+            A.push(monthsOfStockArr)
+            A.push(minStockArr)
+            A.push(maxStockArr)
+            for (var i = 0; i < A.length; i++) {
+              csvRow.push(A[i].join(","))
+            }
+            var csvString = csvRow.join("%0A")
+            var a = document.createElement("a")
+            a.href = 'data:attachment/csv,' + csvString
+            a.target = "_Blank"
+            a.download = i18n.t('static.dashboard.supplyplan') + ".csv"
+            document.body.appendChild(a)
+            a.click()
+          }
+        
+        const exportPDF = () => {
+            const addFooters = doc => {
+        
+              const pageCount = doc.internal.getNumberOfPages()
+        
+              doc.setFont('helvetica', 'bold')
+              doc.setFontSize(10)
+              for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+        
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                  align: 'center'
+                })
+                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                  align: 'center'
+                })
+        
+        
+              }
+            }
+            const addHeaders = doc => {
+        
+              const pageCount = doc.internal.getNumberOfPages()
+              doc.setFont('helvetica', 'bold')
+        
+              // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+              // var reader = new FileReader();
+        
+              //var data='';
+              // Use fs.readFile() method to read the file 
+              //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+              //}); 
+              for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyplan.supplyplan'), doc.internal.pageSize.width / 2, 60, {
+                  align: 'center'
+                })
+                if (i == 1) {
+                  doc.setFontSize(8)
+                  doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                    align: 'left'
+                  })
+                doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    align: 'left'
+                  })
+                }
+        
+              }
+            }
+            const unit = "pt";
+            const size = "A4"; // Use A1, A2, A3 or A4
+            const orientation = "landscape"; // portrait or landscape
+        
+            const marginLeft = 10;
+            const doc = new jsPDF(orientation, unit, size, true);
+        
+            doc.setFontSize(15);
+        
+             var canvas = document.getElementById("cool-canvas");
+            //creates image
+        
+            var canvasImg = canvas.toDataURL("image/png", 1.0);
+            var width = doc.internal.pageSize.width;
+            var height = doc.internal.pageSize.height;
+            var h1 = 100;
+            var aspectwidth1 = (width - h1);
+        
+            doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1,( height-h1) * 3 / 4);
+        const header=[...[""],... (this.state.monthsArray.filter(m => m.display == 1).map(item => (
+            item.month
+        ))
+         )]
+         
+            const headers =[header]  ;
+            
+             var openningArr=[...["Opening Balance"],... this.state.openingBalanceArray]
+             var consumptionArr=[...["Consumption"],...this.state.consumptionTotalData]
+             var suggestedArr= [...["Suggested Shipments"],...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+             var psmShipmentArr=[...["PSM Shipments in QAT"],...this.state.psmShipmentsTotalData.map(item => item.qty)]
+             var artmisShipmentArr=[...["PSM Shipments from ARTMIS"],...this.state.artmisShipmentsTotalData.map(item => item.qty)]
+             var nonPsmShipmentArr=[...["Non PSM Shipment"],...this.state.nonPsmShipmentsTotalData.map(item => item.qty)]
+             var inventoryArr=[...["Adjustments"],...this.state.inventoryTotalData]
+             var closingBalanceArr=[...["Ending Balance"],...this.state.closingBalanceArray]
+             var amcgArr=[...["AMC"],...this.state.amcTotalData]
+             var monthsOfStockArr=[...["Months of Stock"],... this.state.monthsOfStockArray]
+             var minStocArr=[...["Min stock"],...this.state.minStockArray]
+             var maxStockArr=[...["Max stock"],...this.state.maxStockArray]
+             
+            const data = [openningArr,consumptionArr,suggestedArr,psmShipmentArr,artmisShipmentArr,nonPsmShipmentArr,inventoryArr,closingBalanceArr,amcgArr,monthsOfStockArr,minStocArr,maxStockArr];
+        
+            let content = {
+              margin: { top: 80 },
+              startY: height,
+              head: headers,
+              body: data,
+              styles:{lineWidth:  1,fontSize : 8},
+            };
+            doc.autoTable(content);
+            addHeaders(doc)
+            addFooters(doc)
+            doc.save("SupplyPlan.pdf")
+        
+        }
+
+         console.log('****' + this.state.jsonArrForGraph)
+        let bar = {}
+        if (this.state.jsonArrForGraph.length > 0)
+            bar = {
+
+                labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
+                datasets: [
+                    {
+                        label: 'planned',
+                        backgroundColor: '#000050',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                    }, {
+                        label: 'Draft',
+                        backgroundColor: '#1E1E6E',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.draft)),
+                    }, {
+                        label: 'Shipped',
+                        backgroundColor: '#5A5AAA',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                    },
+                    {
+                        label: 'Arrived',
+                        backgroundColor: '#5B5BF5',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.arrived)),
+                    }, {
+                        label: 'Delivered',
+                        backgroundColor: '#AAAAFA',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                    }, {
+                        label: 'Submitted',
+                        backgroundColor: '#0FB5FF',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.submitted)),
+                    }, {
+                        label: 'Approved',
+                        backgroundColor: '#52CAFF',
+                        borderColor: 'rgba(179,181,198,1)',
+                        pointBackgroundColor: 'rgba(179,181,198,1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179,181,198,1)',
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                    }, {
+                        label: "Stock",
+                        type: 'line',
+                        borderColor: 'rgba(179,181,158,1)',
+                        borderStyle: 'dotted',
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
+                        },
+                        pointStyle: 'line',
+                        showInLegend: true,
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                    }, {
+                        label: "Consumption",
+                        type: 'line',
+                        backgroundColor: 'transparent',
+                        borderColor: 'rgba(255.102.102.1)',
+                        borderStyle: 'dotted',
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
+                        },
+                        pointStyle: 'line',
+                        showInLegend: true,
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    }
+                ]
+
+            };
+        return (
+            <>
+                <TabPane tabId="1">
+                {this.state.planningUnitChange && <SupplyPlanComparisionComponent />}
+                <div id="supplyPlanTableId" style={{ display: this.state.display }}>
+                                                <Row>
+                                                    <div className="col-md-12">
+                                                        <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                                        <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                                    </div>
+                                                </Row>
+                                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                                    <thead>
+                                                        <tr>
+                                                            <th ></th>
+                                                            {
+                                                                this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                                    <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <MyMenu props />
+                                                        <NoSkip props />
+                                                        <tr>
+                                                            <td align="left">Opening Balance</td>
+                                                            {
+                                                                this.state.openingBalanceArray.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                                            <td align="left">Consumption</td>
+                                                            {
+                                                                this.state.consumptionTotalData.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
+                                                            <td align="left">Suggested Shipments</td>
+                                                            {
+                                                                this.state.suggestedShipmentsTotalData.map(item1 => {
+                                                                    if (item1.suggestedOrderQty.toString() != "") {
+                                                                        if (item1.isEmergencyOrder == 1) {
+                                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                                        } else {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                                        }
+                                                                    } else {
+                                                                        var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                                                        if (compare) {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, ``, '', '', `${item1.isEmergencyOrder}`)}>{item1.suggestedOrderQty}</td>)
+                                                                        } else {
+                                                                            return (<td>{item1.suggestedOrderQty}</td>)
+                                                                        }
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+                                                        <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
+                                                            <td align="left">PSM Shipments in QAT</td>
+                                                            {
+                                                                this.state.psmShipmentsTotalData.map(item1 => {
+                                                                    if (item1.toString() != "") {
+                                                                        if (item1.accountFlag == true) {
+                                                                            if (item1.isEmergencyOrder == 1) {
+                                                                                return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            } else {
+                                                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            }
+                                                                        } else {
+                                                                            if (item1.isEmergencyOrder == 1) {
+                                                                                return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            } else {
+                                                                                return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        return (<td align="right" >{item1}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+
+                                                        <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
+                                                            <td align="left">PSM Shipments from ARTMIS</td>
+                                                            {
+                                                                this.state.artmisShipmentsTotalData.map(item1 => {
+                                                                    if (item1.toString() != "") {
+                                                                        if (item1.accountFlag == true) {
+                                                                            if (item1.isEmergencyOrder == 1) {
+                                                                                return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            } else {
+                                                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            }
+                                                                        } else {
+                                                                            if (item1.isEmergencyOrder == 1) {
+                                                                                return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            } else {
+                                                                                return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        return (<td align="right" > {item1}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+
+                                                        <tr style={{ "backgroundColor": "rgb(207, 226, 243)" }}>
+                                                            <td align="left">Non PSM Shipment</td>
+                                                            {
+                                                                this.state.nonPsmShipmentsTotalData.map(item1 => {
+                                                                    if (item1.toString() != "") {
+                                                                        if (item1.accountFlag == true) {
+                                                                            if (item1.isEmergencyOrder == 1) {
+                                                                                return (<td align="right" style={{ color: 'red' }} onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            } else {
+                                                                                return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            }
+                                                                        } else {
+                                                                            if (item1.isEmergencyOrder == 1) {
+                                                                                return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#FA8072' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            } else {
+                                                                                return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            }
+
+                                                                        }
+                                                                    } else {
+                                                                        return (<td align="right" >{item1}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+
+                                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                                            <td align="left">Adjustments</td>
+                                                            {
+                                                                this.state.inventoryTotalData.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
+                                                            <td align="left">Ending Balance</td>
+                                                            {
+                                                                this.state.closingBalanceArray.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">AMC</td>
+                                                            {
+                                                                this.state.amcTotalData.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">Months of Stock</td>
+                                                            {
+                                                                this.state.monthsOfStockArray.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">Min stock</td>
+                                                            {
+                                                                this.state.minStockArray.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left">Max stock</td>
+                                                            {
+                                                                this.state.maxStockArray.map(item1 => (
+                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                ))
+                                                            }
+                                                        </tr>
+                                                    </tbody>
+                                                </Table>
+                                            </div>
+
+                                            {/* Consumption modal */}
+                                            <Modal isOpen={this.state.consumption}
+                                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                                <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
+                                                    <strong>Consumption Details</strong>
+                                                    <ul className="legend legend-supplypln">
+                                                        <li><span className="purplelegend"></span> <span className="legendText">Forecasted consumption</span></li>
+                                                        <li><span className="blacklegend"></span> <span className="legendText">Actual consumption</span></li>
+                                                    </ul>
+                                                </ModalHeader>
+                                                <ModalBody>
+                                                    <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionError}</h6>
+                                                    <div className="col-md-12">
+                                                        <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                                        <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                                    </div>
+                                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                {
+                                                                    this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                                        <th>{item.month}</th>
+                                                                    ))
+                                                                }
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {
+                                                                this.state.regionListFiltered.map(item => (
+                                                                    <tr>
+                                                                        <td align="left">{item.name}</td>
+                                                                        {
+                                                                            this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                                                if (item1.consumptionQty.toString() != '') {
+                                                                                    if (item1.actualFlag.toString() == 'true') {
+                                                                                        return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                                    } else {
+                                                                                        return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                                    }
+                                                                                } else {
+                                                                                    return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, ``, `${item1.month.month}`)}></td>)
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    </tr>
+                                                                )
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <th style={{ textAlign: 'left' }}>Total</th>
+                                                                {
+                                                                    this.state.consumptionTotalMonthWise.map(item => (
+                                                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                                    ))
+                                                                }
+                                                            </tr>
+                                                        </tfoot>
+                                                    </Table>
+                                                    <div className="table-responsive">
+                                                        <div id="consumptionDetailsTable" />
+                                                    </div>
+
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* Consumption modal */}
+                                            {/* Adjustments modal */}
+                                            <Modal isOpen={this.state.adjustments}
+                                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
+                                                <ModalBody>
+                                                    <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryError}</h6>
+                                                    <div className="col-md-12">
+                                                        <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                                        <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                                    </div>
+                                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                {
+                                                                    this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                                        <th>{item.month}</th>
+                                                                    ))
+                                                                }
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {
+                                                                this.state.regionListFiltered.map(item => (
+                                                                    <tr>
+                                                                        <td style={{ textAlign: 'left' }}>{item.name}</td>
+                                                                        {
+                                                                            this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                                                if (item1.adjustmentQty.toString() != '') {
+                                                                                    return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
+                                                                                } else {
+                                                                                    return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}></td>)
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    </tr>
+                                                                )
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <th style={{ textAlign: 'left' }}>Total</th>
+                                                                {
+                                                                    this.state.inventoryTotalMonthWise.map(item => (
+                                                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                                    ))
+                                                                }
+                                                            </tr>
+                                                        </tfoot>
+                                                    </Table>
+                                                    <div className="table-responsive">
+                                                        <div id="adjustmentsTable" className="table-responsive" />
+                                                    </div>
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* adjustments modal */}
+
+                                            {/* Suggested shipments modal */}
+                                            <Modal isOpen={this.state.suggestedShipments}
+                                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                                <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
+                                                    <strong>Shipment Details</strong>
+                                                </ModalHeader>
+                                                <ModalBody>
+                                                    <h6 className="red">{this.state.suggestedShipmentDuplicateError || this.state.suggestedShipmentError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="suggestedShipmentsDetailsTable" />
+                                                    </div>
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* Suggested shipments modal */}
+                                            {/* PSM Shipments modal */}
+                                            <Modal isOpen={this.state.psmShipments}
+                                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                                <ModalHeader toggle={() => this.toggleLarge('psmShipments')} className="modalHeaderSupplyPlan">
+                                                    <strong>Shipment Details</strong>
+                                                </ModalHeader>
+                                                <ModalBody>
+                                                    <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="shipmentsDetailsTable" />
+                                                    </div>
+                                                    <h6 className="red">{this.state.budgetError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="shipmentBudgetTable"></div>
+                                                    </div>
+
+                                                    <div id="showButtonsDiv" style={{ display: 'none' }}>
+                                                        {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>Save budget</Button>}
+                                                    </div>
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.saveShipments('psmShipments')}> <i className="fa fa-check"></i> Save</Button>
+                                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('psmShipments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* PSM Shipments modal */}
+                                            {/* artmis shipments modal */}
+                                            <Modal isOpen={this.state.artmisShipments}
+                                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                                <ModalHeader toggle={() => this.toggleLarge('artmisShipments')} className="modalHeaderSupplyPlan">
+                                                    <strong>Shipment Details</strong>
+                                                </ModalHeader>
+                                                <ModalBody>
+                                                    <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentError || this.state.shipmentBudgetError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="shipmentsDetailsTable" />
+                                                    </div>
+                                                    <h6 className="red">{this.state.budgetError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="shipmentBudgetTable"></div>
+                                                    </div>
+
+                                                    <div id="showButtonsDiv" style={{ display: 'none' }}>
+                                                        {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>Save budget</Button>}
+                                                    </div>
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('artmisShipments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* artmis shipments modal */}
+
+                                            {/* Non PSM Shipments modal */}
+                                            <Modal isOpen={this.state.nonPsmShipments}
+                                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                                <ModalHeader toggle={() => this.toggleLarge('nonPsmShipments')} className="modalHeaderSupplyPlan">
+                                                    <strong>Shipment Details</strong>
+                                                </ModalHeader>
+                                                <ModalBody>
+                                                    <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentError || this.state.shipmentBudgetError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="shipmentsDetailsTable" />
+                                                    </div>
+                                                    <h6 className="red">{this.state.budgetError}</h6>
+                                                    <div className="table-responsive">
+                                                        <div id="shipmentBudgetTable"></div>
+                                                    </div>
+
+                                                    <div id="showButtonsDiv" style={{ display: 'none' }}>
+                                                        {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>Save budget</Button>}
+                                                    </div>
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveShipments('nonPsmShipments')}> <i className="fa fa-check"></i> Save</Button>{' '}
+                                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('nonPsmShipments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* Non PSM Shipments modal */}
+
+
+                        
+                </TabPane>
+                <TabPane tabId="2">
+                <div className="row" > 
+
+{
+    this.state.jsonArrForGraph.length > 0
+    &&
+    <div className="col-md-12 grapg-margin " >
+       <Row>
+                                                    <div className="col-md-12">
+                                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => exportPDF()} />
+                                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => exportCSV()} />
+
+                              </div>
+                                                </Row>
+        <div className="col-md-12">
+            <div className="chart-wrapper chart-graph-report">
+                <Bar id="cool-canvas" data={bar} options={chartOptions} />
+            </div>
+        </div>   </div>}
+
+</div>
+
+                </TabPane></>)
     }
 
     componentDidMount() {
@@ -179,14 +959,14 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                for (var i = 0; i < programJson.regionList.length; i++) {
-                    var regionJson = {
-                        name: getLabelText(programJson.regionList[i].label, lan),
-                        id: programJson.regionList[i].regionId
-                    }
-                    regionList[i] = regionJson
-
-                }
+                /* for (var i = 0; i < programJson.regionList.length; i++) {
+                     var regionJson = {
+                         name: getLabelText(programJson.regionList[i].label, lan),
+                         id: programJson.regionList[i].regionId
+                     }
+                     regionList[i] = regionJson
+ 
+                 }*/
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
@@ -262,10 +1042,10 @@ export default class SupplyPlanComponent extends React.Component {
 
     formSubmit(monthCount) {
         this.setState({
-            planningUnitChange: true
+            planningUnitChange: true,
+            display:'block'
         })
-        document.getElementById("supplyPlanTableId").style.display = 'block';
-
+       
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
 
         var programId = document.getElementById("programId").value;
@@ -912,7 +1692,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var json = {
                         month: m[jsonForGraph].month,
                         consumption: consumptionTotalData[jsonForGraph],
-                        stock: openingBalanceArray[jsonForGraph],
+                        stock: closingBalanceArray[jsonForGraph],
                         planned: plannedTotalShipmentsBasedOnMonth[jsonForGraph],
                         draft: draftTotalShipmentsBasedOnMonth[jsonForGraph],
                         submitted: submittedTotalShipmentsBasedOnMonth[jsonForGraph],
@@ -3390,19 +4170,6 @@ export default class SupplyPlanComponent extends React.Component {
 
 
     render() {
-        const MyMenu = (props) => (
-            <Menu id='menu_id'>
-                <Item disabled>{i18n.t('static.supplyPlan.yesAccount')}</Item>
-                <Item onClick={this.onClick}>{i18n.t('static.supplyPlan.noSkip')}</Item>
-            </Menu>
-        );
-
-        const NoSkip = () => (
-            <Menu id='no_skip'>
-                <Item onClick={this.onClick}>{i18n.t('static.supplyPlan.yesAccount')}</Item>
-                <Item disabled>{i18n.t('static.supplyPlan.noSkip')}</Item>
-            </Menu>
-        );
 
         const lan = 'en';
         const { programList } = this.state;
@@ -3440,9 +4207,11 @@ export default class SupplyPlanComponent extends React.Component {
                     <CardHeader>
                         <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
                         <div className="card-header-actions">
+
                             <a className="card-header-action">
                                 <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
                             </a>
+
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -3498,423 +4267,29 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     )} />
 
-                        {this.state.planningUnitChange && <SupplyPlanComparisionComponent />}
-                        <div id="supplyPlanTableId" style={{ display: 'none' }}>
+                        <div className="animated fadeIn">
                             <Row>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                            </Row>
-                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th ></th>
-                                        {
-                                            this.state.monthsArray.map(item => (
-                                                <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
-                                            ))
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <MyMenu props />
-                                    <NoSkip props />
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.openingBalance')}</td>
-                                        {
-                                            this.state.openingBalanceArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
-                                        <td align="left">{i18n.t('static.dashboard.consumption')}</td>
-                                        {
-                                            this.state.consumptionTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.suggestedShipments')}</td>
-                                        {
-                                            this.state.suggestedShipmentsTotalData.map(item1 => {
-                                                if (item1.suggestedOrderQty.toString() != "") {
-                                                    if (item1.isEmergencyOrder == 1) {
-                                                        return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
-                                                    } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
-                                                    }
-                                                } else {
-                                                    var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                                                    if (compare) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, ``, '', '', `${item1.isEmergencyOrder}`)}>{item1.suggestedOrderQty}</td>)
-                                                    } else {
-                                                        return (<td>{item1.suggestedOrderQty}</td>)
-                                                    }
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.psmShipments')}</td>
-                                        {
-                                            this.state.psmShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.accountFlag == true) {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    } else {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    }
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
 
-                                    <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.artmisShipments')}</td>
-                                        {
-                                            this.state.artmisShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.accountFlag == true) {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    } else {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    }
-                                                } else {
-                                                    return (<td align="right" > {item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
+                                <Col xs="12" md="12" className="mb-4">
+                                    <Nav tabs>
+                                        <NavItem>
+                                            <NavLink
+                                                active={this.state.activeTab[0] === '1'}
+                                                onClick={() => { this.toggle(0, '1'); }}
+                                            >Supply Plan </NavLink>
+                                        </NavItem>
+                                        <NavItem>
+                                            <NavLink
+                                                active={this.state.activeTab[0] === '2'}
+                                                onClick={() => { this.toggle(0, '2'); }}
+                                            >
+                                                Supply Plan Graphical Representation
+                </NavLink>
 
-                                    <tr style={{ "backgroundColor": "rgb(207, 226, 243)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.nonPsmShipments')}</td>
-                                        {
-                                            this.state.nonPsmShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.accountFlag == true) {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    } else {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#FA8072' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-
-                                                    }
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                        <td align="left">{i18n.t('static.supplyPlan.adjustments')}</td>
-                                        {
-                                            this.state.inventoryTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.endingBalance')}</td>
-                                        {
-                                            this.state.closingBalanceArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
-                                        {
-                                            this.state.amcTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.monthsOfStock')}</td>
-                                        {
-                                            this.state.monthsOfStockArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.minStock')}</td>
-                                        {
-                                            this.state.minStockArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.maxStock')}</td>
-                                        {
-                                            this.state.maxStockArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </div>
-
-                        {/* Consumption modal */}
-                        <Modal isOpen={this.state.consumption}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                                <ul className="legend legend-supplypln">
-                                    <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
-                                    <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
-                                </ul>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            {
-                                                this.state.monthsArray.map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.regionListFiltered.map(item => (
-                                                <tr>
-                                                    <td align="left">{item.name}</td>
-                                                    {
-                                                        this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            if (item1.consumptionQty.toString() != '') {
-                                                                if (item1.actualFlag.toString() == 'true') {
-                                                                    return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
-                                                                } else {
-                                                                    return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
-                                                                }
-                                                            } else {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, ``, `${item1.month.month}`)}></td>)
-                                                            }
-                                                        })
-                                                    }
-                                                </tr>
-                                            )
-                                            )
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                            {
-                                                this.state.consumptionTotalMonthWise.map(item => (
-                                                    <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </tfoot>
-                                </Table>
-                                <div className="table-responsive">
-                                    <div id="consumptionDetailsTable" />
-                                </div>
-
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Consumption modal */}
-                        {/* Adjustments modal */}
-                        <Modal isOpen={this.state.adjustments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            {
-                                                this.state.monthsArray.map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.regionListFiltered.map(item => (
-                                                <tr>
-                                                    <td style={{ textAlign: 'left' }}>{item.name}</td>
-                                                    {
-                                                        this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            if (item1.adjustmentQty.toString() != '') {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
-                                                            } else {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}></td>)
-                                                            }
-                                                        })
-                                                    }
-                                                </tr>
-                                            )
-                                            )
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                            {
-                                                this.state.inventoryTotalMonthWise.map(item => (
-                                                    <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </tfoot>
-                                </Table>
-                                <div className="table-responsive">
-                                    <div id="adjustmentsTable" className="table-responsive" />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* adjustments modal */}
-
-                        {/* Suggested shipments modal */}
-                        <Modal isOpen={this.state.suggestedShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.suggestedShipmentDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.suggestedShipmentDuplicateError || this.state.suggestedShipmentError}</h6>
-                                <div className="table-responsive">
-                                    <div id="suggestedShipmentsDetailsTable" />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Suggested shipments modal */}
-                        {/* PSM Shipments modal */}
-                        <Modal isOpen={this.state.psmShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('psmShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.psmShipmentsDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
-                                </div>
-                                <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentBudgetTable"></div>
-                                </div>
-
-                                <div id="showButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBudget')}</Button>}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.saveShipments('psmShipments')}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('psmShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* PSM Shipments modal */}
-                        {/* artmis shipments modal */}
-                        <Modal isOpen={this.state.artmisShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('artmisShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.artmisShipmentsDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentError || this.state.shipmentBudgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
-                                </div>
-                                <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentBudgetTable"></div>
-                                </div>
-
-                                <div id="showButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBudget')}</Button>}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('artmisShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* artmis shipments modal */}
-
-                        {/* Non PSM Shipments modal */}
-                        <Modal isOpen={this.state.nonPsmShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('nonPsmShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.nonPsmShipmentsDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
-                                </div>
-                                <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentBudgetTable"></div>
-                                </div>
-
-                                <div id="showButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBudget')}</Button>}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveShipments('nonPsmShipments')}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>{' '}
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('nonPsmShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Non PSM Shipments modal */}
+                                           </NavItem>
+                                    </Nav> <TabContent activeTab={this.state.activeTab[0]}>
+                          {this.tabPane()}
+                        </TabContent></Col></Row></div>
                     </CardBody>
                 </Card>
 

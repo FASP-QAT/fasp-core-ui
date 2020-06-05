@@ -151,14 +151,14 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                for (var i = 0; i < programJson.regionList.length; i++) {
+              /*  for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
                         name: getLabelText(programJson.regionList[i].label, lan),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
 
-                }
+                }*/
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
@@ -607,7 +607,7 @@ export default class SupplyPlanComponent extends React.Component {
                         if (artmisShipments[a].accountFlag == 1) {
                             artmisToBeAccounted = 1;
                         }
-                        if (psm[a].emergencyOrder == 1) {
+                        if (artmisShipments[a].emergencyOrder == 1) {
                             artmisEmergencyOrder = 1;
                         }
                     }
