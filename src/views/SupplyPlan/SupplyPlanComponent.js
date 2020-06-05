@@ -1722,7 +1722,7 @@ export default class SupplyPlanComponent extends React.Component {
                             data[2] = inventoryList[j].dataSource.id;
                             data[3] = inventoryList[j].realmCountryPlanningUnit.id;
                             data[4] = inventoryList[j].multiplier;
-                            data[5] = `=IF(NOT(ISBLANK(E${j+1})), G${j+1}/E${j+1},0)`;
+                            data[5] = `=IF(NOT(ISBLANK(E${j + 1})), G${j + 1}/E${j + 1},0)`;
                             data[6] = expectedBalPlanningUnitQty;
                             data[7] = inventoryList[j].adjustmentQty;
                             data[8] = `=E${j + 1}*H${j + 1}`;
@@ -1882,33 +1882,41 @@ export default class SupplyPlanComponent extends React.Component {
                                     // Insert new row
                                     if (obj.options.allowInsertRow == true) {
                                         var json = obj.getJson();
-                                        items.push({
-                                            title: i18n.t('static.supplyPlan.addNewAdjustments'),
-                                            onclick: function () {
-                                                var json = obj.getJson();
-                                                var map = new Map(Object.entries(json[0]));
-                                                var data = [];
-                                                data[0] = map.get("0");
-                                                data[1] = map.get("1");
-                                                data[2] = "";
-                                                data[3] = "";
-                                                data[4] = "";
-                                                data[5] = `=IF(NOT(ISBLANK(E${(json.length)+1})), G${(json.length) + 1}/E${(json.length)+1},0)`;
-                                                data[6] = `=(G${json.length}+I${json.length})`;
-                                                data[7] = "";
-                                                data[8] = `=E${(json.length) + 1}*H${(json.length) + 1}`;
-                                                data[9] = "";
-                                                data[10] = `=E${(json.length) + 1}*J${(json.length) + 1}`;
-                                                data[11] = "";
-                                                data[12] = -1;
-                                                data[13] = true;
-                                                data[14] = endDate;
-                                                obj.insertRow(data);
-                                                var cell = obj.getCell(`D${parseInt(json.length) + 1}`)
-                                                cell.classList.remove('readonly');
+                                        var expectedBalPlanningUnitQty = (obj.getCell(`G${parseInt(json.length)}`)).innerHTML;
+                                        console.log("expectedBalance", expectedBalPlanningUnitQty);
+                                        var adjustedPlanningUnitQty = (obj.getCell(`I${parseInt(json.length)}`)).innerHTML;
+                                        console.log("Adjustmenst planning unit Qty", adjustedPlanningUnitQty)
+                                        var balance = parseInt(expectedBalPlanningUnitQty) + parseInt(adjustedPlanningUnitQty);
+                                        console.log("Balance", balance);
+                                        if (balance > 0) {
+                                            items.push({
+                                                title: i18n.t('static.supplyPlan.addNewAdjustments'),
+                                                onclick: function () {
+                                                    var json = obj.getJson();
+                                                    var map = new Map(Object.entries(json[0]));
+                                                    var data = [];
+                                                    data[0] = map.get("0");
+                                                    data[1] = map.get("1");
+                                                    data[2] = "";
+                                                    data[3] = "";
+                                                    data[4] = "";
+                                                    data[5] = `=IF(NOT(ISBLANK(E${(json.length) + 1})), G${(json.length) + 1}/E${(json.length) + 1},0)`;
+                                                    data[6] = `=(G${json.length}+I${json.length})`;
+                                                    data[7] = "";
+                                                    data[8] = `=E${(json.length) + 1}*H${(json.length) + 1}`;
+                                                    data[9] = "";
+                                                    data[10] = `=E${(json.length) + 1}*J${(json.length) + 1}`;
+                                                    data[11] = "";
+                                                    data[12] = -1;
+                                                    data[13] = true;
+                                                    data[14] = endDate;
+                                                    obj.insertRow(data);
+                                                    var cell = obj.getCell(`D${parseInt(json.length) + 1}`)
+                                                    cell.classList.remove('readonly');
 
-                                            }.bind(this)
-                                        });
+                                                }.bind(this)
+                                            });
+                                        }
                                     }
 
                                     if (obj.options.allowDeleteRow == true) {
@@ -2053,6 +2061,24 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
+            }
+        }
+
+        if (x == 8) {
+            var col = ("H").concat(parseInt(y) + 1);
+            var expectedBalPlanningUnitQty = (elInstance.getCell(`G${parseInt(y) + 1}`)).innerHTML;
+            console.log("expectedBalance", expectedBalPlanningUnitQty);
+            var adjustedPlanningUnitQty = (elInstance.getCell(`I${parseInt(y) + 1}`)).innerHTML;
+            console.log("Adjustmenst planning unit Qty", adjustedPlanningUnitQty)
+            var balance = parseInt(expectedBalPlanningUnitQty) + parseInt(adjustedPlanningUnitQty);
+            console.log("Balance", balance);
+            if (balance < 0) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
         }
 
@@ -2246,41 +2272,10 @@ export default class SupplyPlanComponent extends React.Component {
                         var map = new Map(Object.entries(json[i]));
                         if (parseInt(map.get("12")) != -1) {
                             inventoryDataList[parseInt(map.get("12"))].dataSource.id = map.get("2");
-                            inventoryDataList[parseInt(map.get("12"))].expectedBal = parseInt(map.get("5"));
                             inventoryDataList[parseInt(map.get("12"))].adjustmentQty = parseInt(map.get("7"));
                             inventoryDataList[parseInt(map.get("12"))].actualQty = parseInt(map.get("9"));
                             inventoryDataList[parseInt(map.get("12"))].notes = map.get("11");
                             inventoryDataList[parseInt(map.get("12"))].active = map.get("13");
-
-                            var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
-                            for (var j = 0; j < inventoryDataListFiltered.length; j++) {
-                                var inventoryId = inventoryDataListFiltered[j].inventoryId;
-                                var index;
-                                if (inventoryId != 0) {
-                                    index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
-                                } else {
-                                    index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
-                                }
-                                if (j == 0) {
-                                    inventoryDataList[index].expectedBal = 0
-                                } else {
-                                    var inventoryDetails = inventoryDataListFiltered.filter(c => c.inventoryDate >= map.get("14"));
-                                    var lastInventoryDate = "";
-                                    for (var id = 0; id < inventoryDetails.length; id++) {
-                                        if (id == 0) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                        if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                    }
-                                    var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
-                                    if (inventoryDetailsFiltered.length != 0) {
-                                        inventoryDataList[index].expectedBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
-                                    }
-                                }
-
-                            }
                         } else {
                             var inventoryJson = {
                                 inventoryId: 0,
@@ -2291,11 +2286,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     id: map.get("1")
                                 },
                                 inventoryDate: map.get("14"),
-                                expectedBal: map.get("5"),
                                 adjustmentQty: map.get("7"),
                                 actualQty: map.get("9"),
-                                // batchNo: map.get("6"),
-                                // expiryDate: expiryDate,
                                 active: map.get("13"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("3"),
@@ -2309,36 +2301,6 @@ export default class SupplyPlanComponent extends React.Component {
 
 
                             inventoryDataList.push(inventoryJson);
-                            var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
-                            for (var j = 0; j < inventoryDataListFiltered.length; j++) {
-                                var inventoryId = inventoryDataListFiltered[j].inventoryId;
-                                var index;
-                                if (inventoryId != 0) {
-                                    index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
-                                } else {
-                                    index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
-                                }
-                                if (j == 0) {
-                                    inventoryDataList[index].expectedBal = 0
-                                } else {
-                                    var inventoryDetails = inventoryDataListFiltered.filter(c => c.inventoryDate >= map.get("14"));
-                                    var lastInventoryDate = "";
-                                    for (var id = 0; id < inventoryDetails.length; id++) {
-                                        if (id == 0) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                        if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                    }
-                                    var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
-                                    if (inventoryDetailsFiltered.length != 0) {
-                                        inventoryDataList[index].expectedBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
-                                    }
-                                }
-
-
-                            }
                         }
                     }
                     programJson.inventoryList = inventoryDataList;
