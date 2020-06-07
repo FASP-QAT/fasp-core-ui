@@ -682,8 +682,9 @@
     "static.dashboard.procurementAgentExport": "Procurement Agent Report",
     "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
     "static.user.accessControlText": "Access Control",
-    "static.report.annualshipmentcost":"Annual Shipment Cost",
-    "static.common.reportbase":"Report based on",
-    "static.common.shippingdate":"Shipping Date",
-    "static.common.receivedate":"Receiving Date"
+    "static.budget.budgetamountUSD": "Budget Amount USD",
+    "static.report.annualshipmentcost": "Annual Shipment Cost",
+    "static.common.reportbase": "Report based on",
+    "static.common.shippingdate": "Shipping Date",
+    "static.common.receivedate": "Receiving Date"
 }

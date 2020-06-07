@@ -197,9 +197,12 @@ const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineP
 const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusOverTime'));
 const SupplyPlanFormulas = React.lazy(() => import('./views/SupplyPlan/SupplyPlanFormulas'));
 const ForecastMetrics = React.lazy(() => import('./views/Report/ForecastMetrics'));
+
+const QatProblemPlusActionReport = React.lazy(() => import('./views/Report/QatProblemPlusActionReport'));
 const FunderExport = React.lazy(() => import('./views/Report/FunderExport'));
 const ProcurementAgentExport = React.lazy(() => import('./views/Report/ProcurementAgentExport'));
 const AnnualShipmentCost = React.lazy(() => import('./views/Report/AnnualShipmentCost'));
+
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -398,6 +401,9 @@ const routes = [
   { path: '/report/forecastOverTheTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
   { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
+
+  { path: '/report/qatProblemPlusActionReport', name: i18n.t('static.dashboard.report') + " / " + 'QatProblemPlusActionReport', component: QatProblemPlusActionReport },
+
   { path: '/report/funderExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.funderExport'), component: FunderExport },
   { path: '/report/procurementAgentExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
 

@@ -426,6 +426,11 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange'
                           },
                           {
+                            name: 'QAT problem+action report',
+                            url: '/report/qatProblemPlusActionReport',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
                             name: i18n.t('static.dashboard.funderExport'),
                             url: '/report/funderExport',
                             icon: 'fa fa-exchange'
