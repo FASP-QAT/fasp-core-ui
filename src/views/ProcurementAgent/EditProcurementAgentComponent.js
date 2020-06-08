@@ -20,9 +20,11 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
+        // submittedToApprovedLeadTime: Yup.string()
+        //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
         submittedToApprovedLeadTime: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
+            .required(i18n.t('static.procurementagent.submitToApproveLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         // submittedToApprovedLeadTime: Yup.number()
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
@@ -263,7 +265,7 @@ class EditProcurementAgentComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            min={1}
+                                                            min="0"
                                                             value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                                         />
                                                         {/* </InputGroupAddon> */}

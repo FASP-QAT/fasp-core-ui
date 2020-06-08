@@ -19,11 +19,19 @@ const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext'))
+            .required(i18n.t('static.role.roletext')),
         // businessFunctions: Yup.string()
         //     .required(i18n.t('static.role.businessfunctiontext')),
         // canCreateRole: Yup.string()
         //     .required(i18n.t('static.role.cancreateroletext'))
+        businessFunctions: Yup.array()
+            .min(3, 'Pick at least 3 tags')
+            .of(
+                Yup.object().shape({
+                    label: Yup.string().required(),
+                    value: Yup.string().required(),
+                })
+            ),
     })
 }
 
@@ -209,7 +217,7 @@ class AddRoleComponent extends Component {
                     this.setState({
                         canCreateRoleList
                     })
-                }else{
+                } else {
                     this.setState({
                         message: response.data.messageCode
                     },
@@ -218,30 +226,30 @@ class AddRoleComponent extends Component {
                         })
 
                 }
-                
-               
+
+
             })
-            
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
+
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     render() {
@@ -309,7 +317,8 @@ class AddRoleComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
                                                 <CardBody>

@@ -39,15 +39,15 @@ class DefaultLayout extends Component {
   }
 
   componentDidMount() {
-    // var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
-    // console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
-    // var bfunction = [];
-    // if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
-    //   for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-    //     bfunction.push(curUserBusinessFunctions[i].authority);
-    //   }
-    //   this.setState({ businessFunctions: bfunction });
-    // }
+    var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
+    console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
+    var bfunction = [];
+    if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
+      for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+        bfunction.push(curUserBusinessFunctions[i].authority);
+      }
+      this.setState({ businessFunctions: bfunction });
+    }
 
   }
 
@@ -140,10 +140,12 @@ class DefaultLayout extends Component {
                             url: '/role/listRole',
                             icon: 'fa fa-dot-circle-o'
                           },
+                          // (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
                           {
                             name: i18n.t('static.dashboard.user'),
                             url: '/user/listUser',
-                            icon: 'fa fa-users'
+                            icon: 'fa fa-users',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CREATE_USER') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.language'),
@@ -382,7 +384,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: "Supply Plan",
+                            name: i18n.t('static.dashboard.supplyPlan'),
                             url: '/supplyPlan',
                             icon: 'fa fa-calculator'
                           },
@@ -454,12 +456,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text'
-                          } ,
+                          },
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
                             icon: 'fa fa-exchange'
-                          } ,
+                          },
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
@@ -576,9 +578,15 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={props => (
-                          <route.component {...props} />
-                        )} />
+                        render={props =>
+                          AuthenticationService.authenticatedRoute(route.path) ?
+                            (
+                              <route.component {...props} />
+                            ) : (
+                              <Redirect to={{ pathname: "/login/static.accessDenied" }} />
+                            )
+                        }
+                      />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/login" />

@@ -159,12 +159,18 @@ class ApplicationDashboard extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
+    this.hideFirstComponent = this.hideFirstComponent.bind(this);
 
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
     };
   }
+  hideFirstComponent() {
+    setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
+    }, 8000);
+}
 
   toggle() {
     this.setState({
@@ -177,6 +183,10 @@ class ApplicationDashboard extends Component {
       radioSelected: radioSelected,
     });
   }
+  componentDidMount() {
+    
+    this.hideFirstComponent();
+  }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
@@ -184,7 +194,7 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-        <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
+        <h5  className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
         <Row>
           <Col md="12">
             <Card>

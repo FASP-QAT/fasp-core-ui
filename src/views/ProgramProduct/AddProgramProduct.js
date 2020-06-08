@@ -30,17 +30,20 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        reorderFrequencyInMonths: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        reorderFrequencyInMonths: Yup.string()
+            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        minMonthsOfStock: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        minMonthsOfStock: Yup.string()
+            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText')),
         localProcurementLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter local procurement lead time').min(0, i18n.t('static.procurementUnit.validValueText'))
     })
 }
+
 
 const validate = (getValidationSchema) => {
 
@@ -594,10 +597,10 @@ class AddprogramPlanningUnit extends Component {
                                                     <td>
                                                         {this.state.rows[idx].planningUnit.label.label_en}
                                                     </td>
-                                                    <td  className="text-right">
+                                                    <td className="text-right">
                                                         {this.state.rows[idx].reorderFrequencyInMonths}
                                                     </td>
-                                                    <td  className="text-right">
+                                                    <td className="text-right">
                                                         {this.state.rows[idx].minMonthsOfStock}
                                                     </td>
                                                     <td>

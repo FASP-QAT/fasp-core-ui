@@ -18,6 +18,7 @@ import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const initialValues = {
     programId: ''
@@ -59,7 +60,8 @@ export default class ExportProgram extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            programList: []
+            programList: [],
+            message: '',
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -178,49 +180,51 @@ export default class ExportProgram extends Component {
     render() {
         return (
             <>
-               
-                    <Card>
-                        <Formik
-                            initialValues={initialValues}
-                            render={
-                                ({
-                                    errors,
-                                    touched,
-                                    handleChange,
-                                    handleBlur,
-                                }) => (
-                                        <Form noValidate name='simpleForm'>
-                                            <CardHeader>
-                                                <strong>{i18n.t('static.program.export')}</strong>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <FormGroup className="col-md-4" >
-                                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                    <Select
-                                                        bsSize="sm"
-                                                        valid={!errors.programId}
-                                                        invalid={touched.programId && !!errors.programId}
-                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                        onBlur={handleBlur} name="programId" id="programId"
-                                                        multi
-                                                        options={this.state.programList}
-                                                        value={this.state.programId}
-                                                    />
-                                                    <FormFeedback>{errors.programId}</FormFeedback>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <Card>
+                    <Formik
+                        initialValues={initialValues}
+                        render={
+                            ({
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                            }) => (
+                                    <Form noValidate name='simpleForm'>
+                                        <CardHeader>
+                                            <strong>{i18n.t('static.program.export')}</strong>
+                                        </CardHeader>
+                                        <CardBody>
+                                            <FormGroup className="col-md-4" >
+                                                <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                                <Select
+                                                    bsSize="sm"
+                                                    valid={!errors.programId}
+                                                    invalid={touched.programId && !!errors.programId}
+                                                    onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                    onBlur={handleBlur} name="programId" id="programId"
+                                                    multi
+                                                    options={this.state.programList}
+                                                    value={this.state.programId}
+                                                />
+                                                <FormFeedback>{errors.programId}</FormFeedback>
+                                            </FormGroup>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                &nbsp;
                                                 </FormGroup>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                    &nbsp;
-                                                </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
-                    </Card>
-               
+                                        </CardFooter>
+                                    </Form>
+                                )} />
+                </Card>
+
             </>
         )
     }
