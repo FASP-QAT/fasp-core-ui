@@ -391,33 +391,61 @@ class AuthenticationService {
 
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
-                var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-                console.log("bfunction---", bfunction);
-                switch (route) {
-                    case "/user/addUser":
-                        if (bfunction.includes("ROLE_BF_CREATE_USER")) {
-                            return true;
-                        }
-                        break;
-                    case "/role/addRole":
-                        if (bfunction.includes("ROLE_BF_CREATE_ROLE")) {
-                            return true;
-                        }
-                        break;
-                    case "/ApplicationDashboard/:color/:message":
-                        if (bfunction.includes("ROLE_BF_CREATE_USER")) {
-                            return true;
-                        }
-                        break;
-                    default:
-                        console.log("Inside default-");
-                        return false;
-                }
+            if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+                return false;
             }
-            return false;
+
+            var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
+            console.log("bfunction---", bfunction);
+            switch (route) {
+                case "/user/addUser":
+                    if (bfunction.includes("ROLE_BF_CREATE_USER")) {
+                        return true;
+                    }
+                    break;
+                case "/role/addRole":
+                    if (bfunction.includes("ROLE_BF_CREATE_ROLE")) {
+                        return true;
+                    }
+                    break;
+                case "/ApplicationDashboard/:color/:message":
+                    if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
+                        return true;
+                    }
+                    break;
+                case "/ApplicationDashboard":
+                    if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockStatusMatrix":
+                    if (bfunction.includes("ROLE_BF_VIEW_STOCK_STATUS_MATRIX")) {
+                        return true;
+                    }
+                    break;
+                case "/program/downloadProgram":
+                    if (bfunction.includes("ROLE_BF_VIEW_STOCK_STATUS_MATRIX")) {
+                        return true;
+                    }
+                    break;
+                case "/dashboard/:message":
+                    if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
+                        return true;
+                    }
+                    break;
+                case "/logout/:message":
+                    return true;
+                    break;
+                case "/logout":
+                    return true;
+                    break;
+                default:
+                    console.log("Inside default-");
+                    return false;
+            }
         }
         return false;
+
     }
 
 }
