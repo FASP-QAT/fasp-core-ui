@@ -308,7 +308,7 @@ class ForecastMetrics extends Component {
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-    elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100) + '%', elt.months]);
+    elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100 ) + '%', elt.months]);
     let startY = this.state.planningUnitLabels.length > 2 ? 350 : 200
     let content = {
       margin: { top: 80 },
@@ -990,7 +990,7 @@ class ForecastMetrics extends Component {
                   </div>
                 </Col>
               </Form>
-              <Col md="12 pl-0">
+              <Col md="12 pl-0 mt-reporttabl">
 
                 <div className="row">
                   <div className="col-md-12">
@@ -1007,7 +1007,7 @@ class ForecastMetrics extends Component {
                       >
                         {
                           props => (
-                            <div className="TableCust">
+                            <div className="TableCust ">
                               <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                 <SearchBar {...props.searchProps} />
                                 <ClearSearchButton {...props.searchProps} /></div>
