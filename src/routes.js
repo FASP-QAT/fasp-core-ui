@@ -202,11 +202,23 @@ const QatProblemPlusActionReport = React.lazy(() => import('./views/Report/QatPr
 const FunderExport = React.lazy(() => import('./views/Report/FunderExport'));
 const ProcurementAgentExport = React.lazy(() => import('./views/Report/ProcurementAgentExport'));
 const AnnualShipmentCost = React.lazy(() => import('./views/Report/AnnualShipmentCost'));
+const SupplyPlanVersionAndReview = React.lazy(() => import('./views/Report/SupplyPlanVersionAndReview'));
+const EditSupplyPlanStatus= React.lazy(() => import('./views/Report/EditSupplyPlanStatus'));
 
+
+const PipelineProgramList = React.lazy(() => import('./views/Pipeline/PipelineProgramList'));
+
+const PlanningUnitListNegativeInventory=React.lazy(() => import('./views/Pipeline/PlanningUnitListNegativeInventory'));
+const CostOfInventoryReport=React.lazy(() => import('./views/Report/CostOfInventory'));
+const InventoryTurnsReport=React.lazy(() => import('./views/Report/InventoryTurns'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/pipeline/pieplineProgramSetup', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
+  { path: '/report/inventoryTurns',name: 'Report  / Inventory Turns',component: InventoryTurnsReport },
+  { path: '/report/costOfInventory',name: 'Report  /  Cost Of Inventory',component: CostOfInventoryReport },
+  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'PlanningUnit List',component: PlanningUnitListNegativeInventory },
+  { path: '/pipeline/pieplineProgramList', name: 'Program List', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
@@ -223,7 +235,7 @@ const routes = [
   { path: '/realm/addrealm', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realm') }), component: AddRealm },
   { path: '/realm/realmlist', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.realm') }), component: RealmList },
   { path: '/realm/updateRealm/:realmId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.realm') }), component: EditRealm },
-  { path: '/realm/realmlist/:message', component: RealmList },
+  { path: '/realm/realmlist/:color/:message', component: RealmList },
 
   { path: '/product/editProduct/:productId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.product.product') }), component: EditProdct },
   { path: '/product/listProduct', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.product.product') }), component: ListProdct },
@@ -244,25 +256,29 @@ const routes = [
 
   { path: '/budget/addBudget', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.budget') }), component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.budget') }), component: ListBudgetComponent },
-  { path: '/budget/listBudget/:message', component: ListBudgetComponent },
+  // { path: '/budget/listBudget/:message', component: ListBudgetComponent },
+  { path: '/budget/listBudget/:color/:message', component: ListBudgetComponent },
   { path: '/budget/editBudget/:budgetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.budget') }), component: EditBudgetComponent },
 
   { path: '/', exact: true, name: i18n.t('static.home') },
 
   { path: '/healthArea/addHealthArea', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healtharea') }), component: AddHealthArea },
-  { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  { path: '/healthArea/listHealthArea/:color/:message', component: HealthAreaList },
   { path: '/healthArea/listHealthArea', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: HealthAreaList },
   { path: '/healthArea/editHealthArea/:healthAreaId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healtharea') }), component: EditHealthArea },
 
   { path: '/organisation/addOrganisation', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.organisation.organisation') }), component: AddOrganisation },
-  { path: '/organisation/listOrganisation/:message', component: OrganisationList },
+  // { path: '/organisation/listOrganisation/:message', component: OrganisationList },
+  { path: '/organisation/listOrganisation/:color/:message', component: OrganisationList },
   { path: '/organisation/listOrganisation', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisation.organisation') }), component: OrganisationList },
   { path: '/organisation/editOrganisation/:organisationId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisation.organisation') }), component: EditOrganisation },
 
   { path: '/fundingSource/addFundingSource', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.fundingsource') }), component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.fundingsource') }), component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.fundingsource') }), component: EditFundingSource },
-  { path: '/fundingSource/listFundingSource/:message', component: ListFundingSource },
+  // { path: '/fundingSource/listFundingSource/:message', component: ListFundingSource },
+  { path: '/fundingSource/listFundingSource/:color/:message', component: ListFundingSource },
 
   { path: '/subFundingSource/addSubFundingSource', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: AddSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: ListSubFundingSource },
@@ -270,7 +286,8 @@ const routes = [
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
 
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-  { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
+  // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
+  { path: '/ApplicationDashboard/:color/:message', component: ApplicationDashboard },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
@@ -291,12 +308,16 @@ const routes = [
   { path: '/supplier/addSupplier', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.supplier') }), component: AddSupplier },
   { path: '/supplier/listSupplier', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.supplier') }), component: ListSupplier },
   { path: '/supplier/editSupplier/:supplierId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.supplier') }), component: EditSupplier },
-  { path: '/supplier/listSupplier/:message', component: ListSupplier },
+  // { path: '/supplier/listSupplier/:message', component: ListSupplier },
+  { path: '/supplier/listSupplier/:color/:message', component: ListSupplier },
+  
+  
 
   { path: '/region/addRegion', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.region') }), component: AddRegion },
   { path: '/region/listRegion', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.region') }), component: ListRegion },
   { path: '/region/editRegion/:regionId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.region') }), component: EditRegion },
   { path: '/region/listRegion/:message', component: ListRegion },
+  
 
   { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: i18n.t('static.dashboard.realmcountrylist'), component: ListRealmCountry },
@@ -350,12 +371,14 @@ const routes = [
 
   { path: '/dataSourceType/addDataSourceType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.datasourcetype') }), component: AddDataSourceType },
   { path: '/dataSourceType/listDataSourceType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.datasourcetype') }), component: ListDataSourceType },
-  { path: '/dataSourceType/listDataSourceType/:message', component: ListDataSourceType },
+  // { path: '/dataSourceType/listDataSourceType/:message', component: ListDataSourceType },
+  { path: '/dataSourceType/listDataSourceType/:color/:message', component: ListDataSourceType },
   { path: '/dataSourceType/editDataSourceType/:dataSourceTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.datasourcetype') }), component: EditDataSourceType },
 
   { path: '/dataSource/addDataSource', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.datasource') }), component: AddDataSource },
   { path: '/dataSource/listDataSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.datasource') }), component: ListDataSource },
-  { path: '/dataSource/listDataSource/:message', component: ListDataSource },
+  // { path: '/dataSource/listDataSource/:message', component: ListDataSource },
+  { path: '/dataSource/listDataSource/:color/:message', component: ListDataSource },
   { path: '/dataSource/editDataSource/:dataSourceId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.datasource') }), component: EditDataSource },
 
   { path: '/currency/addCurrency', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.currency') }), component: AddCurrency },
@@ -367,7 +390,7 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlan', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.supplyplan'), component: SupplyPlan },
   { path: '/supplyPlanFormulas', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 
@@ -408,7 +431,11 @@ const routes = [
   { path: '/report/procurementAgentExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
 
   { path: '/report/annualShipmentCost', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.annualshipmentcost'), component: AnnualShipmentCost },
- 
+
+  { path: '/report/supplyPlanVersionAndReview', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
+  { path: '/report/editStatus/:programId/:versionId', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: EditSupplyPlanStatus },
+  { path: '/report/supplyPlanVersionAndReview/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
+
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

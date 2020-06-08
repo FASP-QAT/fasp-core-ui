@@ -76,6 +76,13 @@ class EditRoleComponent extends Component {
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     Capitalize(str) {
@@ -156,13 +163,22 @@ class EditRoleComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
-                var businessFunctionList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
+                if (response.status == 200) {
+                    var businessFunctionList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        businessFunctionList
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
-                this.setState({
-                    businessFunctionList
-                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -185,13 +201,22 @@ class EditRoleComponent extends Component {
             );
         UserService.getRoleList()
             .then(response => {
-                var canCreateRoleList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                if (response.status == 200) {
+                    var canCreateRoleList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        canCreateRoleList
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
-                this.setState({
-                    canCreateRoleList
-                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -215,12 +240,21 @@ class EditRoleComponent extends Component {
 
         UserService.getRoleById(this.props.match.params.roleId)
             .then(response => {
-                this.setState({
-                    role: response.data
-                },
-                    () => {
-                        console.log("ROLE****************> ", this.state.role)
-                    });
+                if (response.status == 200) {
+                    this.setState({
+                        role: response.data
+                    },
+                        () => {
+                            console.log("ROLE****************> ", this.state.role)
+                        });
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -246,7 +280,7 @@ class EditRoleComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -265,11 +299,14 @@ class EditRoleComponent extends Component {
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/role/listRole/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
 
                                         })
@@ -384,7 +421,7 @@ class EditRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/role/listRole/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         UserService.getRoleById(this.props.match.params.roleId)
@@ -393,6 +430,7 @@ class EditRoleComponent extends Component {
                     role: response.data
                 });
             })
+
     }
 }
 

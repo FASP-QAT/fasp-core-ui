@@ -64,7 +64,13 @@ class AddSupplierComponent extends Component {
     this.dataChange = this.dataChange.bind(this);
     this.Capitalize = this.Capitalize.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
+  hideSecondComponent() {
+    setTimeout(function () {
+        document.getElementById('div2').style.display = 'none';
+    }, 8000);
+}
   Capitalize(str) {
     if (str != null && str != "") {
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -135,7 +141,7 @@ class AddSupplierComponent extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-        <h5>{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -151,11 +157,14 @@ class AddSupplierComponent extends Component {
                     .then(response => {
                       console.log("Response->", response);
                       if (response.status == 200) {
-                        this.props.history.push(`/supplier/listSupplier/` + i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/supplier/listSupplier/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
-                          message: response.data.messagCodee
-                        })
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                       }
                     })
                 }}
@@ -232,7 +241,7 @@ class AddSupplierComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/supplier/listSupplier/` + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/supplier/listSupplier/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {

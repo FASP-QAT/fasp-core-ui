@@ -479,7 +479,8 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
-  padding: 5px !important;
+  padding: 6px 4px 5px 4px!important;
+  // padding: 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -711,27 +712,32 @@ label.arrow_label:after {
     margin-left: 0px !important;}
 
 //  table dropdown css removed sorting in all master consistent to jexcel
-.dropdown-item {
+.react-bs-table-sizePerPage-dropdown .dropdown-item {
     border-bottom: none;
-}.dropdown-menu {border-radius: 0px !important;}
+}.react-bs-table-sizePerPage-dropdown .dropdown-menu {border-radius: 0px !important;}
 .jexcel_pagination_dropdown option {
   color: #205493 !important;}
-.dropdown-menu {
+.react-bs-table-sizePerPage-dropdown .dropdown-menu {
   text-align: center !important;
 }
-.dropdown-item:hover {
+.react-bs-table-sizePerPage-dropdown .dropdown-item:hover {
   background-color: #ef6e12e8;
   
 }
-.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a:hover {color: #fff !important;}
-.dropdown-menu.show{width:50px !important;z-index: 1000!important;}
-.dropdown-menu { min-width: 4rem !important; margin-left: 2px;top: auto !important; z-index: 1000;}
-.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a {padding: 8px 35px 8px 15px;}
+.react-bs-table-sizePerPage-dropdown .dropdown-item a:hover{color: #fff;}
+
+.react-bs-table-sizePerPage-dropdown .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a:hover {color: #fff !important;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu.show{width:50px !important;z-index: 1000!important;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu { min-width: 4rem !important; margin-left: 2px;top: auto !important; z-index: 1000;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a {padding: 8px 28px 8px 19px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item:active{ background-color: #ef6e12e8;}
 .TableCust span.btn-default{padding-left: 10px !important;}
-#pageDropDown span{padding-left: 7px;}
+.react-bs-table-sizePerPage-dropdown  #pageDropDown span{padding-left: 7px;}
 // loader css
 .spinner-border{color:#20a8d8; height: 2.5rem;width: 2.5rem;}
+
+// margin-left ml-120 procurement agent radio
+.ml-12 {margin-left: 120px;}
 
 // tableAlignThtd
 // user
@@ -1071,6 +1077,7 @@ a:hover {
 h5,
 .h5 {
   font-size: 14px !important;
+  margin-top: 5px;
 }
 
 .frgtpass-heading {
@@ -1646,16 +1653,16 @@ input::placeholder {
   left: 7px;
 }
 .progresdatatext2 {
-  left: 19%;
+  left: 23%;
 }
 .progresdatatext3 {
-  left: 37%;
+  left: 46%;
 }
 .progresdatatext4 {
-  left: 55.46%;
+  left: 71.46%;
 }
 .progresdatatext5 {
-  left: 76%;
+  left: 94%;
 }
 .progresdatatext6 {
   left: 94.79%;
@@ -1815,7 +1822,7 @@ input::placeholder {
 
 .background-red {
   // background-color: red;
-  background-color: #fac8c8;
+  background-color: #fac8c8!important;
 }
 
 .supplyplan-larrow {
@@ -2168,4 +2175,14 @@ text-overflow: ellipsis;
 
 .ml-field{
   margin-left: -15px;
+}
+.mt-reporttable{
+  margin-top: -4%;
+}
+h6{
+  margin-top:5px;
+}
+
+.custom-file-input {
+  cursor: pointer;
 }

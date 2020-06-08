@@ -35,6 +35,7 @@ const validationSchema = function (values, t) {
         gtin: Yup.string()
             .required(i18n.t('static.mapProcurementUnit.validGtinText'))
             .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
+            .min(14, i18n.t('static.procurementUnit.validMinValueText'))
             .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
         approvedToShippedLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))

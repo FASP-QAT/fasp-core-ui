@@ -487,7 +487,6 @@
     "static.masterDataSync.syncFailed": "La synchronisation des données de base a échoué.Veuillez réessayer.",
     "static.programproduct.programproduct": "Produit du programme",
     "static.unit.dimensiontext": "Veuillez sélectionner une dimension",
-    "static.supplyplan.supplyplan": "Plan d'approvisionnement / Plan d'approvisionnement",
     "static.dashboard.masterdatasync": "Synchronisation des données de base",
     "static.language.languageCodemax3digittext": "Deux caractères maximum sont autorisés.",
     "static.healtharea.realm": "Domaine",

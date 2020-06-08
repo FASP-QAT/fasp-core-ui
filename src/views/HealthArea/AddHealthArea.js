@@ -84,6 +84,7 @@ export default class AddHealthAreaComponent extends Component {
     this.updateFieldData = this.updateFieldData.bind(this);
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
 
   dataChange(event) {
@@ -136,10 +137,22 @@ export default class AddHealthAreaComponent extends Component {
     AuthenticationService.setupAxiosInterceptors();
     CountryService.getCountryListAll()
       .then(response => {
-        console.log("country list---", response.data);
-        this.setState({
-          countries: response.data
-        })
+        if (response.status == 200) {
+          console.log("country list---", response.data);
+          this.setState({
+            countries: response.data
+          })
+        }
+        else {
+
+          this.setState({
+            message: response.data.messageCode
+          },
+            () => {
+              this.hideSecondComponent();
+            })
+        }
+
       })
 
     UserService.getRealmList()
@@ -151,6 +164,13 @@ export default class AddHealthAreaComponent extends Component {
       })
 
   }
+
+  hideSecondComponent() {
+    setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
+    }, 8000);
+  }
+
   updateFieldData(value) {
     let { healthArea } = this.state;
     this.setState({ realmCountryId: value });
@@ -215,7 +235,7 @@ export default class AddHealthAreaComponent extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-        <h5>{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -230,11 +250,14 @@ export default class AddHealthAreaComponent extends Component {
                   HealthAreaService.addHealthArea(this.state.healthArea)
                     .then(response => {
                       if (response.status == 200) {
-                        this.props.history.push(`/healthArea/listHealthArea/` + i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
                           message: response.data.messageCode
-                        })
+                        },
+                          () => {
+                            this.hideSecondComponent();
+                          })
                       }
                     })
 
@@ -333,7 +356,7 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   cancelClicked() {
-    this.props.history.push(`/healthArea/listHealthArea/` + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/healthArea/listHealthArea/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {

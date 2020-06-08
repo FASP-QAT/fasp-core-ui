@@ -122,11 +122,13 @@ export default class PipelineProgramDataStepThree extends Component {
         return (
             <>
                 <Formik
-                    initialValues={initialValuesThree}
+                    enableReinitialize={true}
+                    initialValues={{ healthAreaId: this.props.items.program.healthArea.id }}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        console.log("in success--");
-                        this.props.finishedStepThree && this.props.finishedStepThree();
+                        // console.log("in success--");
+                        // this.props.finishedStepThree && this.props.finishedStepThree();
+                        this.props.endProgramInfoStepTwo && this.props.endProgramInfoStepTwo();
 
                     }}
                     render={
@@ -145,7 +147,7 @@ export default class PipelineProgramDataStepThree extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.healthAreaId}
+                                            valid={!errors.healthAreaId && this.props.items.program.healthArea.id != ''}
                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
                                             onBlur={handleBlur}
                                             bsSize="sm"
@@ -153,17 +155,18 @@ export default class PipelineProgramDataStepThree extends Component {
                                             name="healthAreaId"
                                             id="healthAreaId"
                                             className="col-md-6"
-                                        // onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            value={this.props.items.program.healthArea.id}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         >
-                                            {/* <option value="">{i18n.t('static.common.select')}</option> */}
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {realmHealthArea}
                                         </Input>
                                         <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllThree(setTouched, errors)}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </Form>
