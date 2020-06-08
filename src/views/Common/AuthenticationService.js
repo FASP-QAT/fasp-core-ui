@@ -405,9 +405,14 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    default: 
-                    console.log("Inside default-");
-                    return false;
+                    case "/ApplicationDashboard/:color/:message":
+                        if (bfunction.includes("ROLE_BF_CREATE_USER")) {
+                            return true;
+                        }
+                        break;
+                    default:
+                        console.log("Inside default-");
+                        return false;
                 }
             }
             return false;
