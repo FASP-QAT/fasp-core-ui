@@ -104,6 +104,11 @@ class ProgramService {
         return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}`, {}
         );
     }
+    
+    getVersionTypeList(){
+        return axios.get(`${API_URL}/api/versionType`, {}
+        );
+    }
 
 }
 export default new ProgramService()

@@ -25,6 +25,7 @@ export default class PlanningUnitListComponent extends Component {
             selSource: [],
             realmId: '',
             realms: [],
+            loading: true
 
         }
         this.editPlanningUnit = this.editPlanningUnit.bind(this);
@@ -75,7 +76,7 @@ export default class PlanningUnitListComponent extends Component {
             // console.log(response.data)
             this.setState({
                 forecastingUnits: response.data,
-
+                loading: false
             })
         })
 
@@ -302,20 +303,35 @@ export default class PlanningUnitListComponent extends Component {
                             {
                                 props => (
                                     <div className="TableCust PlanningUnitlistAlignThtd">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
+                                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                            <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                <SearchBar {...props.searchProps} />
+                                                <ClearSearchButton {...props.searchProps} />
+                                            </div>
+                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                pagination={paginationFactory(options)}
+                                                rowEvents={{
+                                                    onClick: (e, row, rowIndex) => {
+                                                        this.editPlanningUnit(row);
+                                                    }
+                                                }}
+                                                {...props.baseProps}
+                                            />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(options)}
-                                            rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
-                                                    this.editPlanningUnit(row);
-                                                }
-                                            }}
-                                            {...props.baseProps}
-                                        />
+
+                                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                <div class="align-items-center">
+                                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                                    <div class="spinner-border blue ml-4" role="status">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 )
                             }
                         </ToolkitProvider>

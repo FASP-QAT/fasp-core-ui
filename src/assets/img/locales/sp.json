@@ -490,7 +490,6 @@
     "static.masterDataSync.syncFailed": "Los datos maestros sincronizados fallaron.Inténtalo de nuevo.",
     "static.programproduct.programproduct": "Producto del programa",
     "static.unit.dimensiontext": "Por favor seleccione dimensión",
-    "static.supplyplan.supplyplan": "Plan de suministro / Plan de suministro",
     "static.dashboard.masterdatasync": "Sincronización de datos maestros",
     "static.language.languageCodemax3digittext": "Se permiten un máximo de dos caracteres.",
     "static.healtharea.realm": "Reino",

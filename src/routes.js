@@ -244,7 +244,8 @@ const routes = [
 
   { path: '/program/addProgram', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.program') }), component: AddProgram },
   { path: '/program/listProgram', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.program') }), component: Programs },
-  { path: '/program/listProgram/:message', component: Programs },
+  // { path: '/program/listProgram/:message', component: Programs },
+  { path: '/program/listProgram/:color/:message', component: Programs },
   { path: '/program/editProgram/:programId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.program') }), component: EditProgram },
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
@@ -302,7 +303,8 @@ const routes = [
 
   { path: '/tracerCategory/addTracerCategory', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.tracercategory') }), component: AddTracerCategory },
   { path: '/tracerCategory/listTracerCategory', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.tracercategory') }), component: ListTracerCategory },
-  { path: '/tracerCategory/listTracerCategory/:message', component: ListTracerCategory },
+  // { path: '/tracerCategory/listTracerCategory/:message', component: ListTracerCategory },
+  { path: '/tracerCategory/listTracerCategory/:color/:message', component: ListTracerCategory },
   { path: '/tracerCategory/editTracerCategory/:tracerCategoryId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.tracercategory') }), component: EditTracerCategory },
 
   { path: '/supplier/addSupplier', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.supplier') }), component: AddSupplier },
@@ -390,7 +392,7 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlan', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.supplyplan'), component: SupplyPlan },
   { path: '/supplyPlanFormulas', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 

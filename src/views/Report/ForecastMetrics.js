@@ -267,7 +267,7 @@ class ForecastMetrics extends Component {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.dashboard.forecastmetrics'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -300,16 +300,15 @@ class ForecastMetrics extends Component {
 
     doc.setFontSize(8);
 
-    const title = "Consumption Report";
-
+  
     var height = doc.internal.pageSize.height;
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.dashboard.program'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-    elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100 ) + '%', elt.months]);
-    let startY = this.state.planningUnitLabels.length > 2 ? 350 : 200
+    elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100) + '%', elt.months]);
+    let startY = this.state.planningUnitLabels.length > 15 ? 250 : 200
     let content = {
       margin: { top: 80 },
       startY: startY,
