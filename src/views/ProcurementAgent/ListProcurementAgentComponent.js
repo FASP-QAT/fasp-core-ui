@@ -23,7 +23,8 @@ class ListProcurementAgentComponent extends Component {
             procurementAgentList: [],
             message: '',
             selProcurementAgent: [],
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -163,7 +164,7 @@ class ListProcurementAgentComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({ message: response.data.messageCode })
@@ -347,7 +348,7 @@ class ListProcurementAgentComponent extends Component {
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
@@ -409,6 +410,17 @@ class ListProcurementAgentComponent extends Component {
                         </ToolkitProvider>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
