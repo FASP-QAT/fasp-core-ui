@@ -119,6 +119,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_TRANSLATION') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.label.labelTranslations'),
@@ -138,6 +139,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.role'),
@@ -186,6 +188,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.realm'),
                             icon: 'fa fa-list',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APP_REALM_MASTERS') ? false : true) },
                             children: [{
                               name: i18n.t('static.dashboard.realm'),
                               url: '/realm/realmlist',
@@ -209,6 +212,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.datasourcetype'),
@@ -276,6 +280,7 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.programmaster'),
                         url: '/program',
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_MASTERS') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.program'),

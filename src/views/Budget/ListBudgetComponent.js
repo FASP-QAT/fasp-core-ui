@@ -92,11 +92,13 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    var budgetId = budget.budgetId
-    this.props.history.push({
-      pathname: `/budget/editBudget/${budgetId}`,
-      // state: { budget }
-    });
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
+      var budgetId = budget.budgetId
+      this.props.history.push({
+        pathname: `/budget/editBudget/${budgetId}`,
+        // state: { budget }
+      });
+    }
   }
 
   addBudget(budget) {
@@ -380,14 +382,14 @@ class ListBudgetComponent extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-       <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader className="mb-md-3 pb-lg-1">
             <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
+              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </CardHeader>

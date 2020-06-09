@@ -394,13 +394,20 @@ class AuthenticationService {
             if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 return false;
             }
-
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-            console.log("my result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"))
-            console.log("bfunction---", bfunction);
             switch (route) {
                 case "/user/addUser":
-                    if (bfunction.includes("ROLE_BF_CREATE_USER")) {
+                    if (bfunction.includes("ROLE_BF_ADD_USER")) {
+                        return true;
+                    }
+                    break;
+                case "/user/editUser/:userId":
+                    if (bfunction.includes("ROLE_BF_EDIT_USER")) {
+                        return true;
+                    }
+                    break;
+                case "/user/accessControl":
+                    if (bfunction.includes("ROLE_BF_ACCESS_CONTROL")) {
                         return true;
                     }
                     break;
@@ -415,9 +422,24 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/role/editRole/:roleId":
+                    if (bfunction.includes("ROLE_BF_EDIT_ROLE")) {
+                        return true;
+                    }
+                    break;
                 case "/role/listRole":
                 case "/role/listRole/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_ROLE")) {
+                        return true;
+                    }
+                    break;
+                case "/language/addLanguage":
+                    if (bfunction.includes("ROLE_BF_ADD_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
+                case "/language/editLanguage/:languageId":
+                    if (bfunction.includes("ROLE_BF_EDIT_LANGUAGE")) {
                         return true;
                     }
                     break;
@@ -427,9 +449,29 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/country/addCountry":
+                    if (bfunction.includes("ROLE_BF_ADD_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/country/editCountry/:countryId":
+                    if (bfunction.includes("ROLE_BF_EDIT_COUNTRY")) {
+                        return true;
+                    }
+                    break;
                 case "/country/listCountry":
                 case "/country/listCountry/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/currency/addCurrency":
+                    if (bfunction.includes("ROLE_BF_ADD_CURRENCY")) {
+                        return true;
+                    }
+                    break;
+                case "/currency/editCurrency/:currencyId":
+                    if (bfunction.includes("ROLE_BF_EDIT_CURRENCY")) {
                         return true;
                     }
                     break;
@@ -439,15 +481,45 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/diamension/AddDiamension":
+                    if (bfunction.includes("ROLE_BF_ADD_DIAMENSIONS")) {
+                        return true;
+                    }
+                    break;
+                case "/diamension/editDiamension/:dimensionId":
+                    if (bfunction.includes("ROLE_BF_EDIT_DIAMENSIONS")) {
+                        return true;
+                    }
+                    break;
                 case "/diamension/diamensionlist":
                 case "/diamension/diamensionlist/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_DIAMENSIONS")) {
                         return true;
                     }
                     break;
+                case "/unit/addUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_UNITS")) {
+                        return true;
+                    }
+                    break;
+                case "/unit/editUnit/:unitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_UNITS")) {
+                        return true;
+                    }
+                    break;
                 case "/unit/listUnit":
                 case "/unit/listUnit/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_UNITS")) {
+                        return true;
+                    }
+                    break;
+                case "/realm/addrealm":
+                    if (bfunction.includes("ROLE_BF_ADD_REALMS")) {
+                        return true;
+                    }
+                    break;
+                case "/realm/updateRealm/:realmId":
+                    if (bfunction.includes("ROLE_BF_EDIT_REALMS")) {
                         return true;
                     }
                     break;
@@ -468,9 +540,29 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/dataSourceType/addDataSourceType":
+                    if (bfunction.includes("ROLE_BF_ADD_DATASOURCE_TYPE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSourceType/editDataSourceType/:dataSourceTypeId":
+                    if (bfunction.includes("ROLE_BF_EDIT_DATASOURCE_TYPE")) {
+                        return true;
+                    }
+                    break;
                 case "/dataSourceType/listDataSourceType":
                 case "/dataSourceType/listDataSourceType/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_DATASOURCE_TYPE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSource/addDataSource":
+                    if (bfunction.includes("ROLE_BF_ADD_DATASOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSource/editDataSource/:dataSourceId":
+                    if (bfunction.includes("ROLE_BF_EDIT_DATASOURCE")) {
                         return true;
                     }
                     break;
@@ -480,9 +572,29 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/fundingSource/addFundingSource":
+                    if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/fundingSource/editFundingSource/:fundingSourceId":
+                    if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
+                        return true;
+                    }
+                    break;
                 case "/fundingSource/listFundingSource":
                 case "/fundingSource/listFundingSource/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/addProcurementAgent":
+                    if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_AGENT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/editProcurementAgent/:procurementAgentId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_AGENT")) {
                         return true;
                     }
                     break;
@@ -492,9 +604,29 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/budget/addBudget":
+                    if (bfunction.includes("ROLE_BF_ADD_BUDGET")) {
+                        return true;
+                    }
+                    break;
+                case "/budget/editBudget/:budgetId":
+                    if (bfunction.includes("ROLE_BF_EDIT_BUDGET")) {
+                        return true;
+                    }
+                    break;
                 case "/budget/listBudget":
                 case "/budget/listBudget/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_BUDGET")) {
+                        return true;
+                    }
+                    break;
+                case "/supplier/addSupplier":
+                    if (bfunction.includes("ROLE_BF_ADD_SUPPLIER")) {
+                        return true;
+                    }
+                    break;
+                case "/supplier/editSupplier/:supplierId":
+                    if (bfunction.includes("ROLE_BF_EDIT_SUPPLIER")) {
                         return true;
                     }
                     break;
@@ -510,9 +642,29 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/healthArea/addHealthArea":
+                    if (bfunction.includes("ROLE_BF_ADD_HEALTHAREA")) {
+                        return true;
+                    }
+                    break;
+                case "/healthArea/editHealthArea/:healthAreaId":
+                    if (bfunction.includes("ROLE_BF_EDIT_HEALTHAREA")) {
+                        return true;
+                    }
+                    break;
                 case "/healthArea/listHealthArea":
                 case "/healthArea/listHealthArea/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_HEALTHAREA")) {
+                        return true;
+                    }
+                    break;
+                case "/organisation/addOrganisation":
+                    if (bfunction.includes("ROLE_BF_ADD_ORGANISATION")) {
+                        return true;
+                    }
+                    break;
+                case "/organisation/editOrganisation/:organisationId":
+                    if (bfunction.includes("ROLE_BF_EDIT_ORGANISATION")) {
                         return true;
                     }
                     break;
@@ -522,9 +674,29 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/program/addProgram":
+                    if (bfunction.includes("ROLE_BF_ADD_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/program/editProgram/:programId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
+                        return true;
+                    }
+                    break;
                 case "/program/listProgram":
                 case "/program/listProgram/:message":
                     if (bfunction.includes("ROLE_BF_LIST_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/tracerCategory/addTracerCategory":
+                    if (bfunction.includes("ROLE_BF_ADD_TRACER_CATEGORY")) {
+                        return true;
+                    }
+                    break;
+                case "/tracerCategory/editTracerCategory/:tracerCategoryId":
+                    if (bfunction.includes("ROLE_BF_EDIT_TRACER_CATEGORY")) {
                         return true;
                     }
                     break;
@@ -539,10 +711,30 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/forecastingUnit/addForecastingUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_FORECASTING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/forecastingUnit/editForecastingUnit/:forecastingUnitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_FORECASTING_UNIT")) {
+                        return true;
+                    }
+                    break;
                 case "/forecastingUnit/listForecastingUnit":
                 case "/forecastingUnit/listForecastingUnit/:message":
                     console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
                     if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/planningUnit/addPlanningUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/planningUnit/editPlanningUnit/:planningUnitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PLANNING_UNIT")) {
                         return true;
                     }
                     break;
@@ -554,6 +746,16 @@ class AuthenticationService {
                     break;
                 case "/planningUnitCapacity/listPlanningUnitCapacity":
                     if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_CAPACITY")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementUnit/addProcurementUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementUnit/editProcurementUnit/:procurementUnitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_UNIT")) {
                         return true;
                     }
                     break;

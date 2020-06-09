@@ -50,10 +50,12 @@ export default class ProgramList extends Component {
   }
 
   editProgram(program) {
-    this.props.history.push({
-      pathname: `/program/editProgram/${program.programId}`,
-      // state: { program }
-    });
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
+      this.props.history.push({
+        pathname: `/program/editProgram/${program.programId}`,
+        // state: { program }
+      });
+    }
   }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
@@ -111,11 +113,12 @@ export default class ProgramList extends Component {
     return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
   }
   addProductMapping(event, cell) {
-    event.stopPropagation();
-    this.props.history.push({
-      pathname: `/programProduct/addProgramProduct/${cell}`,
-    });
-
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROGRAM_PLANNING_UNIT')) {
+      event.stopPropagation();
+      this.props.history.push({
+        pathname: `/programProduct/addProgramProduct/${cell}`,
+      });
+    }
   }
 
   formatLabel(cell, row) {
@@ -220,7 +223,7 @@ export default class ProgramList extends Component {
             <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROGRAM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </CardHeader>

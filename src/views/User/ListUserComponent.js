@@ -45,14 +45,16 @@ class ListUserComponent extends Component {
         return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
     }
     addAccessControls(event, row) {
-        event.stopPropagation();
-        this.props.history.push({
-            pathname: "/user/accessControl",
-            state: {
-                user: row
-            }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ACCESS_CONTROL')) {
+            event.stopPropagation();
+            this.props.history.push({
+                pathname: "/user/accessControl",
+                state: {
+                    user: row
+                }
 
-        })
+            })
+        }
     }
     addNewUser() {
         this.props.history.push("/user/addUser");
@@ -71,7 +73,7 @@ class ListUserComponent extends Component {
         }
     }
     editUser(user) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CREATE_USER')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
             this.props.history.push({
                 pathname: `/user/editUser/${user.userId}`,
                 // pathname: `/language/editLanguage/${language.languageId}`,
@@ -286,7 +288,7 @@ class ListUserComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CREATE_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

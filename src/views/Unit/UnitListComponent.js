@@ -60,10 +60,12 @@ export default class UnitListComponent extends Component {
     }
 
     editUnit(unit) {
-        this.props.history.push({
-            pathname: `/unit/editUnit/${unit.unitId}`,
-            // state: { unit }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_UNITS')) {
+            this.props.history.push({
+                pathname: `/unit/editUnit/${unit.unitId}`,
+                // state: { unit }
+            });
+        }
     }
 
     addUnit() {
@@ -97,7 +99,7 @@ export default class UnitListComponent extends Component {
                     dimensions: response.data
                 })
             } else {
-                 this.setState({
+                this.setState({
                     message: response.data.messageCode
                 },
                     () => {
@@ -253,7 +255,7 @@ export default class UnitListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_UNITS') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

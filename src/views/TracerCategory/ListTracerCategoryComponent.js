@@ -48,10 +48,12 @@ class ListTracerCategoryComponent extends Component {
         }
     }
     editTracerCategory(tracerCategory) {
-        this.props.history.push({
-            pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
-            // state: { tracerCategory }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TRACER_CATEGORY')) {
+            this.props.history.push({
+                pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
+                // state: { tracerCategory }
+            });
+        }
     }
 
     componentDidMount() {
@@ -169,7 +171,7 @@ class ListTracerCategoryComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TRACER_CATEGORY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>
@@ -211,7 +213,7 @@ class ListTracerCategoryComponent extends Component {
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable  hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
