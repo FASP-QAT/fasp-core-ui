@@ -112,8 +112,15 @@ export default class EditForecastingUnitComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     changeMessage(message) {
         this.setState({ message: message })
     }
@@ -176,9 +183,20 @@ export default class EditForecastingUnitComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
-            this.setState({
-                forecastingUnit: response.data
-            });
+            if (response.status == 200) {
+                this.setState({
+                    forecastingUnit: response.data
+                });
+            }
+            else {
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
 
         })
 
@@ -198,6 +216,7 @@ export default class EditForecastingUnitComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -216,11 +235,14 @@ export default class EditForecastingUnitComponent extends Component {
                                     ForecastingUnitService.editForecastingUnit(this.state.forecastingUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                         .catch(
@@ -400,7 +422,7 @@ export default class EditForecastingUnitComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

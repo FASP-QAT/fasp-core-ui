@@ -749,6 +749,8 @@ label.arrow_label:after {
 .listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(7){text-align: right !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
@@ -757,6 +759,7 @@ label.arrow_label:after {
 .listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
 
 // PlanningUnitlist
 .PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
@@ -766,6 +769,15 @@ label.arrow_label:after {
 .listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
+
+.prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
