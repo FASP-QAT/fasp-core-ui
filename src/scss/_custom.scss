@@ -727,8 +727,8 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-item a:hover{color: #fff;}
 
 .react-bs-table-sizePerPage-dropdown .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a:hover {color: #fff !important;}
-.react-bs-table-sizePerPage-dropdown .dropdown-menu.show{width:50px !important;z-index: 1000!important;}
-.react-bs-table-sizePerPage-dropdown .dropdown-menu { min-width: 4rem !important; margin-left: 2px;top: auto !important; z-index: 1000;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu.show { width:50px !important;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu { min-width: 4rem !important; margin-left: 2px; z-index: 1000;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a {padding: 8px 28px 8px 19px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item:active{ background-color: #ef6e12e8;}
 .TableCust span.btn-default{padding-left: 10px !important;}
@@ -2191,10 +2191,16 @@ text-overflow: ellipsis;
 .mt-reporttable{
   margin-top: -4%;
 }
+
 h6{
   margin-top:5px;
 }
 
 .custom-file-input {
   cursor: pointer;
+}
+//////supply plan table responsive css
+
+.overflowhide{
+  overflow-x: hidden!important;
 }

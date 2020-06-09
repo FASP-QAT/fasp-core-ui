@@ -698,7 +698,8 @@ class ForcastMatrixOverTime extends Component {
                           {this.state.show ? 'Hide Data' : 'Show Data'}
                         </button>
 
-                      </div> </div>}
+                      </div> 
+                      </div>}
                          </div>
                         
                          <div className="row">
