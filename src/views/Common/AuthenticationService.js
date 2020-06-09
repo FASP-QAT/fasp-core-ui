@@ -765,8 +765,18 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/program/programOnboarding":
+                    if (bfunction.includes("ROLE_BF_LIST_SETUP_PROGRAM")) {
+                        return true;
+                    }
+                    break;
                 case "/program/syncPage":
                     if (bfunction.includes("ROLE_BF_LIST_COMMIT_VERSION")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/realmCountry/:realmId":
+                    if (bfunction.includes("ROLE_BF_MAP_REALM_COUNTRY")) {
                         return true;
                     }
                     break;

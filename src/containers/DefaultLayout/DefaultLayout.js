@@ -188,7 +188,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.realm'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APP_REALM_MASTERS') ? false : true) },
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
                             children: [{
                               name: i18n.t('static.dashboard.realm'),
                               url: '/realm/realmlist',
@@ -366,7 +366,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.program'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_TAB') ? false : true) },
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
                             children: [
                               // {
                               //   name: i18n.t('static.dashboard.datasync'),
@@ -377,19 +377,19 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.dashboard.downloadprogram'),
                                 url: '/program/downloadProgram',
                                 icon: 'fa fa-download',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) }
+                                // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.importprogram'),
                                 url: '/program/importProgram',
                                 icon: 'fa fa-cloud-download',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGRAM') ? false : true) }
+                                // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGRAM') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.exportprogram'),
                                 url: '/program/exportProgram',
                                 icon: 'fa fa-sign-in',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGRAM') ? false : true) }
+                                // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGRAM') ? false : true) }
                               }
 
                             ]
@@ -543,7 +543,8 @@ class DefaultLayout extends Component {
                       {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',
-                        icon: 'fa fa-list-ol'
+                        icon: 'fa fa-list-ol',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_SETUP_PROGRAM') ? false : true) }
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
