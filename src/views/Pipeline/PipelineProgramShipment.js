@@ -958,6 +958,37 @@ export default class PipelineProgramShipment extends Component {
     }
     SubmitProgram() {
 
+        PipelineService.submitProgram(this.props.match.params.pipelineId)
+        .then(response => {
+             console.log(response.data.messageCode)
+            this.setState({
+                message: response.data.messageCode,
+                changedData: false
+            })
+        }
+        ).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
+                    }
+                }
+            }
+        );
+
+
+
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
             .then(response => {
                 var planningUnitListFinalInventory = response.data;

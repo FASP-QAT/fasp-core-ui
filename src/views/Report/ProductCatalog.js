@@ -191,8 +191,8 @@ export default class ProductCatalog extends React.Component {
 
         var A = [headers]
 
-        this.state.data.map(elt => A.push([elt.planningUnit.forecastingUnit.label.label_en.replaceAll(',', ' '), elt.planningUnit.forecastingUnit.productCategory.label.label_en, elt.planningUnit.forecastingUnit.tracerCategory.label.label_en
-            , elt.planningUnit.label.label_en.replaceAll(',', ' '), elt.planningUnit.multiplier, elt.planningUnit.unit.label.label_en, elt.label.label_en.replaceAll(',', ' '), elt.multiplier, elt.unit.label.label_en, elt.supplier.label.label_en ? elt.supplier.label.label_en.replaceAll(',', '') : '', elt.labeling ? elt.labeling.replaceAll(',', ' ') : '', elt.active ? 'Active' : 'disabled']));
+        this.state.data.map(elt => A.push([(elt.planningUnit.forecastingUnit.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.planningUnit.forecastingUnit.productCategory.label.label_en.replaceAll(' ', '%20'), elt.planningUnit.forecastingUnit.tracerCategory.label.label_en.replaceAll(' ', '%20')
+            , (elt.planningUnit.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.planningUnit.multiplier, elt.planningUnit.unit.label.label_en.replaceAll(' ', '%20'), (elt.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.multiplier, elt.unit.label.label_en.replaceAll(' ', '%20'), elt.supplier.label.label_en ?( elt.supplier.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20') : '%20', elt.labeling ? (elt.labeling.replaceAll(' ', '%20')).replaceAll(',','%20') : '%20', elt.active ? 'Active' : 'disabled']));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -231,6 +231,7 @@ export default class ProductCatalog extends React.Component {
             startY: 50,
             head: header,
             body: data,
+            styles: { lineWidth: 1, fontSize: 8 },
             columnStyles: {
                 0: { cellWidth: '8%' },
                 2: { cellWidth: '8%' },
@@ -250,7 +251,7 @@ export default class ProductCatalog extends React.Component {
 
         doc.text(title, marginLeft, 40);
         doc.autoTable(content);
-        doc.save("ProductCatelog.pdf")
+        doc.save("ProductCatalog.pdf")
     }
 
 
