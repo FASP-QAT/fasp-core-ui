@@ -66,8 +66,8 @@ class ListRealmCountryComponent extends Component {
         });
     }
     PlanningUnitCountry(event, row) {
+        event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_PLANNING_UNIT')) {
-            event.stopPropagation();
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
@@ -78,8 +78,8 @@ class ListRealmCountryComponent extends Component {
         }
     }
     RealmCountryRegion(event, row) {
+        event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
-            event.stopPropagation();
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,

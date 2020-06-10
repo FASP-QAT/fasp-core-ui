@@ -37,8 +37,8 @@ class ListProcurementAgentComponent extends Component {
     }
 
     addPlanningUnitMapping(event, cell) {
+        event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PLANNING_UNIT')) {
-            event.stopPropagation();
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
             });
@@ -85,8 +85,8 @@ class ListProcurementAgentComponent extends Component {
     }
 
     addProcurementUnitMapping(event, cell) {
+        event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PROCUREMENT_UNIT')) {
-            event.stopPropagation();
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
             });

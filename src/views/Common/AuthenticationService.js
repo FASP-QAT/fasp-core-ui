@@ -792,7 +792,33 @@ class AuthenticationService {
                     break;
                 case "/shipment/ShipmentList":
                 case "/shipment/shipmentList/:message":
+                case "/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex":
                     if (bfunction.includes("ROLE_BF_LIST_SHIPMENT")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/realmCountryPlanningUnit/:realmCountryId":
+                    if (bfunction.includes("ROLE_BF_MAP_REALM_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/addProcurementAgentProcurementUnit/:procurementAgentId":
+                    if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_AGENT_PROCUREMENT_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId":
+                    if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_AGENT_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/programProduct/addProgramProduct/:programId":
+                    if (bfunction.includes("ROLE_BF_MAP_PROGRAM_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/realmCountryRegion/:realmCountryId":
+                    if (bfunction.includes("ROLE_BF_MAP_REGION")) {
                         return true;
                     }
                     break;
@@ -920,6 +946,11 @@ class AuthenticationService {
                     break;
                 case "/translations/databaseTranslations":
                     if (bfunction.includes("ROLE_BF_LIST_DATABASE_TRANSLATION")) {
+                        return true;
+                    }
+                    break;
+                case "/changePassword":
+                    if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
                     }
                     break;

@@ -45,8 +45,8 @@ class ListUserComponent extends Component {
         return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
     }
     addAccessControls(event, row) {
+        event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ACCESS_CONTROL')) {
-            event.stopPropagation();
             this.props.history.push({
                 pathname: "/user/accessControl",
                 state: {

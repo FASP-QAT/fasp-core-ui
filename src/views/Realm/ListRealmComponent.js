@@ -100,8 +100,8 @@ export default class ReactListComponent extends Component {
 
     }
     RealmCountry(event, row) {
+        event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
-            event.stopPropagation();
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/RealmCountry/${row.realmId}`,
