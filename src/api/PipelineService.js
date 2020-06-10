@@ -83,6 +83,11 @@ class PipelineService {
         return axios.get(`${API_URL}/api/qatTemp/planningUnitListFinalInventry/${json}`, {}
         );
     }
+   submitProgram(pipelineId) {
+        return axios.post(`${API_URL}/api/pipeline/programdata/${pipelineId}`,  {}
+        );
+    }
+
 }
 
 export default new PipelineService();

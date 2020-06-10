@@ -151,7 +151,7 @@ export default class PipelineProgramDataStepTwo extends Component {
                                             // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                             bsSize="sm"
-                                            className="col-md-6"
+                                            className="col-md-4"
                                             onBlur={handleBlur}
                                             value={this.props.items.program.realmCountry.realmCountryId}
                                             type="select" name="realmCountryId" id="realmCountryId">

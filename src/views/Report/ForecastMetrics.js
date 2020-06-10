@@ -267,26 +267,26 @@ class ForecastMetrics extends Component {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.dashboard.forecastmetrics'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.dashboard.forecastmetrics'), doc.internal.pageSize.width / 2, 50, {
           align: 'center'
         })
         if (i == 1) {
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.selectMonth') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.selectMonth') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 80, {
             align: 'left'
           })
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 100, planningText)
 
           planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
+          doc.text(doc.internal.pageSize.width / 8, 120, planningText)
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 140, {
             align: 'left'
           })
           planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
+          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 160, planningText)
         }
 
       }
@@ -1007,7 +1007,7 @@ class ForecastMetrics extends Component {
                         {
                           props => (
                             <div className="TableCust ">
-                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left mt-reporttable">
                                 <SearchBar {...props.searchProps} />
                                 <ClearSearchButton {...props.searchProps} /></div>
                               <BootstrapTable striped rowClasses={this.rowClassNameFormat} hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell

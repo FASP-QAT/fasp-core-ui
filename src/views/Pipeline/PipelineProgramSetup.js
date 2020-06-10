@@ -154,7 +154,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'block';
     }
     endProgramInfoStepFive() {
-        // console.log("program Data--->", this.state.program);
+        console.log("program Data=======>", this.state.program);
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
@@ -468,10 +468,10 @@ export default class PipelineProgramSetup extends Component {
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
-                // console.log("my resp---", response);
+                console.log("my resp---", response);
                 if (response.status == 200) {
                     if (response.data != "") {
-                        // console.log("in if----->");
+                        console.log("in if----->");
                         this.setState({ program: response.data });
                         ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                             .then(response => {
@@ -492,7 +492,7 @@ export default class PipelineProgramSetup extends Component {
                                 }
                             })
                     } else {
-                        // console.log("in else------->");
+                        console.log("in else------->");
                         PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
                             .then(response => {
                                 if (response.status == 200) {
@@ -829,7 +829,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Program Planning Units</strong>{' '}
                                             </CardHeader>
-                                            <CardBody>
+                                            <CardBody  className="pt-0">
                                                 {/* <h3>Program Planning Units</h3> */}
                                                 <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId} realmId={this.state.program.realmCountry.realm.realmId}></PipelineProgramPlanningUnits>
                                             </CardBody>
@@ -859,7 +859,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Consumption Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody>
+                                            <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
                                                 {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
                                                 {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>}
@@ -884,7 +884,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Inventory Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody>
+                                            <CardBody className="pt-0">
                                                 {/* <h3>Inventory</h3> */}
                                                 {this.state.inventoryStatus && <PipelineProgramInventory pipelineId={this.props.match.params.pipelineId} ref="inventoryChild"></PipelineProgramInventory>}
                                             </CardBody>
@@ -908,7 +908,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Shipment Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody>
+                                            <CardBody className="pt-0">
                                                 {/*<h3>Shipments</h3>*/}
                                                 {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>}
                                             </CardBody>
