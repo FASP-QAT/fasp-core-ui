@@ -713,6 +713,8 @@
     "static.report.comment":"Comments",
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
-    "static.program.validstatus":"Please select Status"
+    "static.program.validstatus":"Please select Status",
+    "static.dashboard.pipelineProgramImport":"ProgramImport",
+    "static.message.pipelineProgramImportSuccess":"Program Imported Succesfully"
 
 }

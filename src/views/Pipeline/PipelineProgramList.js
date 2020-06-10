@@ -16,13 +16,12 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import moment from 'moment';
 
 
-const entityname = i18n.t('static.currency.currencyMaster');
+const entityname = i18n.t('static.dashboard.pipelineProgramImport');
 export default class PipelineProgramList extends Component {
 
 
     constructor(props) {
         super(props);
-
         this.state = {
             pipelineProgramList: [],
             message: '',
@@ -155,7 +154,8 @@ export default class PipelineProgramList extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader className="mb-md-3 pb-lg-1">
