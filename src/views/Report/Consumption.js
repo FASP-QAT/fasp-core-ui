@@ -110,7 +110,10 @@ for (var i = 0; i <= elements; i++) {
   data3.push(65);
 }
 
-
+const pickerLang = {
+  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+  from: 'From', to: 'To',
+}
 
 
 class Consumption extends Component {
@@ -151,14 +154,20 @@ class Consumption extends Component {
 
   }
 
+
+  makeText = m => {
+    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+    return '?'
+  }
+
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.planningunit.planningunit') + ' : ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
     var re;
@@ -179,7 +188,7 @@ class Consumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.consumption_') + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -219,7 +228,7 @@ class Consumption extends Component {
       //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
       //}); 
       for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(18)
+        doc.setFontSize(12)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
@@ -230,8 +239,8 @@ class Consumption extends Component {
           align: 'center'
         })
         if (i == 1) {
-          doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+          doc.setFontSize(8)
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -254,19 +263,19 @@ class Consumption extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
 
-    doc.setFontSize(15);
+    doc.setFontSize(8);
 
-    const title = "Consumption Report";
+   // const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
     //creates image
 
     var canvasImg = canvas.toDataURL("image/png", 1.0);
     var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
-    var h1 = 50;
+    var h1 = 100;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 170, aspectwidth1, height * 3 / 4);
+    doc.addImage(canvasImg, 'png', 50, 170, aspectwidth1, (height-h1) * 3 / 4,'CANVAS');
 
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
@@ -278,6 +287,7 @@ class Consumption extends Component {
       startY: height,
       head: headers,
       body: data,
+      styles: { lineWidth: 1, fontSize: 8 }
 
     };
 
@@ -303,6 +313,8 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    if(productCategoryId>0 && planningUnitId>0&&programId>0){
+    
     if (navigator.onLine) {
       let realmId = AuthenticationService.getRealmId();
       AuthenticationService.setupAxiosInterceptors();
@@ -413,6 +425,15 @@ class Consumption extends Component {
 
       }.bind(this)
       // }
+    }}else   if(programId==0){
+      this.setState({ message: i18n.t('static.common.selectProgram') ,consumptions:[]});
+              
+    }else if(productCategoryId==-1){
+      this.setState({ message: i18n.t('static.common.selectProductCategory'),consumptions:[] });
+  
+    }else{
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'),consumptions:[] });
+ 
     }
   }
 
@@ -501,6 +522,8 @@ class Consumption extends Component {
         console.log('**' + JSON.stringify(response.data))
         this.setState({
           planningUnits: response.data,
+        },() => {
+          this.filterData();
         })
       })
         .catch(
@@ -574,6 +597,8 @@ class Consumption extends Component {
           console.log(JSON.stringify(response.data))
           this.setState({
             productCategories: response.data
+          },() => {
+            this.filterData();
           })
         }).catch(
           error => {
@@ -714,7 +739,9 @@ class Consumption extends Component {
     //
   }
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value })
+    this.setState({ rangeValue: value },() => {
+      this.filterData();
+    })
 
   }
 
@@ -818,6 +845,7 @@ class Consumption extends Component {
           this.setState({ message: message })
         }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
+        <h5>{i18n.t(this.state.message)}</h5>
 
         <Card>
           <CardHeader className="pb-1">
@@ -901,7 +929,7 @@ class Consumption extends Component {
                                 onChange={this.getProductCategories}
 
                               >
-                                <option value="0">{i18n.t('static.common.select')}</option>
+                                <option value="-1">{i18n.t('static.common.select')}</option>
                                 {programs.length > 0
                                   && programs.map((item, i) => {
                                     return (
@@ -956,7 +984,7 @@ class Consumption extends Component {
                                 bsSize="sm"
                                 onChange={this.getPlanningUnit}
                               >
-                                <option value="0">{i18n.t('static.common.select')}</option>
+                                <option value="-1">{i18n.t('static.common.select')}</option>
                                 {productCategories.length > 0
                                   && productCategories.map((item, i) => {
                                     return (

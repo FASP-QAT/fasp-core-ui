@@ -302,6 +302,7 @@ class GlobalConsumption extends Component {
       startY:  height,
       head: headers,
       body: data,
+      styles: { lineWidth: 1, fontSize: 8 }
       
     };
     
