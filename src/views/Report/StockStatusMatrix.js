@@ -95,6 +95,8 @@ export default class StockStatusMatrix extends React.Component {
     let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let view = document.getElementById("view").value;
+    if(productCategoryId>0 && planningUnitId>0&&programId>0){
+    
     if (navigator.onLine) {
       let realmId = AuthenticationService.getRealmId();
       AuthenticationService.setupAxiosInterceptors();
@@ -389,6 +391,15 @@ export default class StockStatusMatrix extends React.Component {
 
         }.bind(this)
       }
+    }}else   if(programId==0){
+      this.setState({ message: i18n.t('static.common.selectProgram') ,consumptions:[]});
+              
+    }else if(productCategoryId==-1){
+      this.setState({ message: i18n.t('static.common.selectProductCategory'),consumptions:[] });
+  
+    }else{
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'),consumptions:[] });
+ 
     }
   }
 
@@ -1426,7 +1437,7 @@ export default class StockStatusMatrix extends React.Component {
                           bsSize="sm"
                           onChange={(e) => { this.getPlanningUnit(e); this.filterData(e) }}
                         >
-                          <option value="0">{i18n.t('static.common.select')}</option>
+                          <option value="-1">{i18n.t('static.common.select')}</option>
                           {productCategoryList}
                         </Input>
 

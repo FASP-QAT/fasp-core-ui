@@ -212,7 +212,7 @@ class ForcastMatrixOverTime extends Component {
       const pageCount = doc.internal.getNumberOfPages()
     
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
+      doc.setFontSize(8)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
       
@@ -233,7 +233,7 @@ class ForcastMatrixOverTime extends Component {
       doc.setFont('helvetica', 'bold')
      
       for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(18)
+        doc.setFontSize(12)
         doc.setPage(i)
         
         doc.addImage(LOGO,'png', 0, 10,180,50,'','FAST');
@@ -243,7 +243,7 @@ class ForcastMatrixOverTime extends Component {
           align: 'center'
         })
         if(i==1){
-          doc.setFontSize(12)
+          doc.setFontSize(8)
           doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -267,7 +267,7 @@ class ForcastMatrixOverTime extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size,true);
 
-    doc.setFontSize(15);
+    doc.setFontSize(8);
 
     var canvas = document.getElementById("cool-canvas");
     //creates image
@@ -288,6 +288,7 @@ class ForcastMatrixOverTime extends Component {
     startY:  height,
     head: headers,
     body: data,
+    styles: { lineWidth: 1, fontSize: 8 }
     
   };
   
@@ -698,7 +699,8 @@ class ForcastMatrixOverTime extends Component {
                           {this.state.show ? 'Hide Data' : 'Show Data'}
                         </button>
 
-                      </div> </div>}
+                      </div> 
+                      </div>}
                          </div>
                         
                          <div className="row">
@@ -733,7 +735,7 @@ class ForcastMatrixOverTime extends Component {
                                     {this.state.matricsList[idx].actualConsumption}
                                   </td>
                                   <td>
-                                    {this.roundN(this.state.matricsList[idx].forecastError*100)+'%'}
+                                    {this.roundN(this.state.matricsList[idx].forecastError*100)}
                                   </td>
                                   <td>
                                     {this.state.matricsList[idx].monthsInCalc}

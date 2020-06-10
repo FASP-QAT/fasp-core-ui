@@ -154,7 +154,7 @@ export default class PipelineProgramDataStepThree extends Component {
                                             type="select"
                                             name="healthAreaId"
                                             id="healthAreaId"
-                                            className="col-md-6"
+                                            className="col-md-4"
                                             value={this.props.items.program.healthArea.id}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         >

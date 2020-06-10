@@ -444,7 +444,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                     <FormGroup className="col-md-12">
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)}>Save<i className="fa fa-angle-double-right"></i></Button>
+                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)}>Save <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
                                 </Row>
                             </Form>

@@ -24,7 +24,8 @@ export default class ListProcurementUnit extends Component {
       message: '',
       selProcurementUnit: [],
       planningUnitList: [],
-      lang: localStorage.getItem('lang')
+      lang: localStorage.getItem('lang'),
+      loading: true
     }
     this.editProcurementUnit = this.editProcurementUnit.bind(this);
     this.addNewProcurementUnit = this.addNewProcurementUnit.bind(this);
@@ -58,7 +59,8 @@ export default class ListProcurementUnit extends Component {
       if (response.status == 200) {
         this.setState({
           procurementUnitList: response.data,
-          selProcurementUnit: response.data
+          selProcurementUnit: response.data,
+          loading: false
         })
       } else {
         this.setState({ message: response.data.messageCode })
@@ -200,7 +202,7 @@ export default class ListProcurementUnit extends Component {
         }} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
-        <Card>
+        <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <CardHeader className="mb-md-3 pb-lg-1">
             <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
             <div className="card-header-actions">
@@ -243,26 +245,40 @@ export default class ListProcurementUnit extends Component {
             >
               {
                 props => (
-                  <div className="TableCust listprocurementUnitAlignThtd">
-                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                      <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} />
+                  <div>
+                    <div className="TableCust listprocurementUnitAlignThtd" >
+                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                          <SearchBar {...props.searchProps} />
+                          <ClearSearchButton {...props.searchProps} />
+                        </div>
+                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                          pagination={paginationFactory(options)}
+                          rowEvents={{
+                            onClick: (e, row, rowIndex) => {
+                              this.editProcurementUnit(row);
+                            }
+                          }}
+                          {...props.baseProps}
+                        />
                     </div>
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                      pagination={paginationFactory(options)}
-                      rowEvents={{
-                        onClick: (e, row, rowIndex) => {
-                          this.editProcurementUnit(row);
-                        }
-                      }}
-                      {...props.baseProps}
-                    />
+
                   </div>
                 )
               }
             </ToolkitProvider>
           </CardBody>
         </Card>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

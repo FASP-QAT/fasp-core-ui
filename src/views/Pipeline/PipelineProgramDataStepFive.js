@@ -77,7 +77,7 @@ export default class PipelineProgramDataStepFive extends Component {
                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                     <Select
                         onChange={(e) => { this.props.updateFieldData(e) }}
-                        className="col-md-6"
+                        className="col-md-4 ml-field"
                         bsSize="sm"
                         name="regionId"
                         id="regionId"

@@ -877,18 +877,21 @@ class AnnualShipmentCost extends Component {
                                 <div className="row">
                                     <div className="col-md-12" id="div_id">
                                   { this.state.matricsList.length>0 && <div className="controls"> 
-                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.previewPDF}>Preview</button>
+                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
                               
-                                        <p style={{ width: '100%', height: '700px' }} id='pdf'></p>   </div>}
+                                        <p  style={{ width: '100%', height: '700px' }} id='pdf'></p>   </div>}
 
                                     </div>
-                                </div></Col>
+                                </div>
+                                </Col>
 
 
 
                         </div>
-                    </div></CardBody>
-            </Card></div>
+                    </div>
+                    </CardBody>
+            </Card>
+            </div>
         );
     }
 }
