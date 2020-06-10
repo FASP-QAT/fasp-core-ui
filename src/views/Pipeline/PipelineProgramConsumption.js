@@ -4,7 +4,8 @@ import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
-import PlanningUnitService from '../../api/PlanningUnitService'
+import PlanningUnitService from '../../api/PlanningUnitService';
+import moment from 'moment';
 
 export default class PipelineProgramConsumption extends Component {
 
@@ -54,7 +55,6 @@ export default class PipelineProgramConsumption extends Component {
     loaded() {
         var list = this.state.consumptionList;
         var json = this.el.getJson();
-
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             var col = ("F").concat(parseInt(y) + 1);
@@ -65,7 +65,7 @@ export default class PipelineProgramConsumption extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+                this.el.setComments(col, (list[map.get("8")].dataSourceId).concat(" Does not exist."));
             }
         }
 
@@ -154,20 +154,23 @@ export default class PipelineProgramConsumption extends Component {
                                 //don for loaded function
 
                                 for (var j = 0; j < consumptionList.length; j++) {
-                                    data = [];
-                                    data[1] = consumptionList[j].consumptionDate;
-                                    data[2] = consumptionList[j].regionId;
-                                    data[3] = consumptionList[j].consumptionQty;
-                                    data[4] = consumptionList[j].dayOfStockOut;
-                                    data[5] = consumptionList[j].dataSourceId;
-                                    if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
-                                        data[6] = '';
-                                    } else {
-                                        data[6] = consumptionList[j].notes;
+                                    for (var cm = 0; cm < consumptionList[j].consNumMonth; cm++) {
+                                        data = [];
+                                        data[1] = moment(consumptionList[j].consumptionDate).add(cm,'months').format("YYYY-MM-DD");
+                                        data[2] = consumptionList[j].regionId;
+                                        data[3] = consumptionList[j].consumptionQty;
+                                        data[4] = consumptionList[j].dayOfStockOut;
+                                        data[5] = consumptionList[j].dataSourceId;
+                                        if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
+                                            data[6] = '';
+                                        } else {
+                                            data[6] = consumptionList[j].notes;
+                                        }
+                                        data[7] = consumptionList[j].actualFlag;
+                                        data[0] = consumptionList[j].planningUnitId;
+                                        data[8] = j;
+                                        consumptionDataArr.push(data);
                                     }
-                                    data[7] = consumptionList[j].actualFlag;
-                                    data[0] = consumptionList[j].planningUnitId;
-                                    consumptionDataArr.push(data);
                                 }
 
                                 this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
@@ -223,7 +226,7 @@ export default class PipelineProgramConsumption extends Component {
                                             source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                         },
 
-                                        // { title: 'Created By', type: 'text', readOnly: true },
+                                        { title: 'Index', type: 'hidden'},
                                         // { title: 'Last Modified date', type: 'text', readOnly: true },
                                         // { title: 'Last Modified by', type: 'text', readOnly: true }
                                     ],

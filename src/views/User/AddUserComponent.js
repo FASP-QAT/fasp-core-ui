@@ -508,14 +508,14 @@ class AddUserComponent extends Component {
                     </Col>
                 </Row>
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div  className="d-flex align-items-center justify-content-center" style={{height: "500px"}} >
-                <div class="align-items-center">
-                       <div ><h4> <strong>Loading...</strong></h4></div>
-                        
-                        <div class="spinner-border blue ml-4" role="status">
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </Row>
             </div>

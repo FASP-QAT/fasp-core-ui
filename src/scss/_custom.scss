@@ -479,7 +479,8 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
-  padding: 5px !important;
+  padding: 6px 4px 5px 4px!important;
+  // padding: 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -726,14 +727,17 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-item a:hover{color: #fff;}
 
 .react-bs-table-sizePerPage-dropdown .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a:hover {color: #fff !important;}
-.react-bs-table-sizePerPage-dropdown .dropdown-menu.show{width:50px !important;z-index: 1000!important;}
-.react-bs-table-sizePerPage-dropdown .dropdown-menu { min-width: 4rem !important; margin-left: 2px;top: auto !important; z-index: 1000;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu.show { width:50px !important;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu { min-width: 4rem !important; margin-left: 2px; z-index: 1000;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a {padding: 8px 28px 8px 19px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item:active{ background-color: #ef6e12e8;}
 .TableCust span.btn-default{padding-left: 10px !important;}
 .react-bs-table-sizePerPage-dropdown  #pageDropDown span{padding-left: 7px;}
 // loader css
 .spinner-border{color:#20a8d8; height: 2.5rem;width: 2.5rem;}
+
+// margin-left ml-120 procurement agent radio
+.ml-12 {margin-left: 120px;}
 
 // tableAlignThtd
 // user
@@ -745,6 +749,8 @@ label.arrow_label:after {
 .listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(7){text-align: right !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
@@ -753,6 +759,7 @@ label.arrow_label:after {
 .listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
 
 // PlanningUnitlist
 .PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
@@ -762,6 +769,15 @@ label.arrow_label:after {
 .listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
+
+.prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
@@ -1073,6 +1089,7 @@ a:hover {
 h5,
 .h5 {
   font-size: 14px !important;
+  margin-top: 5px;
 }
 
 .frgtpass-heading {
@@ -2173,4 +2190,17 @@ text-overflow: ellipsis;
 }
 .mt-reporttable{
   margin-top: -4%;
+}
+
+h6{
+  margin-top:5px;
+}
+
+.custom-file-input {
+  cursor: pointer;
+}
+//////supply plan table responsive css
+
+.overflowhide{
+  overflow-x: hidden!important;
 }

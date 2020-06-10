@@ -83,16 +83,16 @@ export default class CostOfInventory extends Component {
     }
 
     getDependentList() {
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramPlaningUnitListByProgramId(event.target.value).then(response => {
-            if (response.status == 200) {
-                console.log("for planning units", response.data);
-                this.setState({ planningUnitList: response.data });
-            } else {
+        // AuthenticationService.setupAxiosInterceptors();
+        // ProgramService.getProgramPlaningUnitListByProgramId(event.target.value).then(response => {
+        //     if (response.status == 200) {
+        //         console.log("for planning units", response.data);
+        //         this.setState({ planningUnitList: response.data });
+        //     } else {
 
-            }
+        //     }
 
-        });
+        // });
 
     }
 

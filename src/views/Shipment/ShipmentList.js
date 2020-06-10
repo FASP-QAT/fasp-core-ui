@@ -21,8 +21,9 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.shipment.shipment');
@@ -450,6 +451,9 @@ export default class LanguageListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
@@ -485,21 +489,21 @@ export default class LanguageListComponent extends Component {
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton"><span className="stock-box-icon  fa fa-sort-desc ml-1"></span>Select Period</Label>
                                     <div className="controls">
-                                        
-                                            <Picker
-                                                ref="pickRange"
-                                                years={{ min: 2013 }}
-                                                value={rangeValue}
-                                                lang={pickerLang}
-                                                //theme="light"
-                                                onChange={this.handleRangeChange}
-                                                // onChange={this.formSubmit}
-                                                onDismiss={this.handleRangeDissmis}
-                                            >
-                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                            </Picker>
 
-                                        
+                                        <Picker
+                                            ref="pickRange"
+                                            years={{ min: 2013 }}
+                                            value={rangeValue}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            // onChange={this.formSubmit}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+
+
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">

@@ -29,6 +29,7 @@ export default class ProductCatalog extends React.Component {
             tracerCategories: [],
             planningUnits: [],
             selSource: [],
+            loading: true
 
 
         }
@@ -127,7 +128,7 @@ export default class ProductCatalog extends React.Component {
         TracerCategoryService.getTracerCategoryByRealmId(realmId)
             .then(response => {
                 this.setState({
-                    tracerCategories: response.data
+                    tracerCategories: response.data,loading: false
                 })
             }).catch(
                 error => {
@@ -420,7 +421,7 @@ export default class ProductCatalog extends React.Component {
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         {  this.state.data.length > 0 && <div className="card-header-actions">
@@ -503,7 +504,7 @@ export default class ProductCatalog extends React.Component {
                         >
                             {
                                 props => (
-                                    <div className="TableCust">
+                                    <div className="TableCust prodCatlogAlignThtd">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
@@ -519,7 +520,17 @@ export default class ProductCatalog extends React.Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>)
     }

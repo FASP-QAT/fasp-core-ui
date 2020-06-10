@@ -267,7 +267,7 @@ class ForecastMetrics extends Component {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.dashboard.forecastmetrics'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -300,8 +300,7 @@ class ForecastMetrics extends Component {
 
     doc.setFontSize(8);
 
-    const title = "Consumption Report";
-
+  
     var height = doc.internal.pageSize.height;
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.dashboard.program'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
@@ -309,7 +308,7 @@ class ForecastMetrics extends Component {
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
     elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100) + '%', elt.months]);
-    let startY = this.state.planningUnitLabels.length > 2 ? 350 : 200
+    let startY = this.state.planningUnitLabels.length > 15 ? 250 : 200
     let content = {
       margin: { top: 80 },
       startY: startY,
@@ -990,7 +989,7 @@ class ForecastMetrics extends Component {
                   </div>
                 </Col>
               </Form>
-              <Col md="12 pl-0">
+              <Col md="12 pl-0 mt-reporttabl">
 
                 <div className="row">
                   <div className="col-md-12">
@@ -1007,7 +1006,7 @@ class ForecastMetrics extends Component {
                       >
                         {
                           props => (
-                            <div className="TableCust">
+                            <div className="TableCust ">
                               <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                 <SearchBar {...props.searchProps} />
                                 <ClearSearchButton {...props.searchProps} /></div>

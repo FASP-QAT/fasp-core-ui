@@ -20,6 +20,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const initialValues = {
     programId: ''
 }
@@ -27,7 +28,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
-        .required(i18n.t('static.program.validselectprogramtext'))
+            .required(i18n.t('static.program.validselectprogramtext'))
     })
 }
 
@@ -60,7 +61,8 @@ export default class ImportProgram extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            programList: []
+            programList: [],
+            message: '',
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.importFile = this.importFile.bind(this);
@@ -102,18 +104,18 @@ export default class ImportProgram extends Component {
                         console.log("program data json", programDataJson)
                         for (var i = 0; i < myResult.length; i++) {
                             for (var j = 0; j < programDataJson.length; j++) {
-                                for(var k=0;k<selectedPrgArr.length;k++){
-                                console.log("1",programDataJson[j].filename);
-                                if (programDataJson[j].filename == selectedPrgArr[k].value) {
-                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                    console.log("Id", myResult[i].id)
-                                    console.log("Id from list", programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId)
-                                    if (myResult[i].id == programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId) {
-                                        count++;
+                                for (var k = 0; k < selectedPrgArr.length; k++) {
+                                    console.log("1", programDataJson[j].filename);
+                                    if (programDataJson[j].filename == selectedPrgArr[k].value) {
+                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                        console.log("Id", myResult[i].id)
+                                        console.log("Id from list", programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId)
+                                        if (myResult[i].id == programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId) {
+                                            count++;
+                                        }
                                     }
                                 }
-                            }
                             }
                             console.log("count", count)
                         }
@@ -142,7 +144,7 @@ export default class ImportProgram extends Component {
                                 })
                             })
                             this.setState({
-                                message:i18n.t('static.program.dataimportsuccess') 
+                                message: i18n.t('static.program.dataimportsuccess')
                             })
                             this.props.history.push(`/dashboard/` + i18n.t('static.program.dataimportsuccess'))
                         } else {
@@ -298,59 +300,62 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
-                    <Card>
-                        <Formik
-                            initialValues={initialValues}
-                            render={
-                                ({
-                                    errors,
-                                    touched,
-                                    handleChange,
-                                    handleBlur,
-                                }) => (
-                                        <Form noValidate name='simpleForm'>
-                                            <CardHeader>
-                                                <strong>{i18n.t('static.program.import')}</strong>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <FormGroup id="fileImportDiv">
-                                                    <Col md="3">
-                                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
-                                                    </Col>
-                                                    <Col xs="12" md="4" className="custom-file">
-                                                        {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                                        <Input type="file" className="custom-file-input" id="file-input" name="file-input" />
-                                                        <label className="custom-file-label" id="file-input">Choose file</label>
-                                                    </Col>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <Card>
+                    <Formik
+                        initialValues={initialValues}
+                        render={
+                            ({
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                            }) => (
+                                    <Form noValidate name='simpleForm'>
+                                        <CardHeader>
+                                            <strong>{i18n.t('static.program.import')}</strong>
+                                        </CardHeader>
+                                        <CardBody>
+                                            <FormGroup id="fileImportDiv">
+                                                <Col md="3">
+                                                    <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                                </Col>
+                                                <Col xs="12" md="4" className="custom-file">
+                                                    {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" />
+                                                    <label className="custom-file-label" id="file-input">Choose file</label>
+                                                </Col>
+                                            </FormGroup>
+                                            <FormGroup id="programIdDiv">
+                                                <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                                <Select
+                                                    bsSize="sm"
+                                                    valid={!errors.programId}
+                                                    invalid={touched.programId && !!errors.programId}
+                                                    onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                    onBlur={handleBlur} name="programId" id="programId"
+                                                    multi
+                                                    options={this.state.programList}
+                                                    value={this.state.programId}
+                                                />
+                                                <FormFeedback>{errors.programId}</FormFeedback>
+                                            </FormGroup>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                &nbsp;
                                                 </FormGroup>
-                                                <FormGroup id="programIdDiv">
-                                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                    <Select
-                                                        bsSize="sm"
-                                                        valid={!errors.programId}
-                                                        invalid={touched.programId && !!errors.programId}
-                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                        onBlur={handleBlur} name="programId" id="programId"
-                                                        multi
-                                                        options={this.state.programList}
-                                                        value={this.state.programId}
-                                                    />
-                                                    <FormFeedback>{errors.programId}</FormFeedback>
-                                                </FormGroup>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                    <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                    &nbsp;
-                                                </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
-                    </Card>
-               
+                                        </CardFooter>
+                                    </Form>
+                                )} />
+                </Card>
+
             </>
         )
 

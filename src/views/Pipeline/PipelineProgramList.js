@@ -120,6 +120,13 @@ export default class PipelineProgramList extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatDate
+            },
+            {
+                dataField: 'STATUS',
+                text: 'Status',
+                align: 'center',
+                headerAlign: 'center',
+                
             }
         ];
         const options = {

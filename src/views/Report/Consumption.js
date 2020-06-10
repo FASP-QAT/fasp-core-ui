@@ -49,6 +49,7 @@ import csvicon from '../../assets/img/csv.png'
 import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -133,6 +134,7 @@ class Consumption extends Component {
       productCategories: [],
       offlineProductCategoryList: [],
       show: false,
+      message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -252,7 +254,7 @@ class Consumption extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
 
-    doc.setFontSize(15);
+    doc.setFontSize(8);
 
     const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
@@ -264,7 +266,7 @@ class Consumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 170, aspectwidth1, height * 3 / 4);
+    doc.addImage(canvasImg, 'png', 50, 220,750,290,'CANVAS');
 
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
@@ -564,10 +566,10 @@ class Consumption extends Component {
   }
   getProductCategories() {
     let programId = document.getElementById("programId").value;
-    let realmId=AuthenticationService.getRealmId();
+    let realmId = AuthenticationService.getRealmId();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      ProductService.getProductCategoryListByProgram(realmId,programId)
+      ProductService.getProductCategoryListByProgram(realmId, programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -812,6 +814,9 @@ class Consumption extends Component {
 
     return (
       <div className="animated fadeIn" >
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
 
         <Card>
@@ -956,8 +961,8 @@ class Consumption extends Component {
                                   && productCategories.map((item, i) => {
                                     return (
                                       <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                      {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                    </option>
+                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                      </option>
                                     )
                                   }, this)}
                               </Input>
@@ -1014,8 +1019,8 @@ class Consumption extends Component {
                                   }, this)}
                               </Input>
                               {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
+                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                         </InputGroupAddon> */}
                             </InputGroup>
                           </div>
                         </FormGroup>
@@ -1041,8 +1046,8 @@ class Consumption extends Component {
                                   }, this)}
                               </Input>
                               {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
+                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                      </InputGroupAddon> */}
                             </InputGroup>
                           </div>
                         </FormGroup>
@@ -1070,8 +1075,10 @@ class Consumption extends Component {
                             </button>
 
                           </div>
-                        </div>}
-                      <br></br>
+                          </div>}
+                       
+                    
+                      
                     </Online>
                     <Offline>
                       {
@@ -1090,14 +1097,16 @@ class Consumption extends Component {
                             </button>
                           </div>
                         </div>}
-                      <br></br>
+                      
                     </Offline>
                   </div>
-                </Col>
-              </div>
-              <Col md="12">
+                
+              
+             
                 <div className="row">
-                  {this.state.show && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                <div className="col-md-12">
+                  {this.state.show && 
+                  <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
                       <tr>
@@ -1115,8 +1124,8 @@ class Consumption extends Component {
 
                             <tr id="addr0" key={idx} >
                               {/* <td>
- {this.state.consumptions[idx].consumption_date}
- </td> */}
+                                {this.state.consumptions[idx].consumption_date}
+                               </td> */}
                               <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
                               <td>
 
@@ -1138,8 +1147,8 @@ class Consumption extends Component {
 
                             <tr id="addr0" key={idx} >
                               {/* <td>
- {this.state.offlineConsumptionList[idx].consumption_date}
- </td> */}
+                               {this.state.offlineConsumptionList[idx].consumption_date}
+                              </td> */}
                               <td>{moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
                               <td>
 
@@ -1154,8 +1163,11 @@ class Consumption extends Component {
                       </tbody>
                     </Offline>
                   </Table>}
+                  </div>
                 </div>
+              
               </Col>
+              </div>
             </div>
           </CardBody>
         </Card>
