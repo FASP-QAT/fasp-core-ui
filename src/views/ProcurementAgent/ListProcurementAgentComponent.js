@@ -34,7 +34,20 @@ class ListProcurementAgentComponent extends Component {
         this.buttonFormatterForProcurementUnit = this.buttonFormatterForProcurementUnit.bind(this);
         this.addPlanningUnitMapping = this.addPlanningUnitMapping.bind(this);
         this.addProcurementUnitMapping = this.addProcurementUnitMapping.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     addPlanningUnitMapping(event, cell) {
@@ -160,6 +173,7 @@ class ListProcurementAgentComponent extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -167,7 +181,12 @@ class ListProcurementAgentComponent extends Component {
                         realms: response.data, loading: false
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
         // .catch(
@@ -193,10 +212,20 @@ class ListProcurementAgentComponent extends Component {
 
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
-                this.setState({
-                    procurementAgentList: response.data,
-                    selProcurementAgent: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        procurementAgentList: response.data,
+                        selProcurementAgent: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+               
             })
         // .catch(
         //     error => {
@@ -346,8 +375,8 @@ class ListProcurementAgentComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+               <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
