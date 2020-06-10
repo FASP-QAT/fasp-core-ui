@@ -61,18 +61,21 @@ export default class PipelineProgramImport extends Component {
                                 <strong>{i18n.t('static.program.import')}</strong>
                             </CardHeader>
                             <CardBody>
+                            
                                 <FormGroup id="fileImportDiv">
                                     <Col md="3">
-                                        <Label htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
                                     </Col>
-                                    <Col xs="12" md="4">
+                                    <Col xs="12" md="4" className="custom-file">
                                         <Input
                                             type="file"
                                             id="file-input"
                                             name="file-input"
+                                            className="custom-file-input"
                                             onChange={e => this.showFile(e)}
                                             accept=".json" 
                                             />
+                                            <label className="custom-file-label" id="fileImportDiv">Choose file</label>
                                             
                                     </Col>
                                 </FormGroup>

@@ -74,7 +74,7 @@ export default class DatabaseTranslations extends React.Component {
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [10, 25, 50, 100],
+                    paginationOptions: [10, 30, 50, 100],
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,

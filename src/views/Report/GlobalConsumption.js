@@ -302,6 +302,7 @@ class GlobalConsumption extends Component {
       startY:  height,
       head: headers,
       body: data,
+      styles: { lineWidth: 1, fontSize: 8 }
       
     };
     
@@ -912,12 +913,14 @@ if(productCategoryId!=-1){
                       <div className="chart-wrapper chart-graph-report">
                         <Bar id="cool-canvas" data={bar} options={options} />
                       </div>
-                    </div>   <div className="col-md-12">
+                    </div> 
+                      <div className="col-md-12">
                         <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                           {this.state.show ? 'Hide Data' : 'Show Data'}
                         </button>
 
-                      </div> </div>}
+                      </div>
+                       </div>}
 
                 </div>
                 <div className="row">

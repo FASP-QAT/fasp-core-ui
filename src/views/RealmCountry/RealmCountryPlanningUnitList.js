@@ -246,7 +246,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         >
                             {
                                 props => (
-                                    <div className="TableCust">
+                                    <div className="TableCust listRealmcountryplanningAlignThtd">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />

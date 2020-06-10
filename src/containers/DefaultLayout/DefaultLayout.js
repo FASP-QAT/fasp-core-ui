@@ -473,7 +473,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
-                            icon: 'fa fa-exchange',
+                            icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT_STOCK_STATUS') ? false : true) }
                           },
                           {
@@ -551,7 +551,7 @@ class DefaultLayout extends Component {
                         name: 'Pipeline Program Import',
                         // url: '/pipeline/pipelineProgramImport',
                         url: '/pipeline/pieplineProgramList',
-                        icon: 'icon-graph'
+                        icon: 'fa fa-sitemap'
                       }
 
                     ]

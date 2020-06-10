@@ -75,10 +75,16 @@ class EditTracerCategoryComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
 
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     Capitalize(str) {
@@ -135,9 +141,20 @@ class EditTracerCategoryComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
-            this.setState({
-                tracerCategory: response.data
-            });
+            if (response.status == 200) {
+                this.setState({
+                    tracerCategory: response.data
+                });
+            }
+            else{
+
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
 
         })
 
@@ -146,7 +163,7 @@ class EditTracerCategoryComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{this.state.message}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -169,11 +186,14 @@ class EditTracerCategoryComponent extends Component {
                                     TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/tracerCategory/listTracerCategory/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/tracerCategory/listTracerCategory/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -281,7 +301,7 @@ class EditTracerCategoryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/tracerCategory/listTracerCategory/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/tracerCategory/listTracerCategory/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
