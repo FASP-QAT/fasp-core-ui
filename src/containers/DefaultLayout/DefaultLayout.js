@@ -322,7 +322,7 @@ class DefaultLayout extends Component {
                           // },
 
                           {
-                            name: 'Commit Version',
+                            name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
                             icon: 'fa fa-code-fork',
                           },
@@ -382,7 +382,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: "Supply Plan",
+                            name: i18n.t('static.dashboard.supplyPlan'),
                             url: '/supplyPlan',
                             icon: 'fa fa-calculator'
                           },
@@ -421,7 +421,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-line-chart'
                           },
                           {
                             name: i18n.t('static.dashboard.costOfInventory'),
@@ -454,12 +454,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text'
-                          } ,
+                          },
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
                             icon: 'fa fa-exchange'
-                          } ,
+                          },
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
@@ -490,7 +490,7 @@ class DefaultLayout extends Component {
                         name: 'Pipeline Program Import',
                         // url: '/pipeline/pipelineProgramImport',
                         url: '/pipeline/pieplineProgramList',
-                        icon: 'icon-graph'
+                        icon: 'fa fa-sitemap'
                       }
 
                     ]

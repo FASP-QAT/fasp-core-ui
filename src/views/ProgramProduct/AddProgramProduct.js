@@ -30,17 +30,20 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        reorderFrequencyInMonths: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        reorderFrequencyInMonths: Yup.string()
+            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        minMonthsOfStock: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        minMonthsOfStock: Yup.string()
+            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText')),
         localProcurementLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter local procurement lead time').min(0, i18n.t('static.procurementUnit.validValueText'))
     })
 }
+
 
 const validate = (getValidationSchema) => {
 
@@ -101,7 +104,12 @@ class AddprogramPlanningUnit extends Component {
         this.enableRow = this.enableRow.bind(this);
         this.disableRow = this.disableRow.bind(this);
         this.updateRow = this.updateRow.bind(this);
-
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
     addRow() {
         let addRow = true;
@@ -232,11 +240,14 @@ class AddprogramPlanningUnit extends Component {
         ProgramService.addprogramPlanningUnitMapping(this.state.rows)
             .then(response => {
                 if (response.status == "200") {
-                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/program/listProgram/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
-                        message: response.data.message
-                    })
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -407,7 +418,7 @@ class AddprogramPlanningUnit extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -594,10 +605,10 @@ class AddprogramPlanningUnit extends Component {
                                                     <td>
                                                         {this.state.rows[idx].planningUnit.label.label_en}
                                                     </td>
-                                                    <td  className="text-right">
+                                                    <td className="text-right">
                                                         {this.state.rows[idx].reorderFrequencyInMonths}
                                                     </td>
-                                                    <td  className="text-right">
+                                                    <td className="text-right">
                                                         {this.state.rows[idx].minMonthsOfStock}
                                                     </td>
                                                     <td>
@@ -633,7 +644,7 @@ class AddprogramPlanningUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

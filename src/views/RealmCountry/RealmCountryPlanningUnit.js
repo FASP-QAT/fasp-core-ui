@@ -134,7 +134,14 @@ realmCountryPlanningUnitId:'',
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
         this.CapitalizeFull = this.CapitalizeFull.bind(this);
         this.updateRow = this.updateRow.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     updateRow(idx) {
         if (this.state.updateRowStatus == 1) {
             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
@@ -298,12 +305,15 @@ realmCountryPlanningUnitId:'',
         RealmCountryService.editPlanningUnitCountry(planningUnitCountry)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/realmCountry/listRealmCountry/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
 
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -334,9 +344,19 @@ realmCountryPlanningUnitId:'',
         AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
-                this.setState({
-                    units: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        units: response.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -358,10 +378,20 @@ realmCountryPlanningUnitId:'',
                 }
             );
         RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
-            this.setState({
-                realmCountry: response.data,
-                // rows:response.data
-            })
+            if (response.status == 200) {
+                this.setState({
+                    realmCountry: response.data,
+                    // rows:response.data
+                })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+      
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -383,10 +413,21 @@ realmCountryPlanningUnitId:'',
             }
         );
         RealmCountryService.getPlanningUnitCountryForId(this.props.match.params.realmCountryId).then(response => {
-            this.setState({
-                planningUnitCountry: response.data,
-                rows: response.data
-            })
+            if (response.status == 200) {
+                this.setState({
+                    planningUnitCountry: response.data,
+                    rows: response.data
+                })
+            }
+            else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+            
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -409,9 +450,12 @@ realmCountryPlanningUnitId:'',
         );
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
-                this.setState({
-                    planningUnits: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        planningUnits: response.data
+                    })
+                }
+               
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -455,7 +499,7 @@ realmCountryPlanningUnitId:'',
             }, this);
 
         return (<div className="animated fadeIn">
-            <h5>{i18n.t(this.state.message)}</h5>
+             <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
@@ -754,7 +798,7 @@ realmCountryPlanningUnitId:'',
         );
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realmCountry/listRealmCountry/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

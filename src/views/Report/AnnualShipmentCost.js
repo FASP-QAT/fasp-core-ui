@@ -311,7 +311,7 @@ class AnnualShipmentCost extends Component {
             var total = 0
             var splittext = doc.splitTextToSize(record.procurementAgent + '\n' + record.fundingsource + '\n' + record.planningUnit, index);
 
-            doc.text(initalvalue+index,  yindex, splittext)
+            doc.text(doc.internal.pageSize.width / 8,  yindex, splittext)
             initalvalue=initalvalue+index
             for (var x = 0; x < year.length; x++){
                 for (var n = 0; n < keys.length; n++) {
@@ -339,7 +339,7 @@ class AnnualShipmentCost extends Component {
                     doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);
                     yindex += 20
                     initalvalue=initalvalue+index
-                    doc.text("Total", initalvalue, yindex, {
+                    doc.text("Total", doc.internal.pageSize.width / 8, yindex, {
                         align: 'left'
                     });
                     var Gtotal = 0
@@ -361,7 +361,7 @@ class AnnualShipmentCost extends Component {
                 doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);
                 yindex += 20
                 initalvalue=initalvalue+index
-                doc.text("Total", initalvalue, yindex, {
+                doc.text("Total", doc.internal.pageSize.width / 8, yindex, {
                     align: 'left'
                 });
                 var Gtotal = 0
@@ -382,7 +382,7 @@ class AnnualShipmentCost extends Component {
         doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);
         yindex += 20
         doc.setFontSize(9);
-        doc.text("Grand Total", initalvalue, yindex, {
+        doc.text("Grand Total", doc.internal.pageSize.width / 8, yindex, {
             align: 'left'
         });
         var Gtotal = 0
@@ -877,18 +877,21 @@ class AnnualShipmentCost extends Component {
                                 <div className="row">
                                     <div className="col-md-12" id="div_id">
                                   { this.state.matricsList.length>0 && <div className="controls"> 
-                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.previewPDF}>Preview</button>
+                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
                               
-                                        <p style={{ width: '100%', height: '700px' }} id='pdf'></p>   </div>}
+                                        <p  style={{ width: '100%', height: '700px' }} id='pdf'></p>   </div>}
 
                                     </div>
-                                </div></Col>
+                                </div>
+                                </Col>
 
 
 
                         </div>
-                    </div></CardBody>
-            </Card></div>
+                    </div>
+                    </CardBody>
+            </Card>
+            </div>
         );
     }
 }

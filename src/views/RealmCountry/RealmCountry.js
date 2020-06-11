@@ -127,7 +127,14 @@ class RealmCountry extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
         this.updateRow = this.updateRow.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     updateRow(idx) {
@@ -307,12 +314,15 @@ class RealmCountry extends Component {
         RealmCountryService.addRealmCountry(realmCountry)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/realm/realmlist/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/realm/realmlist/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
 
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -342,11 +352,21 @@ class RealmCountry extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
-            console.log(response.data);
-            this.setState({
-                realm: response.data,
-                //  rows:response.data
-            })
+            if (response.status == 200) {
+                console.log(response.data);
+                this.setState({
+                    realm: response.data,
+                    //  rows:response.data
+                })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+           
         }).catch(
             error => {
                 console.log(JSON.stringify(error))
@@ -370,11 +390,21 @@ class RealmCountry extends Component {
             }
         );
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
-            console.log("getRealmCountryrealmIdById---", response.data);
+            if (response.status == 200) {
+                console.log("getRealmCountryrealmIdById---", response.data);
             this.setState({
                 realmCountry: response.data,
                 rows: response.data
             })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+            
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -398,10 +428,20 @@ class RealmCountry extends Component {
         );
         CountryService.getCountryListAll()
             .then(response => {
-                console.log(response.data)
-                this.setState({
-                    countries: response.data
-                })
+                if (response.status == 200) {
+                    console.log(response.data)
+                    this.setState({
+                        countries: response.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+              
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -430,7 +470,10 @@ class RealmCountry extends Component {
             } else {
                 this.setState({
                     message: response.data.messageCode
-                })
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         })
             .catch(
@@ -508,7 +551,7 @@ class RealmCountry extends Component {
         //         )
         //     }, this);
         return (<div className="animated fadeIn">
-            <h5>{i18n.t(this.state.message)}</h5>
+            <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
@@ -831,10 +874,10 @@ class RealmCountry extends Component {
                                                 <td className="text-right">
                                                     {this.state.rows[idx].seaFreightPercentage}
                                                 </td>
-                                                <td>
+                                                <td  className="text-right">
                                                     {this.state.rows[idx].shippedToArrivedByAirLeadTime}
                                                 </td>
-                                                <td>
+                                                <td  className="text-right">
                                                     {this.state.rows[idx].shippedToArrivedBySeaLeadTime}
                                                 </td> <td className="text-right">
                                                     {this.state.rows[idx].arrivedToDeliveredLeadTime}
@@ -872,8 +915,9 @@ class RealmCountry extends Component {
 
         );
     }
+
     cancelClicked() {
-        this.props.history.push(`/realm/realmlist/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/realmlist/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

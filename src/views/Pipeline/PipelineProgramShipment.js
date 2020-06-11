@@ -13,6 +13,7 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PipelineProgramShipment extends Component {
 
@@ -887,12 +888,22 @@ export default class PipelineProgramShipment extends Component {
             allowDeleteRow: false,
             onchange: this.changed,
             oneditionend: this.onedit,
-            copyCompatibility: true
+            copyCompatibility: true,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedCommonFunctionJExcel,
 
         };
 
         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
         this.loaded();
+    }
+
+    loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
 
@@ -959,21 +970,58 @@ export default class PipelineProgramShipment extends Component {
     SubmitProgram() {
 
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
-            .then(response => {
-                var planningUnitListFinalInventory = response.data;
-                console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
-                var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
-                console.log("negtive inventory list=====", negtiveInventoryList);
-                if (negtiveInventoryList.length > 0) {
-                    console.log("my page------");
-                    this.props.history.push({
-                        pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
-                    });
-                } else {
-                    console.log('You have submitted the program');
-                }
-
+        .then(response => {
+            var planningUnitListFinalInventory = response.data;
+            console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
+            var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
+            console.log("negtive inventory list=====", negtiveInventoryList);
+            if (negtiveInventoryList.length > 0) {
+                console.log("my page------");
+                this.props.history.push({
+                    pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
+                });
+            } else {
+                PipelineService.submitProgram(this.props.match.params.pipelineId)
+        .then(response => {
+             console.log(response.data.messageCode)
+            this.setState({
+                message: response.data.messageCode,
+                changedData: false
+            })
+            this.props.history.push({
+                pathname: `/pipeline/pieplineProgramList`
             });
+        }
+        ).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
+                    }
+                }
+            }
+        );
+
+
+                console.log('You have submitted the program');
+            }
+
+        });
+
+        
+
+       
     }
 
     render() {
@@ -981,7 +1029,7 @@ export default class PipelineProgramShipment extends Component {
         return (
             <>
                 <div className="table-responsive" >
-
+                <h5>{i18n.t(this.state.message)}</h5>
                     <div id="shipmenttableDiv">
                     </div>
                     <div>

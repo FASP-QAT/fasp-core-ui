@@ -23,13 +23,27 @@ class ListTracerCategoryComponent extends Component {
             tracerCategoryList: [],
             message: '',
             selTracerCategory: [],
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.editTracerCategory = this.editTracerCategory.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewTracerCategory = this.addNewTracerCategory.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
     addNewTracerCategory() {
         this.props.history.push("/tracerCategory/addTracerCategory");
@@ -56,14 +70,21 @@ class ListTracerCategoryComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
 
@@ -162,9 +183,9 @@ class ListTracerCategoryComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}
                         <div className="card-header-actions">
@@ -211,7 +232,7 @@ class ListTracerCategoryComponent extends Component {
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable  hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
@@ -226,6 +247,15 @@ class ListTracerCategoryComponent extends Component {
                         </ToolkitProvider>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

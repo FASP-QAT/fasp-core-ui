@@ -94,8 +94,14 @@ export default class AddForecastingUnitComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.getProductCategoryByRealmId = this.getProductCategoryByRealmId.bind(this);
-
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
 
     dataChange(event) {
         let { forecastingUnit } = this.state
@@ -261,7 +267,7 @@ export default class AddForecastingUnitComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -276,11 +282,14 @@ export default class AddForecastingUnitComponent extends Component {
                                     ForecastingUnitService.addForecastingUnit(this.state.forecastingUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -431,7 +440,7 @@ export default class AddForecastingUnitComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
