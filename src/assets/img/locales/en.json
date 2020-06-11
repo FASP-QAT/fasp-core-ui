@@ -41,7 +41,7 @@
     "static.country.languagetext": "Please select Language",
     "static.program.validselectprogramtext": "Please select program",
     "static.budget.budgetstopdate": "End Date of Budget",
-    "static.message.login.disabled": "User account \"${username}\" is disabled",
+    "static.message.login.disabled": "User account is disabled",
     "static.message.login.passwordExpired": "Your password expired",
     "static.message.user.disabled": "User is disabled",
     "static.common.submit": "Submit",

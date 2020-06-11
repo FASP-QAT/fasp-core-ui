@@ -686,6 +686,7 @@ class AuthenticationService {
                     break;
                 case "/program/listProgram":
                 case "/program/listProgram/:message":
+                case "/program/listProgram/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_PROGRAM")) {
                         return true;
                     }
