@@ -6,7 +6,6 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-import PlanningUnitService from '../../api/PlanningUnitService';
 import RealmCountryService from '../../api/RealmCountryService'
 
 export default class PipelineProgramInventory extends Component {

@@ -1242,7 +1242,7 @@ export default class syncPage extends Component {
           // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "green");
+            elInstance.setStyle(col, "background-color", "#86cd99");
           }
         }
       } else {
@@ -1331,7 +1331,7 @@ export default class syncPage extends Component {
           // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "green");
+            elInstance.setStyle(col, "background-color", "#86cd99");
           }
         }
       } else {
@@ -1381,7 +1381,7 @@ export default class syncPage extends Component {
           // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "green");
+            elInstance.setStyle(col, "background-color", "#86cd99");
           }
         }
       } else {
