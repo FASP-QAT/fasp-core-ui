@@ -413,6 +413,7 @@ class AuthenticationService {
                     break;
                 case "/user/listUser":
                 case "/user/listUser/:message":
+                case "/user/listUser/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_USER")) {
                         return true;
                     }
@@ -703,6 +704,7 @@ class AuthenticationService {
                     break;
                 case "/tracerCategory/listTracerCategory":
                 case "/tracerCategory/listTracerCategory/:message":
+                case "/tracerCategory/listTracerCategory/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_TRACER_CATEGORY")) {
                         return true;
                     }
@@ -724,6 +726,7 @@ class AuthenticationService {
                     break;
                 case "/forecastingUnit/listForecastingUnit":
                 case "/forecastingUnit/listForecastingUnit/:message":
+                case "/forecastingUnit/listForecastingUnit/:color/:message":
                     console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
                     if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
                         return true;

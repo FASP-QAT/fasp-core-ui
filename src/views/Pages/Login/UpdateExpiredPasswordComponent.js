@@ -120,7 +120,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6 " className="mt-4">
-                                <h5 className="mx-4">{this.state.message}</h5>
+                                <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
                                         <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
@@ -159,6 +159,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 500:
                                                                     case 401:
+                                                                    case 403:
                                                                     case 404:
                                                                     case 406:
                                                                     case 412:
@@ -243,8 +244,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
-                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
+                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>
