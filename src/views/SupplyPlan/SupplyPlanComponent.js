@@ -304,8 +304,9 @@ export default class SupplyPlanComponent extends React.Component {
             var height = doc.internal.pageSize.height;
             var h1 = 100;
             var aspectwidth1 = (width - h1);
-
-            doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
+            
+            doc.addImage(canvasImg, 'png', 50, 110,750,290,'CANVAS');
+            // doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
             const header = [...[""], ... (this.state.monthsArray.map(item => (
                 item.month
             ))
@@ -446,7 +447,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <TabPane tabId="1">
 
                     <div id="supplyPlanTableId" style={{ display: this.state.display }}>
-                        <Row>
+                        <Row className="float-right">
                             <div className="col-md-12">
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => exportPDF()} />
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => exportCSV()} />
@@ -459,7 +460,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i className="cui-arrow-right icons" ></i> </span>
                             </div>
                         </Row>
-                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                        <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
                                 <tr>
                                     <th ></th>
@@ -928,7 +929,7 @@ export default class SupplyPlanComponent extends React.Component {
                         {
                             this.state.jsonArrForGraph.length > 0
                             &&
-                            <div className="col-md-12 grapg-margin " >
+                            <div className="col-md-12" >
 
                                 <div className="col-md-12">
                                     <div className="chart-wrapper chart-graph-report">

@@ -95,6 +95,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             lang: localStorage.getItem('lang'),
             procurementAgentId: this.props.match.params.procurementAgentId,
             updateRowStatus: 0,
+            loading: true
         }
         this.addRow = this.addRow.bind(this);
         // this.deleteLastRow = this.deleteLastRow.bind(this);
@@ -105,7 +106,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.enableRow = this.enableRow.bind(this);
         this.disableRow = this.disableRow.bind(this);
         this.updateRow = this.updateRow.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     updateRow(idx) {
@@ -257,11 +264,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         ProcurementAgentService.addprocurementAgentProcurementUnitMapping(this.state.rows)
             .then(response => {
                 if (response.status == "200") {
-                    this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
-                        message: response.data.message
-                    })
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -294,12 +304,15 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 if (response.status == 200) {
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse });
+                        this.setState({ rows: myResponse , loading: false });
                     }
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
@@ -332,8 +345,11 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 });
             } else {
                 this.setState({
-                    message: response.data.message
-                })
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
 
         }).catch(
@@ -367,7 +383,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             } else {
                 this.setState({
                     message: response.data.messageCode
-                })
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
 
         }).catch(
@@ -430,10 +449,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card  >
 
                             <CardHeader>
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
@@ -560,7 +579,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                <Table style={{ display: this.state.loading ? "none" : "block" }} responsive className="table-striped table-hover table-bordered text-center mt-2">
                                     <thead>
                                         <tr>
                                             <th className="text-center">{i18n.t('static.procurementagent.procurementagent')}</th>
@@ -618,6 +637,17 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                             </CardFooter>
                         </Card>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </Col>
                 </Row>
             </div>
@@ -625,7 +655,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

@@ -817,6 +817,8 @@
     "static.commit.differenceBetweenVersions":"Difference between versions",
     "static.commit.newDataCurrentVersion":"New data from current version",
     "static.commit.newDataLatestVersion":"New data from latest version",
-    "static.commit.inactiveData":"Inactive data"
+    "static.commit.inactiveData":"Inactive data",
+    "static.dashboard.pipelineProgramImport":"ProgramImport",
+    "static.message.pipelineProgramImportSuccess":"Program Imported Succesfully"
 
 }

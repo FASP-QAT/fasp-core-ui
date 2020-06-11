@@ -111,6 +111,12 @@ class AddUserComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -194,9 +200,19 @@ class AddUserComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageList()
             .then(response => {
-                this.setState({
-                    languages: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        languages: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -220,9 +236,19 @@ class AddUserComponent extends Component {
 
         RealmService.getRealmListAll()
             .then(response => {
-                this.setState({
-                    realms: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -246,13 +272,23 @@ class AddUserComponent extends Component {
 
         UserService.getRoleList()
             .then(response => {
-                var roleList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                if (response.status == 200) {
+                    var roleList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        roleList
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
-                this.setState({
-                    roleList
-                })
+               
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -300,7 +336,7 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -318,12 +354,14 @@ class AddUserComponent extends Component {
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/user/listUser/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    loading: false,
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
 
                                         })
@@ -508,14 +546,14 @@ class AddUserComponent extends Component {
                     </Col>
                 </Row>
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div  className="d-flex align-items-center justify-content-center" style={{height: "500px"}} >
-                <div class="align-items-center">
-                       <div ><h4> <strong>Loading...</strong></h4></div>
-                        
-                        <div class="spinner-border blue ml-4" role="status">
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </Row>
             </div>
@@ -523,7 +561,7 @@ class AddUserComponent extends Component {
     }
     cancelClicked() {
 
-        this.props.history.push(`/user/listUser/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/user/listUser/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

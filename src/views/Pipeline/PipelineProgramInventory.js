@@ -6,6 +6,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import PlanningUnitService from '../../api/PlanningUnitService';
+import RealmCountryService from '../../api/RealmCountryService'
 
 export default class PipelineProgramInventory extends Component {
 
@@ -15,8 +17,23 @@ export default class PipelineProgramInventory extends Component {
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.dropdownFilter = this.dropdownFilter.bind(this);
     }
 
+    dropdownFilter = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var value = (instance.jexcel.getJson()[r])[c - 7];
+        var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value);
+
+        for (var k = 0; k < puList.length; k++) {
+            var realmCountryPlanningUnitJson = {
+                name: puList[k].label.label_en,
+                id: puList[k].realmCountryPlanningUnitId
+            }
+            mylist.push(realmCountryPlanningUnitJson);
+        }
+        return mylist;
+    }
 
     checkValidation() {
         var valid = true;
@@ -48,6 +65,42 @@ export default class PipelineProgramInventory extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var json = this.el.getJson();
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("7");
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
+                        i = json.length;
+                    } else {
+                        // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
+                        // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
+                        // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
+                        // var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
+                        // this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
+                        // this.el.setValueFromCoords(4, y, quantity, true);
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
+                var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
+                this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
+                this.el.setValueFromCoords(4, y, quantity, true);
+
             }
         }
 
@@ -95,7 +148,9 @@ export default class PipelineProgramInventory extends Component {
                 inventoryDate: map.get("3"),
                 manualAdjustment: map.get("4"),
                 notes: map.get("5"),
-                active: map.get("6")
+                active: map.get("6"),
+                realmCountryPlanningUnitId: map.get("7"),
+                multiplier: map.get("8")
             }
             inventoryArray.push(inventoryJson);
         }
@@ -104,140 +159,174 @@ export default class PipelineProgramInventory extends Component {
     }
 
     componentDidMount() {
+
+        // alert(document.getElementById("realmCountryId").value);
+        var realmCounryId = document.getElementById("realmCountryId").value;
         AuthenticationService.setupAxiosInterceptors();
-        PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
-            // console.log("inventory region List +++++++++++++++ ----->", response.data);
-            var regionList = [];
+        RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCounryId).then(response => {
+            var realmCountryPlanningUnitList = [];
+
+            this.setState({ realmCountryPlanningUnitList: response.data });
+
             for (var i = 0; i < response.data.length; i++) {
-                var regionJson = {
-                    id: ((response.data)[i]).regionId,
+                var rcpJson = {
+                    id: ((response.data)[i]).realmCountryPlanningUnitId,
                     name: ((response.data)[i]).label.label_en
                 }
-                regionList.push(regionJson);
+                realmCountryPlanningUnitList.push(rcpJson);
             }
 
+
+
             AuthenticationService.setupAxiosInterceptors();
-            DataSourceService.getActiveDataSourceList().then(response => {
-                var dataSourceList = [];
-                // console.log("inventory data source List ++++++++++++++++++----->", response.data);
-                for (var j = 0; j < response.data.length; j++) {
-                    var dataSourceJson = {
-                        id: ((response.data)[j]).dataSourceId,
-                        name: ((response.data)[j]).label.label_en
+            PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
+                // console.log("inventory region List +++++++++++++++ ----->", response.data);
+                var regionList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    var regionJson = {
+                        id: ((response.data)[i]).regionId,
+                        name: ((response.data)[i]).label.label_en
                     }
-                    dataSourceList.push(dataSourceJson);
+                    regionList.push(regionJson);
                 }
+
                 AuthenticationService.setupAxiosInterceptors();
-                PlanningUnitService.getActivePlanningUnitList()
-                    .then(response => {
-                        var planningUnitListQat = []
-                        for (var k = 0; k < (response.data).length; k++) {
-                            var planningUnitJson = {
-                                name: response.data[k].label.label_en,
-                                id: response.data[k].planningUnitId
-                            }
-                            planningUnitListQat.push(planningUnitJson);
+                DataSourceService.getActiveDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    // console.log("inventory data source List ++++++++++++++++++----->", response.data);
+                    for (var j = 0; j < response.data.length; j++) {
+                        var dataSourceJson = {
+                            id: ((response.data)[j]).dataSourceId,
+                            name: ((response.data)[j]).label.label_en
                         }
-
-                        AuthenticationService.setupAxiosInterceptors();
-                        PipelineService.getPipelineProgramInventory(this.props.pipelineId).then(response => {
-                            // console.log("inventory List iiiiiiiiiiii----->", response.data);
-
-                            var data = [];
-                            var inventoryDataArr = [];
-                            var inventoryList = response.data;
-                            this.setState({ inventoryList: response.data });
-                            for (var j = 0; j < inventoryList.length; j++) {
-                                data = [];
-                                data[0] = inventoryList[j].planningUnitId;
-                                data[1] = inventoryList[j].dataSourceId;
-                                data[2] = inventoryList[j].regionId;
-                                data[3] = inventoryList[j].inventoryDate;
-                                data[4] = inventoryList[j].manualAdjustment;
-                                if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
-                                    data[5] = '';
-                                } else {
-                                    data[5] = inventoryList[j].notes;
+                        dataSourceList.push(dataSourceJson);
+                    }
+                    AuthenticationService.setupAxiosInterceptors();
+                    PlanningUnitService.getActivePlanningUnitList()
+                        .then(response => {
+                            var planningUnitListQat = []
+                            for (var k = 0; k < (response.data).length; k++) {
+                                var planningUnitJson = {
+                                    name: response.data[k].label.label_en,
+                                    id: response.data[k].planningUnitId
                                 }
-                                data[6] = true;
-                                inventoryDataArr.push(data);
+                                planningUnitListQat.push(planningUnitJson);
                             }
 
-                            this.el = jexcel(document.getElementById("inventorytableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = inventoryDataArr;
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                colWidths: [190, 130, 100, 120, 100, 90, 100, 130],
-                                columns: [
+                            AuthenticationService.setupAxiosInterceptors();
+                            PipelineService.getPipelineProgramInventory(this.props.pipelineId).then(response => {
+                                // console.log("inventory List iiiiiiiiiiii----->", response.data);
 
-                                    {
-                                        title: 'Planning Unit',
-                                        type: 'dropdown',
-                                        source: planningUnitListQat,
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.dataSource'),
-                                        type: 'dropdown',
-                                        source: dataSourceList
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.region'),
-                                        type: 'dropdown',
-                                        source: regionList
-
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.inventoryDate'),
-                                        type: 'calendar',
-                                        options: { format: 'MM-YYYY' }
-
-                                    },
-
-                                    {
-                                        title: i18n.t('static.inventory.manualAdjustment'),
-                                        type: 'text'
-                                    },
-                                    {
-                                        title: 'Note',
-                                        type: 'text'
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.active'),
-                                        type: 'checkbox'
+                                var data = [];
+                                var inventoryDataArr = [];
+                                var inventoryList = response.data;
+                                this.setState({ inventoryList: response.data });
+                                for (var j = 0; j < inventoryList.length; j++) {
+                                    data = [];
+                                    data[0] = inventoryList[j].planningUnitId;
+                                    data[1] = inventoryList[j].dataSourceId;
+                                    data[2] = inventoryList[j].regionId;
+                                    data[3] = inventoryList[j].inventoryDate;
+                                    data[4] = inventoryList[j].manualAdjustment;
+                                    if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
+                                        data[5] = '';
+                                    } else {
+                                        data[5] = inventoryList[j].notes;
                                     }
+                                    data[6] = true;
+                                    data[7] = inventoryList[j].realmCountryPlanningUnitId;
+                                    data[8] = inventoryList[j].multiplier
+                                    inventoryDataArr.push(data);
+                                }
 
-                                ],
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onchange: this.changed,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                // paginationOptions: [10, 25, 50, 100],
-                                position: 'top',
-                                text: {
-                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                    show: '',
-                                    entries: '',
-                                },
-                                onload: this.loaded,
-                            };
+                                this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+                                this.el.destroy();
+                                var json = [];
+                                var data = inventoryDataArr;
+                                var options = {
+                                    data: data,
+                                    columnDrag: true,
+                                    colWidths: [190, 130, 100, 120, 100, 90, 100, 130, 130],
+                                    columns: [
 
-                            this.el = jexcel(document.getElementById("inventorytableDiv"), options);
-                            this.loaded();
+                                        {
+                                            title: 'Planning Unit',
+                                            type: 'dropdown',
+                                            source: planningUnitListQat,
+                                            readOnly: true
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.dataSource'),
+                                            type: 'dropdown',
+                                            source: dataSourceList
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.region'),
+                                            type: 'dropdown',
+                                            source: regionList
+
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.inventoryDate'),
+                                            type: 'calendar',
+                                            options: { format: 'MM-YYYY' }
+
+                                        },
+
+                                        {
+                                            title: i18n.t('static.inventory.manualAdjustment'),
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: 'Note',
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.active'),
+                                            type: 'checkbox'
+                                        },
+                                        {
+                                            title: "Realm Country Planning Unit",
+                                            type: 'dropdown',
+                                            source: realmCountryPlanningUnitList,
+                                            filter: this.dropdownFilter
+
+                                        },
+                                        {
+                                            title: "Multiplier",
+                                            type: 'text',
+                                            readonly: true
+                                        },
+
+                                    ],
+                                    pagination: 10,
+                                    search: true,
+                                    columnSorting: true,
+                                    tableOverflow: true,
+                                    wordWrap: true,
+                                    allowInsertColumn: false,
+                                    allowManualInsertColumn: false,
+                                    allowDeleteRow: false,
+                                    onchange: this.changed,
+                                    oneditionend: this.onedit,
+                                    copyCompatibility: true,
+                                    // paginationOptions: [10, 25, 50, 100],
+                                    position: 'top',
+                                    text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        show: '',
+                                        entries: '',
+                                    },
+                                    onload: this.loaded,
+                                };
+
+                                this.el = jexcel(document.getElementById("inventorytableDiv"), options);
+                                this.loaded();
+                            });
+
+
                         });
-
-
-                    });
+                });
             });
         });
     }

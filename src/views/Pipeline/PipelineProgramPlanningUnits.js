@@ -244,7 +244,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 planningUnitId: planningUnitId,
                 reorderFrequencyInMonths: map.get("4"),
                 minMonthsOfStock: map.get("5"),
-                programPlanningUnitId: map.get("6")
+                programPlanningUnitId: map.get("6"),
+                localProcurmentLeadTime:map.get("7")
+                
             }
             planningUnitArray.push(planningUnitJson);
         }
@@ -326,6 +328,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[4] = planningUnitList[j].reorderFrequencyInMonths;
                                                     data[5] = planningUnitList[j].minMonthsOfStock;
                                                     data[6] = planningUnitList[j].programPlanningUnitId
+                                                    data[7] = planningUnitList[j].localProcurmentLeadTime
                                                     productDataArr.push(data);
 
                                                 }
@@ -377,6 +380,11 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     {
                                                         title: 'Pipeline Product Id',
                                                         type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Local Procurment Lead Time',
+                                                        type: 'number',
+
                                                     },
                                                 ],
                                                 pagination: 10,
