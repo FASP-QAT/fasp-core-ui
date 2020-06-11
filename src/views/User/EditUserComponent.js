@@ -95,6 +95,12 @@ class EditUserComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -171,22 +177,42 @@ class EditUserComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         // console.log("USERID --> ", this.props.match.params.userId);
         UserService.getUserByUserId(this.props.match.params.userId).then(response => {
-            this.setState({
-                user: response.data
-
-            }, (
-            ) => {
-                // console.log("state after update---", this.state.user);
-                // console.log("Role list---", this.state.user.roleList);
-            });
+            if (response.status == 200) {
+                this.setState({
+                    user: response.data
+    
+                }, (
+                ) => {
+                    // console.log("state after update---", this.state.user);
+                    // console.log("Role list---", this.state.user.roleList);
+                });
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+           
 
         })
 
         LanguageService.getLanguageList()
             .then(response => {
-                this.setState({
-                    languages: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        languages: response.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -217,7 +243,10 @@ class EditUserComponent extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
@@ -242,13 +271,24 @@ class EditUserComponent extends Component {
 
         UserService.getRoleList()
             .then(response => {
-                var roleList = [];
+                if (response.status == 200) {
+                    var roleList = [];
                 for (var i = 0; i < response.data.length; i++) {
                     roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                 }
                 this.setState({
                     roleList
                 })
+                }
+                else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -296,7 +336,7 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+               <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -320,11 +360,14 @@ class EditUserComponent extends Component {
                                     UserService.editUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/user/listUser/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
 
                                         })
@@ -524,7 +567,7 @@ class EditUserComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + i18n.t("static.message.cancelled", { entityname }))
+        this.props.history.push(`/user/listUser/`+ 'red/'  + i18n.t("static.message.cancelled", { entityname }))
     }
 
     resetClicked() {

@@ -44,6 +44,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/stockOverTime`,json,{}
         );
     }
+    costOfInventory(json){
+        return axios.post(`${API_URL}/api/report/costOfInventory`,json,{}
+        );
+    }
 
 }
 export default new ReportService();

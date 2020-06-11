@@ -33,7 +33,8 @@ export default class DimensionListComponent extends Component {
         this.state = {
             dimensionList: [],
             message: '',
-            selSource: []
+            selSource: [],
+            loading: true
         }
         this.addNewDimension = this.addNewDimension.bind(this);
         this.editDimension = this.editDimension.bind(this);
@@ -58,11 +59,12 @@ export default class DimensionListComponent extends Component {
                 console.log(response.data)
                 this.setState({
                     dimensionList: response.data,
-                    selSource: response.data
+                    selSource: response.data, loading: false
+
                 })
 
             }
-            else{
+            else {
                 this.setState({
                     message: response.data.messageCode
                 },
@@ -70,28 +72,28 @@ export default class DimensionListComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-           
+
         })
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response.status) {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response.status) {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
 
@@ -161,9 +163,9 @@ export default class DimensionListComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-              <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
@@ -205,6 +207,17 @@ export default class DimensionListComponent extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

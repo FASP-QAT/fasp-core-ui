@@ -154,7 +154,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'block';
     }
     endProgramInfoStepFive() {
-        // console.log("program Data--->", this.state.program);
+        console.log("program Data=======>", this.state.program);
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
@@ -468,10 +468,10 @@ export default class PipelineProgramSetup extends Component {
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
-                // console.log("my resp---", response);
+                console.log("my resp---", response);
                 if (response.status == 200) {
                     if (response.data != "") {
-                        // console.log("in if----->");
+                        console.log("in if----->");
                         this.setState({ program: response.data });
                         ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                             .then(response => {
@@ -492,7 +492,7 @@ export default class PipelineProgramSetup extends Component {
                                 }
                             })
                     } else {
-                        // console.log("in else------->");
+                        console.log("in else------->");
                         PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
                             .then(response => {
                                 if (response.status == 200) {

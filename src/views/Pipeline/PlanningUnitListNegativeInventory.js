@@ -5,12 +5,13 @@ import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Card, CardHeader, CardBody, CardFooter, Button } from 'reactstrap';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PlanningUnitListNegativeInventory extends Component {
 
     constructor(props) {
         super(props);
-        this.cancelClicked=this.cancelClicked.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -61,13 +62,23 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     allowDeleteRow: false,
                     onchange: this.changed,
                     oneditionend: this.onedit,
-                    copyCompatibility: true
+                    copyCompatibility: true,
+                    text: {
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        show: '',
+                        entries: '',
+                    },
+                    onload: this.loaded,
 
                 };
                 var elVar = jexcel(document.getElementById("planningUnitList"), options);
                 this.el = elVar;
 
             });
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
     render() {
@@ -84,7 +95,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                         </div>
                     </CardBody>
                     <CardFooter>
-                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </CardFooter>
                 </Card>
             </>

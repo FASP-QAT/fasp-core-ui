@@ -46,11 +46,17 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 class ForgotPasswordComponent extends Component {
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         loading: false
+    //     }
+    // }
     loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
     constructor(props) {
         super(props);
         this.state = {
-            message: ''
+            message: '', loading: false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideMessage = this.hideMessage.bind(this);
@@ -72,6 +78,12 @@ class ForgotPasswordComponent extends Component {
         this.findFirstError('forgotPasswordForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
+        this.setState({
+            loading:true
+        }, (
+        ) => {
+            
+        })
     }
     findFirstError(formName, hasError) {
         const form = document.forms[formName]
@@ -82,7 +94,7 @@ class ForgotPasswordComponent extends Component {
             }
         }
     }
-    hideMessage(){
+    hideMessage() {
         setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 8000);
     }
 
@@ -98,8 +110,8 @@ class ForgotPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 style={{ color:"red" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
-                                <Card className="mx-4 ">
+                                <h5 style={{ color: "red" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
+                                <Card className="mx-4 " style={{ display: this.state.loading ? "none" : "block" }}>
 
                                     <CardHeader>
                                         <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
@@ -145,12 +157,12 @@ class ForgotPasswordComponent extends Component {
                                                     );
 
                                             } else {
-                                                
+
 
                                                 this.setState({
                                                     message: "You must be online to update the password."
                                                 },
-                                                    () => { 
+                                                    () => {
                                                         this.hideMessage();
                                                     })
                                             }
@@ -195,6 +207,18 @@ class ForgotPasswordComponent extends Component {
                                                     </Form>
                                                 )} />
                                 </Card>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </Col>
                         </Row>
 
