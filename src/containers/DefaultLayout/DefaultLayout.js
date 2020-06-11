@@ -551,7 +551,8 @@ class DefaultLayout extends Component {
                         name: 'Pipeline Program Import',
                         // url: '/pipeline/pipelineProgramImport',
                         url: '/pipeline/pieplineProgramList',
-                        icon: 'fa fa-sitemap'
+                        icon: 'fa fa-sitemap',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') ? false : true) }
                       }
 
                     ]

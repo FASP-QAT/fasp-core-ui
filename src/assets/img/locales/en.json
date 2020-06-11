@@ -796,7 +796,9 @@
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
     "static.program.validstatus":"Please select Status",
-    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed.",
-    "static.accessDenied":"Access Denied"
+    "static.accessDenied":"Access Denied",
+    "static.dashboard.pipelineProgramImport":"ProgramImport",
+    "static.message.pipelineProgramImportSuccess":"Program Imported Succesfully",
+    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed."
 
 }
