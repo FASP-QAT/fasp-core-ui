@@ -13,6 +13,7 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PipelineProgramShipment extends Component {
 
@@ -887,12 +888,22 @@ export default class PipelineProgramShipment extends Component {
             allowDeleteRow: false,
             onchange: this.changed,
             oneditionend: this.onedit,
-            copyCompatibility: true
+            copyCompatibility: true,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedCommonFunctionJExcel,
 
         };
 
         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
         this.loaded();
+    }
+
+    loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
 

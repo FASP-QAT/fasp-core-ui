@@ -22,6 +22,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -167,7 +168,13 @@ export default class ConsumptionDetails extends React.Component {
                     oneditionend: this.onedit,
                     copyCompatibility: true,
                     paginationOptions: [10, 25, 50, 100],
-                    position: 'top'
+                    position: 'top',
+                    text: {
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        show: '',
+                        entries: '',
+                    },
+                    onload: this.loaded,
                 };
                 this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
@@ -184,6 +191,10 @@ export default class ConsumptionDetails extends React.Component {
 
 
     };
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
 
     filterData() {
         let programId = document.getElementById('programId').value;
@@ -336,128 +347,128 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated fadeIn">
-                
-                    <h5>{i18n.t(this.state.message)}</h5>
-                    <Card>
 
-                        <CardHeader>
-                            <strong>QAT PROBLEM+ACTION REPORT</strong>
-                            {
-                                // this.state.matricsList.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" />
+                <h5>{i18n.t(this.state.message)}</h5>
+                <Card>
 
-                                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                    <CardHeader>
+                        <strong>QAT PROBLEM+ACTION REPORT</strong>
+                        {
+                            // this.state.matricsList.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" />
+
+                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
  
  {({ toPdf }) =>
  <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
  }
  </Pdf>*/}
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} />
+                            </div>
+                        }
+                    </CardHeader>
+                    <CardBody>
+                        <Formik
+                            render={
+                                ({
+                                }) => (
+                                        <Form name='simpleForm'>
+
+                                            <Col md="12 pl-0">
+                                                <div className="d-md-flex">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">Program</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    value={this.state.programId}
+                                                                    name="programId" id="programId"
+                                                                    onChange={this.getPlanningUnitList}
+                                                                >
+                                                                    <option value="0">Please select</option>
+                                                                    {programs}
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="planningUnitId"
+                                                                    id="planningUnitId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.planningUnitId}
+                                                                    onChange={this.filterData}
+                                                                >
+                                                                    <option value="0">Please Select</option>
+                                                                    {planningUnits}
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">Priority</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    value={this.state.priorityId}
+                                                                    name="priorityId" id="priorityId"
+                                                                    onChange={this.filterData}
+                                                                >
+                                                                    <option value="0">Please select</option>
+                                                                    <option value="1">High</option>
+                                                                    <option value="2">Midium</option>
+                                                                    <option value="3">Low</option>
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">HQ Status</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    value={this.state.hqStatusId}
+                                                                    name="hqStatusId" id="hqStatusId"
+                                                                    onChange={this.filterData}
+                                                                >
+                                                                    <option value="0">Please select</option>
+                                                                    <option value="1">Open</option>
+                                                                    <option value="2">Closed</option>
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
+                                    )} />
+
+                        <Col xs="12" sm="12">
+                            <div className="table-responsive">
+                                <div id="shipmenttableDiv">
+
                                 </div>
-                            }
-                        </CardHeader>
-                        <CardBody>
-                            <Formik
-                                render={
-                                    ({
-                                    }) => (
-                                            <Form name='simpleForm'>
-
-                                                <Col md="12 pl-0">
-                                                    <div className="d-md-flex">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">Program</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        value={this.state.programId}
-                                                                        name="programId" id="programId"
-                                                                        onChange={this.getPlanningUnitList}
-                                                                    >
-                                                                        <option value="0">Please select</option>
-                                                                        {programs}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="planningUnitId"
-                                                                        id="planningUnitId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.planningUnitId}
-                                                                        onChange={this.filterData}
-                                                                    >
-                                                                        <option value="0">Please Select</option>
-                                                                        {planningUnits}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">Priority</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        value={this.state.priorityId}
-                                                                        name="priorityId" id="priorityId"
-                                                                        onChange={this.filterData}
-                                                                    >
-                                                                        <option value="0">Please select</option>
-                                                                        <option value="1">High</option>
-                                                                        <option value="2">Midium</option>
-                                                                        <option value="3">Low</option>
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">HQ Status</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        value={this.state.hqStatusId}
-                                                                        name="hqStatusId" id="hqStatusId"
-                                                                        onChange={this.filterData}
-                                                                    >
-                                                                        <option value="0">Please select</option>
-                                                                        <option value="1">Open</option>
-                                                                        <option value="2">Closed</option>
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
-                                        )} />
-
-                            <Col xs="12" sm="12">
-                                <div className="table-responsive">
-                                    <div id="shipmenttableDiv">
-
-                                    </div>
-                                </div>
-                            </Col>
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup>
-                                &nbsp;
+                            </div>
+                        </Col>
+                    </CardBody>
+                    <CardFooter>
+                        <FormGroup>
+                            &nbsp;
 </FormGroup>
-                        </CardFooter>
-                    </Card>
-                
+                    </CardFooter>
+                </Card>
+
 
             </div >
         );

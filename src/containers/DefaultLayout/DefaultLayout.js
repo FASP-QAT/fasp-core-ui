@@ -324,7 +324,7 @@ class DefaultLayout extends Component {
                           // },
 
                           {
-                            name: 'Commit Version',
+                            name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
                             icon: 'fa fa-code-fork',
                           },
