@@ -18,6 +18,8 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
 export default class ConsumptionDetails extends React.Component {
@@ -435,6 +437,16 @@ export default class ConsumptionDetails extends React.Component {
                                 // { title: 'Last Modified date', type: 'text', readOnly: true },
                                 // { title: 'Last Modified by', type: 'text', readOnly: true }
                             ],
+
+                            text: {
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                show: '',
+                                entries: '',
+                            },
+
+
+
+                            onload: this.loaded,
                             pagination: 10,
                             search: true,
                             columnSorting: true,
@@ -458,7 +470,9 @@ export default class ConsumptionDetails extends React.Component {
     }
 
 
-
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
 
 
 

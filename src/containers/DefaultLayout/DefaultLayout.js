@@ -322,7 +322,7 @@ class DefaultLayout extends Component {
                           // },
 
                           {
-                            name: 'Commit Version',
+                            name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
                             icon: 'fa fa-code-fork',
                           },
@@ -454,12 +454,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text'
-                          } ,
+                          },
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
                             icon: 'fa fa-exchange'
-                          } ,
+                          },
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',

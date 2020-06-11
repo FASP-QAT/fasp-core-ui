@@ -5,6 +5,7 @@ import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PipelineProgramInventory extends Component {
 
@@ -27,7 +28,7 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid=false;
+                valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -222,7 +223,13 @@ export default class PipelineProgramInventory extends Component {
                                 oneditionend: this.onedit,
                                 copyCompatibility: true,
                                 // paginationOptions: [10, 25, 50, 100],
-                                position: 'top'
+                                position: 'top',
+                                text: {
+                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                    show: '',
+                                    entries: '',
+                                },
+                                onload: this.loaded,
                             };
 
                             this.el = jexcel(document.getElementById("inventorytableDiv"), options);
@@ -233,6 +240,10 @@ export default class PipelineProgramInventory extends Component {
                     });
             });
         });
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
     render() {
