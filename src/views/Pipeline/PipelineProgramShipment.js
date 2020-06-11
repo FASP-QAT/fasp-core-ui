@@ -958,13 +958,28 @@ export default class PipelineProgramShipment extends Component {
     }
     SubmitProgram() {
 
-        PipelineService.submitProgram(this.props.match.params.pipelineId)
+        PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
+        .then(response => {
+            var planningUnitListFinalInventory = response.data;
+            console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
+            var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
+            console.log("negtive inventory list=====", negtiveInventoryList);
+            if (negtiveInventoryList.length > 0) {
+                console.log("my page------");
+                this.props.history.push({
+                    pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
+                });
+            } else {
+                PipelineService.submitProgram(this.props.match.params.pipelineId)
         .then(response => {
              console.log(response.data.messageCode)
             this.setState({
                 message: response.data.messageCode,
                 changedData: false
             })
+            this.props.history.push({
+                pathname: `/pipeline/pieplineProgramList`
+            });
         }
         ).catch(
             error => {
@@ -988,23 +1003,14 @@ export default class PipelineProgramShipment extends Component {
         );
 
 
+                console.log('You have submitted the program');
+            }
 
-        PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
-            .then(response => {
-                var planningUnitListFinalInventory = response.data;
-                console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
-                var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
-                console.log("negtive inventory list=====", negtiveInventoryList);
-                if (negtiveInventoryList.length > 0) {
-                    console.log("my page------");
-                    this.props.history.push({
-                        pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
-                    });
-                } else {
-                    console.log('You have submitted the program');
-                }
+        });
 
-            });
+        
+
+       
     }
 
     render() {
@@ -1012,7 +1018,7 @@ export default class PipelineProgramShipment extends Component {
         return (
             <>
                 <div className="table-responsive" >
-
+                <h5>{i18n.t(this.state.message)}</h5>
                     <div id="shipmenttableDiv">
                     </div>
                     <div>

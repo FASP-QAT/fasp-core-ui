@@ -217,7 +217,8 @@ const routes = [
   { path: '/report/inventoryTurns',name: 'Report  / Inventory Turns',component: InventoryTurnsReport },
   { path: '/report/costOfInventory',name: 'Report  /  Cost Of Inventory',component: CostOfInventoryReport },
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'PlanningUnit List',component: PlanningUnitListNegativeInventory },
-  { path: '/pipeline/pieplineProgramList', name: 'Program List', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramList/:color/:message', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramList',exact: true ,name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
@@ -298,7 +299,8 @@ const routes = [
 
   { path: '/procurementAgent/addProcurementAgent', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementagent') }), component: AddProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagent') }), component: ListProcurementAgent },
-  { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
+  // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent/:color/:message', component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent/:procurementAgentId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementagent') }), component: EditProcurementAgent },
 
   { path: '/tracerCategory/addTracerCategory', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.tracercategory') }), component: AddTracerCategory },
@@ -321,7 +323,8 @@ const routes = [
   { path: '/region/listRegion/:message', component: ListRegion },
   
 
-  { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
+  // { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
+  { path: '/realmCountry/listRealmCountry/:color/:message', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: i18n.t('static.dashboard.realmcountrylist'), component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realmcountry') }), component: AddRealmCountry },
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: i18n.t('static.dashboard.realm') + " / " + i18n.t('static.dashboard.realmcountry'), component: RealmCountry },
@@ -334,7 +337,8 @@ const routes = [
   { path: '/role/addRole', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.role') }), component: AddRole },
   { path: '/role/editRole/:roleId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.role') }), component: EditRole },
 
-  { path: '/user/listUser/:message', component: ListUser },
+  // { path: '/user/listUser/:message', component: ListUser },
+  { path: '/user/listUser/:color/:message', component: ListUser },
   { path: '/user/listUser', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.user') }), component: ListUser },
   { path: '/user/addUser', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.user') }), component: AddUser },
   { path: '/user/editUser/:userId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.user') }), component: EditUser },
