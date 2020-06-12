@@ -105,12 +105,13 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     editPlanningUnit(planningUnit) {
-        console.log('**' + JSON.stringify(planningUnit))
-        this.props.history.push({
-            pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
-            // state: { planningUnit: planningUnit }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
+            console.log('**' + JSON.stringify(planningUnit))
+            this.props.history.push({
+                pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
+                // state: { planningUnit: planningUnit }
+            });
+        }
     }
 
     addNewPlanningUnit() {
@@ -242,7 +243,7 @@ export default class PlanningUnitListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

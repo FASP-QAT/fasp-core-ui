@@ -118,7 +118,7 @@ export default class DataSourceListComponent extends Component {
                     programs: response.data, loading: false 
                 })}
 
-                else{
+                else {
 
                     this.setState({
                         message: response.data.messageCode
@@ -127,7 +127,7 @@ export default class DataSourceListComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-               
+
             })
         // .catch(
         //     error => {
@@ -238,11 +238,12 @@ export default class DataSourceListComponent extends Component {
     }
 
     editDataSource(dataSource) {
-        this.props.history.push({
-            pathname: `/dataSource/editDataSource/${dataSource.dataSourceId}`,
-            // state: { dataSource: dataSource }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASOURCE')) {
+            this.props.history.push({
+                pathname: `/dataSource/editDataSource/${dataSource.dataSourceId}`,
+                // state: { dataSource: dataSource }
+            });
+        }
     }
 
     addNewDataSource() {
@@ -376,7 +377,7 @@ export default class DataSourceListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATASOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

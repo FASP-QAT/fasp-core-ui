@@ -81,23 +81,27 @@ class ListRealmCountryComponent extends Component {
     }
     PlanningUnitCountry(event, row) {
         event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
-            state: { realmCountry: row }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_PLANNING_UNIT')) {
+            console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
+                state: { realmCountry: row }
 
 
-        })
+            })
+        }
     }
     RealmCountryRegion(event, row) {
         event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
-            state: { realmCountry: row }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
+            console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
+                state: { realmCountry: row }
 
 
-        })
+            })
+        }
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();

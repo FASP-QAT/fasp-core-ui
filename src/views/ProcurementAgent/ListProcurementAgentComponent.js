@@ -52,93 +52,97 @@ class ListProcurementAgentComponent extends Component {
 
     addPlanningUnitMapping(event, cell) {
         event.stopPropagation();
-        this.props.history.push({
-            pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
-        });
-        // AuthenticationService.setupAxiosInterceptors();
-        // ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             let myReasponse = response.data;
-        //             this.props.history.push({
-        //                 pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
-        //                 state: {
-        //                     procurementAgentPlanningUnit: myReasponse,
-        //                     procurementAgentId:cell
-        //                 }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PLANNING_UNIT')) {
+            this.props.history.push({
+                pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
+            });
+            // AuthenticationService.setupAxiosInterceptors();
+            // ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
+            //     .then(response => {
+            //         if (response.status == 200) {
+            //             let myReasponse = response.data;
+            //             this.props.history.push({
+            //                 pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
+            //                 state: {
+            //                     procurementAgentPlanningUnit: myReasponse,
+            //                     procurementAgentId:cell
+            //                 }
 
-        //             })
-        //         } else {
-        //             this.setState({
-        //                 message: response.data.messageCode
-        //             })
-        //         }
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({ message: error.message });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-        //                     case 500:
-        //                     case 401:
-        //                     case 404:
-        //                     case 406:
-        //                     case 412:
-        //                         this.setState({ message: error.response.data.messageCode });
-        //                         break;
-        //                     default:
-        //                         this.setState({ message: 'static.unkownError' });
-        //                         console.log("Error code unkown");
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+            //             })
+            //         } else {
+            //             this.setState({
+            //                 message: response.data.messageCode
+            //             })
+            //         }
+            //     }).catch(
+            //         error => {
+            //             if (error.message === "Network Error") {
+            //                 this.setState({ message: error.message });
+            //             } else {
+            //                 switch (error.response ? error.response.status : "") {
+            //                     case 500:
+            //                     case 401:
+            //                     case 404:
+            //                     case 406:
+            //                     case 412:
+            //                         this.setState({ message: error.response.data.messageCode });
+            //                         break;
+            //                     default:
+            //                         this.setState({ message: 'static.unkownError' });
+            //                         console.log("Error code unkown");
+            //                         break;
+            //                 }
+            //             }
+            //         }
+            //     );
+        }
     }
 
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
-        this.props.history.push({
-            pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
-        });
-        // AuthenticationService.setupAxiosInterceptors();
-        // ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             let myResponse = response.data;
-        //             this.props.history.push({
-        //                 pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
-        //                 state: {
-        //                     procurementAgentProcurementUnit: myResponse,
-        //                     procurementAgentId:cell
-        //                 }
-        //             })
-        //         } else {
-        //             this.setState({
-        //                 message: response.data.messageCode
-        //             })
-        //         }
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({ message: error.message });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-        //                     case 500:
-        //                     case 401:
-        //                     case 404:
-        //                     case 406:
-        //                     case 412:
-        //                         this.setState({ message: error.response.data.messageCode });
-        //                         break;
-        //                     default:
-        //                         this.setState({ message: 'static.unkownError' });
-        //                         console.log("Error code unkown");
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PROCUREMENT_UNIT')) {
+            this.props.history.push({
+                pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
+            });
+            // AuthenticationService.setupAxiosInterceptors();
+            // ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
+            //     .then(response => {
+            //         if (response.status == 200) {
+            //             let myResponse = response.data;
+            //             this.props.history.push({
+            //                 pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
+            //                 state: {
+            //                     procurementAgentProcurementUnit: myResponse,
+            //                     procurementAgentId:cell
+            //                 }
+            //             })
+            //         } else {
+            //             this.setState({
+            //                 message: response.data.messageCode
+            //             })
+            //         }
+            //     }).catch(
+            //         error => {
+            //             if (error.message === "Network Error") {
+            //                 this.setState({ message: error.message });
+            //             } else {
+            //                 switch (error.response ? error.response.status : "") {
+            //                     case 500:
+            //                     case 401:
+            //                     case 404:
+            //                     case 406:
+            //                     case 412:
+            //                         this.setState({ message: error.response.data.messageCode });
+            //                         break;
+            //                     default:
+            //                         this.setState({ message: 'static.unkownError' });
+            //                         console.log("Error code unkown");
+            //                         break;
+            //                 }
+            //             }
+            //         }
+            //     );
+        }
     }
 
     addNewProcurementAgent() {
@@ -158,10 +162,12 @@ class ListProcurementAgentComponent extends Component {
         }
     }
     editProcurementAgent(procurementAgent) {
-        this.props.history.push({
-            pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
-            // state: { procurementAgent }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+            this.props.history.push({
+                pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
+                // state: { procurementAgent }
+            });
+        }
     }
     buttonFormatter(cell, row) {
         console.log("button formater cell-----------", cell);
@@ -382,7 +388,7 @@ class ListProcurementAgentComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

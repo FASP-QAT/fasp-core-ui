@@ -79,10 +79,10 @@ class ForgotPasswordComponent extends Component {
             return Boolean(errors[fieldName])
         })
         this.setState({
-            loading:true
+            loading: true
         }, (
         ) => {
-            
+
         })
     }
     findFirstError(formName, hasError) {
@@ -133,6 +133,7 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
+
                                                             console.log(error)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
@@ -146,7 +147,10 @@ class ForgotPasswordComponent extends Component {
                                                                     case 403:
                                                                     case 406:
                                                                     case 412:
-                                                                        this.setState({ message: error.response.data.messageCode });
+                                                                        this.setState({
+                                                                            message: error.response.data.messageCode,
+                                                                            loading: false
+                                                                        });
                                                                         break;
                                                                     default:
                                                                         this.setState({ message: 'static.unkownError' });

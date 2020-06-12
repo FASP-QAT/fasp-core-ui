@@ -222,7 +222,7 @@ export default class OrganisationListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addOrganisation}><i className="fa fa-plus-square"></i></a>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_ORGANISATION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addOrganisation}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -297,10 +297,12 @@ export default class OrganisationListComponent extends Component {
     }
 
     editOrganisation(organisation) {
-        this.props.history.push({
-            pathname: `/organisation/editOrganisation/${organisation.organisationId}`,
-            // state: { organisation: organisation }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANISATION')) {
+            this.props.history.push({
+                pathname: `/organisation/editOrganisation/${organisation.organisationId}`,
+                // state: { organisation: organisation }
+            });
+        }
     }
     addOrganisation() {
         if (navigator.onLine) {
