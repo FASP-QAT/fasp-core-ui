@@ -90,7 +90,7 @@ class AddBudgetComponent extends Component {
                     label_fr: ''
                 },
                 program: {
-                    programId: '',
+                    id:'',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -171,7 +171,7 @@ class AddBudgetComponent extends Component {
             budget.label.label_en = event.target.value;
         }
         if (event.target.name === "programId") {
-            budget.program.programId = event.target.value;
+            budget.program.id = event.target.value;
         }
         if (event.target.name === "fundingSourceId") {
             budget.fundingSource.fundingSourceId = event.target.value;
@@ -385,12 +385,12 @@ class AddBudgetComponent extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            valid={!errors.programId && this.state.budget.program.programId != ''}
+                                                            valid={!errors.programId && this.state.budget.program.id != ''}
                                                             invalid={touched.programId && !!errors.programId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.budget.program.programId}
+                                                            value={this.state.budget.program.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
