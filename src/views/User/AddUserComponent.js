@@ -336,7 +336,8 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                 <h5 style={{ color: "red" }} id="div2">
+                     {i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>

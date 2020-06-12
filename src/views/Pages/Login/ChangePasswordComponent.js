@@ -112,7 +112,7 @@ class ChangePasswordComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -143,9 +143,12 @@ class ChangePasswordComponent extends Component {
                                                         switch (error.response.status) {
                                                             case 500:
                                                             case 401:
+                                                            case 403:
                                                             case 404:
                                                             case 406:
                                                             case 412:
+                                                                console.log("error.response.data.messageCode 111 ---",error.response);
+                                                                console.log("error.response.data.messageCode ---",error.response.data.messageCode);
                                                                 this.setState({ message: error.response.data.messageCode });
                                                                 break;
                                                             default:

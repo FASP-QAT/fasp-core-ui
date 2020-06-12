@@ -7,7 +7,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS } from '../../Constants.js';
+import { SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -31,17 +31,24 @@ export default class syncPage extends Component {
       oldDataJsonConsumption: [],
       latestDataJsonConsumption: [],
       mergedDataConsumption: [],
+      mergedConsumptionList: [],
       oldDataJsonInventory: [],
       latestDataJsonInventory: [],
       mergedDataInventory: [],
+      mergedInventoryList: [],
       consumptionIdArray: [],
       inventoryIdArray: [],
       oldDataJsonShipment: [],
       latestDataJsonShipment: [],
       mergedDataShipment: [],
+      mergedShipmentList: [],
       shipmentIdArray: [],
       versionTypeList: [],
-      lang: localStorage.getItem('lang')
+      batchArray: [],
+      lang: localStorage.getItem('lang'),
+      negativeBatchNumbers: "",
+      isErpMatching: true,
+      isChanged: false
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -56,6 +63,7 @@ export default class syncPage extends Component {
     // this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
     this.synchronize = this.synchronize.bind(this);
+    this.checkValidationForNegativeStockInBatch = this.checkValidationForNegativeStockInBatch.bind(this);
   }
 
   toggle(tabPane, tab) {
@@ -162,15 +170,22 @@ export default class syncPage extends Component {
         var shipmentStatusList = []
         var latestDataJsonConsumption = []
         var oldDataJsonConsumption = []
-        var mergedDataConsumption = []
+        var mergedDataConsumption = [];
+        var mergedConsumptionList = [];
         var latestDataJsonInventory = []
         var oldDataJsonInventory = []
         var mergedDataInventory = []
+        var mergedInventoryList = []
         var oldInventoryList = [];
+        var oldConsumptionList = [];
+        var oldShipmentList = [];
         var latestInventoryList = [];
+        var latestConsumptionList = [];
+        var latestShipmentList = [];
         var latestDataJsonShipment = []
         var oldDataJsonShipment = []
         var mergedDataShipment = []
+        var mergedShipmentList = []
         var procurementAgentListAll = [];
         var procurementUnitListAll = [];
         var shipmentStatusListAll = []
@@ -178,10 +193,19 @@ export default class syncPage extends Component {
         var consumptionList = (programJson.consumptionList);
         var inventoryList = (programJson.inventoryList);
         var shipmentList = (programJson.shipmentList);
+        var batchNumberArray = [];
+        var realmCountryId = programJson.realmCountry.realmCountryId;
+        var batchNumberList = programJson.batchInfoList;
+        for (var i = 0; i < batchNumberList.length; i++) {
+          if (!batchNumberArray.includes(batchNumberList[i].batchNo)) {
+            batchNumberArray.push(batchNumberList[i].batchNo);
+          }
+        }
         this.setState({
           consumptionList: consumptionList,
           inventoryList: inventoryList,
-          shipmentList: shipmentList
+          shipmentList: shipmentList,
+          realmCountryId: realmCountryId
         });
 
         var data = [];
@@ -205,6 +229,7 @@ export default class syncPage extends Component {
           consumptionDataArr[j] = data;
         }
         latestDataJsonConsumption = consumptionDataArr;
+        latestConsumptionList = consumptionList
         this.setState({
           latestDataJsonConsumption: latestDataJsonConsumption
         })
@@ -230,6 +255,7 @@ export default class syncPage extends Component {
           inventoryDataArr[j] = data;
         }
         latestDataJsonInventory = inventoryDataArr;
+        latestInventoryList = inventoryList;
         this.setState({
           latestDataJsonInventory: latestDataJsonInventory,
           latestInventoryList: inventoryList
@@ -266,6 +292,7 @@ export default class syncPage extends Component {
           shipmentDataArr[j] = data;
         }
         latestDataJsonShipment = shipmentDataArr;
+        latestShipmentList = shipmentList;
         this.setState({
           latestDataJsonShipment: latestDataJsonShipment
         })
@@ -291,7 +318,13 @@ export default class syncPage extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-
+            var batchNumberList = programJson.batchInfoList;
+            for (var i = 0; i < batchNumberList.length; i++) {
+              if (!batchNumberArray.includes(batchNumberList[i].batchNo)) {
+                batchNumberArray.push(batchNumberList[i].batchNo);
+              }
+            }
+            this.setState({ batchNumberArray: batchNumberArray });
             var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
             var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
             var dataSourceRequest = dataSourceOs.getAll();
@@ -498,6 +531,7 @@ export default class syncPage extends Component {
                             // this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
                             // this.el.destroy();
                             oldDataJsonConsumption = consumptionDataArr;
+                            oldConsumptionList = consumptionList;
                             // this.setState({
                             //   oldDataJsonConsumption: oldDataJsonConsumption
                             // })
@@ -627,6 +661,7 @@ export default class syncPage extends Component {
                             // this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
                             // this.el.destroy();
                             oldDataJsonShipment = shipmentDataArr;
+                            oldShipmentList = shipmentList;
                             // this.setState({
                             //   oldDataJsonInventory: oldDataJsonInventory
                             // })
@@ -846,23 +881,41 @@ export default class syncPage extends Component {
                             // this.el = jexcel(document.getElementById("latestVersionInventory"), options);
 
                             var mergedDataConsumption = [];
+                            var mergedConsumptionList = [];
                             var consumptionIdArray = [];
                             for (var i = 0; i < oldDataJsonConsumption.length; i++) {
                               if ((oldDataJsonConsumption[i])[0] != 0) {
                                 mergedDataConsumption.push(oldDataJsonConsumption[i]);
+                                mergedConsumptionList.push(oldConsumptionList[i]);
                                 consumptionIdArray.push((oldDataJsonConsumption[i])[0]);
+                              }
+                            }
+                            for (var i = 0; i < oldDataJsonConsumption.length; i++) {
+                              if ((oldDataJsonConsumption[i])[0] == 0) {
+                                var checkIfExists = latestConsumptionList.filter(c =>
+                                  moment(c.consumptionDate).format("YYYY-MM") == moment(oldConsumptionList[i].consumptionDate).format("YYYY-MM") &&
+                                  c.region.id == oldConsumptionList[i].region.id &&
+                                  c.planningUnit.id == oldConsumptionList[i].planningUnit.id &&
+                                  c.actualFlag == oldConsumptionList[i].actualFlag
+                                )
+                                console.log("CheckIfExists", checkIfExists);
+                                if (checkIfExists.length > 0) {
+                                  (oldDataJsonConsumption[i])[0] = checkIfExists[0].consumptionId;
+                                  mergedDataConsumption.push(oldDataJsonConsumption[i])
+                                  mergedConsumptionList.push(oldConsumptionList[i]);
+                                  consumptionIdArray.push(checkIfExists[0].consumptionId)
+                                } else {
+                                  mergedDataConsumption.push(oldDataJsonConsumption[i])
+                                  mergedConsumptionList.push(oldConsumptionList[i])
+                                }
                               }
                             }
                             for (var i = 0; i < latestDataJsonConsumption.length; i++) {
                               if (consumptionIdArray.includes((latestDataJsonConsumption[i])[0])) {
                               } else {
                                 mergedDataConsumption.push(latestDataJsonConsumption[i]);
+                                mergedConsumptionList.push(latestConsumptionList[i]);
                                 // consumptionIdArray.push(latestDataJsonConsumption[i].consumptionId);
-                              }
-                            }
-                            for (var i = 0; i < oldDataJsonConsumption.length; i++) {
-                              if ((oldDataJsonConsumption[i])[0] == 0) {
-                                mergedDataConsumption.push(oldDataJsonConsumption[i])
                               }
                             }
                             this.el = jexcel(document.getElementById("mergedVersionConsumption"), '');
@@ -870,7 +923,8 @@ export default class syncPage extends Component {
                             mergedDataConsumption = mergedDataConsumption;
                             this.setState({
                               mergedDataJsonConsumption: mergedDataConsumption,
-                              consumptionIdArray: consumptionIdArray
+                              consumptionIdArray: consumptionIdArray,
+                              mergedConsumptionList: mergedConsumptionList
                             })
                             var options = {
                               data: mergedDataConsumption,
@@ -920,7 +974,7 @@ export default class syncPage extends Component {
                                 { type: 'checkbox', title: i18n.t('static.consumption.actualflag') },
                               ],
                               pagination: 10,
-                              paginationOptions: [10, 25, 50, 100],
+                              // paginationOptions: [10, 25, 50, 100],
                               search: true,
                               columnSorting: true,
                               tableOverflow: true,
@@ -941,10 +995,12 @@ export default class syncPage extends Component {
                             this.el = jexcel(document.getElementById("mergedVersionConsumption"), options);
 
                             var mergedDataInventory = [];
+                            var mergedInventoryList = [];
                             var inventoryIdArray = [];
                             for (var i = 0; i < oldDataJsonInventory.length; i++) {
                               if ((oldDataJsonInventory[i])[0] != 0) {
                                 mergedDataInventory.push(oldDataJsonInventory[i]);
+                                mergedInventoryList.push(oldInventoryList[i]);
                                 inventoryIdArray.push((oldDataJsonInventory[i])[0]);
                               }
                             }
@@ -953,15 +1009,17 @@ export default class syncPage extends Component {
                                 var checkIfExists = latestInventoryList.filter(c =>
                                   moment(c.inventoryDate).format("YYYY-MM") == moment(oldInventoryList[i].inventoryDate).format("YYYY-MM") &&
                                   c.region.id == oldInventoryList[i].region.id &&
-                                  c.planningUnit.id == oldInventoryList[i].planningUnit.id &&
                                   c.realmCountryPlanningUnit.id == oldInventoryList[i].realmCountryPlanningUnit.id
                                 )
+                                console.log("CheckIfExists", checkIfExists);
                                 if (checkIfExists.length > 0) {
                                   (oldDataJsonInventory[i])[0] = checkIfExists[0].inventoryId;
                                   mergedDataInventory.push(oldDataJsonInventory[i])
+                                  mergedInventoryList.push(oldInventoryList[i]);
                                   inventoryIdArray.push(checkIfExists[0].inventoryId)
                                 } else {
                                   mergedDataInventory.push(oldDataJsonInventory[i])
+                                  mergedInventoryList.push(oldInventoryList[i]);
                                 }
                               }
                             }
@@ -969,6 +1027,7 @@ export default class syncPage extends Component {
                               if (inventoryIdArray.includes((latestDataJsonInventory[i])[0])) {
                               } else {
                                 mergedDataInventory.push(latestDataJsonInventory[i]);
+                                mergedInventoryList.push(latestInventoryList[i]);
                                 // inventoryIdArray.push(latestDataJsonInventory[i].consumptionId);
                               }
                             }
@@ -978,7 +1037,8 @@ export default class syncPage extends Component {
                             mergedDataInventory = mergedDataInventory;
                             this.setState({
                               mergedDataInventory: mergedDataInventory,
-                              inventoryIdArray: inventoryIdArray
+                              inventoryIdArray: inventoryIdArray,
+                              mergedInventoryList: mergedInventoryList
                             })
                             var options = {
                               data: mergedDataInventory,
@@ -1034,7 +1094,7 @@ export default class syncPage extends Component {
 
                               ],
                               pagination: 10,
-                              paginationOptions: [10, 25, 50, 100],
+                              // paginationOptions: [10, 25, 50, 100],
                               search: true,
                               columnSorting: true,
                               tableOverflow: true,
@@ -1058,23 +1118,41 @@ export default class syncPage extends Component {
 
 
                             var mergedDataShipment = [];
+                            var mergedShipmentList = [];
                             var shipmentIdArray = [];
                             for (var i = 0; i < oldDataJsonShipment.length; i++) {
                               if ((oldDataJsonShipment[i])[0] != 0) {
                                 mergedDataShipment.push(oldDataJsonShipment[i]);
+                                mergedShipmentList.push(oldShipmentList[i]);
                                 shipmentIdArray.push((oldDataJsonShipment[i])[0]);
+                              }
+                            }
+                            for (var i = 0; i < oldDataJsonShipment.length; i++) {
+                              if ((oldDataJsonShipment[i])[0] == 0) {
+                                var checkIfExists = latestShipmentList.filter(c =>
+                                  moment(c.expectedDeliveryDate).format("YYYY-MM") == moment(oldShipmentList[i].expectedDeliveryDate).format("YYYY-MM") &&
+                                  c.planningUnit.id == oldShipmentList[i].planningUnit.id &&
+                                  c.procurementAgent.id == oldShipmentList[i].procurementAgent.id &&
+                                  c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS
+                                )
+                                console.log("CheckIfExists", checkIfExists);
+                                if (checkIfExists.length > 0) {
+                                  (oldDataJsonShipment[i])[0] = checkIfExists[0].shipmentId;
+                                  mergedDataShipment.push(oldDataJsonShipment[i])
+                                  mergedShipmentList.push(oldShipmentList[i]);
+                                  shipmentIdArray.push(checkIfExists[0].shipmentId)
+                                } else {
+                                  mergedDataShipment.push(oldDataJsonShipment[i])
+                                  mergedShipmentList.push(oldShipmentList[i]);
+                                }
                               }
                             }
                             for (var i = 0; i < latestDataJsonShipment.length; i++) {
                               if (shipmentIdArray.includes((latestDataJsonShipment[i])[0])) {
                               } else {
                                 mergedDataShipment.push(latestDataJsonShipment[i]);
+                                mergedShipmentList.push(latestShipmentList[i]);
                                 // inventoryIdArray.push(latestDataJsonInventory[i].consumptionId);
-                              }
-                            }
-                            for (var i = 0; i < oldDataJsonShipment.length; i++) {
-                              if ((oldDataJsonShipment[i])[0] == 0) {
-                                mergedDataShipment.push(oldDataJsonShipment[i])
                               }
                             }
 
@@ -1083,7 +1161,8 @@ export default class syncPage extends Component {
                             mergedDataShipment = mergedDataShipment;
                             this.setState({
                               mergedDataShipment: mergedDataShipment,
-                              shipmentIdArray: shipmentIdArray
+                              shipmentIdArray: shipmentIdArray,
+                              mergedShipmentList: mergedShipmentList
                             })
                             var options = {
                               data: mergedDataShipment,
@@ -1111,7 +1190,7 @@ export default class syncPage extends Component {
                                 { type: 'checkbox', title: i18n.t('static.common.active') },
                               ],
                               pagination: 10,
-                              paginationOptions: [10, 25, 50, 100],
+                              // paginationOptions: [10, 25, 50, 100],
                               search: true,
                               columnSorting: true,
                               tableOverflow: true,
@@ -1205,7 +1284,7 @@ export default class syncPage extends Component {
   // }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunction(instance);
+    // jExcelLoadedFunction(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
@@ -1225,6 +1304,9 @@ export default class syncPage extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                   } else {
                     elInstance.setStyle(col, "background-color", "yellow");
+                    this.setState({
+                      isChanged: true
+                    })
                   }
                 }
                 z = latestDataJson.length
@@ -1238,7 +1320,9 @@ export default class syncPage extends Component {
             }
           }
         } else {
-
+          this.setState({
+            isChanged: true
+          })
           // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
@@ -1246,7 +1330,6 @@ export default class syncPage extends Component {
           }
         }
       } else {
-
         // Else part for inactive colour
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
@@ -1295,7 +1378,7 @@ export default class syncPage extends Component {
   // }
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunction(instance);
+    // jExcelLoadedFunction(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
@@ -1314,6 +1397,9 @@ export default class syncPage extends Component {
                   if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
                     elInstance.setStyle(col, "background-color", "transparent");
                   } else {
+                    this.setState({
+                      isChanged: true
+                    })
                     elInstance.setStyle(col, "background-color", "yellow");
                   }
                 }
@@ -1329,6 +1415,9 @@ export default class syncPage extends Component {
           }
         } else {
           // Else part for new entries in current version
+          this.setState({
+            isChanged: true
+          })
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "#86cd99");
@@ -1345,7 +1434,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    jExcelLoadedFunction(instance);
+    // jExcelLoadedFunction(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
@@ -1365,8 +1454,98 @@ export default class syncPage extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                   } else {
                     elInstance.setStyle(col, "background-color", "yellow");
+                    this.setState({
+                      isChanged: true
+                    })
                   }
                 }
+
+                // Logic for ERP Validation
+                var valueToCompareOrderNumber = (jsonData[y])[3];
+                var valueToCompareWithOrderNumber = (latestDataJson[z])[3];
+
+                var valueToComparePrimeLineNumber = (jsonData[y])[4];
+                var valueToCompareWithPrimeLineNumber = (latestDataJson[z])[4];
+
+                console.log("Value To compare order number", valueToCompareOrderNumber);
+                console.log("Value To compare with order number", valueToCompareWithOrderNumber);
+
+                console.log("Value To compare line number", valueToComparePrimeLineNumber);
+                console.log("Value To compare with line number", valueToCompareWithPrimeLineNumber);
+
+                if (valueToCompareOrderNumber != "" && valueToComparePrimeLineNumber != "") {
+                  var countOrderNumberAndLineNumber = this.state.mergedShipmentList.filter(c => c.orderNo == valueToCompareOrderNumber && c.primeLineNo == valueToComparePrimeLineNumber);
+                  console.log("length of order number", countOrderNumberAndLineNumber.length)
+                  if (countOrderNumberAndLineNumber.length == 1) {
+                    if (valueToCompareOrderNumber != valueToCompareWithOrderNumber || valueToComparePrimeLineNumber != valueToCompareWithPrimeLineNumber) {
+                      console.log("On", valueToCompareOrderNumber, "LN",
+                        valueToComparePrimeLineNumber,
+                        "rci", this.state.realmCountryId, "PI",
+                        (jsonData[y])[7])
+                      AuthenticationService.setupAxiosInterceptors();
+                      ProgramService.checkOrderNumberAndLineNumber(
+                        valueToCompareOrderNumber,
+                        valueToComparePrimeLineNumber,
+                        this.state.realmCountryId,
+                        (jsonData[y])[7]
+                      ).then(response => {
+                        console.log("Resposne.data", response.config.url.split("/")[7]);
+                        console.log("Prime number", response.config.url.split("/")[9]);
+                        if (response.data == 0) {
+                          console.log("Did match")
+                        } else {
+                          console.log("y", y)
+                          var index = this.state.mergedShipmentList.findIndex(c => c.orderNo == response.config.url.split("/")[7] && c.primeLineNo == response.config.url.split("/")[9])
+                          console.log("Index", index);
+                          for (var j = 0; j < colArr.length; j++) {
+                            var col = (colArr[j]).concat(parseInt(index) + 1);
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "orange");
+                          }
+                        }
+                        this.setState({
+                          isErpMatching: false
+                        })
+                      })
+                        .catch(
+                          error => {
+                            console.log("Didn't match");
+                            this.setState({
+                              statuses: [],
+                            })
+                            if (error.message === "Network Error") {
+                              this.setState({ message: error.message });
+                            } else {
+                              switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                  this.setState({ message: error.response.data.messageCode });
+                                  break;
+                                default:
+                                  this.setState({ message: 'static.unkownError' });
+                                  break;
+                              }
+                            }
+                          }
+                        );
+
+                    }
+                  } else {
+                    console.log("in else")
+                    for (var j = 0; j < colArr.length; j++) {
+                      var col = (colArr[j]).concat(parseInt(y) + 1);
+                      elInstance.setStyle(col, "background-color", "transparent");
+                      elInstance.setStyle(col, "background-color", "orangered");
+                    }
+                    this.setState({
+                      isErpMatching: false
+                    })
+                  }
+                }
+
                 z = latestDataJson.length
               }
             }
@@ -1383,6 +1562,9 @@ export default class syncPage extends Component {
             var col = (colArr[j]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "#86cd99");
           }
+          this.setState({
+            isChanged: true
+          })
         }
       } else {
         // Else part for inactive colour
@@ -1392,6 +1574,29 @@ export default class syncPage extends Component {
         }
       }
     }
+
+    // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
+    // // var colArrForOrderNumberAndLineNumber = ['D', 'E']
+    // var elInstance = instance.jexcel;
+    // var jsonData = elInstance.getJson();
+    // var latestDataJson = this.state.latestDataJsonShipment
+    // var shipmentIdArray = this.state.shipmentIdArray;
+    // for (var y = 0; y < jsonData.length; y++) {
+    //   if ((jsonData[y])[18] == true) {
+    //     if ((jsonData[y])[0] != 0) {
+    //       if (shipmentIdArray.includes((jsonData[y])[0])) {
+    //         for (var z = 0; z < latestDataJson.length; z++) {
+    //           if ((jsonData[y])[0] == (latestDataJson[z])[0]) {
+
+    //             // var col = (colArr[j]).concat(parseInt(y) + 1);
+
+    //             z = latestDataJson.length
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   // loadedFunctionLatest = function (instance) {
@@ -1558,7 +1763,7 @@ export default class syncPage extends Component {
           this.setState({ message: message })
         }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
-        <h6>{this.state.commitVersionError}</h6>
+        <h6 className="red">{(this.state.negativeBatchNumbers != "" && (this.state.negativeBatchNumbers).concat(i18n.t('static.commit.negativeStock'))) || this.state.commitVersionError}</h6>
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -1598,9 +1803,10 @@ export default class syncPage extends Component {
                           <li><span className="greenlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.newDataCurrentVersion')}</span></li>
                           <li><span className="notawesome"></span><span className="legendTextsync">  {i18n.t('static.commit.newDataLatestVersion')}</span></li>
                           <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.inactiveData')}</span></li>
+                          <li><span className="orangelegend"></span><span className="legendTextsync"> {i18n.t('static.commit.erpDidNotMatch')}</span></li>
+                          <li><span className="orangeredlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.duplicateErp')}</span></li>
                         </ul>
                       </div>
-
                     </div>
                   </Col>
                 </Form>
@@ -1673,7 +1879,7 @@ export default class syncPage extends Component {
               <CardFooter>
                 <FormGroup>
                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                  <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                  {this.state.isErpMatching && this.state.isChanged && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>}
                   &nbsp;
                                         </FormGroup>
               </CardFooter>
@@ -1684,75 +1890,152 @@ export default class syncPage extends Component {
     );
   };
 
+  checkValidationForNegativeStockInBatch() {
+    var negativeBatchNumbers = "";
+    var expiredBatchNumbers = this.state.batchNumberArray;
+    for (var ebn = 0; ebn < expiredBatchNumbers.length; ebn++) {
+      var shipmentList = this.state.mergedShipmentList;
+      var shipmentBatchArray = [];
+      for (var ship = 0; ship < shipmentList.length; ship++) {
+        var batchInfoList = shipmentList[ship].batchInfoList;
+        for (var bi = 0; bi < batchInfoList.length; bi++) {
+          shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+        }
+      }
+      var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn])[0];
+      var totalStockForBatchNumber = stockForBatchNumber.qty;
+      console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", expiredBatchNumbers[ebn]);
+
+      var consumptionList = this.state.mergedConsumptionList;
+      var consumptionBatchArray = [];
+      for (var con = 0; con < consumptionList.length; con++) {
+        var batchInfoList = consumptionList[con].batchInfoList;
+        for (var bi = 0; bi < batchInfoList.length; bi++) {
+          console.log("batchInfoList[bi].consumptionQty", batchInfoList[bi].consumptionQty)
+          consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+        }
+      }
+      var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn]);
+      var consumptionQty = 0;
+      for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+      }
+      console.log("Total consumptions batch number", consumptionQty, "Batch number", expiredBatchNumbers[ebn]);
+      var inventoryList = this.state.mergedInventoryList;
+      var inventoryBatchArray = [];
+      for (var inv = 0; inv < inventoryList.length; inv++) {
+        var batchInfoList = inventoryList[inv].batchInfoList;
+        for (var bi = 0; bi < batchInfoList.length; bi++) {
+          inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+        }
+      }
+      var inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn]);
+      var adjustmentQty = 0;
+      for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+      }
+
+      console.log("Total adjustments batch number", adjustmentQty, "Batch number", expiredBatchNumbers[ebn]);
+      var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+      console.log("RemainingBtach Qty", remainingBatchQty, " For batch number", expiredBatchNumbers[ebn]);
+      if (remainingBatchQty < 0) {
+        negativeBatchNumbers = negativeBatchNumbers.concat(expiredBatchNumbers[ebn].toString()).concat(",");
+        console.log("NegativebatchNumbers", negativeBatchNumbers);
+      }
+
+    }
+    console.log("Negative baych mnumbers", negativeBatchNumbers);
+    if (negativeBatchNumbers != "") {
+      console.log("In if")
+      negativeBatchNumbers = negativeBatchNumbers.substring(0, negativeBatchNumbers.length - 1);
+      this.setState({
+        negativeBatchNumbers: negativeBatchNumbers
+      })
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   synchronize() {
     if (navigator.onLine) {
-      document.getElementById("detailsDiv").style.display = "block";
-      var programId = document.getElementById('programId').value;
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onerror = function (event) {
-        this.setState({
-          commitVersionError: i18n.t('static.program.errortext')
-        })
-      }.bind(this);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var programRequest = programTransaction.get(programId);
-        programRequest.onerror = function (event) {
+      var validate = this.checkValidationForNegativeStockInBatch();
+      if (validate) {
+        document.getElementById("detailsDiv").style.display = "block";
+        var programId = document.getElementById('programId').value;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onerror = function (event) {
           this.setState({
             commitVersionError: i18n.t('static.program.errortext')
           })
         }.bind(this);
-        programRequest.onsuccess = function (event) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          programJson.versionType = { id: document.getElementById("versionType").value };
-          programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
-          programJson.notes = document.getElementById("notes").value
-          ProgramService.saveProgramData(programJson).then(response => {
-            if (response.status == 200) {
-              this.props.history.push(`/dashboard/` + i18n.t('static.message.commitSuccess', { entityname }))
-            } else {
-              this.setState({
-                message: response.data.messageCode
-              })
-            }
-          }).catch(
-            error => {
-              this.setState({
-                statuses: [],
-              })
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var programRequest = programTransaction.get(programId);
+          programRequest.onerror = function (event) {
+            this.setState({
+              commitVersionError: i18n.t('static.program.errortext')
+            })
+          }.bind(this);
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            programJson.versionType = { id: document.getElementById("versionType").value };
+            programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+            programJson.notes = document.getElementById("notes").value;
+            programJson.consumptionList = this.state.mergedConsumptionList;
+            programJson.inventoryList = this.state.mergedInventoryList;
+            programJson.shipmentList = this.state.mergedShipmentList;
+            ProgramService.saveProgramData(programJson).then(response => {
+              if (response.status == 200) {
+                this.props.history.push(`/dashboard/` + i18n.t('static.message.commitSuccess', { entityname }))
               } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    this.setState({ message: error.response.data.messageCode });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
+                this.setState({
+                  message: response.data.messageCode
+                })
+              }
+            }).catch(
+              error => {
+                this.setState({
+                  statuses: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: error.response.data.messageCode });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
                 }
               }
-            }
-          );
-          console.log("Program json", programJson);
+            );
+            console.log("Program json", programJson);
+          }.bind(this)
         }.bind(this)
-      }.bind(this)
+      } else {
+      }
     } else {
       this.setState({
         message: 'static.common.onlinealerttext'
       })
     }
   }
+
+  // checkValidationForOrderNumberAndLineNumber() {
+  // }
 
   cancelClicked() {
     this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))

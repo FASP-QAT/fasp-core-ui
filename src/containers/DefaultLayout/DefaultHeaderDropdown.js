@@ -116,7 +116,7 @@ class DefaultHeaderDropdown extends Component {
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.profile')}</strong></DropdownItem>
           <DropdownItem className="nonclickablebox"><i className="icon-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
-            {this.state.roleList.map(
+            {this.state.roleList != null && this.state.roleList != '' && this.state.roleList.map(
               role =>
 
                 <div className=" mb-1 mt-2" key={role.roleId}>

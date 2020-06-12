@@ -35,7 +35,7 @@ class AuthenticationService {
         var curDate = moment(new Date());
         const diff = curDate.diff(syncExpiresOn, 'days');
         // const diffDuration = moment.duration(diff);
-        console.log("diff---",diff);
+        console.log("diff---", diff);
         // console.log("diffDuration---",diffDuration)
         // console.log("Days:", diffDuration.days());
         console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
@@ -46,27 +46,32 @@ class AuthenticationService {
     }
 
     getLoggedInUsername() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        return decryptedUser.username;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            return decryptedUser.username;
+        }
+        return "";
     }
 
     getLoggedInUserRole() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        let roles = "";
-        for (let i = 0; i <= decryptedUser.roles.length; i++) {
-            let role = decryptedUser.roles[i];
-            // if (role != null && role != "") {
-            //     if (i > 0) {
-            //         roles += "," + role.label.label_en;
-            //     } else {
-            //         roles += role.label.label_en;
-            //     }
-            // }
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let roles = "";
+            for (let i = 0; i <= decryptedUser.roles.length; i++) {
+                let role = decryptedUser.roles[i];
+                // if (role != null && role != "") {
+                //     if (i > 0) {
+                //         roles += "," + role.label.label_en;
+                //     } else {
+                //         roles += role.label.label_en;
+                //     }
+                // }
+            }
+            console.log("decryptedUser.roles---" + decryptedUser.roles);
+            return decryptedUser.roles;
         }
-        console.log("decryptedUser.roles---" + decryptedUser.roles);
-        return decryptedUser.roles;
     }
 
     getLoggedInUserId() {
@@ -358,13 +363,613 @@ class AuthenticationService {
         return userObj;
     }
 
-    // getLoggedInUserRoleBusinessFunction() {
-    //     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-    //     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-    //     let businessFunctions = decryptedUser.businessFunction;
-    //     console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
-    //     return businessFunctions;
-    // }
+    getLoggedInUserRoleBusinessFunction() {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let businessFunctions = decryptedUser.businessFunction;
+            console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
+            return businessFunctions;
+        }
+        return "";
+    }
+
+    getLoggedInUserRoleBusinessFunctionArray() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        let businessFunctions = decryptedUser.businessFunction;
+        console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
+
+        var bfunction = [];
+        for (let i = 0; i < businessFunctions.length; i++) {
+            bfunction.push(businessFunctions[i].authority);
+        }
+        return bfunction;
+    }
+    authenticatedRoute(route) {
+        console.log("route---" + route);
+
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+                return false;
+            }
+            var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
+            switch (route) {
+                case "/user/addUser":
+                    if (bfunction.includes("ROLE_BF_ADD_USER")) {
+                        return true;
+                    }
+                    break;
+                case "/user/editUser/:userId":
+                    if (bfunction.includes("ROLE_BF_EDIT_USER")) {
+                        return true;
+                    }
+                    break;
+                case "/user/accessControl":
+                    if (bfunction.includes("ROLE_BF_ACCESS_CONTROL")) {
+                        return true;
+                    }
+                    break;
+                case "/user/listUser":
+                case "/user/listUser/:message":
+                case "/user/listUser/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_USER")) {
+                        return true;
+                    }
+                    break;
+                case "/role/addRole":
+                    if (bfunction.includes("ROLE_BF_ADD_ROLE")) {
+                        return true;
+                    }
+                    break;
+                case "/role/editRole/:roleId":
+                    if (bfunction.includes("ROLE_BF_EDIT_ROLE")) {
+                        return true;
+                    }
+                    break;
+                case "/role/listRole":
+                case "/role/listRole/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_ROLE")) {
+                        return true;
+                    }
+                    break;
+                case "/language/addLanguage":
+                    if (bfunction.includes("ROLE_BF_ADD_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
+                case "/language/editLanguage/:languageId":
+                    if (bfunction.includes("ROLE_BF_EDIT_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
+                case "/language/listLanguage":
+                case "/language/listLanguage/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
+                case "/country/addCountry":
+                    if (bfunction.includes("ROLE_BF_ADD_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/country/editCountry/:countryId":
+                    if (bfunction.includes("ROLE_BF_EDIT_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/country/listCountry":
+                case "/country/listCountry/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/currency/addCurrency":
+                    if (bfunction.includes("ROLE_BF_ADD_CURRENCY")) {
+                        return true;
+                    }
+                    break;
+                case "/currency/editCurrency/:currencyId":
+                    if (bfunction.includes("ROLE_BF_EDIT_CURRENCY")) {
+                        return true;
+                    }
+                    break;
+                case "/currency/listCurrency":
+                case "/currency/listCurrency/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_CURRENCY")) {
+                        return true;
+                    }
+                    break;
+                case "/diamension/AddDiamension":
+                    if (bfunction.includes("ROLE_BF_ADD_DIAMENSIONS")) {
+                        return true;
+                    }
+                    break;
+                case "/diamension/editDiamension/:dimensionId":
+                    if (bfunction.includes("ROLE_BF_EDIT_DIAMENSIONS")) {
+                        return true;
+                    }
+                    break;
+                case "/diamension/diamensionlist":
+                case "/diamension/diamensionlist/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_DIAMENSIONS")) {
+                        return true;
+                    }
+                    break;
+                case "/unit/addUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_UNITS")) {
+                        return true;
+                    }
+                    break;
+                case "/unit/editUnit/:unitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_UNITS")) {
+                        return true;
+                    }
+                    break;
+                case "/unit/listUnit":
+                case "/unit/listUnit/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_UNITS")) {
+                        return true;
+                    }
+                    break;
+                case "/realm/addrealm":
+                    if (bfunction.includes("ROLE_BF_ADD_REALMS")) {
+                        return true;
+                    }
+                    break;
+                case "/realm/updateRealm/:realmId":
+                    if (bfunction.includes("ROLE_BF_EDIT_REALMS")) {
+                        return true;
+                    }
+                    break;
+                case "/realm/realmlist":
+                case "/realm/realmlist/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_REALMS")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/listRealmCountry":
+                case "/realmCountry/listRealmCountry/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/listRealmCountryPlanningUnit":
+                    if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSourceType/addDataSourceType":
+                    if (bfunction.includes("ROLE_BF_ADD_DATASOURCE_TYPE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSourceType/editDataSourceType/:dataSourceTypeId":
+                    if (bfunction.includes("ROLE_BF_EDIT_DATASOURCE_TYPE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSourceType/listDataSourceType":
+                case "/dataSourceType/listDataSourceType/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_DATASOURCE_TYPE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSource/addDataSource":
+                    if (bfunction.includes("ROLE_BF_ADD_DATASOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSource/editDataSource/:dataSourceId":
+                    if (bfunction.includes("ROLE_BF_EDIT_DATASOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/dataSource/listDataSource":
+                case "/dataSource/listDataSource/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_DATASOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/fundingSource/addFundingSource":
+                    if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/fundingSource/editFundingSource/:fundingSourceId":
+                    if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/fundingSource/listFundingSource":
+                case "/fundingSource/listFundingSource/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/addProcurementAgent":
+                    if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_AGENT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/editProcurementAgent/:procurementAgentId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_AGENT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/listProcurementAgent":
+                case "/procurementAgent/listProcurementAgent/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
+                        return true;
+                    }
+                    break;
+                case "/budget/addBudget":
+                    if (bfunction.includes("ROLE_BF_ADD_BUDGET")) {
+                        return true;
+                    }
+                    break;
+                case "/budget/editBudget/:budgetId":
+                    if (bfunction.includes("ROLE_BF_EDIT_BUDGET")) {
+                        return true;
+                    }
+                    break;
+                case "/budget/listBudget":
+                case "/budget/listBudget/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_BUDGET")) {
+                        return true;
+                    }
+                    break;
+                case "/supplier/addSupplier":
+                    if (bfunction.includes("ROLE_BF_ADD_SUPPLIER")) {
+                        return true;
+                    }
+                    break;
+                case "/supplier/editSupplier/:supplierId":
+                    if (bfunction.includes("ROLE_BF_EDIT_SUPPLIER")) {
+                        return true;
+                    }
+                    break;
+                case "/supplier/listSupplier":
+                case "/supplier/listSupplier/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_SUPPLIER")) {
+                        return true;
+                    }
+                    break;
+                case "/region/listRegion":
+                case "/region/listRegion/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_REGIONS")) {
+                        return true;
+                    }
+                    break;
+                case "/healthArea/addHealthArea":
+                    if (bfunction.includes("ROLE_BF_ADD_HEALTHAREA")) {
+                        return true;
+                    }
+                    break;
+                case "/healthArea/editHealthArea/:healthAreaId":
+                    if (bfunction.includes("ROLE_BF_EDIT_HEALTHAREA")) {
+                        return true;
+                    }
+                    break;
+                case "/healthArea/listHealthArea":
+                case "/healthArea/listHealthArea/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_HEALTHAREA")) {
+                        return true;
+                    }
+                    break;
+                case "/organisation/addOrganisation":
+                    if (bfunction.includes("ROLE_BF_ADD_ORGANISATION")) {
+                        return true;
+                    }
+                    break;
+                case "/organisation/editOrganisation/:organisationId":
+                    if (bfunction.includes("ROLE_BF_EDIT_ORGANISATION")) {
+                        return true;
+                    }
+                    break;
+                case "/organisation/listOrganisation":
+                case "/organisation/listOrganisation/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_ORGANISATION")) {
+                        return true;
+                    }
+                    break;
+                case "/program/addProgram":
+                    if (bfunction.includes("ROLE_BF_ADD_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/program/editProgram/:programId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/program/listProgram":
+                case "/program/listProgram/:message":
+                case "/program/listProgram/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/tracerCategory/addTracerCategory":
+                    if (bfunction.includes("ROLE_BF_ADD_TRACER_CATEGORY")) {
+                        return true;
+                    }
+                    break;
+                case "/tracerCategory/editTracerCategory/:tracerCategoryId":
+                    if (bfunction.includes("ROLE_BF_EDIT_TRACER_CATEGORY")) {
+                        return true;
+                    }
+                    break;
+                case "/tracerCategory/listTracerCategory":
+                case "/tracerCategory/listTracerCategory/:message":
+                case "/tracerCategory/listTracerCategory/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_TRACER_CATEGORY")) {
+                        return true;
+                    }
+                    break;
+                case "/productCategory/productCategoryTree":
+                    if (bfunction.includes("ROLE_BF_LIST_PRODUCT_CATEGORY")) {
+                        return true;
+                    }
+                    break;
+                case "/forecastingUnit/addForecastingUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_FORECASTING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/forecastingUnit/editForecastingUnit/:forecastingUnitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_FORECASTING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/forecastingUnit/listForecastingUnit":
+                case "/forecastingUnit/listForecastingUnit/:message":
+                case "/forecastingUnit/listForecastingUnit/:color/:message":
+                    console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
+                    if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/planningUnit/addPlanningUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/planningUnit/editPlanningUnit/:planningUnitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/planningUnit/listPlanningUnit":
+                case "/planningUnit/listPlanningUnit/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/planningUnitCapacity/listPlanningUnitCapacity":
+                    if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_CAPACITY")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementUnit/addProcurementUnit":
+                    if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementUnit/editProcurementUnit/:procurementUnitId":
+                    if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementUnit/listProcurementUnit":
+                case "/procurementUnit/listProcurementUnit/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/program/programOnboarding":
+                    if (bfunction.includes("ROLE_BF_LIST_SETUP_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/program/syncPage":
+                    if (bfunction.includes("ROLE_BF_LIST_COMMIT_VERSION")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/realmCountry/:realmId":
+                    if (bfunction.includes("ROLE_BF_MAP_REALM_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/consumptionDetails":
+                    if (bfunction.includes("ROLE_BF_LIST_CONSUMPTION_DETAILS")) {
+                        return true;
+                    }
+                    break;
+                case "/inventory/addInventory":
+                    if (bfunction.includes("ROLE_BF_LIST_INVENTORY")) {
+                        return true;
+                    }
+                    break;
+                case "/shipment/ShipmentList":
+                case "/shipment/shipmentList/:message":
+                case "/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex":
+                    if (bfunction.includes("ROLE_BF_LIST_SHIPMENT")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/realmCountryPlanningUnit/:realmCountryId":
+                    if (bfunction.includes("ROLE_BF_MAP_REALM_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/addProcurementAgentProcurementUnit/:procurementAgentId":
+                    if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_AGENT_PROCUREMENT_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId":
+                    if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_AGENT_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/programProduct/addProgramProduct/:programId":
+                    if (bfunction.includes("ROLE_BF_MAP_PROGRAM_PLANNING_UNIT")) {
+                        return true;
+                    }
+                    break;
+                case "/realmCountry/realmCountryRegion/:realmCountryId":
+                    if (bfunction.includes("ROLE_BF_MAP_REGION")) {
+                        return true;
+                    }
+                    break;
+                case "/supplyPlan":
+                case "/supplyPlanFormulas":
+                    if (bfunction.includes("ROLE_BF_LIST_SUPPLY_PLAN")) {
+                        return true;
+                    }
+                    break;
+                case "/report/productCatalog":
+                    if (bfunction.includes("ROLE_BF_REPORT_PRODUCT_CATALOG")) {
+                        return true;
+                    }
+                    break;
+                case "/report/consumption":
+                    if (bfunction.includes("ROLE_BF_REPORT_CONSUMPTION")) {
+                        return true;
+                    }
+                    break;
+                case "/report/globalConsumption":
+                    if (bfunction.includes("ROLE_BF_REPORT_CONSUMPTION_GLOBAL_VIEW")) {
+                        return true;
+                    }
+                    break;
+                case "/report/forecastOverTheTime":
+                    if (bfunction.includes("ROLE_BF_REPORT_FORECAST_ERROR_OVER_TIME")) {
+                        return true;
+                    }
+                    break;
+                case "/report/forecastMetrics":
+                    if (bfunction.includes("ROLE_BF_REPORT_FORECAST_METRICS")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockStatusOverTime":
+                    if (bfunction.includes("ROLE_BF_REPORT_STOCK_STATUS_OVER_TIME")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockStatusMatrix":
+                    if (bfunction.includes("ROLE_BF_REPORT_STOCK_STATUS_MATRIX")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockStatus":
+                    if (bfunction.includes("ROLE_BF_REPORT_STOCK_STATUS")) {
+                        return true;
+                    }
+                    break;
+                case "/report/qatProblemPlusActionReport":
+                    if (bfunction.includes("ROLE_BF_REPORT_PROBLEM_ACTION")) {
+                        return true;
+                    }
+                    break;
+                case "/report/funderExport":
+                    if (bfunction.includes("ROLE_BF_REPORT_FUNDER")) {
+                        return true;
+                    }
+                    break;
+                case "/report/procurementAgentExport":
+                    if (bfunction.includes("ROLE_BF_REPORT_PROCUREMENT_AGENT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/annualShipmentCost":
+                    if (bfunction.includes("ROLE_BF_REPORT_ANNUAL_SHIPMENT_COST")) {
+                        return true;
+                    }
+                    break;
+                case "/ApplicationDashboard/:color/:message":
+                case "/ApplicationDashboard":
+                    if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockStatusMatrix":
+                    if (bfunction.includes("ROLE_BF_VIEW_STOCK_STATUS_MATRIX")) {
+                        return true;
+                    }
+                    break;
+                case "/program/downloadProgram":
+                    if (bfunction.includes("ROLE_BF_DOWNLOAD_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/program/importProgram":
+                    if (bfunction.includes("ROLE_BF_IMPORT_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/program/exportProgram":
+                    if (bfunction.includes("ROLE_BF_EXPORT_PROGRAM")) {
+                        return true;
+                    }
+                    break;
+                case "/report/costOfInventory":
+                    if (bfunction.includes("ROLE_BF_REPORT_COST_OF_INVERTORY")) {
+                        return true;
+                    }
+                    break;
+                case "/report/inventoryTurns":
+                    if (bfunction.includes("ROLE_BF_REPORT_INVENTORY_TURN")) {
+                        return true;
+                    }
+                    break;
+                case "/report/supplyPlanVersionAndReview":
+                    if (bfunction.includes("ROLE_BF_REPORT_SUPPLY_PLAN_VERSION_REVIEW")) {
+                        return true;
+                    }
+                    break;
+                case "/dashboard/:message":
+                    if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
+                        return true;
+                    }
+                    break;
+                case "/ProgramDashboard":
+                    if (bfunction.includes("ROLE_BF_VIEW_PROGRAM_DASHBOARD")) {
+                        return true;
+                    }
+                    break;
+                case "/translations/labelTranslations":
+                    if (bfunction.includes("ROLE_BF_LIST_LABEL_TRANSLATION")) {
+                        return true;
+                    }
+                    break;
+                case "/translations/databaseTranslations":
+                    if (bfunction.includes("ROLE_BF_LIST_DATABASE_TRANSLATION")) {
+                        return true;
+                    }
+                    break;
+                case "/changePassword":
+                    if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
+                        return true;
+                    }
+                    break;
+                case "/logout/:message":
+                case "/logout":
+                    return true;
+                    break;
+                default:
+                    console.log("Inside default-");
+                    return false;
+            }
+        }
+        return false;
+
+    }
 
 }
 

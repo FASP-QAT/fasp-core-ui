@@ -232,11 +232,12 @@ export default class ForecastingUnitListComponent extends Component {
     }
 
     editForecastingUnit(forecastingUnit) {
-        this.props.history.push({
-            pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
-            // state: { forecastingUnit: forecastingUnit }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
+            this.props.history.push({
+                pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
+                // state: { forecastingUnit: forecastingUnit }
+            });
+        }
     }
 
     addNewForecastingUnit() {
@@ -377,7 +378,7 @@ export default class ForecastingUnitListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
