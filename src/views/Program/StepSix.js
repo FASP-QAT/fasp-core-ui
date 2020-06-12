@@ -14,7 +14,7 @@ const initialValuesSix = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
-    deliveredToReceivedLeadTime: '',
+    // deliveredToReceivedLeadTime: '',
     draftToSubmittedLeadTime: '',
     plannedToDraftLeadTime: '',
     submittedToApprovedLeadTime: '',
@@ -22,7 +22,10 @@ const initialValuesSix = {
     monthsInFutureForAmc: '',
     monthsInPastForAmc: '',
     // healthAreaId: '',
-    programNotes: ''
+    programNotes: '',
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    arrivedToDeliveredLeadTime: ''
 
 }
 
@@ -36,8 +39,8 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
+        // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+        // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         draftToSubmittedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToDraftLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -54,6 +57,12 @@ const validationSchemaSix = function (values) {
         //     .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext')),
+        shippedToArrivedByAirLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedBySeaLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
+        arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
 
     })
 }
@@ -96,7 +105,7 @@ export default class StepSix extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
-            deliveredToReceivedLeadTime: true,
+            // deliveredToReceivedLeadTime: true,
             draftToSubmittedLeadTime: true,
             plannedToDraftLeadTime: true,
             submittedToApprovedLeadTime: true,
@@ -105,6 +114,9 @@ export default class StepSix extends Component {
             monthsInPastForAmc: true,
             // healthAreaId: true,
             // programNotes: true,
+            shippedToArrivedByAirLeadTime: true,
+            shippedToArrivedBySeaLeadTime: true,
+            arrivedToDeliveredLeadTime: true
 
         }
         )
@@ -295,18 +307,50 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">Shipped To Arrive By Air Lead Time<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.deliveredToReceivedLeadTime && this.props.items.program.deliveredToReceivedLeadTime != ''}
-                                            invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
+                                            valid={!errors.shippedToArrivedByAirLeadTime && this.props.items.program.shippedToArrivedByAirLeadTime != ''}
+                                            invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
-                                        <FormFeedback className="red">{errors.deliveredToReceivedLeadTime}</FormFeedback>
+                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" placeholder='please enter shipped to arrived by air lead time' />
+                                        <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
                                     </FormGroup>
+
+            
+            
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">Shipped To Arrive By Sea Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.shippedToArrivedBySeaLeadTime && this.props.items.program.shippedToArrivedBySeaLeadTime != ''}
+                                            invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" placeholder='please enter shipped to arrived by sea lead time' />
+                                        <FormFeedback className="red">{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+                                    </FormGroup>
+
+
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company"> Arrived to deliver Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}
+                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" placeholder='please enter shipped to arrived to delivered lead time' />
+                                        <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+                                    </FormGroup>
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -337,7 +381,7 @@ export default class StepSix extends Component {
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
                                          <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
-                                        
+
                                     </FormGroup>
                                 </Row>
                             </Form>

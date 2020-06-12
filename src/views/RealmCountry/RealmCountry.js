@@ -39,8 +39,8 @@ let initialValues = {
     }, countryName: '',
     airFreightPercentage: '0.0',
     seaFreightPercentage: '0.0',
-    shippedToArrivedAirLeadTime: '0',
-    shippedToArrivedSeaLeadTime: '0',
+    shippedToArrivedByAirLeadTime: '0',
+    shippedToArrivedBySeaLeadTime: '0',
     arrivedToDeliveredLeadTime: '0',
 
 
@@ -52,8 +52,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.region.validcountry')),
         currencyId: Yup.number()
             .required(i18n.t('static.country.currencytext')),
-        // unitId: Yup.string()
-        //     .required(i18n.t('static.common.realmtext'))
+        unitId: Yup.string()
+            .required(i18n.t('static.common.realmtext'))
     })
 }
 
@@ -107,8 +107,8 @@ class RealmCountry extends Component {
             }, countryName: '',
             airFreightPercentage: '0.0',
             seaFreightPercentage: '0.0',
-            shippedToArrivedAirLeadTime: '0',
-            shippedToArrivedSeaLeadTime: '0',
+            shippedToArrivedByAirLeadTime: '0',
+            shippedToArrivedBySeaLeadTime: '0',
             arrivedToDeliveredLeadTime: '0',
             rows: [],
             realm: {
@@ -156,15 +156,15 @@ class RealmCountry extends Component {
                         label_en: this.state.rows[idx].defaultCurrency.label.label_en
                     }
                 }, currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
-                    // unitId: this.state.rows[idx].palletUnit.unitId,
+                     unitId: this.state.rows[idx].palletUnit.unitId,
                     label: {
                         label_en: this.state.rows[idx].palletUnit.label.label_en
                     }
                 }, unitId: this.state.rows[idx].palletUnit.unitId,
                 airFreightPercentage: this.state.rows[idx].airFreightPercentage,
                 seaFreightPercentage: this.state.rows[idx].seaFreightPercentage,
-                shippedToArrivedAirLeadTime: this.state.rows[idx].shippedToArrivedAirLeadTime,
-                shippedToArrivedSeaLeadTime: this.state.rows[idx].shippedToArrivedSeaLeadTime,
+                shippedToArrivedByAirLeadTime: this.state.rows[idx].shippedToArrivedByAirLeadTime,
+                shippedToArrivedBySeaLeadTime: this.state.rows[idx].shippedToArrivedBySeaLeadTime,
                 arrivedToDeliveredLeadTime: this.state.rows[idx].arrivedToDeliveredLeadTime
 
             }
@@ -188,11 +188,11 @@ class RealmCountry extends Component {
                         label_en: this.state.rows[idx].palletUnit.label.label_en
                     }
                 },
-                // unitId: this.state.rows[idx].palletUnit.unitId,
+                 unitId: this.state.rows[idx].palletUnit.unitId,
                 airFreightPercentage: this.state.rows[idx].airFreightPercentage,
                 seaFreightPercentage: this.state.rows[idx].seaFreightPercentage,
-                shippedToArrivedAirLeadTime: this.state.rows[idx].shippedToArrivedAirLeadTime,
-                shippedToArrivedSeaLeadTime: this.state.rows[idx].shippedToArrivedSeaLeadTime,
+                shippedToArrivedByAirLeadTime: this.state.rows[idx].shippedToArrivedByAirLeadTime,
+                shippedToArrivedBySeaLeadTime: this.state.rows[idx].shippedToArrivedBySeaLeadTime,
                 arrivedToDeliveredLeadTime: this.state.rows[idx].arrivedToDeliveredLeadTime,
                 isNew: false,
                 updateRowStatus: 1
@@ -252,21 +252,21 @@ class RealmCountry extends Component {
             this.state.defaultCurrency.currencyId = event.target.value;
             this.state.defaultCurrency.label.label_en = event.target[event.target.selectedIndex].text;
         }
-        // if (event.target.name === "unitId") {
-        //     this.state.palletUnit.unitId = event.target.value;
-        //     this.state.palletUnit.label.label_en = event.target[event.target.selectedIndex].text;
-        // }
+        if (event.target.name === "unitId") {
+            this.state.palletUnit.unitId = event.target.value;
+            this.state.palletUnit.label.label_en = event.target[event.target.selectedIndex].text;
+        }
         if (event.target.name === "airFreightPercentage") {
             this.state.airFreightPercentage = event.target.value;
         }
         if (event.target.name === "seaFreightPercentage") {
             this.state.seaFreightPercentage = event.target.value;
         }
-        if (event.target.name === "shippedToArrivedAirLeadTime") {
-            this.state.shippedToArrivedAirLeadTime = event.target.value;
+        if (event.target.name === "shippedToArrivedByAirLeadTime") {
+            this.state.shippedToArrivedByAirLeadTime = event.target.value;
         }
-        if (event.target.name === "shippedToArrivedSeaLeadTime") {
-            this.state.shippedToArrivedSeaLeadTime = event.target.value;
+        if (event.target.name === "shippedToArrivedBySeaLeadTime") {
+            this.state.shippedToArrivedBySeaLeadTime = event.target.value;
         }
         if (event.target.name === "arrivedToDeliveredLeadTime") {
             this.state.arrivedToDeliveredLeadTime = event.target.value;
@@ -496,31 +496,31 @@ class RealmCountry extends Component {
                         }
                     }
                 });
-        // UnitService.getUnitListAll()
-        //     .then(response => {
-        //         this.setState({
-        //             units: response.data
-        //         })
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({ message: error.message });
-        //             } else {
-        //                 switch (error.response.status) {
-        //                     case 500:
-        //                     case 401:
-        //                     case 404:
-        //                     case 406:
-        //                     case 412:
-        //                         this.setState({ message: error.response.data.messageCode });
-        //                         break;
-        //                     default:
-        //                         this.setState({ message: 'static.unkownError' });
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+        UnitService.getUnitListAll()
+            .then(response => {
+                this.setState({
+                    units: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
 
 
     }
@@ -541,15 +541,15 @@ class RealmCountry extends Component {
                 </option>
             )
         }, this);
-        // const { units } = this.state;
-        // let unitList = units.length > 0
-        //     && units.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.unitId}>
-        //                 {item.label.label_en}
-        //             </option>
-        //         )
-        //     }, this);
+        const { units } = this.state;
+        let unitList = units.length > 0
+            && units.map((item, i) => {
+                return (
+                    <option key={i} value={item.unitId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
         return (<div className="animated fadeIn">
             <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
             <Row>
@@ -584,17 +584,17 @@ class RealmCountry extends Component {
                                                     label_en: this.state.defaultCurrency.label.label_en
                                                 }
                                             }
-                                            // , palletUnit: {
-                                            //     unitId: this.state.palletUnit.unitId,
-                                            //     label: {
-                                            //         label_en: this.state.palletUnit.label.label_en
-                                            //     }
-                                            // }
+                                            , palletUnit: {
+                                                unitId: this.state.palletUnit.unitId,
+                                                label: {
+                                                    label_en: this.state.palletUnit.label.label_en
+                                                }
+                                            }
                                             ,
                                             airFreightPercentage: this.state.airFreightPercentage,
                                             seaFreightPercentage: this.state.seaFreightPercentage,
-                                            shippedToArrivedAirLeadTime: this.state.shippedToArrivedAirLeadTime,
-                                            shippedToArrivedSeaLeadTime: this.state.shippedToArrivedSeaLeadTime,
+                                            shippedToArrivedByAirLeadTime: this.state.shippedToArrivedByAirLeadTime,
+                                            shippedToArrivedBySeaLeadTime: this.state.shippedToArrivedBySeaLeadTime,
                                             arrivedToDeliveredLeadTime: this.state.arrivedToDeliveredLeadTime,
                                             isNew: this.state.isNew,
                                             active: true
@@ -617,17 +617,17 @@ class RealmCountry extends Component {
                                                     label_en: ''
                                                 }
                                             }
-                                            // , palletUnit: {
-                                            //     unitId: '',
-                                            //     label: {
-                                            //         label_en:''
-                                            //     }
-                                            // }
+                                            , palletUnit: {
+                                                unitId: '',
+                                                label: {
+                                                    label_en:''
+                                                }
+                                            }
                                             ,
                                             airFreightPercentage: '0.0',
                                             seaFreightPercentage: '0.0',
-                                            shippedToArrivedAirLeadTime: '0',
-                                            shippedToArrivedSeaLeadTime: '0',
+                                            shippedToArrivedByAirLeadTime: '0',
+                                            shippedToArrivedBySeaLeadTime: '0',
                                             arrivedToDeliveredLeadTime: '0',
                                             active: true
                                         })
@@ -650,17 +650,17 @@ class RealmCountry extends Component {
                                                 label_en: ''
                                             }
                                         }
-                                        // , palletUnit: {
-                                        //     unitId: '',
-                                        //     label: {
-                                        //         label_en:''
-                                        //     }
-                                        // }
+                                        , palletUnit: {
+                                            unitId: '',
+                                            label: {
+                                                label_en:''
+                                            }
+                                        }
                                         ,
                                         airFreightPercentage: '0.0',
                                         seaFreightPercentage: '0.0',
-                                        shippedToArrivedAirLeadTime: '0',
-                                        shippedToArrivedSeaLeadTime: '0',
+                                        shippedToArrivedByAirLeadTime: '0',
+                                        shippedToArrivedBySeaLeadTime: '0',
                                         arrivedToDeliveredLeadTime: '0',
                                         active: true
                                     })
@@ -719,7 +719,7 @@ class RealmCountry extends Component {
                                                     {currencyList}
                                                 </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
                                             </FormGroup>
-                                            {/* <FormGroup className="col-md-6">
+                                             <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
                                             <Input
                                                 type="select"
@@ -736,7 +736,7 @@ class RealmCountry extends Component {
                                                 {unitList}
                                             </Input>
                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>
-                                        </FormGroup> */}
+                                        </FormGroup> 
 
                                             <FormGroup className="col-md-6">
                                                 <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')}</Label>
@@ -775,40 +775,40 @@ class RealmCountry extends Component {
                                                 <FormFeedback className="red">{errors.seaFreightPercentage}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="shippedToArrivedAirLeadTime">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</Label>
+                                                <Label for="shippedToArrivedByAirLeadTime">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</Label>
                                                 <Input
                                                     type="number"
                                                     min="0"
-                                                    name="shippedToArrivedAirLeadTime"
-                                                    id="shippedToArrivedAirLeadTime"
+                                                    name="shippedToArrivedByAirLeadTime"
+                                                    id="shippedToArrivedByAirLeadTime"
                                                     bsSize="sm"
-                                                    valid={!errors.shippedToArrivedAirLeadTime && this.state.shippedToArrivedAirLeadTime != '0' && this.state.shippedToArrivedAirLeadTime != ''}
-                                                    invalid={touched.shippedToArrivedAirLeadTime && !!errors.shippedToArrivedAirLeadTime}
+                                                    valid={!errors.shippedToArrivedByAirLeadTime && this.state.shippedToArrivedByAirLeadTime != '0' && this.state.shippedToArrivedByAirLeadTime != ''}
+                                                    invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                     type="number"
-                                                    value={this.state.shippedToArrivedAirLeadTime}
+                                                    value={this.state.shippedToArrivedByAirLeadTime}
                                                     placeholder={i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext')}
                                                 />
-                                                <FormFeedback className="red">{errors.shippedToArrivedAirLeadTime}</FormFeedback>
+                                                <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="shippedToArrivedSeaLeadTime">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}</Label>
+                                                <Label for="shippedToArrivedBySeaLeadTime">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}</Label>
                                                 <Input
                                                     type="number"
                                                     min="0"
-                                                    name="shippedToArrivedSeaLeadTime"
-                                                    id="shippedToArrivedSeaLeadTime"
+                                                    name="shippedToArrivedBySeaLeadTime"
+                                                    id="shippedToArrivedBySeaLeadTime"
                                                     bsSize="sm"
-                                                    valid={!errors.shippedToArrivedSeaLeadTime && this.state.shippedToArrivedSeaLeadTime != '0' && this.state.shippedToArrivedSeaLeadTime != ''}
-                                                    invalid={touched.shippedToArrivedSeaLeadTime && !!errors.shippedToArrivedSeaLeadTime}
+                                                    valid={!errors.shippedToArrivedBySeaLeadTime && this.state.shippedToArrivedBySeaLeadTime != '0' && this.state.shippedToArrivedBySeaLeadTime != ''}
+                                                    invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                     type="number"
-                                                    value={this.state.shippedToArrivedSeaLeadTime}
+                                                    value={this.state.shippedToArrivedBySeaLeadTime}
                                                     placeholder={i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext')}
                                                 />
-                                                <FormFeedback className="red">{errors.shippedToArrivedSeaLeadTime}</FormFeedback>
+                                                <FormFeedback className="red">{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
                                                 <Label for="arrivedToDeliveredLeadTime">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}</Label>
@@ -829,14 +829,14 @@ class RealmCountry extends Component {
                                                 <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-12 mt-md-4">
+                                            <FormGroup className="col-md-12 ">
                                                 {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
                                                 <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                 &nbsp;
                                         </FormGroup>
                                         </Row></Form>)} />
                             <h5 className="red">{this.state.rowErrorMessage}</h5>
-                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                            <Table responsive className="table-striped table-hover table-bordered text-center">
 
                                 <thead>
                                     <tr>
@@ -865,9 +865,9 @@ class RealmCountry extends Component {
                                                 <td>
                                                     {this.state.rows[idx].defaultCurrency.label.label_en}
                                                 </td>
-                                                {/* <td>
+                                                 <td>
                                                     {this.state.rows[idx].palletUnit.label.label_en}
-                                                </td> */}
+                                                </td> 
                                                 <td className="text-right">
                                                     {this.state.rows[idx].airFreightPercentage}
                                                 </td>
