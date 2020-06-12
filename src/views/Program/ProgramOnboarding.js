@@ -55,13 +55,18 @@ export default class ProgramOnboarding extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
-                deliveredToReceivedLeadTime: '',
+                // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
+
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedBySeaLeadTime: '',
+                arrivedToDeliveredLeadTime: '',
+
                 healthArea: {
                     id: ''
                 },
@@ -318,9 +323,11 @@ export default class ProgramOnboarding extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        } if (event.target.name == 'deliveredToReceivedLeadTime') {
-            program.deliveredToReceivedLeadTime = event.target.value;
-        } if (event.target.name == 'draftToSubmittedLeadTime') {
+        } 
+        // if (event.target.name == 'deliveredToReceivedLeadTime') {
+        //     program.deliveredToReceivedLeadTime = event.target.value;
+        // } 
+        if (event.target.name == 'draftToSubmittedLeadTime') {
             program.draftToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'plannedToDraftLeadTime') {
             program.plannedToDraftLeadTime = event.target.value;
@@ -336,6 +343,14 @@ export default class ProgramOnboarding extends Component {
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
+        }if (event.target.name == 'shippedToArrivedByAirLeadTime') {
+            program.shippedToArrivedByAirLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
+            program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'arrivedToDeliveredLeadTime') {
+            program.arrivedToDeliveredLeadTime = event.target.value;
         }
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
@@ -495,7 +510,7 @@ export default class ProgramOnboarding extends Component {
         return (
 
 
-            
+
 
             <div className="animated fadeIn">
                 <h5></h5>
@@ -711,10 +726,10 @@ export default class ProgramOnboarding extends Component {
                                             options={this.state.regionList}
                                             value={this.state.regionId}
                                         />
-                                        </FormGroup>
-                                        
-                                        <FormGroup>
-                                        
+                                    </FormGroup>
+
+                                    <FormGroup>
+
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1 nextbtn" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
