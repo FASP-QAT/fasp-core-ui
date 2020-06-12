@@ -956,6 +956,15 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/pipeline/pieplineProgramList":
+                case "/pipeline/pipelineProgramImport":
+                case "/pipeline/planningUnitListFinalInventory/:pipelineId":
+                case "/pipeline/pieplineProgramList/:color/:message":
+                case "/pipeline/pieplineProgramSetup/:pipelineId":
+                    if (bfunction.includes("ROLE_BF_VIEW_GUEST_SCREENS")) {
+                        return true;
+                    }
+                    break;
                 case "/changePassword":
                     if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
