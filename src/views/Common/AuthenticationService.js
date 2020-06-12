@@ -532,6 +532,7 @@ class AuthenticationService {
                     break;
                 case "/realmCountry/listRealmCountry":
                 case "/realmCountry/listRealmCountry/:message":
+                case "/realmCountry/listRealmCountry/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                         return true;
                     }
@@ -601,6 +602,7 @@ class AuthenticationService {
                     break;
                 case "/procurementAgent/listProcurementAgent":
                 case "/procurementAgent/listProcurementAgent/:message":
+                case "/procurementAgent/listProcurementAgent/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
                         return true;
                     }
@@ -744,6 +746,7 @@ class AuthenticationService {
                     break;
                 case "/planningUnit/listPlanningUnit":
                 case "/planningUnit/listPlanningUnit/:message":
+                case "/planningUnitCapacity/planningUnitCapacity/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT")) {
                         return true;
                     }
