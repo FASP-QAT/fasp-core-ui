@@ -359,7 +359,7 @@
     "static.common.deleterow": "Delete Row",
     "static.common.remove": "Remove",
     "static.healtharea.healtharea": "Health Area",
-    "static.organisation.organisation": "Organizations",
+    "static.organisation.organisation": "Organization",
     "static.tracercategory.tracercategory": "Tracer Category",
     "static.tracerCategory.tracercategorytext": "Please enter tracer category",
     "static.unit.unit": "Unit",
@@ -656,7 +656,7 @@
     "static.realm.yes": "Yes",
     "static.realm.no": "No",
     "static.message.syncExpiresOn": "You have exceeded the maximum number of days that you can work offline. Please go online to continue using QAT.",
-    "static.region.glnvalue": "GLN No must be 13 No. digits",
+    "static.region.glnvalue": "GLN No must be 0 or 13 No. digits",
     "static.dashboard.globalconsumption": "Consumption (Global View)",
     "static.report.forecasterrorovertime": "Forecast Error Over Time",
     "static.report.month": "Month",
@@ -826,5 +826,6 @@
     "static.dashboard.pipelineProgramImport": "ProgramImport",
     "static.message.incorrectPassword": "Old password is incorrect",
     "static.message.accessControlSuccess": "Access controls updated successfully",
-    "static.message.pipelineProgramImportSuccess": "Program Imported Succesfully"
+    "static.message.pipelineProgramImportSuccess": "Program Imported Succesfully",
+    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed."
 }

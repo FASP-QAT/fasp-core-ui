@@ -1056,6 +1056,7 @@ a:hover {
 
 .table-responsive {
   overflow-x: auto;
+  // margin-top: -1%;
   // max-height: 240px;
 }
 
@@ -1640,13 +1641,14 @@ input::placeholder {
   left: 31%;
 }
 .progressbartext4 {
-  left: 46.46%;
+  left: 47%;
 }
 .progressbartext5 {
   left: 64%;
 }
 .progressbartext6 {
-  left: 77.79%;
+  // left: 78.79%;
+  left:78%;
 }
 .progressbartext7 {
   left: 94.95%;
@@ -1682,7 +1684,7 @@ input::placeholder {
   left:72%;
 }
 .progresdatatext5 {
-  left: 94%;
+  left: 95%;
 }
 .progresdatatext6 {
   left: 94.79%;
@@ -2067,7 +2069,7 @@ text-overflow: ellipsis;
 }
 .css-1pcexqc-container {
   position: relative;
-  width: 206px!important;
+  width: 190px!important;
   box-sizing: border-box;
 }
 
@@ -2223,3 +2225,12 @@ h6{
   padding: 10px 20px 10px 20px!important;
 } 
   
+.costinventryinput{
+  width:234px!important;
+}
+.table-mt{
+  margin-top: -1%;
+}
+.table-accesscnl-mt{
+  margin-top: -3%;
+}
