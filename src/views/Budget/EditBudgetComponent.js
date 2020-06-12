@@ -254,9 +254,17 @@ class EditBudgetComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    let { budget } = this.state;
+
+                                    var startDate=moment(this.state.budget.startDate).format("YYYY-MM-DD");
+                                    budget.startDate=startDate;
+
+                                    var stopDate=moment(this.state.budget.stopDate).format("YYYY-MM-DD");
+                                    budget.stopDate=stopDate;
+
                                     AuthenticationService.setupAxiosInterceptors();
-                                    console.log("this.state.budget----->", this.state.budget);
-                                    BudgetService.editBudget(this.state.budget)
+                                    console.log("this.state.budget----->",budget);
+                                    BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
                                                 this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
