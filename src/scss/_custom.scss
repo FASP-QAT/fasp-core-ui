@@ -1445,12 +1445,22 @@ h5,
   border-color: 1px solid yellow;
 }
 .legend .greenlegend {
-  background-color: green;
-  border-color: 1px solid green;
+  background-color:#86cd99;
+  border-color: 1px solid #86cd99;
 }
 .legend .redlegend {
   background-color: red;
   border-color: 1px solid red;
+}
+
+.legend .orangelegend {
+  background-color: orange;
+  border-color: 1px solid orange;
+}
+
+.legend .orangeredlegend{
+  background-color: orangered;
+  border-color: 1px solid orangered;
 }
 
 .legend .skipedShipmentslegend{
@@ -2207,3 +2217,9 @@ h6{
 {
   margin-top:5px !important;
 }
+
+.card-header
+{
+  padding: 10px 20px 10px 20px!important;
+} 
+  

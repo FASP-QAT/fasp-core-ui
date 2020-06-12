@@ -184,6 +184,8 @@ class Login extends Component {
                           if (navigator.onLine) {
                             LoginService.authenticate(username, password)
                               .then(response => {
+                                console.log("response---",response);
+                                console.log("response data---",response.data);
                                 var decoded = jwt_decode(response.data.token);
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))

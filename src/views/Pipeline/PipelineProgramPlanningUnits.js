@@ -7,6 +7,8 @@ import PlanningUnitService from '../../api/PlanningUnitService'
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -398,6 +400,12 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                text: {
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    show: '',
+                                                    entries: '',
+                                                },
+                                                onload: this.loadedJexcelCommonFunction,
                                                 // onload: this.loaded
 
                                             };
@@ -526,6 +534,10 @@ export default class PipelineProgramPlanningUnits extends Component {
             });
 
 
+    }
+
+    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
     render() {

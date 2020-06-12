@@ -61,10 +61,12 @@ hideSecondComponent() {
   }
 
   editProcurementUnit(procurementUnit) {
-    console.log(procurementUnit.procurementUnitId)
-    this.props.history.push({
-      pathname: `/procurementUnit/editProcurementUnit/${procurementUnit.procurementUnitId}`,
-    });
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_UNIT')) {
+      console.log(procurementUnit.procurementUnitId)
+      this.props.history.push({
+        pathname: `/procurementUnit/editProcurementUnit/${procurementUnit.procurementUnitId}`,
+      });
+    }
   }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
@@ -226,7 +228,7 @@ hideSecondComponent() {
             <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>
+              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </CardHeader>

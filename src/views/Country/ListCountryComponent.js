@@ -78,12 +78,13 @@ export default class CountryListComponent extends Component {
 
     }
     editCountry(country) {
-        console.log(country);
-        this.props.history.push({
-            pathname: `/country/editCountry/${country.countryId}`,
-            // state: { country: country }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
+            console.log(country);
+            this.props.history.push({
+                pathname: `/country/editCountry/${country.countryId}`,
+                // state: { country: country }
+            });
+        }
     }
 
     componentDidMount() {
@@ -211,7 +212,7 @@ export default class CountryListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_COUNTRY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
