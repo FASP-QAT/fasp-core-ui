@@ -411,7 +411,7 @@ class AddUserComponent extends Component {
                                                         id="showRealm"
                                                     />
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
