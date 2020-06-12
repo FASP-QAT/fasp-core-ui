@@ -10,6 +10,7 @@ import {
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const entityname = i18n.t('static.label.databaseTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -71,7 +72,13 @@ export default class DatabaseTranslations extends React.Component {
                     onchange: this.changed,
                     oneditionstart: this.editStart,
                     allowDeleteRow: false,
-                    tableOverflow: false
+                    tableOverflow: false,
+                    text: {
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        show: '',
+                        entries: '',
+                    },
+                    onload: this.loaded,
                     // tableHeight: '500px',
                 };
                 this.el = jexcel(document.getElementById("databaseTranslationTable"), options);
@@ -104,6 +111,10 @@ export default class DatabaseTranslations extends React.Component {
             }
         );
     };
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
 
     saveData = function () {
         var labelList = this.state.labelList;
