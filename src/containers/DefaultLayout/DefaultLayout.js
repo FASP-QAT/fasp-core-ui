@@ -39,7 +39,6 @@ class DefaultLayout extends Component {
   }
 
   componentDidMount() {
-    console.log("Thisprops", this.props)
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
     var bfunction = [];

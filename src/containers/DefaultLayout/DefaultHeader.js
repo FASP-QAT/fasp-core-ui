@@ -56,7 +56,6 @@ class DefaultHeader extends Component {
             <NavLink to="/ProgramTree" className="nav-link" >KENYA-FAMILY PLANNING-MOH</NavLink>
           </NavItem> */}
         </Nav>
-        <h4>ABC</h4>
         <Nav className="ml-auto " navbar>
 
           {/* <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> */}
