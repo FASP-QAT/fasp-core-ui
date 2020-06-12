@@ -1098,7 +1098,7 @@ class Consumption extends Component {
                             </div>
                           </div>
                           <div className="col-md-12">
-                            <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                            <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                               {this.state.show ? 'Hide Data' : 'Show Data'}
                             </button>
 
