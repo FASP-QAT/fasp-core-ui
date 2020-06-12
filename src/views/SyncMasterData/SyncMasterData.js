@@ -65,7 +65,7 @@ export default class SyncMasterData extends Component {
         return (
             <div className="animated fadeIn">
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12">
                     <Col xs="12" sm="12">
                         <Card>

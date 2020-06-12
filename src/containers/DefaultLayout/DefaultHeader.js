@@ -37,7 +37,7 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
           full={{ src: logo, width: 150, height: 50, alt: 'QAT Logo' }}
-        minimized={{ src: QAT, width: 52, height: 50, alt: 'QAT Logo' }}
+          minimized={{ src: QAT, width: 52, height: 50, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         {/* <Nav className="d-md-down-none" navbar>
@@ -56,8 +56,8 @@ class DefaultHeader extends Component {
             <NavLink to="/ProgramTree" className="nav-link" >KENYA-FAMILY PLANNING-MOH</NavLink>
           </NavItem> */}
         </Nav>
+        <h4>ABC</h4>
         <Nav className="ml-auto " navbar>
-
 
           {/* <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> */}
           {/* <span><b>

@@ -826,5 +826,6 @@
     "static.dashboard.pipelineProgramImport": "ProgramImport",
     "static.message.incorrectPassword": "Old password is incorrect",
     "static.message.accessControlSuccess": "Access controls updated successfully",
-    "static.message.pipelineProgramImportSuccess": "Program Imported Succesfully"
+    "static.message.pipelineProgramImportSuccess": "Program Imported Succesfully",
+    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed."
 }

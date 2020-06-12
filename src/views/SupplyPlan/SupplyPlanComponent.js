@@ -4544,7 +4544,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (valueOfG == "Sea") {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                     } else {
-                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
+                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
                                     }
                                 }
                                 addLeadTimes = parseInt(addLeadTimes) + 1;
@@ -4625,7 +4625,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (value == "Sea") {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                     } else {
-                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
+                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
                                     }
                                 }
                                 addLeadTimes = parseInt(addLeadTimes) + 1;
@@ -4817,7 +4817,7 @@ export default class SupplyPlanComponent extends React.Component {
                             if (map.get("6") == "Sea") {
                                 addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                             } else {
-                                addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
+                                addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
                             }
                         }
                         addLeadTimes = parseInt(addLeadTimes) + 1;
@@ -6145,6 +6145,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 allowDeleteRow: false,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
+                                                                allowInsertRow: false,
+                                                                allowManualInsertRow: false,
                                                                 editable: tableEditableBasedOnSupplyPlan,
                                                                 onchange: this.budgetChanged,
                                                                 text: {
