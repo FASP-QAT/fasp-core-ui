@@ -435,7 +435,7 @@ class RealmCountryRegion extends Component {
                                                 </Input>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="label">{i18n.t('static.region.region')}</Label>
+                                                <Label for="label">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     name="label"
                                                     id="label"
@@ -449,7 +449,7 @@ class RealmCountryRegion extends Component {
                                                 <FormFeedback className="red">{errors.label}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}</Label>
+                                                <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}<span className="red Reqasterisk">*</span></Label>
                                                 <Input type="number"
                                                     name="capacityCBM"
                                                     id="capacityCBM"
