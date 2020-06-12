@@ -938,6 +938,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/dashboard/:message":
+                case "/dashboard/:color/:message":
                     if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
                         return true;
                     }
