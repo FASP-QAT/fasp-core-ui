@@ -91,7 +91,7 @@ class AddUserComponent extends Component {
             languages: [],
             user: {
                 realm: {
-                    realmId: ''
+                    realmId: '0'
                 },
                 language: {
                     languageId: ''
@@ -351,7 +351,7 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log(JSON.stringify(this.state.user))
+                                    console.log("user object---",this.state.user)
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
