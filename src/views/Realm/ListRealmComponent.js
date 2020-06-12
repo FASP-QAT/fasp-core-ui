@@ -23,7 +23,8 @@ export default class ReactListComponent extends Component {
         this.state = {
             realmList: [],
             message: '',
-            selRealm: []
+            selRealm: [],
+            loading: true
         }
         this.addNewRealm = this.addNewRealm.bind(this);
         this.editRealm = this.editRealm.bind(this);
@@ -49,7 +50,8 @@ export default class ReactListComponent extends Component {
             if (response.status == 200) {
                 this.setState({
                     realmList: response.data,
-                    selRealm: response.data
+                    selRealm: response.data,
+                     loading: false
                 })
             } else {
                 this.setState({
@@ -83,11 +85,12 @@ export default class ReactListComponent extends Component {
         // );
     }
     editRealm(realm) {
-        this.props.history.push({
-            pathname: `/realm/updateRealm/${realm.realmId}`,
-            // state: { realm: realm }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALMS')) {
+            this.props.history.push({
+                pathname: `/realm/updateRealm/${realm.realmId}`,
+                // state: { realm: realm }
+            });
+        }
     }
 
     addNewRealm() {
@@ -100,13 +103,15 @@ export default class ReactListComponent extends Component {
     }
     RealmCountry(event, row) {
         event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/realmCountry/RealmCountry/${row.realmId}`,
-            state: { realm: row }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
+            console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/realmCountry/RealmCountry/${row.realmId}`,
+                state: { realm: row }
 
 
-        })
+            })
+        }
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -187,15 +192,15 @@ export default class ReactListComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                  <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_REALMS') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>
@@ -238,6 +243,17 @@ export default class ReactListComponent extends Component {
                         </BootstrapTable> */}
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

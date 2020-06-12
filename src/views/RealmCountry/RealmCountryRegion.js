@@ -101,8 +101,13 @@ class RealmCountryRegion extends Component {
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
         this.CapitalizeFull = this.CapitalizeFull.bind(this);
         this.updateRow = this.updateRow.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
     updateRow(idx) {
         if (this.state.updateRowStatus == 1) {
             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
@@ -221,12 +226,15 @@ class RealmCountryRegion extends Component {
         RegionService.editRegionsForcountry(regionCountry)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/realmCountry/listRealmCountry/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
 
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -256,11 +264,21 @@ class RealmCountryRegion extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
-            console.log(JSON.stringify(response.data))
-            this.setState({
-                realmCountry: response.data,
-                //  rows:response.data
-            })
+            if (response.status == 200) {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    realmCountry: response.data,
+                    //  rows:response.data
+                })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+       
         }).catch(
             error => {
                 console.log(JSON.stringify(error))
@@ -284,11 +302,22 @@ class RealmCountryRegion extends Component {
             }
         );
         RegionService.getRegionForCountryId(this.props.match.params.realmCountryId).then(response => {
-            console.log(response.data);
-            this.setState({
-                regionCountry: response.data,
-                rows: response.data
-            })
+            if (response.status == 200) {
+                console.log(response.data);
+                this.setState({
+                    regionCountry: response.data,
+                    rows: response.data
+                })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
+    
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -325,7 +354,7 @@ class RealmCountryRegion extends Component {
 
 
         return (<div className="animated fadeIn">
-            <h5>{i18n.t(this.state.message)}</h5>
+              <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
@@ -460,7 +489,7 @@ class RealmCountryRegion extends Component {
 
                 </FormGroup></Row></Form>)} />
                             <h5 className="red">{this.state.rowErrorMessage}</h5>
-                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                            <Table responsive className="table-striped table-hover table-bordered text-center ">
 
                                 <thead>
                                     <tr>
@@ -523,7 +552,7 @@ class RealmCountryRegion extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realmCountry/listRealmCountry/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

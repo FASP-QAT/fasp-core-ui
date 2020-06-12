@@ -10,6 +10,7 @@ import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
+const entityname = i18n.t('static.program.realmcountry');
 const initialValues = {
     realmId: [],
     procurementAgentCode: "",
@@ -69,6 +70,12 @@ class AddRealmCountryComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     Capitalize(str) {
@@ -136,7 +143,12 @@ class AddRealmCountryComponent extends Component {
                     realms: response.data
                 })
             } else {
-                this.setState({ message: response.data.messageCode })
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         }).catch(
             error => {
@@ -161,9 +173,20 @@ class AddRealmCountryComponent extends Component {
 
         CountryService.getCountryListAll()
             .then(response => {
-                this.setState({
-                    countries: response.data.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        countries: response.data.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+
+                }
+                
             }).catch(
                 error => {
                     switch (error.message) {
@@ -204,7 +227,7 @@ class AddRealmCountryComponent extends Component {
         //     }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -219,11 +242,14 @@ class AddRealmCountryComponent extends Component {
                                     RealmCountryService.addRealmCountry(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.data.status == "Success") {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.message}`)
+                                                this.props.history.push(`/procurementAgent/listProcurementAgent/green${response.data.message}`)
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
-                                                })
+                                                    message: response.data.messageCode
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                         .catch(
@@ -354,7 +380,7 @@ class AddRealmCountryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` +i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/`+ 'red/' +i18n.t('static.program.actioncancelled'))
     }
 }
 

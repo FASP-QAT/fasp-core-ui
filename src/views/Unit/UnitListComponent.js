@@ -38,7 +38,8 @@ export default class UnitListComponent extends Component {
             message: '',
             selSource: [],
             dimensions: [],
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.editUnit = this.editUnit.bind(this);
         this.addUnit = this.addUnit.bind(this);
@@ -60,10 +61,12 @@ export default class UnitListComponent extends Component {
     }
 
     editUnit(unit) {
-        this.props.history.push({
-            pathname: `/unit/editUnit/${unit.unitId}`,
-            // state: { unit }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_UNITS')) {
+            this.props.history.push({
+                pathname: `/unit/editUnit/${unit.unitId}`,
+                // state: { unit }
+            });
+        }
     }
 
     addUnit() {
@@ -94,10 +97,10 @@ export default class UnitListComponent extends Component {
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    dimensions: response.data
+                    dimensions: response.data, loading: false
                 })
             } else {
-                 this.setState({
+                this.setState({
                     message: response.data.messageCode
                 },
                     () => {
@@ -248,12 +251,12 @@ export default class UnitListComponent extends Component {
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_UNITS') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>
@@ -313,6 +316,17 @@ export default class UnitListComponent extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );

@@ -352,11 +352,21 @@ class RealmCountry extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
-            console.log(response.data);
-            this.setState({
-                realm: response.data,
-                //  rows:response.data
-            })
+            if (response.status == 200) {
+                console.log(response.data);
+                this.setState({
+                    realm: response.data,
+                    //  rows:response.data
+                })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+           
         }).catch(
             error => {
                 console.log(JSON.stringify(error))
@@ -380,11 +390,21 @@ class RealmCountry extends Component {
             }
         );
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
-            console.log("getRealmCountryrealmIdById---", response.data);
+            if (response.status == 200) {
+                console.log("getRealmCountryrealmIdById---", response.data);
             this.setState({
                 realmCountry: response.data,
                 rows: response.data
             })
+            }else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+            
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -408,10 +428,20 @@ class RealmCountry extends Component {
         );
         CountryService.getCountryListAll()
             .then(response => {
-                console.log(response.data)
-                this.setState({
-                    countries: response.data
-                })
+                if (response.status == 200) {
+                    console.log(response.data)
+                    this.setState({
+                        countries: response.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+              
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -440,7 +470,10 @@ class RealmCountry extends Component {
             } else {
                 this.setState({
                     message: response.data.messageCode
-                })
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         })
             .catch(
@@ -796,14 +829,14 @@ class RealmCountry extends Component {
                                                 <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-12 mt-md-4">
+                                            <FormGroup className="col-md-12 ">
                                                 {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
                                                 <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                 &nbsp;
                                         </FormGroup>
                                         </Row></Form>)} />
                             <h5 className="red">{this.state.rowErrorMessage}</h5>
-                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                            <Table responsive className="table-striped table-hover table-bordered text-center">
 
                                 <thead>
                                     <tr>
@@ -841,10 +874,10 @@ class RealmCountry extends Component {
                                                 <td className="text-right">
                                                     {this.state.rows[idx].seaFreightPercentage}
                                                 </td>
-                                                <td>
+                                                <td  className="text-right">
                                                     {this.state.rows[idx].shippedToArrivedByAirLeadTime}
                                                 </td>
-                                                <td>
+                                                <td  className="text-right">
                                                     {this.state.rows[idx].shippedToArrivedBySeaLeadTime}
                                                 </td> <td className="text-right">
                                                     {this.state.rows[idx].arrivedToDeliveredLeadTime}

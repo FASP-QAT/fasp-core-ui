@@ -24,7 +24,8 @@ export default class HealthAreaListComponent extends Component {
             realms: [],
             healthAreas: [],
             message: "",
-            selSource: []
+            selSource: [],
+            loading: true
         }
         this.editHealthArea = this.editHealthArea.bind(this);
         this.addHealthArea = this.addHealthArea.bind(this);
@@ -64,7 +65,7 @@ export default class HealthAreaListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false 
                     })
                 } else {
                     this.setState({
@@ -80,12 +81,12 @@ export default class HealthAreaListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     console.log("response---", response.data);
-                this.setState({
-                    healthAreas: response.data,
-                    selSource: response.data
-                })
+                    this.setState({
+                        healthAreas: response.data,
+                        selSource: response.data
+                    })
                 }
-                else{
+                else {
 
                     this.setState({
                         message: response.data.messageCode
@@ -94,7 +95,7 @@ export default class HealthAreaListComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-                
+
 
             })
     }
@@ -214,14 +215,14 @@ export default class HealthAreaListComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card  style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_HEALTHAREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -280,16 +281,29 @@ export default class HealthAreaListComponent extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     editHealthArea(healthArea) {
-        this.props.history.push({
-            // pathname: "/healthArea/editHealthArea/",
-            // state: { healthArea: healthArea }
-            pathname: `/healthArea/editHealthArea/${healthArea.healthAreaId}`,
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTHAREA')) {
+            this.props.history.push({
+                // pathname: "/healthArea/editHealthArea/",
+                // state: { healthArea: healthArea }
+                pathname: `/healthArea/editHealthArea/${healthArea.healthAreaId}`,
+            });
+        }
     }
     addHealthArea() {
         if (navigator.onLine) {

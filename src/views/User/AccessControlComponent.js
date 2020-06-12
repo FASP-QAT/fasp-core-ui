@@ -53,7 +53,13 @@ class AccessControlComponent extends Component {
         this.filterOrganisation = this.filterOrganisation.bind(this);
         this.filterHealthArea = this.filterHealthArea.bind(this);
         this.filterProgram = this.filterProgram.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
     filterProgram() {
         let realmId = this.state.user.realm.realmId;
@@ -203,11 +209,14 @@ class AccessControlComponent extends Component {
         UserService.accessControls(user)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/user/listUser/${response.data.messageCode}`)
+                    this.props.history.push(`/user/listUser/green/${response.data.messageCode}`)
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -238,10 +247,20 @@ class AccessControlComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryListAll()
             .then(response => {
-                this.setState({
-                    realmCountryList: response.data,
-                    selRealmCountry: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountryList: response.data,
+                        selRealmCountry: response.data
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+               
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -271,8 +290,11 @@ class AccessControlComponent extends Component {
                 });
             } else {
                 this.setState({
-                    message: response.data.message
-                })
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
 
         }).catch(
@@ -335,8 +357,11 @@ class AccessControlComponent extends Component {
                 });
             } else {
                 this.setState({
-                    message: response.data.message
-                })
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
 
         }).catch(
@@ -400,7 +425,7 @@ class AccessControlComponent extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -470,7 +495,8 @@ class AccessControlComponent extends Component {
                         </CardBody>
                    
                         <CardBody>
-                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                            <div className="table-accesscnl-mt">
+                             <Table responsive className="table-striped table-hover table-bordered text-center ">
 
                                     <thead>
                                         <tr>
@@ -509,6 +535,7 @@ class AccessControlComponent extends Component {
                                     </tbody>
 
                                 </Table>
+                                </div>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -526,7 +553,7 @@ class AccessControlComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + i18n.t('static.actionCancelled'))
+        this.props.history.push(`/user/listUser/`+ 'red/' + i18n.t('static.actionCancelled'))
     }
 
 }

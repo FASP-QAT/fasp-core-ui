@@ -24,7 +24,8 @@ export default class CountryListComponent extends Component {
         this.state = {
             countryList: [],
             message: '',
-            selCountry: []
+            selCountry: [],
+            loading: true
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -77,12 +78,13 @@ export default class CountryListComponent extends Component {
 
     }
     editCountry(country) {
-        console.log(country);
-        this.props.history.push({
-            pathname: `/country/editCountry/${country.countryId}`,
-            // state: { country: country }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
+            console.log(country);
+            this.props.history.push({
+                pathname: `/country/editCountry/${country.countryId}`,
+                // state: { country: country }
+            });
+        }
     }
 
     componentDidMount() {
@@ -93,7 +95,7 @@ export default class CountryListComponent extends Component {
                 console.log("response--->", response.data);
                 this.setState({
                     countryList: response.data,
-                    selCountry: response.data
+                    selCountry: response.data, loading: false
                 })
 
             } else {
@@ -203,14 +205,14 @@ export default class CountryListComponent extends Component {
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_COUNTRY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -270,6 +272,17 @@ export default class CountryListComponent extends Component {
                         </ToolkitProvider>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

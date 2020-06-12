@@ -23,7 +23,8 @@ class ListProcurementAgentComponent extends Component {
             procurementAgentList: [],
             message: '',
             selProcurementAgent: [],
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -33,98 +34,115 @@ class ListProcurementAgentComponent extends Component {
         this.buttonFormatterForProcurementUnit = this.buttonFormatterForProcurementUnit.bind(this);
         this.addPlanningUnitMapping = this.addPlanningUnitMapping.bind(this);
         this.addProcurementUnitMapping = this.addProcurementUnitMapping.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     addPlanningUnitMapping(event, cell) {
         event.stopPropagation();
-        this.props.history.push({
-            pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
-        });
-        // AuthenticationService.setupAxiosInterceptors();
-        // ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             let myReasponse = response.data;
-        //             this.props.history.push({
-        //                 pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
-        //                 state: {
-        //                     procurementAgentPlanningUnit: myReasponse,
-        //                     procurementAgentId:cell
-        //                 }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PLANNING_UNIT')) {
+            this.props.history.push({
+                pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
+            });
+            // AuthenticationService.setupAxiosInterceptors();
+            // ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
+            //     .then(response => {
+            //         if (response.status == 200) {
+            //             let myReasponse = response.data;
+            //             this.props.history.push({
+            //                 pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
+            //                 state: {
+            //                     procurementAgentPlanningUnit: myReasponse,
+            //                     procurementAgentId:cell
+            //                 }
 
-        //             })
-        //         } else {
-        //             this.setState({
-        //                 message: response.data.messageCode
-        //             })
-        //         }
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({ message: error.message });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-        //                     case 500:
-        //                     case 401:
-        //                     case 404:
-        //                     case 406:
-        //                     case 412:
-        //                         this.setState({ message: error.response.data.messageCode });
-        //                         break;
-        //                     default:
-        //                         this.setState({ message: 'static.unkownError' });
-        //                         console.log("Error code unkown");
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+            //             })
+            //         } else {
+            //             this.setState({
+            //                 message: response.data.messageCode
+            //             })
+            //         }
+            //     }).catch(
+            //         error => {
+            //             if (error.message === "Network Error") {
+            //                 this.setState({ message: error.message });
+            //             } else {
+            //                 switch (error.response ? error.response.status : "") {
+            //                     case 500:
+            //                     case 401:
+            //                     case 404:
+            //                     case 406:
+            //                     case 412:
+            //                         this.setState({ message: error.response.data.messageCode });
+            //                         break;
+            //                     default:
+            //                         this.setState({ message: 'static.unkownError' });
+            //                         console.log("Error code unkown");
+            //                         break;
+            //                 }
+            //             }
+            //         }
+            //     );
+        }
     }
 
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
-        this.props.history.push({
-            pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
-        });
-        // AuthenticationService.setupAxiosInterceptors();
-        // ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             let myResponse = response.data;
-        //             this.props.history.push({
-        //                 pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
-        //                 state: {
-        //                     procurementAgentProcurementUnit: myResponse,
-        //                     procurementAgentId:cell
-        //                 }
-        //             })
-        //         } else {
-        //             this.setState({
-        //                 message: response.data.messageCode
-        //             })
-        //         }
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({ message: error.message });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-        //                     case 500:
-        //                     case 401:
-        //                     case 404:
-        //                     case 406:
-        //                     case 412:
-        //                         this.setState({ message: error.response.data.messageCode });
-        //                         break;
-        //                     default:
-        //                         this.setState({ message: 'static.unkownError' });
-        //                         console.log("Error code unkown");
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PROCUREMENT_UNIT')) {
+            this.props.history.push({
+                pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
+            });
+            // AuthenticationService.setupAxiosInterceptors();
+            // ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
+            //     .then(response => {
+            //         if (response.status == 200) {
+            //             let myResponse = response.data;
+            //             this.props.history.push({
+            //                 pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
+            //                 state: {
+            //                     procurementAgentProcurementUnit: myResponse,
+            //                     procurementAgentId:cell
+            //                 }
+            //             })
+            //         } else {
+            //             this.setState({
+            //                 message: response.data.messageCode
+            //             })
+            //         }
+            //     }).catch(
+            //         error => {
+            //             if (error.message === "Network Error") {
+            //                 this.setState({ message: error.message });
+            //             } else {
+            //                 switch (error.response ? error.response.status : "") {
+            //                     case 500:
+            //                     case 401:
+            //                     case 404:
+            //                     case 406:
+            //                     case 412:
+            //                         this.setState({ message: error.response.data.messageCode });
+            //                         break;
+            //                     default:
+            //                         this.setState({ message: 'static.unkownError' });
+            //                         console.log("Error code unkown");
+            //                         break;
+            //                 }
+            //             }
+            //         }
+            //     );
+        }
     }
 
     addNewProcurementAgent() {
@@ -144,10 +162,12 @@ class ListProcurementAgentComponent extends Component {
         }
     }
     editProcurementAgent(procurementAgent) {
-        this.props.history.push({
-            pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
-            // state: { procurementAgent }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+            this.props.history.push({
+                pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
+                // state: { procurementAgent }
+            });
+        }
     }
     buttonFormatter(cell, row) {
         console.log("button formater cell-----------", cell);
@@ -159,14 +179,20 @@ class ListProcurementAgentComponent extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
         // .catch(
@@ -192,10 +218,20 @@ class ListProcurementAgentComponent extends Component {
 
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
-                this.setState({
-                    procurementAgentList: response.data,
-                    selProcurementAgent: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        procurementAgentList: response.data,
+                        selProcurementAgent: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+               
             })
         // .catch(
         //     error => {
@@ -345,14 +381,14 @@ class ListProcurementAgentComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+               <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>
@@ -409,6 +445,17 @@ class ListProcurementAgentComponent extends Component {
                         </ToolkitProvider>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

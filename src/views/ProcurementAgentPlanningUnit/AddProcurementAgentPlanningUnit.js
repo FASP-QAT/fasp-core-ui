@@ -121,6 +121,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.enableRow = this.enableRow.bind(this);
         this.disableRow = this.disableRow.bind(this);
         this.updateRow = this.updateRow.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     updateRow(idx) {
@@ -280,11 +286,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 console.log(response.data);
                 if (response.status == "200") {
                     console.log(response);
-                    this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/procurementAgent/listProcurementAgent/`  + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
-                        message: response.data.message
-                    })
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -323,7 +332,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
@@ -355,8 +367,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 });
             } else {
                 this.setState({
-                    message: response.data.message
-                })
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
 
         }).catch(
@@ -389,7 +404,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             } else {
                 this.setState({
                     message: response.data.messageCode
-                })
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
 
         }).catch(
@@ -452,7 +470,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+              <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -719,7 +737,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

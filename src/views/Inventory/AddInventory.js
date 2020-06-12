@@ -10,6 +10,7 @@ import { SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import moment from "moment";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const entityname = i18n.t('static.inventory.inventory')
 export default class AddInventory extends Component {
@@ -318,7 +319,13 @@ export default class AddInventory extends Component {
                                 allowDeleteRow: false,
                                 onchange: this.changed,
                                 oneditionend: this.onedit,
-                                copyCompatibility: true
+                                copyCompatibility: true,
+                                text: {
+                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                    show: '',
+                                    entries: '',
+                                },
+                                onload: this.loaded,
 
                             };
 
@@ -329,6 +336,10 @@ export default class AddInventory extends Component {
             }.bind(this)
 
         }
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
     // -----------start of changed function

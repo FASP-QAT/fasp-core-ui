@@ -1058,6 +1058,7 @@ a:hover {
 
 .table-responsive {
   overflow-x: auto;
+  // margin-top: -1%;
   // max-height: 240px;
 }
 
@@ -1447,12 +1448,22 @@ h5,
   border-color: 1px solid yellow;
 }
 .legend .greenlegend {
-  background-color: green;
-  border-color: 1px solid green;
+  background-color:#86cd99;
+  border-color: 1px solid #86cd99;
 }
 .legend .redlegend {
   background-color: red;
   border-color: 1px solid red;
+}
+
+.legend .orangelegend {
+  background-color: orange;
+  border-color: 1px solid orange;
+}
+
+.legend .orangeredlegend{
+  background-color: orangered;
+  border-color: 1px solid orangered;
 }
 
 .legend .skipedShipmentslegend{
@@ -1632,13 +1643,14 @@ input::placeholder {
   left: 31%;
 }
 .progressbartext4 {
-  left: 46.46%;
+  left: 47%;
 }
 .progressbartext5 {
   left: 64%;
 }
 .progressbartext6 {
-  left: 77.79%;
+  // left: 78.79%;
+  left:78%;
 }
 .progressbartext7 {
   left: 94.95%;
@@ -1674,7 +1686,7 @@ input::placeholder {
   left:72%;
 }
 .progresdatatext5 {
-  left: 94%;
+  left: 95%;
 }
 .progresdatatext6 {
   left: 94.79%;
@@ -2059,7 +2071,7 @@ text-overflow: ellipsis;
 }
 .css-1pcexqc-container {
   position: relative;
-  width: 206px!important;
+  width: 190px!important;
   box-sizing: border-box;
 }
 
@@ -2208,4 +2220,19 @@ h6{
 .annualshipmrgin
 {
   margin-top:5px !important;
+}
+
+.card-header
+{
+  padding: 10px 20px 10px 20px!important;
+} 
+  
+.costinventryinput{
+  width:234px!important;
+}
+.table-mt{
+  margin-top: -1%;
+}
+.table-accesscnl-mt{
+  margin-top: -3%;
 }
