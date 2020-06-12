@@ -253,7 +253,7 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170],
+                                    colWidths: [290, 290, 170, 170,170],
                                     columns: [
 
                                         {
@@ -276,6 +276,11 @@ export default class MapPlanningUnits extends Component {
                                             title: 'Min month of stock',
                                             type: 'number'
                                         },
+                                        {
+                                            title: 'Local Procurment Lead Time',
+                                            type: 'number'
+                                        }
+
                                     ],
                                     pagination: false,
                                     search: true,
@@ -325,6 +330,7 @@ export default class MapPlanningUnits extends Component {
                 },
                 reorderFrequencyInMonths: map.get("2"),
                 minMonthsOfStock: map.get("3"),
+                localProcurementLeadTime:map.get("4"),
                 active: true,
                 programPlanningUnitId: 0
             }
