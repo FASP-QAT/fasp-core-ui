@@ -746,6 +746,7 @@ class AuthenticationService {
                     break;
                 case "/planningUnit/listPlanningUnit":
                 case "/planningUnit/listPlanningUnit/:message":
+                case "/planningUnit/listPlanningUnit/:color/:message":
                 case "/planningUnitCapacity/planningUnitCapacity/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT")) {
                         return true;
