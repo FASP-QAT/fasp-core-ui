@@ -248,7 +248,7 @@ export default class AddOrganisationComponent extends Component {
                                     OrganisationService.addOrganisation(this.state.organisation)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/organisation/listOrganisation/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/organisation/listOrganisation/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -354,7 +354,7 @@ export default class AddOrganisationComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/organisation/listOrganisation/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/organisation/listOrganisation/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         let { organisation } = this.state

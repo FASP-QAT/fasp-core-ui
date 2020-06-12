@@ -533,7 +533,7 @@ class AddprogramPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.localProcurementLeadTime}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Batch No Required<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">Batch No Required</Label>
                                                             <FormGroup check inline>
                                                                 <Input
                                                                     className="form-check-input"
