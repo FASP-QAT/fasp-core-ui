@@ -27,6 +27,12 @@ export default class DatabaseTranslations extends React.Component {
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
         this.loaded = this.loaded.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -88,8 +94,11 @@ export default class DatabaseTranslations extends React.Component {
                 this.el = jexcel(document.getElementById("labelTranslationTable"), options);
             } else {
                 this.setState({
-                    message: response.data.message
-                })
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         }).catch(
             error => {
@@ -137,11 +146,14 @@ export default class DatabaseTranslations extends React.Component {
             var json = this.state.labelList;
             LabelsService.saveStaticLabels(json).then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/dashboard/` + i18n.t(response.data.messageCode))
+                    this.props.history.push(`/dashboard/`+ 'green/' + i18n.t(response.data.messageCode))
                 } else {
                     this.setState({
-                        message: response.data.message
-                    })
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             }).catch(
                 error => {
@@ -171,7 +183,7 @@ export default class DatabaseTranslations extends React.Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+             <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
 
                     <Col xs="12" sm="12">
@@ -199,7 +211,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dashboard/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
     }
 
     changed = function (instance, cell, x, y, value) {
