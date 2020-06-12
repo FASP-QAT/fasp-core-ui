@@ -30,10 +30,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.region.validregion')),
         capacityCBM: Yup.number().typeError("Must be a number")
             .min(0, i18n.t('static.program.validvaluetext')),
-        gln: Yup.string().matches(/^[0-9]+$/, i18n.t('static.region.glnvalue'))
-            .min(13, i18n.t('static.region.glnvalue'))
-            .max(13, i18n.t('static.region.glnvalue'))
-
+        gln: Yup.string().matches(/^[0-9]{0}(?:-[0-9]{13})?$/, i18n.t('static.region.glnvalue'))
+            
     })
 }
 
@@ -437,7 +435,7 @@ class RealmCountryRegion extends Component {
                                                 </Input>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="label">{i18n.t('static.region.region')}</Label>
+                                                <Label for="label">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     name="label"
                                                     id="label"
@@ -451,7 +449,7 @@ class RealmCountryRegion extends Component {
                                                 <FormFeedback className="red">{errors.label}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}</Label>
+                                                <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}<span className="red Reqasterisk">*</span></Label>
                                                 <Input type="number"
                                                     name="capacityCBM"
                                                     id="capacityCBM"
