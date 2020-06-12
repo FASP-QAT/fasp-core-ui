@@ -16,6 +16,7 @@ import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { confirmAlert } from 'react-confirm-alert';
 import CurrencyService from '../../api/CurrencyService.js';
+import moment from 'moment';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -324,10 +325,19 @@ class AddBudgetComponent extends Component {
                                     var getCurrencyId = this.state.budget.currency.currencyId;
                                     var currencyId = getCurrencyId.split("~");
                                     budget.currency.currencyId = currencyId[0];
-                                    this.setState({ budget: budget });
 
-                                    console.log("this.state.budget--->", this.state.budget);
-                                    BudgetService.addBudget(this.state.budget)
+                                    // alert(this.state.budget.startDate);
+                                    var startDate=moment(this.state.budget.startDate).format("YYYY-MM-DD");
+                                    budget.startDate=startDate;
+
+                                    var stopDate=moment(this.state.budget.stopDate).format("YYYY-MM-DD");
+                                    budget.stopDate=stopDate;
+
+                                    // alert("hiiiiii");
+                                    // this.setState({ budget: budget });
+
+                                    console.log("this.state.budget--->",budget);
+                                    BudgetService.addBudget(budget)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/budget/listBudget/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -583,7 +593,7 @@ class AddBudgetComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-
+ 
                                                         <DatePicker
                                                             id="stopDate"
                                                             name="stopDate"
