@@ -170,6 +170,20 @@ class RegionListComponent extends Component {
                 formatter: this.formatLabel
             },
             {
+                dataField: 'capacityCbm',
+                text: i18n.t('static.region.capacitycbm'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'gln',
+                text: i18n.t('static.region.gln'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'active',
                 text: i18n.t('static.common.status'),
                 sort: true,
