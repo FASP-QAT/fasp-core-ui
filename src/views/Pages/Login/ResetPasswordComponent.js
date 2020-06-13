@@ -63,6 +63,22 @@ class ResetPasswordComponent extends Component {
             token: this.props.match.params.token
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+
+        // setTimeout(function () {
+        //     this.setState({
+        //         message:''
+        //     },
+        //     () => { 
+        //         document.getElementById('div1').style.display = 'block';
+        //     });
+        // }, 8000);
+        
     }
 
     cancelClicked() {
@@ -92,6 +108,7 @@ class ResetPasswordComponent extends Component {
         }
     }
     componentDidMount() {
+        this.hideFirstComponent();
         UserService.confirmForgotPasswordToken(this.state.username, this.state.token)
             .then(response => {
                 this.setState({
@@ -123,7 +140,7 @@ class ResetPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
+                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center">
                             <Col md="12">
@@ -132,7 +149,7 @@ class ResetPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
+                                <h5 style={{ color: "red" }} id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
                                         <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
@@ -145,6 +162,7 @@ class ResetPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
+
                                             if (navigator.onLine) {
                                                 UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                                     .then(response => {
@@ -153,13 +171,17 @@ class ResetPasswordComponent extends Component {
                                                         } else {
                                                             this.setState({
                                                                 message: response.data.message
-                                                            })
+                                                            });
+                                                            document.getElementById('div1').style.display = 'block';
+                                                            this.hideFirstComponent();
                                                         }
                                                     })
                                                     .catch(
                                                         error => {
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
+                                                                document.getElementById('div1').style.display = 'block';
+                                                                this.hideFirstComponent();
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 404:
@@ -170,11 +192,20 @@ class ResetPasswordComponent extends Component {
                                                                     case 403:
                                                                     case 406:
                                                                     case 412:
-                                                                        this.setState({ message: error.response.data.messageCode });
+                                                                        this.setState({ message: error.response.data.messageCode },
+                                                                            () => {
+                                                                                console.log("inside412");
+                                                                                document.getElementById('div1').style.display = 'block';
+                                                                                this.hideFirstComponent();
+                                                                            });
+
+                                                                       
                                                                         break;
                                                                     case 403:
                                                                     default:
                                                                         this.setState({ message: 'static.unkownError' });
+                                                                        document.getElementById('div1').style.display = 'block';
+                                                                        this.hideFirstComponent();
                                                                         break;
                                                                 }
                                                             }
@@ -246,7 +277,7 @@ class ResetPasswordComponent extends Component {
                                                         </CardFooter>
                                                     </Form>
                                                 )} />
-                                </Card>>
+                                </Card>
                             </Col>
                         </Row>
                     </Container>
