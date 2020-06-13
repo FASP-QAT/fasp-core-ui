@@ -827,5 +827,8 @@
     "static.message.incorrectPassword": "Old password is incorrect",
     "static.message.accessControlSuccess": "Access controls updated successfully",
     "static.message.pipelineProgramImportSuccess": "Program Imported Succesfully",
-    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed."
+    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed.",
+    "static.message.duplicateOrg": "Duplicate organisation code",
+    "static.message.updateFailedAcl": "Failed to update",
+    "static.message.allAclAccess": "Either provide All access or specific access."
 }

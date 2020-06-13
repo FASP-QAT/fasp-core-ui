@@ -333,6 +333,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
                                                         <Input
                                                             bsSize="sm"
+                                                            readOnly
                                                             type="text" name="organisationCode" valid={!errors.organisationCode}
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}

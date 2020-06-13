@@ -154,7 +154,13 @@ export default class EditProcurementUnit extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     changeMessage(message) {
@@ -197,8 +203,11 @@ export default class EditProcurementUnit extends Component {
                             unitList: response.data
                         })
                     } else {
-                        this.setState({
-                            message: response.data.messageCode
+                       this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
                         })
                     }
                 })
@@ -308,7 +317,7 @@ export default class EditProcurementUnit extends Component {
 
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -320,11 +329,14 @@ export default class EditProcurementUnit extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProcurementUnitService.editProcurementUnit(this.state.procurementUnit).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/procurementUnit/listProcurementUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
-                                            })
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
                                         }
 
                                     }
@@ -606,7 +618,7 @@ export default class EditProcurementUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementUnit/listProcurementUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementUnit/listProcurementUnit/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         AuthenticationService.setupAxiosInterceptors();
