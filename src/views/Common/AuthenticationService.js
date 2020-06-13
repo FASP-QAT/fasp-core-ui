@@ -532,6 +532,7 @@ class AuthenticationService {
                     break;
                 case "/realmCountry/listRealmCountry":
                 case "/realmCountry/listRealmCountry/:message":
+                case "/realmCountry/listRealmCountry/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                         return true;
                     }
@@ -601,6 +602,7 @@ class AuthenticationService {
                     break;
                 case "/procurementAgent/listProcurementAgent":
                 case "/procurementAgent/listProcurementAgent/:message":
+                case "/procurementAgent/listProcurementAgent/:color/:message":
                     if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
                         return true;
                     }
@@ -744,6 +746,8 @@ class AuthenticationService {
                     break;
                 case "/planningUnit/listPlanningUnit":
                 case "/planningUnit/listPlanningUnit/:message":
+                case "/planningUnit/listPlanningUnit/:color/:message":
+                case "/planningUnitCapacity/planningUnitCapacity/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT")) {
                         return true;
                     }
@@ -934,6 +938,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/dashboard/:message":
+                case "/dashboard/:color/:message":
                     if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
                         return true;
                     }
@@ -950,6 +955,15 @@ class AuthenticationService {
                     break;
                 case "/translations/databaseTranslations":
                     if (bfunction.includes("ROLE_BF_LIST_DATABASE_TRANSLATION")) {
+                        return true;
+                    }
+                    break;
+                case "/pipeline/pieplineProgramList":
+                case "/pipeline/pipelineProgramImport":
+                case "/pipeline/planningUnitListFinalInventory/:pipelineId":
+                case "/pipeline/pieplineProgramList/:color/:message":
+                case "/pipeline/pieplineProgramSetup/:pipelineId":
+                    if (bfunction.includes("ROLE_BF_VIEW_GUEST_SCREENS")) {
                         return true;
                     }
                     break;

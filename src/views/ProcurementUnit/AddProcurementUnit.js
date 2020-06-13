@@ -142,8 +142,13 @@ export default class AddProcurementUnit extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
     Capitalize(str) {
         let { procurementUnit } = this.state
         procurementUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -160,7 +165,10 @@ export default class AddProcurementUnit extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
 
@@ -174,7 +182,10 @@ export default class AddProcurementUnit extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
 
@@ -188,7 +199,10 @@ export default class AddProcurementUnit extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
 
@@ -326,11 +340,14 @@ export default class AddProcurementUnit extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProcurementUnitService.addProcurementUnit(this.state.procurementUnit).then(response => {
                                         if (response.status == "200") {
-                                            this.props.history.push(`/procurementUnit/listProcurementUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
-                                            })
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
                                         }
                                     }
                                     )
@@ -558,7 +575,7 @@ export default class AddProcurementUnit extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         &nbsp;
                                         </FormGroup>
@@ -574,7 +591,7 @@ export default class AddProcurementUnit extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/procurementUnit/listProcurementUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'red/'+ i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

@@ -84,7 +84,13 @@ export default class EditPlanningUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     changeMessage(message) {
@@ -148,15 +154,26 @@ export default class EditPlanningUnitComponent extends Component {
 
     }
     cancelClicked() {
-        this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/planningUnit/listPlanningUnit/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     componentWillMount() {
         AuthenticationService.setupAxiosInterceptors();
         console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
-            this.setState({
-                planningUnit: response.data
-            });
+            if (response.status == 200) {
+                this.setState({
+                    planningUnit: response.data
+                });
+            }else{
+
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+            
 
         })
 
@@ -166,7 +183,7 @@ export default class EditPlanningUnitComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -187,11 +204,14 @@ export default class EditPlanningUnitComponent extends Component {
                                     PlanningUnitService.editPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -306,7 +326,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>

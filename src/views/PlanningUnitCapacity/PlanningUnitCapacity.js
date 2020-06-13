@@ -94,6 +94,12 @@ class PlanningUnitCapacity extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
         this.updateRow = this.updateRow.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     updateRow(idx) {
@@ -239,12 +245,15 @@ class PlanningUnitCapacity extends Component {
         PlanningUnitService.editPlanningUnitCapacity(planningUnitCapacity)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/planningUnit/listPlanningUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
 
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
 
             }).catch(
@@ -274,11 +283,22 @@ class PlanningUnitCapacity extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
-            console.log(response.data);
-            this.setState({
-                planningUnit: response.data,
-                //  rows:response.data
-            })
+            if (response.status == 200) {
+                console.log(response.data);
+                this.setState({
+                    planningUnit: response.data,
+                    //  rows:response.data
+                })
+            }
+            else {
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
         }).catch(
             error => {
                 console.log(JSON.stringify(error))
@@ -302,11 +322,21 @@ class PlanningUnitCapacity extends Component {
             }
         );
         PlanningUnitService.getPlanningUnitCapacityForId(this.props.match.params.planningUnitId).then(response => {
-            console.log(response.data);
-            this.setState({
-                planningUnitCapacity: response.data,
-                rows: response.data
-            })
+            if (response.status == 200) {
+                console.log(response.data);
+                this.setState({
+                    planningUnitCapacity: response.data,
+                    rows: response.data
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -330,10 +360,20 @@ class PlanningUnitCapacity extends Component {
         );
         SupplierService.getSupplierListAll()
             .then(response => {
-                console.log(response.data)
-                this.setState({
-                    suppliers: response.data
-                })
+                if (response.status == 200) {
+                    console.log(response.data)
+                    this.setState({
+                        suppliers: response.data
+                    })
+                }else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+               
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -366,7 +406,7 @@ class PlanningUnitCapacity extends Component {
             )
         }, this);
         return (<div className="animated fadeIn">
-            <h5>{i18n.t(this.state.message)}</h5>
+            <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
@@ -621,7 +661,7 @@ class PlanningUnitCapacity extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/planningUnit/listPlanningUnit/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

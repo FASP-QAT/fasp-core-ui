@@ -348,7 +348,7 @@ export default class StepSix extends Component {
                                             type="number"
                                             min="0"
                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" placeholder='please enter shipped to arrived to delivered lead time' />
-                                        <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+                                        <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                     </FormGroup>
 
                                     <FormGroup className="col-md-6">
