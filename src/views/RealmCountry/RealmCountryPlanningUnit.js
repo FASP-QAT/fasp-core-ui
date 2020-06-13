@@ -44,7 +44,7 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        label: Yup.string()
+            countrysku: Yup.string()
             .required(i18n.t('static.planningunit.Countrytext')),
         skuCode: Yup.string()
             .required(i18n.t('static.procurementAgentProcurementUnit.skuCodeText')),
@@ -60,6 +60,7 @@ const validationSchema = function (values, t) {
 
 const validate = (getValidationSchema) => {
     return (values) => {
+        console.log(values)
         const validationSchema = getValidationSchema(values, i18n.t)
         try {
             validationSchema.validateSync(values, { abortEarly: false })
@@ -158,6 +159,7 @@ realmCountryPlanningUnitId:'',
                     }
                 },
                 label: this.state.rows[idx].label.label_en,
+                countrysku: this.state.rows[idx].label.label_en,
                 // , label: { label_en: this.state.rows[idx].label.label_en },
                 skuCode: this.state.rows[idx].skuCode,
                 unit: {
@@ -168,7 +170,7 @@ realmCountryPlanningUnitId:'',
                 },
                 unitId: this.state.rows[idx].unit.unitId,
                 multiplier: this.state.rows[idx].multiplier,
-                gtin: this.state.rows[idx].gtin,
+                gtin: this.state.rows[idx].gtin==null?'':this.state.rows[idx].gtin,
                 active: this.state.rows[idx].active
             }
             const rows = [...this.state.rows]
@@ -196,7 +198,7 @@ realmCountryPlanningUnitId:'',
                 updateRowStatus: 1
             }
             );
-
+console.log(initialValues)
             rows.splice(idx, 1);
             this.setState({ rows });
         }
@@ -232,32 +234,48 @@ realmCountryPlanningUnitId:'',
     }
 
     setTextAndValue = (event) => {
-        // let { budget } = this.state;
+         let { budget } = this.state;
         console.log(event.target.name)
+        console.log(event.target.value)
         if (event.target.name === "planningUnitId") {
-            this.state.planningUnit.planningUnitId = event.target.value;
-            this.state.planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
-           
+         let   {planningUnit}= this.state
+         planningUnit.planningUnitId = event.target.value;
+         planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
+         this.setState({
+            planningUnit
+        })
         }
-        if (event.target.name === "label") {
-            this.state.label.label_en = event.target.value;
+        if (event.target.name === "countrysku") {
+            this.setState({
+                label:{label_en : event.target.value}
+            })
+           // this.state.label.label_en = event.target.value;
         }
         if (event.target.name === "skuCode") {
-            this.state.skuCode = event.target.value;
-
+            this.setState({
+            skuCode : event.target.value
+            })
         }
         if (event.target.name === "unitId") {
-            this.state.unit.unitId = event.target.value;
-            this.state.unit.label.label_en = event.target[event.target.selectedIndex].text;
-            console.log(event.target.value)
+            let   {unit}= this.state
+            unit.unitId = event.target.value;
+          unit.label.label_en = event.target[event.target.selectedIndex].text;
+          this.setState({
+            unit
+        })
         }
+       
         if (event.target.name === "multiplier") {
-            this.state.multiplier = event.target.value;
-
+            this.setState({
+                multiplier : event.target.value
+                })
+            
         }
         if (event.target.name === "gtin") {
-            this.state.gtin = event.target.value;
-
+            this.setState({
+                gtin : event.target.value
+                })
+           
         }
     }
     Capitalize(str) {
@@ -507,7 +525,7 @@ realmCountryPlanningUnitId:'',
                             <strong>{i18n.t('static.dashboad.planningunitcountry')}</strong>
                         </CardHeader>
                         <CardBody>
-                            <Formik
+                            <Formik 
                                 enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
@@ -642,16 +660,16 @@ realmCountryPlanningUnitId:'',
                                         <FormGroup className="col-md-6">
                                             <Label for="label">{i18n.t('static.planningunit.countrysku')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
-                                                name="label"
-                                                id="label"
+                                                name="countrysku"
+                                                id="countrysku"
                                                 bsSize="sm"
-                                                valid={!errors.label && this.state.label.label_en != ''}
-                                                invalid={touched.label && !!errors.label}
+                                                valid={!errors.countrysku && this.state.label.label_en != ''}
+                                                invalid={touched.countrysku && !!errors.countrysku}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.Capitalize(this.state.label.label_en)}
                                                 required />
-                                            <FormFeedback className="red">{errors.label}</FormFeedback>
+                                            <FormFeedback className="red">{errors.countrysku}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span class="red Reqasterisk">*</span></Label>
