@@ -244,12 +244,6 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.budget'),
-                            url: '/budget/listBudget',
-                            icon: 'fa fa-dollar',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') ? false : true) }
-                          },
-                          {
                             name: i18n.t('static.dashboard.supplier'),
                             url: '/supplier/listSupplier',
                             icon: 'fa fa-user-circle-o',
@@ -299,7 +293,14 @@ class DefaultLayout extends Component {
                             //         icon: 'fa fa-object-group',
                             //       }
                             //     ]
-                          }, {
+                          },
+                          {
+                            name: i18n.t('static.dashboard.budget'),
+                            url: '/budget/listBudget',
+                            icon: 'fa fa-dollar',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.dashboard.tracercategory'),
                             url: '/tracerCategory/listTracerCategory',
                             icon: 'fa fa-th-large',
