@@ -77,7 +77,7 @@ class ChangePasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
