@@ -1472,7 +1472,7 @@ export default class syncPage extends Component {
 
                 console.log("Value To compare line number", valueToComparePrimeLineNumber);
                 console.log("Value To compare with line number", valueToCompareWithPrimeLineNumber);
-
+                console.log("shipmentStatus---------->", (jsonData[y])[2]);
                 if (valueToCompareOrderNumber != "" && valueToComparePrimeLineNumber != "") {
                   var countOrderNumberAndLineNumber = this.state.mergedShipmentList.filter(c => c.orderNo == valueToCompareOrderNumber && c.primeLineNo == valueToComparePrimeLineNumber);
                   console.log("length of order number", countOrderNumberAndLineNumber.length)
@@ -1565,6 +1565,81 @@ export default class syncPage extends Component {
           this.setState({
             isChanged: true
           })
+          var valueToCompareOrderNumber = (jsonData[y])[3];
+          var valueToComparePrimeLineNumber = (jsonData[y])[4];
+          if (valueToCompareOrderNumber != "" && valueToComparePrimeLineNumber != "") {
+            var countOrderNumberAndLineNumber = this.state.mergedShipmentList.filter(c => c.orderNo == valueToCompareOrderNumber && c.primeLineNo == valueToComparePrimeLineNumber);
+            console.log("length of order number", countOrderNumberAndLineNumber.length)
+            if (countOrderNumberAndLineNumber.length == 1) {
+              // if (valueToCompareOrderNumber != valueToCompareWithOrderNumber || valueToComparePrimeLineNumber != valueToCompareWithPrimeLineNumber) {
+              console.log("On", valueToCompareOrderNumber, "LN",
+                valueToComparePrimeLineNumber,
+                "rci", this.state.realmCountryId, "PI",
+                (jsonData[y])[7])
+              AuthenticationService.setupAxiosInterceptors();
+              ProgramService.checkOrderNumberAndLineNumber(
+                valueToCompareOrderNumber,
+                valueToComparePrimeLineNumber,
+                this.state.realmCountryId,
+                (jsonData[y])[7]
+              ).then(response => {
+                console.log("Resposne.data", response.config.url.split("/")[7]);
+                console.log("Prime number", response.config.url.split("/")[9]);
+                if (response.data == 0) {
+                  console.log("Did match")
+                } else {
+                  console.log("y", y)
+                  var index = this.state.mergedShipmentList.findIndex(c => c.orderNo == response.config.url.split("/")[7] && c.primeLineNo == response.config.url.split("/")[9])
+                  console.log("Index", index);
+                  for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(index) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "orange");
+                  }
+                }
+                this.setState({
+                  isErpMatching: false
+                })
+              })
+                .catch(
+                  error => {
+                    console.log("Didn't match");
+                    this.setState({
+                      statuses: [],
+                    })
+                    if (error.message === "Network Error") {
+                      this.setState({ message: error.message });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                          this.setState({ message: error.response.data.messageCode });
+                          break;
+                        default:
+                          this.setState({ message: 'static.unkownError' });
+                          break;
+                      }
+                    }
+                  }
+                );
+
+              // }
+            } else {
+              console.log("in else")
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "orangered");
+              }
+              this.setState({
+                isErpMatching: false
+              })
+            }
+          }
+
         }
       } else {
         // Else part for inactive colour
@@ -1777,8 +1852,10 @@ export default class syncPage extends Component {
                           </ul> */}
               </CardHeader>
               <CardBody>
+              
                 <Form name='simpleForm'>
                   <Col md="12 pl-0">
+              
                     <div className="d-md-flex">
                       <FormGroup className="col-md-2 comparebtntext">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -1797,16 +1874,25 @@ export default class syncPage extends Component {
                         </div>
 
                       </FormGroup>
-                      <div className="col-md-10 comparebtnlegend">
-                        <ul className="legend legendsync">
+                       <div className="col-md-10"> 
+                      <ul class="legendcommitversion">
+                        <li><span class="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
+                        <li><span class=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.newDataCurrentVersion')} </span></li>
+                         <li><span class="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commit.newDataLatestVersion')} </span></li>
+                         <li><span class="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
+                         <li><span class="orangelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.erpDidNotMatch')} </span></li>
+                          <li><span class="orangeredlegend legendcolor"></span><span className="legendcommitversionText"> {i18n.t('static.commit.duplicateErp')} </span></li>
+    
+                      </ul>
+                        {/* <ul className="legend legendsync">
                           <li><span className="lightpinklegend"></span> <span className="legendTextsync">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
                           <li><span className="greenlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.newDataCurrentVersion')}</span></li>
                           <li><span className="notawesome"></span><span className="legendTextsync">  {i18n.t('static.commit.newDataLatestVersion')}</span></li>
                           <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.inactiveData')}</span></li>
                           <li><span className="orangelegend"></span><span className="legendTextsync"> {i18n.t('static.commit.erpDidNotMatch')}</span></li>
                           <li><span className="orangeredlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.duplicateErp')}</span></li>
-                        </ul>
-                      </div>
+                        </ul> */}
+                      </div> 
                     </div>
                   </Col>
                 </Form>

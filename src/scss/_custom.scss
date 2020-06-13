@@ -846,6 +846,7 @@ label.arrow_label:after {
     height: auto;
     left: 0;
     margin: 0;
+    
     min-height: 100%;
     padding: 0;
     background-attachment: fixed;
@@ -864,6 +865,13 @@ label.arrow_label:after {
   margin-left: 0%;
 }
 
+.card-marginTop
+{
+  flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: -26% !important;
+
+}
 @media only screen and (max-width: 767px) {
   .upper-logo {
     // min-width: 100%;
@@ -2234,3 +2242,60 @@ h6{
 .table-accesscnl-mt{
   margin-top: -3%;
 }
+/* commit version legend */
+.legendcommitversion { list-style: none;display: inline-flex; }
+.legendcommitversion li { float: left; margin-right: 10px; }
+.legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
+
+/* your colors */
+.legendcommitversion .lightpinklegend {
+  background-color: yellow;
+  border-color: 1px solid yellow;
+}
+.legendcommitversion .greenlegend {
+  background-color:#86cd99;
+  border-color: 1px solid #86cd99;
+}
+.legendcommitversion .redlegend {
+  background-color: red;
+  border-color: 1px solid red;
+}
+
+.legendcommitversion .orangelegend {
+  background-color: orange;
+  border-color: 1px solid orange;
+}
+
+.legendcommitversion .orangeredlegend{
+  background-color: orangered;
+  border-color: 1px solid orangered;
+}
+
+.legendcommitversion .skipedShipmentslegend{
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+
+.legendcommitversion .skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
+.legendcommitversion .purplelegend {
+  background-color: rgb(170, 85, 161);
+  border-color: 1px solid rgb(170, 85, 161);
+}
+.legendcommitversion .blacklegend {
+  background-color: #000;
+  border-color: 1px solid #000;
+}
+
+.legendcommitversion .notawesome {
+  background-color: #e5edf5;
+  border-color: 1px solid #e5edf5;
+}
+
+.legendcommitversionText{
+  text-align: left;
+  display: table;
+  padding: 0px 0px 0px 11px;
+  }
