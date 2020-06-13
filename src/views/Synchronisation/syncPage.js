@@ -1472,7 +1472,7 @@ export default class syncPage extends Component {
 
                 console.log("Value To compare line number", valueToComparePrimeLineNumber);
                 console.log("Value To compare with line number", valueToCompareWithPrimeLineNumber);
-
+                console.log("shipmentStatus---------->", (jsonData[y])[2]);
                 if (valueToCompareOrderNumber != "" && valueToComparePrimeLineNumber != "") {
                   var countOrderNumberAndLineNumber = this.state.mergedShipmentList.filter(c => c.orderNo == valueToCompareOrderNumber && c.primeLineNo == valueToComparePrimeLineNumber);
                   console.log("length of order number", countOrderNumberAndLineNumber.length)
@@ -1565,6 +1565,81 @@ export default class syncPage extends Component {
           this.setState({
             isChanged: true
           })
+          var valueToCompareOrderNumber = (jsonData[y])[3];
+          var valueToComparePrimeLineNumber = (jsonData[y])[4];
+          if (valueToCompareOrderNumber != "" && valueToComparePrimeLineNumber != "") {
+            var countOrderNumberAndLineNumber = this.state.mergedShipmentList.filter(c => c.orderNo == valueToCompareOrderNumber && c.primeLineNo == valueToComparePrimeLineNumber);
+            console.log("length of order number", countOrderNumberAndLineNumber.length)
+            if (countOrderNumberAndLineNumber.length == 1) {
+              // if (valueToCompareOrderNumber != valueToCompareWithOrderNumber || valueToComparePrimeLineNumber != valueToCompareWithPrimeLineNumber) {
+              console.log("On", valueToCompareOrderNumber, "LN",
+                valueToComparePrimeLineNumber,
+                "rci", this.state.realmCountryId, "PI",
+                (jsonData[y])[7])
+              AuthenticationService.setupAxiosInterceptors();
+              ProgramService.checkOrderNumberAndLineNumber(
+                valueToCompareOrderNumber,
+                valueToComparePrimeLineNumber,
+                this.state.realmCountryId,
+                (jsonData[y])[7]
+              ).then(response => {
+                console.log("Resposne.data", response.config.url.split("/")[7]);
+                console.log("Prime number", response.config.url.split("/")[9]);
+                if (response.data == 0) {
+                  console.log("Did match")
+                } else {
+                  console.log("y", y)
+                  var index = this.state.mergedShipmentList.findIndex(c => c.orderNo == response.config.url.split("/")[7] && c.primeLineNo == response.config.url.split("/")[9])
+                  console.log("Index", index);
+                  for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(index) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "orange");
+                  }
+                }
+                this.setState({
+                  isErpMatching: false
+                })
+              })
+                .catch(
+                  error => {
+                    console.log("Didn't match");
+                    this.setState({
+                      statuses: [],
+                    })
+                    if (error.message === "Network Error") {
+                      this.setState({ message: error.message });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                          this.setState({ message: error.response.data.messageCode });
+                          break;
+                        default:
+                          this.setState({ message: 'static.unkownError' });
+                          break;
+                      }
+                    }
+                  }
+                );
+
+              // }
+            } else {
+              console.log("in else")
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "orangered");
+              }
+              this.setState({
+                isErpMatching: false
+              })
+            }
+          }
+
         }
       } else {
         // Else part for inactive colour
