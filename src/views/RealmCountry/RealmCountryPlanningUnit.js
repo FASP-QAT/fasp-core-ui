@@ -628,7 +628,7 @@ realmCountryPlanningUnitId:'',
                                         <Input type="hidden" name="realmCountryPlanningUnitId" id="realmCountryPlanningUnitId" value={this.state.realmCountryPlanningUnitId}>
                                        </Input></FormGroup> 
                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
                                                 valid={!errors.planningUnitId && this.state.planningUnit.planningUnitId != ''}
                                                 invalid={touched.planningUnitId && !!errors.planningUnitId}
@@ -701,7 +701,7 @@ realmCountryPlanningUnitId:'',
                                             <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
+                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
 
                                                 type="text"
