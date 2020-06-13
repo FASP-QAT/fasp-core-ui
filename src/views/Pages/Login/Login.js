@@ -173,7 +173,7 @@ class Login extends Component {
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
-                  <Card className="p-4 Login-card mt-2">
+                  <div className="p-4 Login-card card-marginTop" >
                     <CardBody>
                       <Formik
                         initialValues={initialValues}
@@ -333,7 +333,7 @@ class Login extends Component {
                               </Form>
                             )} />
                     </CardBody>
-                  </Card>
+                  </div>
 
                 </CardGroup>
               </Col>
