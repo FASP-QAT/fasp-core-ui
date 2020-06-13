@@ -842,7 +842,7 @@ class RealmCountry extends Component {
                                     <tr>
                                         <th className="text-left"> {i18n.t('static.dashboard.country')} </th>
                                         <th className="text-center"> {i18n.t('static.dashboard.currency')}</th>
-                                        {/* <th className="text-center"> {i18n.t('static.dashboard.unit')} </th> */}
+                                        <th className="text-center"> {i18n.t('static.dashboard.unit')} </th>
                                         <th className="text-center">{i18n.t('static.realmcountry.airFreightPercentage')}</th>
                                         <th className="text-center">{i18n.t('static.realmcountry.seaFreightPercentage')}</th>
                                         <th className="text-center">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</th>
