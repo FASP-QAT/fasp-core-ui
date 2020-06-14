@@ -146,7 +146,7 @@ export default class ImportProgram extends Component {
                             this.setState({
                                 message: i18n.t('static.program.dataimportsuccess')
                             })
-                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataimportsuccess'))
+                            this.props.history.push(`/dashboard/`  + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
                                 title: i18n.t('static.program.confirmsubmit'),
@@ -364,7 +364,7 @@ export default class ImportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/dashboard/`+ 'red/'  + i18n.t('static.program.actioncancelled'))
     }
 
 }

@@ -347,7 +347,7 @@ class Program extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/dashboard/`+ 'red/'  + i18n.t('static.program.actioncancelled') )
     }
 
     downloadClicked() {
@@ -553,7 +553,7 @@ class Program extends Component {
 
                                                         // }
                                                         transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
-                                                            this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
+                                                            this.props.history.push(`/dashboard/`+ 'green/'  + "Program downloaded successfully.")
                                                         }.bind(this);
                                                         transactionForOverwriteDownloadedProgramData.onerror = function (event) {
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")

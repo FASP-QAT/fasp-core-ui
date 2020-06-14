@@ -231,7 +231,7 @@ export default class ExportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.program.actioncancelled'))
     }
 
     resetClicked() {
