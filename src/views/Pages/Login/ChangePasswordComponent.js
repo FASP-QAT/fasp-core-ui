@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,Tooltip, CardBody,Form,FormGroup, Label,InputGroupAddon, InputGroupText,InputGroup, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -237,7 +237,9 @@ class ChangePasswordComponent extends Component {
                                                         <FormFeedback>{errors.oldPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                    
                                                         <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
+                                                        <InputGroup>
                                                         <Input type="password"
                                                             name="newPassword"
                                                             id="newPassword"
@@ -248,7 +250,14 @@ class ChangePasswordComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         />
+                                                     <InputGroupAddon addonType="append">
+                              <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i></InputGroupText>
+                            </InputGroupAddon>
+                                 
+                                  </InputGroup>
+                                  
                                                         <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                       
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
