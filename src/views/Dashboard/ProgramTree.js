@@ -36,6 +36,7 @@ class Program extends Component {
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getTree = this.getTree.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.state = {
             dropdownOpen: false,
             radioSelected: 2,
@@ -46,6 +47,11 @@ class Program extends Component {
             lang: localStorage.getItem('lang'),
             realmId: AuthenticationService.getRealmId()
         };
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -233,7 +239,7 @@ class Program extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -403,7 +409,13 @@ class Program extends Component {
             }
         }
         if (programCheckedCount == 0) {
-            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
+            this.setState({
+                message: i18n.t('static.program.errorSelectAtleastOneProgram')
+            },
+            () => {
+                this.hideSecondComponent();
+            })
+            // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         } else {

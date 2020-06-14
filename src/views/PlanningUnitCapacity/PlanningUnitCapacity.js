@@ -545,7 +545,7 @@ class PlanningUnitCapacity extends Component {
                                                     min={this.currentDate()}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                     value={this.state.startDate}
-                                                    placeholder={i18n.t('static.budget.budgetstartdate')}
+                                                    // placeholder={i18n.t('static.budget.budgetstartdate')}
                                                     required />
                                                 <FormFeedback className="red">{errors.startDate}</FormFeedback>
                                             </FormGroup>
@@ -564,7 +564,7 @@ class PlanningUnitCapacity extends Component {
                                                     min={this.state.startDate}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                     value={this.state.stopDate}
-                                                    placeholder={i18n.t('static.budget.budgetstopdate')}
+                                                    // placeholder={i18n.t('static.budget.budgetstopdate')}
                                                     required /> <FormFeedback className="red">{errors.stopDate}</FormFeedback>
 
                                             </FormGroup>
@@ -583,7 +583,7 @@ class PlanningUnitCapacity extends Component {
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                     value={this.state.capacity}
                                                     type="number"
-                                                    placeholder={i18n.t('static.planningunit.capacitytext')}
+                                                    // placeholder={i18n.t('static.planningunit.capacitytext')}
                                                     required />
                                                 <FormFeedback className="red">{errors.capacity}</FormFeedback>
                                             </FormGroup>

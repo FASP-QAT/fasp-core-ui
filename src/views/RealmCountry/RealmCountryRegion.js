@@ -459,7 +459,7 @@ class RealmCountryRegion extends Component {
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                     value={this.state.capacityCbm}
                                                     onBlur={handleBlur}
-                                                    placeholder={i18n.t('static.region.capacitycbmtext')}
+                                                    // placeholder={i18n.t('static.region.capacitycbmtext')}
                                                 />
                                                 <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
                                             </FormGroup>
@@ -476,7 +476,7 @@ class RealmCountryRegion extends Component {
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                     value={this.CapitalizeFull(this.state.gln)}
-                                                    placeholder={i18n.t('static.region.glntext')}
+                                                    // placeholder={i18n.t('static.region.glntext')}
                                                 />
                                                 <FormFeedback className="red">{errors.gln}</FormFeedback>
                                             </FormGroup>

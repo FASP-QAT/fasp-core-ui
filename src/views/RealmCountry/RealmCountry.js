@@ -720,7 +720,7 @@ class RealmCountry extends Component {
                                                 </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
                                             </FormGroup>
                                              <FormGroup className="col-md-6">
-                                            <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                            <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 type="select"
                                                 name="unitId"
