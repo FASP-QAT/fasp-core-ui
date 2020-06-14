@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,Tooltip, CardBody,Form,FormGroup, Label,InputGroupAddon, InputGroupText,InputGroup, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -74,6 +74,22 @@ class ChangePasswordComponent extends Component {
             username: ""
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+
+        // setTimeout(function () {
+        //     this.setState({
+        //         message:''
+        //     },
+        //     () => { 
+        //         document.getElementById('div1').style.display = 'block';
+        //     });
+        // }, 8000);
+        
     }
 
     cancelClicked() {
@@ -112,7 +128,7 @@ class ChangePasswordComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div1">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -138,7 +154,11 @@ class ChangePasswordComponent extends Component {
                                             .catch(
                                                 error => {
                                                     if (error.message === "Network Error") {
-                                                        this.setState({ message: error.message });
+                                                        this.setState({ message: error.message }, () => {
+                                                            console.log("inside412");
+                                                            document.getElementById('div1').style.display = 'block';
+                                                            this.hideFirstComponent();
+                                                        });
                                                     } else {
                                                         switch (error.response.status) {
                                                             case 500:
@@ -149,10 +169,21 @@ class ChangePasswordComponent extends Component {
                                                             case 412:
                                                                 console.log("error.response.data.messageCode 111 ---",error.response);
                                                                 console.log("error.response.data.messageCode ---",error.response.data.messageCode);
-                                                                this.setState({ message: error.response.data.messageCode });
+                                                                this.setState({ message: error.response.data.messageCode }, 
+                                                                    () => {
+                                                                    console.log("inside412");
+                                                                    document.getElementById('div1').style.display = 'block';
+                                                                    this.hideFirstComponent();
+                                                                });
+
                                                                 break;
                                                             default:
-                                                                this.setState({ message: 'static.unkownError' });
+                                                                this.setState({ message: 'static.unkownError' },
+                                                                () => {
+                                                                    console.log("inside412");
+                                                                    document.getElementById('div1').style.display = 'block';
+                                                                    this.hideFirstComponent();
+                                                                });
                                                                 break;
                                                         }
                                                     }
@@ -162,6 +193,11 @@ class ChangePasswordComponent extends Component {
                                     } else {
                                         this.setState({
                                             message: 'static.common.onlinepasswordtext'
+                                        },
+                                        () => {
+                                            console.log("inside412");
+                                            document.getElementById('div1').style.display = 'block';
+                                            this.hideFirstComponent();
                                         });
                                     }
                                 }}
@@ -201,7 +237,9 @@ class ChangePasswordComponent extends Component {
                                                         <FormFeedback>{errors.oldPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                    
                                                         <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
+                                                        <InputGroup>
                                                         <Input type="password"
                                                             name="newPassword"
                                                             id="newPassword"
@@ -212,7 +250,14 @@ class ChangePasswordComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         />
+                                                     <InputGroupAddon addonType="append">
+                              <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i></InputGroupText>
+                            </InputGroupAddon>
+                                 
+                                  </InputGroup>
+                                  
                                                         <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                       
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>

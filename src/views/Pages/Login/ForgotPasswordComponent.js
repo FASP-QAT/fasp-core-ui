@@ -6,7 +6,7 @@ import i18n from '../../../i18n'
 import '../../Forms/ValidationForms/ValidationForms.css';
 // import image1 from '../../../../public/assets/img/QAT-logo.png';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import image1 from '../../../assets/img/QAT-logo.png';
+import image1 from '../../../assets/img/QAT-login-logo.png';
 
 
 import UserService from '../../../api/UserService.js';
@@ -109,7 +109,7 @@ class ForgotPasswordComponent extends Component {
                                     <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
-                            <Col md="9" lg="7" xl="6" className="mt-4">
+                            <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
                                 <h5 style={{ color: "red" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 " style={{ display: this.state.loading ? "none" : "block" }}>
 

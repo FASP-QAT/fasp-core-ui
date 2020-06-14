@@ -139,7 +139,7 @@ export default class ExportProgram extends Component {
                             type: "blob"
                         }).then(function (content) {
                             FileSaver.saveAs(content, "download.zip");
-                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataexportsuccess'))
+                            this.props.history.push(`/dashboard/`+ 'green/'  + i18n.t('static.program.dataexportsuccess'))
                         }.bind(this));
                     }
                 }
@@ -231,7 +231,7 @@ export default class ExportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.program.actioncancelled'))
     }
 
     resetClicked() {

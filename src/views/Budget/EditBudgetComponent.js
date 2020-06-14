@@ -399,7 +399,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="number"
-                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                         />
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>

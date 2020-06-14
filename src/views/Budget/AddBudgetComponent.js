@@ -507,7 +507,7 @@ class AddBudgetComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             value={this.state.budget.budgetAmt}
-                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>

@@ -739,7 +739,7 @@ class RealmCountry extends Component {
                                         </FormGroup> 
 
                                             <FormGroup className="col-md-6">
-                                                <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')}</Label>
+                                                <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')} (%)</Label>
                                                 <Input
                                                     type="number"
                                                     min="0"
@@ -757,7 +757,7 @@ class RealmCountry extends Component {
                                                 <FormFeedback className="red">{errors.airFreightPercentage}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label for="seaFreightPercentage">{i18n.t('static.realmcountry.seaFreightPercentage')}</Label>
+                                                <Label for="seaFreightPercentage">{i18n.t('static.realmcountry.seaFreightPercentage')} (%)</Label>
                                                 <Input
                                                     type="number"
                                                     min="0"
@@ -829,7 +829,7 @@ class RealmCountry extends Component {
                                                 <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-12 ">
+                                            <FormGroup className="col-md-6 mt-md-4  ">
                                                 {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
                                                 <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                 &nbsp;
