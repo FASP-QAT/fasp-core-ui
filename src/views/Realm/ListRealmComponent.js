@@ -85,7 +85,7 @@ export default class ReactListComponent extends Component {
         // );
     }
     editRealm(realm) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALMS')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM')) {
             this.props.history.push({
                 pathname: `/realm/updateRealm/${realm.realmId}`,
                 // state: { realm: realm }
@@ -103,7 +103,7 @@ export default class ReactListComponent extends Component {
     }
     RealmCountry(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/RealmCountry/${row.realmId}`,
@@ -200,7 +200,7 @@ export default class ReactListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_REALMS') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CREATE_REALM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

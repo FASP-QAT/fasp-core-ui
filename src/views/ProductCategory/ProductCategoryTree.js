@@ -568,12 +568,13 @@ export default class ProductCategoryTree extends Component {
                                     </div>
                                 </FormGroup>
                             </CardBody>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                             <CardFooter>
                                 <FormGroup>
                                     <Button type="reset" size="md" onClick={this.reSetTree} color="warning" className="float-right mr-1 text-white"><i className="fa fa-refresh"></i> Reset</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 </ FormGroup>
-                            </CardFooter>
+                            </CardFooter>}
                         </Card>
                     </Col>
                 </Row>

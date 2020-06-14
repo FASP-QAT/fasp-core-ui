@@ -259,7 +259,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: 'Product Category',
                                             type: 'dropdown',
-                                            source: productCategoryList
+                                            source:productCategoryList
                                         },
                                         {
                                             title: 'Planning Unit',

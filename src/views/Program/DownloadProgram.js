@@ -158,12 +158,12 @@ export default class DownloadProgram extends Component {
                                     };
                                     var putRequest = programSaveData.put(item);
                                     putRequest.onerror = function (error) {
-                                        this.props.history.push(`/program/downloadProgram/` +i18n.t('static.program.errortext') )
+                                        this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                     }.bind(this);
 
                                     var putDownloadedProgramDataRequest = downloadedProgramSaveData.put(item);
                                     putDownloadedProgramDataRequest.onerror = function (error) {
-                                        this.props.history.push(`/program/downloadProgram/` +i18n.t('static.program.errortext') )
+                                        this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                     }.bind(this);
                                 }
                                 transactionForSavingData.oncomplete = function (event) {
@@ -172,7 +172,7 @@ export default class DownloadProgram extends Component {
                                 }.bind(this);
                                 transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                     console.log("in transaction complete downloaded")
-                                    this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
+                                    this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.downloadsuccess'))
                                 }.bind(this);
                                 transactionForSavingData.onerror = function (event) {
                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
@@ -213,7 +213,7 @@ export default class DownloadProgram extends Component {
                                                         programData: encryptedText.toString(),
                                                         userId: userId
                                                     };
-                                                    
+
                                                     var putRequest = programOverWrite.put(item);
                                                     putRequest.onerror = function (error) {
                                                         this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
@@ -231,7 +231,7 @@ export default class DownloadProgram extends Component {
                                                 }.bind(this);
                                                 transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
                                                     console.log("in transaction complete downloaded")
-                                                    this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
+                                                    this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
                                                 }.bind(this);
                                                 transactionForOverwrite.onerror = function (event) {
                                                     this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
@@ -263,20 +263,20 @@ export default class DownloadProgram extends Component {
                                 this.setState({
                                     message: error.message
                                 })
-                                this.props.history.push(`/program/downloadProgram/` +  i18n.t('static.program.errortext'))
+                                this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                 break
                             default:
                                 this.setState({
                                     message: error.response
                                 })
-                                this.props.history.push(`/program/downloadProgram/` +  i18n.t('static.program.errortext'))
+                                this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                 break
                         }
                     }
                 )
 
         } else {
-            alert( i18n.t('static.common.online'))
+            alert(i18n.t('static.common.online'))
         }
     }
 
@@ -311,55 +311,55 @@ export default class DownloadProgram extends Component {
     render() {
         return (
             <>
-                
-                    <Card>
-                        <Formik
-                            initialValues={initialValues}
-                            render={
-                                ({
-                                    errors,
-                                    touched,
-                                    handleChange,
-                                    handleBlur,
-                                }) => (
-                                        <Form noValidate name='simpleForm'>
-                                            <CardHeader>
-                                                <strong>{i18n.t('static.program.download')}</strong>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                    <Select
-                                                        valid={!errors.programId}
-                                                        bsSize="sm"
-                                                        invalid={touched.programId && !!errors.programId}
-                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                        onBlur={handleBlur} name="programId" id="programId"
-                                                        multi
-                                                        options={this.state.programList}
-                                                        value={this.state.programId}
-                                                    />
-                                                    <FormFeedback>{errors.programId}</FormFeedback>
+
+                <Card>
+                    <Formik
+                        initialValues={initialValues}
+                        render={
+                            ({
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                            }) => (
+                                    <Form noValidate name='simpleForm'>
+                                        <CardHeader>
+                                            <strong>{i18n.t('static.program.download')}</strong>
+                                        </CardHeader>
+                                        <CardBody>
+                                            <FormGroup>
+                                                <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                                <Select
+                                                    valid={!errors.programId}
+                                                    bsSize="sm"
+                                                    invalid={touched.programId && !!errors.programId}
+                                                    onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                    onBlur={handleBlur} name="programId" id="programId"
+                                                    multi
+                                                    options={this.state.programList}
+                                                    value={this.state.programId}
+                                                />
+                                                <FormFeedback>{errors.programId}</FormFeedback>
+                                            </FormGroup>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                &nbsp;
                                                 </FormGroup>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                    &nbsp;
-                                                </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
-                    </Card>
-              
+                                        </CardFooter>
+                                    </Form>
+                                )} />
+                </Card>
+
             </>
         )
 
     }
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled') )
+        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.message.cancelled'))
     }
 
 }

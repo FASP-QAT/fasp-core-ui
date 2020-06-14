@@ -62,7 +62,7 @@ class ListTracerCategoryComponent extends Component {
         }
     }
     editTracerCategory(tracerCategory) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TRACER_CATEGORY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_TRACER_CATEGORY')) {
             this.props.history.push({
                 pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
                 // state: { tracerCategory }
@@ -192,7 +192,7 @@ class ListTracerCategoryComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TRACER_CATEGORY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_TRACER_CATEGORY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

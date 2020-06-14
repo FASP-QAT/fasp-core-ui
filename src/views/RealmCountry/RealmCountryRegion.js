@@ -30,7 +30,7 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.region.validregion')),
         capacityCBM: Yup.number().typeError("Must be a number")
             .min(0, i18n.t('static.program.validvaluetext')),
-        gln: Yup.string().matches(/^[0-9]{0}(?:-[0-9]{13})?$/, i18n.t('static.region.glnvalue'))
+        gln: Yup.string().matches(/^$|^[0-9X]{13}$/, i18n.t('static.region.glnvalue'))
             
     })
 }
@@ -459,7 +459,7 @@ class RealmCountryRegion extends Component {
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                     value={this.state.capacityCbm}
                                                     onBlur={handleBlur}
-                                                    placeholder={i18n.t('static.region.capacitycbmtext')}
+                                                    // placeholder={i18n.t('static.region.capacitycbmtext')}
                                                 />
                                                 <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
                                             </FormGroup>
@@ -476,7 +476,7 @@ class RealmCountryRegion extends Component {
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                     value={this.CapitalizeFull(this.state.gln)}
-                                                    placeholder={i18n.t('static.region.glntext')}
+                                                    // placeholder={i18n.t('static.region.glntext')}
                                                 />
                                                 <FormFeedback className="red">{errors.gln}</FormFeedback>
                                             </FormGroup>

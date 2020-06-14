@@ -229,7 +229,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} <span class="red ">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
@@ -242,7 +242,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} <span class="red ">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.seaFreightPerc && this.props.items.program.seaFreightPerc != ''}
@@ -378,7 +378,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                          <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
 

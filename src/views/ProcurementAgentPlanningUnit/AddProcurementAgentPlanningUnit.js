@@ -542,7 +542,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="skuCode"
                                                                 id="skuCode"
                                                                 value={this.state.skuCode}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.skuCode && this.state.skuCode != ''}
                                                                 invalid={touched.skuCode && !!errors.skuCode}
@@ -558,7 +558,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="catalogPrice"
                                                                 id="catalogPrice"
                                                                 value={this.state.catalogPrice}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')}
+                                                                // placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.catalogPrice && this.state.catalogPrice != ''}
                                                                 invalid={touched.catalogPrice && !!errors.catalogPrice}
@@ -574,7 +574,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="moq"
                                                                 id="moq"
                                                                 value={this.state.moq}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')}
+                                                                // placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.moq && this.state.moq != ''}
                                                                 invalid={touched.moq && !!errors.moq}
@@ -590,7 +590,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="unitsPerPallet"
                                                                 id="unitsPerPallet"
                                                                 value={this.state.unitsPerPallet}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')}
+                                                                // placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.unitsPerPallet && this.state.unitsPerPallet != ''}
                                                                 invalid={touched.unitsPerPallet && !!errors.unitsPerPallet}
@@ -606,7 +606,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="unitsPerContainer"
                                                                 id="unitsPerContainer"
                                                                 value={this.state.unitsPerContainer}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')}
+                                                                // placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.unitsPerContainer && this.state.unitsPerContainer != ''}
                                                                 invalid={touched.unitsPerContainer && !!errors.unitsPerContainer}
@@ -622,7 +622,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="volume"
                                                                 id="volume"
                                                                 value={this.state.volume}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')}
+                                                                // placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.volume && this.state.volume != ''}
                                                                 invalid={touched.volume && !!errors.volume}
@@ -638,7 +638,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 name="weight"
                                                                 id="weight"
                                                                 value={this.state.weight}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')}
+                                                                // placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')}
                                                                 bsSize="sm"
                                                                 valid={!errors.weight && this.state.weight != ''}
                                                                 invalid={touched.weight && !!errors.weight}
