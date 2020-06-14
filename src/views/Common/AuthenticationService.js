@@ -397,120 +397,120 @@ class AuthenticationService {
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
             switch (route) {
                 case "/user/addUser":
-                    if (bfunction.includes("ROLE_BF_ADD_USER")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
                     break;
                 case "/user/editUser/:userId":
-                    if (bfunction.includes("ROLE_BF_EDIT_USER")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
                     break;
                 case "/user/accessControl":
-                    if (bfunction.includes("ROLE_BF_ACCESS_CONTROL")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
                     break;
                 case "/user/listUser":
                 case "/user/listUser/:message":
                 case "/user/listUser/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_USER")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
                     break;
                 case "/role/addRole":
-                    if (bfunction.includes("ROLE_BF_ADD_ROLE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_ROLE")) {
                         return true;
                     }
                     break;
                 case "/role/editRole/:roleId":
-                    if (bfunction.includes("ROLE_BF_EDIT_ROLE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_ROLE")) {
                         return true;
                     }
                     break;
                 case "/role/listRole":
                 case "/role/listRole/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_ROLE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_ROLE")) {
                         return true;
                     }
                     break;
                 case "/language/addLanguage":
-                    if (bfunction.includes("ROLE_BF_ADD_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;
                     }
                     break;
                 case "/language/editLanguage/:languageId":
-                    if (bfunction.includes("ROLE_BF_EDIT_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;
                     }
                     break;
                 case "/language/listLanguage":
                 case "/language/listLanguage/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;
                     }
                     break;
                 case "/country/addCountry":
-                    if (bfunction.includes("ROLE_BF_ADD_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/country/editCountry/:countryId":
-                    if (bfunction.includes("ROLE_BF_EDIT_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/country/listCountry":
                 case "/country/listCountry/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/currency/addCurrency":
-                    if (bfunction.includes("ROLE_BF_ADD_CURRENCY")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_CURRENCY")) {
                         return true;
                     }
                     break;
                 case "/currency/editCurrency/:currencyId":
-                    if (bfunction.includes("ROLE_BF_EDIT_CURRENCY")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_CURRENCY")) {
                         return true;
                     }
                     break;
                 case "/currency/listCurrency":
                 case "/currency/listCurrency/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_CURRENCY")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_CURRENCY")) {
                         return true;
                     }
                     break;
                 case "/diamension/AddDiamension":
-                    if (bfunction.includes("ROLE_BF_ADD_DIAMENSIONS")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
                     break;
                 case "/diamension/editDiamension/:dimensionId":
-                    if (bfunction.includes("ROLE_BF_EDIT_DIAMENSIONS")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
                     break;
                 case "/diamension/diamensionlist":
                 case "/diamension/diamensionlist/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_DIAMENSIONS")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
                     break;
                 case "/unit/addUnit":
-                    if (bfunction.includes("ROLE_BF_ADD_UNITS")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_UNIT")) {
                         return true;
                     }
                     break;
                 case "/unit/editUnit/:unitId":
-                    if (bfunction.includes("ROLE_BF_EDIT_UNITS")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_UNIT")) {
                         return true;
                     }
                     break;
                 case "/unit/listUnit":
                 case "/unit/listUnit/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_UNITS")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_UNIT")) {
                         return true;
                     }
                     break;
@@ -898,7 +898,7 @@ class AuthenticationService {
                     break;
                 case "/ApplicationDashboard/:color/:message":
                 case "/ApplicationDashboard":
-                    if (bfunction.includes("ROLE_BF_VIEW_APPL_DASHBOARD")) {
+                    if (bfunction.includes("ROLE_BF_APPLICATION_DASHBOARD")) {
                         return true;
                     }
                     break;
@@ -949,12 +949,8 @@ class AuthenticationService {
                     }
                     break;
                 case "/translations/labelTranslations":
-                    if (bfunction.includes("ROLE_BF_LIST_LABEL_TRANSLATION")) {
-                        return true;
-                    }
-                    break;
                 case "/translations/databaseTranslations":
-                    if (bfunction.includes("ROLE_BF_LIST_DATABASE_TRANSLATION")) {
+                    if (bfunction.includes("ROLE_BF_LABEL_TRANSLATIONS")) {
                         return true;
                     }
                     break;
