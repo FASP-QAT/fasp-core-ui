@@ -1852,10 +1852,10 @@ export default class syncPage extends Component {
                           </ul> */}
               </CardHeader>
               <CardBody>
-              
+
                 <Form name='simpleForm'>
                   <Col md="12 pl-0">
-              
+
                     <div className="d-md-flex">
                       <FormGroup className="col-md-2 comparebtntext">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -1874,16 +1874,16 @@ export default class syncPage extends Component {
                         </div>
 
                       </FormGroup>
-                       <div className="col-md-10"> 
-                      <ul class="legendcommitversion">
-                        <li><span class="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
-                        <li><span class=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.newDataCurrentVersion')} </span></li>
-                         <li><span class="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commit.newDataLatestVersion')} </span></li>
-                         <li><span class="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
-                         <li><span class="orangelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.erpDidNotMatch')} </span></li>
+                      <div className="col-md-10">
+                        <ul class="legendcommitversion">
+                          <li><span class="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
+                          <li><span class=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.newDataCurrentVersion')} </span></li>
+                          <li><span class="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commit.newDataLatestVersion')} </span></li>
+                          <li><span class="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
+                          <li><span class="orangelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.erpDidNotMatch')} </span></li>
                           <li><span class="orangeredlegend legendcolor"></span><span className="legendcommitversionText"> {i18n.t('static.commit.duplicateErp')} </span></li>
-    
-                      </ul>
+
+                        </ul>
                         {/* <ul className="legend legendsync">
                           <li><span className="lightpinklegend"></span> <span className="legendTextsync">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
                           <li><span className="greenlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.newDataCurrentVersion')}</span></li>
@@ -1892,7 +1892,7 @@ export default class syncPage extends Component {
                           <li><span className="orangelegend"></span><span className="legendTextsync"> {i18n.t('static.commit.erpDidNotMatch')}</span></li>
                           <li><span className="orangeredlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.duplicateErp')}</span></li>
                         </ul> */}
-                      </div> 
+                      </div>
                     </div>
                   </Col>
                 </Form>
@@ -2124,6 +2124,7 @@ export default class syncPage extends Component {
   // }
 
   cancelClicked() {
-    this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
+    console.log("inside cancel")
+    this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.message.cancelled'))
   }
 }
