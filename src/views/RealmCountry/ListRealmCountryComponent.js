@@ -81,7 +81,7 @@ class ListRealmCountryComponent extends Component {
     }
     PlanningUnitCountry(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_PLANNING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT')) {
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
@@ -93,7 +93,7 @@ class ListRealmCountryComponent extends Component {
     }
     RealmCountryRegion(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REGION')) {
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,

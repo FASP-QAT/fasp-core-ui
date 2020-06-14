@@ -98,7 +98,7 @@ export default class DimensionListComponent extends Component {
 
 
     editDimension(dimension) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIAMENSIONS')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION')) {
             this.props.history.push({
                 pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
                 // state: { dimension: dimension }
@@ -172,7 +172,7 @@ export default class DimensionListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DIAMENSIONS') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

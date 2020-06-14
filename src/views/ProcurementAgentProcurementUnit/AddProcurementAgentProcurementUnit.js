@@ -153,7 +153,6 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.setState({ rows: this.state.rows })
     }
     addRow() {
-        document.getElementById("papuTable").style.display = "block";
         let addRow = true;
         if (addRow) {
             this.state.rows.map(item => {
@@ -580,7 +579,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table style={{ display: this.state.loading ? "none" : "block" }} responsive className="table-striped table-hover table-bordered text-center mt-2" id="papuTable">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2" >
                                     <thead>
                                         <tr>
                                             <th className="text-center">{i18n.t('static.procurementagent.procurementagent')}</th>

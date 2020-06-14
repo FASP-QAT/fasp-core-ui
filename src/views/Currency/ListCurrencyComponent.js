@@ -104,7 +104,7 @@ export default class CurrencyListComponent extends Component {
     }
 
     editCurrency(currency) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
             this.props.history.push({
                 pathname: `/currency/editCurrency/${currency.currencyId}`,
                 // state: { currency: currency }
@@ -220,7 +220,7 @@ export default class CurrencyListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_CURRENCY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCurrency}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCurrency}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

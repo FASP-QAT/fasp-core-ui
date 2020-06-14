@@ -1833,7 +1833,7 @@ input::placeholder {
 
 .react-confirm-alert-button-group {
   float: right !important;
-  margin-top: 11% !important;
+  margin-top: 6% !important;
 }
 
 .react-confirm-alert-button-group > button {
@@ -2298,4 +2298,8 @@ h6{
   text-align: left;
   display: table;
   padding: 0px 0px 0px 11px;
+  }
+  .ForgotmarginTop
+  {
+    margin-top: -3%!important;
   }

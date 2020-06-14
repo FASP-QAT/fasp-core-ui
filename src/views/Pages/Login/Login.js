@@ -140,12 +140,12 @@ class Login extends Component {
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
-    console.log("htnl content.......", htmlContent);
-    if (htmlContent.includes('Cancelled')) {
+    console.log("htnl content....... ", htmlContent);
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('Logged')  ||  htmlContent.includes('cancelled')  )  {
       logoutMessage.style.color = 'red';
     }
     else if (htmlContent.includes('Access Denied')) {
-      logoutMessage.style.color = 'red';
+      logoutMessage.style.color = 'red'; 
     }
     else {
       logoutMessage.style.color = 'green';

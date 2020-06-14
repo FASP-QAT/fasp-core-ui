@@ -30,7 +30,7 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.region.validregion')),
         capacityCBM: Yup.number().typeError("Must be a number")
             .min(0, i18n.t('static.program.validvaluetext')),
-        gln: Yup.string().matches(/^[0-9]{0}(?:-[0-9]{13})?$/, i18n.t('static.region.glnvalue'))
+        gln: Yup.string().matches(/^$|^[0-9X]{13}$/, i18n.t('static.region.glnvalue'))
             
     })
 }

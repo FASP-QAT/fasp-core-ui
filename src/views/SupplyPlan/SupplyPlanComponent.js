@@ -1018,7 +1018,7 @@ export default class SupplyPlanComponent extends React.Component {
                 console.log("Program json", programJson);
                 for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
-                        name: programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, this.state.lang),
+                        name: programJson.regionList[i].regionId, //getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
@@ -1986,7 +1986,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var batchList = []
                     var batchInfoList = programJson.batchInfoList;
                     for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= startDate) {
+                        if (batchInfoList[k].expiryDate >= startDate && batchInfoList[k].createdDate <= startDate) {
                             var batchJson = {
                                 name: batchInfoList[k].batchNo,
                                 id: batchInfoList[k].batchId
@@ -2921,7 +2921,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var batchList = []
                     var batchInfoList = programJson.batchInfoList;
                     for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= moment(endDate).startOf("month").format("YYYY-MM-DD")) {
+                        if (batchInfoList[k].expiryDate >= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].createdDate <= moment(endDate).startOf("month").format("YYYY-MM-DD")) {
                             var batchJson = {
                                 name: batchInfoList[k].batchNo,
                                 id: batchInfoList[k].batchId
@@ -3548,6 +3548,8 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
+                    elInstance.setValueFromCoords(3, y, "", true);
+                    elInstance.setValueFromCoords(1, y, "", true);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
@@ -3916,6 +3918,7 @@ export default class SupplyPlanComponent extends React.Component {
         var elInstance = this.state.inventoryEl;
         if (x == 7) {
             elInstance.setValueFromCoords(9, y, "", true);
+            elInstance.setValueFromCoords(5, y, "", true);
         }
     }.bind(this);
 
@@ -4295,7 +4298,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 { type: 'dropdown', source: ['Sea', 'Air'], title: i18n.t('static.supplyPlan.shipmentMode') },
                                 { type: 'text', title: i18n.t('static.program.notes') },
                                 { type: 'hidden', title: i18n.t('static.supplyPlan.orderDate') },
-                                { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), ''] }, title: i18n.t('static.supplyPlan.expectedDeliveryDate') },
+                                { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), null] }, title: i18n.t('static.supplyPlan.expectedDeliveryDate') },
                                 { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder') }
                             ],
                             pagination: false,
@@ -4885,7 +4888,11 @@ export default class SupplyPlanComponent extends React.Component {
                             },
                             shipmentBudgetList: [],
                             emergencyOrder: isEmergencyOrder,
-                            batchInfoList: []
+                            batchInfoList: [],
+                            currency: {
+                                currencyId: 1,
+                                conversionRateToUsd: 1
+                            }
                         }
 
                         shipmentDataList.push(shipmentJson);
@@ -5755,7 +5762,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 data: shipmentsArr,
                                                 colWidths: [100, 100, 100, 100, 120, 120, 200, 80, 80, 80, 80, 100, 100, 80, 80, 80, 80, 80, 250, 120, 80, 100, 80, 80, 80, 100],
                                                 columns: [
-                                                    { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), ''] }, title: i18n.t('static.supplyPlan.expectedDeliveryDate') },
+                                                    { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), null] }, title: i18n.t('static.supplyPlan.expectedDeliveryDate') },
                                                     { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, filter: this.shipmentStatusDropdownFilter },
                                                     { type: 'text', title: i18n.t('static.supplyPlan.orderNo') },
                                                     { type: 'text', title: i18n.t('static.supplyPlan.primeLineNo') },
@@ -5827,11 +5834,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var shipmentStatus = rowData[35];
                                                     console.log("Shipment Status", shipmentStatus);
                                                     if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-                                                        for (var i = 0; i < colArr.length; i++) {
-                                                            var cell = elInstance.getCell(`${colArr[i]}${y + 1}`)
-                                                            cell.classList.add('readonly');
-                                                        }
-                                                    } else if (shipmentStatus >= SUBMITTED_SHIPMENT_STATUS && supplyPlanType == 'psmShipments' && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
                                                         for (var i = 0; i < colArr.length; i++) {
                                                             var cell = elInstance.getCell(`${colArr[i]}${y + 1}`)
                                                             cell.classList.add('readonly');
@@ -5914,7 +5916,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         {
                                                                             title: i18n.t('static.supplyPlan.expiryDate'),
                                                                             type: 'calendar',
-                                                                            options: { format: 'MM-DD-YYYY' }
+                                                                            options: {
+                                                                                format: 'MM-DD-YYYY',
+                                                                                validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                                            }
                                                                         },
                                                                         {
                                                                             title: i18n.t('static.supplyPlan.shipmentQty'),
@@ -6718,7 +6723,7 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (value == 3 && supplyPlanType == 'psmShipments') {
+                if (value == SUBMITTED_SHIPMENT_STATUS && supplyPlanType == 'psmShipments') {
                     var orderNo = elInstance.getValueFromCoords(2, y);
                     var lineNo = elInstance.getValueFromCoords(3, y);
                     if (orderNo == "") {
@@ -6738,7 +6743,7 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col2, "background-color", "transparent");
                         elInstance.setComments(col2, "");
                     }
-                } else if (value == 4 && supplyPlanType == 'nonPsmShipments') {
+                } else if (value == SHIPPED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments') {
                     var procurementUnit = elInstance.getValueFromCoords(18, y);
                     var supplier = elInstance.getValueFromCoords(19, y);
                     if (procurementUnit == "") {
@@ -6982,7 +6987,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var shipmentStatus = elInstance.getValueFromCoords(1, y);
             var col1 = ("S").concat(parseInt(y) + 1);
-            if (shipmentStatus == 4 && supplyPlanType == 'nonPsmShipments') {
+            if (shipmentStatus == SHIPPED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments') {
                 var orderNo = value;
                 if (orderNo == "") {
                     elInstance.setStyle(col1, "background-color", "transparent");
@@ -7001,7 +7006,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 19) {
             var shipmentStatus = elInstance.getValueFromCoords(1, y);
             var col1 = ("T").concat(parseInt(y) + 1);
-            if (shipmentStatus == 4 && supplyPlanType == 'nonPsmShipments') {
+            if (shipmentStatus == SHIPPED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments') {
                 var orderNo = value;
                 if (orderNo == "") {
                     elInstance.setStyle(col1, "background-color", "transparent");
@@ -7132,7 +7137,7 @@ export default class SupplyPlanComponent extends React.Component {
                             elInstance.setComments(col2, "");
                         }
 
-                    } else if (value == APPROVED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments') {
+                    } else if (value == SHIPPED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments') {
                         var procurementUnit = elInstance.getValueFromCoords(18, y);
                         var supplier = elInstance.getValueFromCoords(19, y);
                         if (procurementUnit == "") {
