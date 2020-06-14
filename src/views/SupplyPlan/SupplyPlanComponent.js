@@ -4888,7 +4888,11 @@ export default class SupplyPlanComponent extends React.Component {
                             },
                             shipmentBudgetList: [],
                             emergencyOrder: isEmergencyOrder,
-                            batchInfoList: []
+                            batchInfoList: [],
+                            currency: {
+                                currencyId: 1,
+                                conversionRateToUsd: 1
+                            }
                         }
 
                         shipmentDataList.push(shipmentJson);
