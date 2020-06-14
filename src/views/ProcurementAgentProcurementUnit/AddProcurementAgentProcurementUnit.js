@@ -35,7 +35,6 @@ const validationSchema = function (values, t) {
         gtin: Yup.string()
             .required(i18n.t('static.mapProcurementUnit.validGtinText'))
             .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
-            .min(14, i18n.t('static.procurementUnit.validMinValueText'))
             .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
         approvedToShippedLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -304,7 +303,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 if (response.status == 200) {
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse , loading: false });
+                        this.setState({ rows: myResponse, loading: false });
                     }
                 } else {
                     this.setState({
@@ -579,7 +578,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table style={{ display: this.state.loading ? "none" : "block" }} responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2" >
                                     <thead>
                                         <tr>
                                             <th className="text-center">{i18n.t('static.procurementagent.procurementagent')}</th>

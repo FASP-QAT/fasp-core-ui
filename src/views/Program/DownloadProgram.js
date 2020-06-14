@@ -359,7 +359,7 @@ export default class DownloadProgram extends Component {
 
     }
     cancelClicked() {
-        this.props.history.push(`/dashboard/` +    i18n.t('static.program.actioncancelled') )
+        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled') )
     }
 
 }
