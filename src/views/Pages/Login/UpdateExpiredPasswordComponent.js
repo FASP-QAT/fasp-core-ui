@@ -14,7 +14,7 @@ import UserService from '../../../api/UserService'
 import moment from 'moment';
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import image1 from '../../../assets/img/QAT-logo.png';
+import image1 from '../../../assets/img/QAT-login-logo.png';
 
 
 
@@ -119,7 +119,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                     <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
-                            <Col md="9" lg="7" xl="6 " className="mt-4">
+                            <Col md="9" lg="7" xl="6 " className="ForgotmarginTop">
                                 <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>

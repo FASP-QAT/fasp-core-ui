@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label,InputGroupAddon, InputGroupText,InputGroup,Tooltip, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -202,6 +202,7 @@ class ChangePasswordComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
+                                                        <InputGroup>
                                                         <Input type="password"
                                                             name="newPassword"
                                                             id="newPassword"
@@ -212,6 +213,11 @@ class ChangePasswordComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         />
+                                                        <InputGroupAddon addonType="append">
+                              <InputGroupText><i class="icon-info icons" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i></InputGroupText>
+                            </InputGroupAddon>
+                                 
+                                                           </InputGroup>
                                                         <FormFeedback>{errors.newPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
