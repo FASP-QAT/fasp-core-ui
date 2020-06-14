@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label,InputGroupAddon, InputGroupText,InputGroup,Tooltip, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,Tooltip, CardBody,Form,FormGroup, Label,InputGroupAddon, InputGroupText,InputGroup, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -77,7 +77,7 @@ class ChangePasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -201,6 +201,7 @@ class ChangePasswordComponent extends Component {
                                                         <FormFeedback>{errors.oldPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                    
                                                         <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
                                                         <InputGroup>
                                                         <Input type="password"
@@ -213,12 +214,14 @@ class ChangePasswordComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         />
-                                                        <InputGroupAddon addonType="append">
-                              <InputGroupText><i class="icon-info icons" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i></InputGroupText>
+                                                     <InputGroupAddon addonType="append">
+                              <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i></InputGroupText>
                             </InputGroupAddon>
                                  
-                                                           </InputGroup>
+                                  </InputGroup>
+                                  
                                                         <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                       
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
