@@ -139,7 +139,7 @@ export default class ExportProgram extends Component {
                             type: "blob"
                         }).then(function (content) {
                             FileSaver.saveAs(content, "download.zip");
-                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataexportsuccess'))
+                            this.props.history.push(`/dashboard/`+ 'green/'  + i18n.t('static.program.dataexportsuccess'))
                         }.bind(this));
                     }
                 }
