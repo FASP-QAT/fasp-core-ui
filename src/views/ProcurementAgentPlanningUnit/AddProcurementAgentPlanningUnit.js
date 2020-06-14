@@ -24,11 +24,11 @@ let initialValues = {
     planningUnitId: '',
     skuCode: '',
     catalogPrice: '',
-    moq: '',
-    unitsPerPallet: '',
-    unitsPerContainer: '',
-    volume: '',
-    weight: ''
+    moq: 0,
+    unitsPerPallet: 0,
+    unitsPerContainer: 0,
+    volume: 0,
+    weight: 0
 }
 
 const validationSchema = function (values, t) {
@@ -37,24 +37,24 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         skuCode: Yup.string()
             .required(i18n.t('static.procurementAgentPlanningUnit.validSKUCode')),
-        catalogPrice: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        catalogPrice: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.procurementAgentPlanningUnit.validCatalogPrice')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        moq: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementAgentPlanningUnit.validMoq')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        unitsPerPallet: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementAgentPlanningUnit.validUnitsPerPallet')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        unitsPerContainer: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementAgentPlanningUnit.validUnitsPerContainer')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        volume: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementAgentPlanningUnit.validVolume')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        weight: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.procurementAgentPlanningUnit.validWeight')).min(0, i18n.t('static.procurementUnit.validValueText'))
+        moq: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerPallet: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerContainer: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        volume: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        weight: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText'))
     })
 }
 
@@ -94,11 +94,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             planningUnitName: '',
             skuCode: '',
             catalogPrice: '',
-            moq: '',
-            unitsPerPallet: '',
-            unitsPerContainer: '',
-            volume: '',
-            weight: '',
+            moq: 0,
+            unitsPerPallet: 0,
+            unitsPerContainer: 0,
+            volume: 0,
+            weight: 0,
 
             rows: rows,
             procurementAgentList: [],
@@ -286,7 +286,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 console.log(response.data);
                 if (response.status == "200") {
                     console.log(response);
-                    this.props.history.push(`/procurementAgent/listProcurementAgent/`  + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -470,7 +470,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
-              <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -567,7 +567,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.catalogPrice}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 min="0"
@@ -583,7 +583,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.moq}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 min="0"
@@ -599,7 +599,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.unitsPerPallet}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 min="0"
@@ -615,7 +615,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 min="0"
@@ -631,7 +631,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.volume}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 min="0"
@@ -737,7 +737,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 
