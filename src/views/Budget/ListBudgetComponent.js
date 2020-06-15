@@ -205,7 +205,7 @@ class ListBudgetComponent extends Component {
     // rowIdx is index of row
     // console.log('in rowClassNameFormat')
     // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
-    return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedAmt) <= 0 ? 'background-red' : '';
+    return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedUsdAmt) <= 0 ? 'background-red' : '';
   }
   formatLabel(cell, row) {
     // console.log("celll----", cell);
@@ -260,6 +260,14 @@ class ListBudgetComponent extends Component {
         formatter: this.formatLabel
       },
       {
+        dataField: 'label',
+        text: i18n.t('static.budget.budget'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      },
+      {
         dataField: 'fundingSource.label',
         text: i18n.t('static.budget.fundingsource'),
         sort: true,
@@ -267,13 +275,6 @@ class ListBudgetComponent extends Component {
         headerAlign: 'center',
         formatter: this.formatLabel
 
-      },
-      {
-        dataField: 'notes',
-        text: i18n.t('static.program.notes'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
       },
       {
         dataField: 'budgetAmt',
@@ -452,7 +453,7 @@ class ListBudgetComponent extends Component {
                         }
                       }}
                       {...props.baseProps}
-                    /><h5>*Row is in red color indicates there is no money left or budget hits the end date</h5>
+                    /><h5>*Rows in red indicate that Budget has either lapsed or has no money in it</h5>
                   </div>
                 )
               }
