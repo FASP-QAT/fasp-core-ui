@@ -1719,75 +1719,75 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 // Logic for expired stock count
-                // for (var es = 0; es < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; es++) {
-                //     var expiredBatchNumbers = programJson.batchInfoList.filter(c => c.expiryDate <= m[es].endDate && c.expiryDate >= m[es].startDate);
-                //     var expiredStock = 0;
-                //     for (var ebn = 0; ebn < expiredBatchNumbers.length; ebn++) {
-                //         var shipmentList = programJson.shipmentList;
-                //         var shipmentBatchArray = [];
-                //         for (var ship = 0; ship < shipmentList.length; ship++) {
-                //             var batchInfoList = shipmentList[ship].batchInfoList;
-                //             for (var bi = 0; bi < batchInfoList.length; bi++) {
-                //                 shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
-                //             }
-                //         }
-                //         var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo)[0];
-                //         var totalStockForBatchNumber = stockForBatchNumber.qty;
-                //         console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", expiredBatchNumbers[ebn].batchNo);
+                for (var es = 0; es < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; es++) {
+                    var expiredBatchNumbers = programJson.batchInfoList.filter(c => c.expiryDate <= m[es].endDate && c.expiryDate >= m[es].startDate);
+                    var expiredStock = 0;
+                    for (var ebn = 0; ebn < expiredBatchNumbers.length; ebn++) {
+                        var shipmentList = programJson.shipmentList;
+                        var shipmentBatchArray = [];
+                        for (var ship = 0; ship < shipmentList.length; ship++) {
+                            var batchInfoList = shipmentList[ship].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                            }
+                        }
+                        var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo)[0];
+                        var totalStockForBatchNumber = stockForBatchNumber.qty;
+                        console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", expiredBatchNumbers[ebn].batchNo);
 
-                //         var consumptionList = programJson.consumptionList;
-                //         var consumptionBatchArray = [];
-                //         for (var con = 0; con < consumptionList.length; con++) {
-                //             var batchInfoList = consumptionList[con].batchInfoList;
-                //             for (var bi = 0; bi < batchInfoList.length; bi++) {
-                //                 consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
-                //             }
-                //         }
-                //         var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo);
-                //         var consumptionQty = 0;
-                //         for (var b = 0; b < consumptionForBatchNumber.length; b++) {
-                //             consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
-                //         }
-                //         console.log("Total consumptions batch number", consumptionQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
-                //         var inventoryList = programJson.inventoryList;
-                //         var inventoryBatchArray = [];
-                //         for (var inv = 0; inv < inventoryList.length; inv++) {
-                //             var batchInfoList = inventoryList[inv].batchInfoList;
-                //             for (var bi = 0; bi < batchInfoList.length; bi++) {
-                //                 inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
-                //             }
-                //         }
-                //         var inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo);
-                //         var adjustmentQty = 0;
-                //         for (var b = 0; b < inventoryForBatchNumber.length; b++) {
-                //             adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
-                //         }
+                        var consumptionList = programJson.consumptionList;
+                        var consumptionBatchArray = [];
+                        for (var con = 0; con < consumptionList.length; con++) {
+                            var batchInfoList = consumptionList[con].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                            }
+                        }
+                        var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo);
+                        var consumptionQty = 0;
+                        for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                            consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                        }
+                        console.log("Total consumptions batch number", consumptionQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
+                        var inventoryList = programJson.inventoryList;
+                        var inventoryBatchArray = [];
+                        for (var inv = 0; inv < inventoryList.length; inv++) {
+                            var batchInfoList = inventoryList[inv].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                            }
+                        }
+                        var inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo);
+                        var adjustmentQty = 0;
+                        for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                            adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                        }
 
-                //         console.log("Total adjustments batch number", adjustmentQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
-                //         var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-                //         expiredStock += parseInt(remainingBatchQty);
-                //         console.log("Expired stock", expiredStock, "Batch number", expiredBatchNumbers[ebn].batchNo)
-                //     }
-                //     console.log("Expired stock qty", expiredStock, "Month---->", m[es].month);
-                //     console.log("unallocatedConsumption",unallocatedConsumption)
-                //     if (expiredStock > 0) {
-                //         for (var unAlloCon = 0; unAlloCon < es; unAlloCon++) {
-                //             var remainingUnAllocated = unallocatedConsumption[unAlloCon] - expiredStock;
-                //             var remainingExpiredStock = expiredStock - unallocatedConsumption[unAlloCon];
+                        console.log("Total adjustments batch number", adjustmentQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
+                        var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                        expiredStock += parseInt(remainingBatchQty);
+                        console.log("Expired stock", expiredStock, "Batch number", expiredBatchNumbers[ebn].batchNo)
+                    }
+                    console.log("Expired stock qty", expiredStock, "Month---->", m[es].month);
+                    console.log("unallocatedConsumption", unallocatedConsumption)
+                    if (expiredStock > 0) {
+                        for (var unAlloCon = 0; unAlloCon < es; unAlloCon++) {
+                            var remainingUnAllocated = unallocatedConsumption[unAlloCon] - expiredStock;
+                            var remainingExpiredStock = expiredStock - unallocatedConsumption[unAlloCon];
 
-                //             if (remainingExpiredStock > 0) {
-                //                 expiredStock = expiredStock - unallocatedConsumption[unAlloCon];
-                //             } else {
-                //                 expiredStock = 0;
-                //             }
-                //             if (remainingUnAllocated > 0) {
-                //                 unallocatedConsumption[unAlloCon] = remainingUnAllocated;
-                //             }
-                //         }
+                            if (remainingExpiredStock > 0) {
+                                expiredStock = expiredStock - unallocatedConsumption[unAlloCon];
+                            } else {
+                                expiredStock = 0;
+                            }
+                            if (remainingUnAllocated > 0) {
+                                unallocatedConsumption[unAlloCon] = remainingUnAllocated;
+                            }
+                        }
 
-                //     }
-                //     console.log("final Expired stock qty", expiredStock, "Month---->", m[es].month);
-                // }
+                    }
+                    console.log("final Expired stock qty", expiredStock, "Month---->", m[es].month);
+                }
 
                 // Building json for graph
                 for (var jsonForGraph = 0; jsonForGraph < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; jsonForGraph++) {
@@ -5279,11 +5279,11 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 var shipmentDataList = (programJson.shipmentList);
                 for (var i = 0; i < shipmentDataList.length; i++) {
-                    if (props.type == 'psm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == false && shipmentDataList[i].procurementAgent.id == PSM_PROCUREMENT_AGENT_ID) {
+                    if (props.type == 'psm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == false && shipmentDataList[i].procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && shipmentDataList[i].planningUnit.id==document.getElementById("planningUnitId").value) {
                         shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
-                    } else if (props.type == 'nonPsm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].procurementAgent.id != PSM_PROCUREMENT_AGENT_ID) {
+                    } else if (props.type == 'nonPsm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].procurementAgent.id != PSM_PROCUREMENT_AGENT_ID && shipmentDataList[i].planningUnit.id==document.getElementById("planningUnitId").value) {
                         shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
-                    } else if (props.type == 'artmis' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == true) {
+                    } else if (props.type == 'artmis' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == true && shipmentDataList[i].planningUnit.id==document.getElementById("planningUnitId").value) {
                         shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
                     }
                 }
@@ -5654,12 +5654,13 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                             var shipmentList = [];
                                             if (supplyPlanType == 'psmShipments') {
-                                                shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
+                                                shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value);
                                             } else if (supplyPlanType == 'artmisShipments') {
-                                                shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
+                                                shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value);
                                             } else if (supplyPlanType == 'nonPsmShipments') {
-                                                shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.procurementAgent.id != PSM_PROCUREMENT_AGENT_ID && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
+                                                shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.procurementAgent.id != PSM_PROCUREMENT_AGENT_ID && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value);
                                             }
+
 
                                             var procurementUnitType = 'hidden';
                                             if (supplyPlanType == 'nonPsmShipments') {
