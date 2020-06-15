@@ -737,7 +737,7 @@ console.log(initialValues)
                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
                             </FormGroup>*/}
 
-                                        <FormGroup className="col-md-6 mt-md-4">
+                                        <FormGroup className="col-md-12 mt-md-0">
                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
                                            

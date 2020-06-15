@@ -1158,6 +1158,8 @@ export default class SupplyPlanComponent extends React.Component {
         var deliveredTotalShipmentsBasedOnMonth = [];
         var cancelledTotalShipmentsBasedOnMonth = [];
         var onHoldTotalShipmentsBasedOnMonth = [];
+        var unallocatedConsumption = [];
+        var unallocatedAdjustments = [];
         var db1;
         var storeOS;
         getDatabase();
@@ -1203,6 +1205,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                 for (var i = 0; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
                     var consumptionQty = 0;
+                    var consumptionUnaccountedQty = 0;
                     for (var reg = 0; reg < regionListFiltered.length; reg++) {
                         var c = consumptionList.filter(c => (c.consumptionDate >= m[i].startDate && c.consumptionDate <= m[i].endDate) && c.region.id == regionListFiltered[reg].id);
                         var filteredJson = { consumptionQty: '', region: { id: regionListFiltered[reg].id }, month: m[i] };
@@ -1217,10 +1220,18 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             if (count == 0) {
                                 consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                if (this.state.batchNoRequired) {
+                                    consumptionUnaccountedQty += parseInt((c[j].consumptionQty));
+                                }
                                 filteredJson = { month: m[i], region: c[j].region, consumptionQty: c[j].consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, consumptionDate: c[j].consumptionDate };
                             } else {
                                 if (c[j].actualFlag.toString() == 'true') {
                                     consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                    if (this.state.batchNoRequired) {
+                                        if (c[j].batchInfoList.length == 0) {
+                                            consumptionUnaccountedQty += parseInt((c[j].consumptionQty));
+                                        }
+                                    }
                                     filteredJson = { month: m[i], region: c[j].region, consumptionQty: c[j].consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, consumptionDate: c[j].consumptionDate };
                                 }
                             }
@@ -1232,8 +1243,10 @@ export default class SupplyPlanComponent extends React.Component {
                     var consumptionWithoutRegion = consumptionList.filter(c => (c.consumptionDate >= m[i].startDate && c.consumptionDate <= m[i].endDate));
                     if (consumptionWithoutRegion.length == 0) {
                         consumptionTotalData.push("");
+                        unallocatedConsumption.push("");
                     } else {
                         consumptionTotalData.push(consumptionQty);
+                        unallocatedConsumption.push(consumptionUnaccountedQty);
                     }
                 }
 
@@ -1380,12 +1393,16 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 for (var i = 0; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
                     var adjustmentQty = 0;
+                    var adjustmentUnallocatedQty = 0;
                     for (var reg = 0; reg < regionListFiltered.length; reg++) {
                         var adjustmentQtyForRegion = 0;
                         var c = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate) && c.region.id == regionListFiltered[reg].id);
                         var filteredJsonInventory = { adjustmentQty: '', region: { id: regionListFiltered[reg].id }, month: m[i] };
                         for (var j = 0; j < c.length; j++) {
                             adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                            if (c[j].batchInfoList.length == 0 && c[j].adjustmentQty < 0) {
+                                adjustmentUnallocatedQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                            }
                             adjustmentQtyForRegion += parseFloat((c[j].adjustmentQty * c[j].multiplier));
                             filteredJsonInventory = { month: m[i], region: c[j].region, adjustmentQty: adjustmentQtyForRegion, inventoryId: c[j].inventoryId, inventoryDate: c[j].inventoryDate };
                         }
@@ -1394,8 +1411,10 @@ export default class SupplyPlanComponent extends React.Component {
                     var adjustmentsTotalData = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate));
                     if (adjustmentsTotalData.length == 0) {
                         inventoryTotalData.push("");
+                        unallocatedAdjustments.push("");
                     } else {
                         inventoryTotalData.push(adjustmentQty);
+                        unallocatedAdjustments.push(adjustmentUnallocatedQty);
                     }
                 }
 
@@ -1747,9 +1766,27 @@ export default class SupplyPlanComponent extends React.Component {
                 //         console.log("Total adjustments batch number", adjustmentQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
                 //         var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
                 //         expiredStock += parseInt(remainingBatchQty);
-                //         console.log("Expired stock",expiredStock, "Batch number", expiredBatchNumbers[ebn].batchNo)
+                //         console.log("Expired stock", expiredStock, "Batch number", expiredBatchNumbers[ebn].batchNo)
                 //     }
-                //     console.log("Expired stock", expiredStock,"Month---->",m[es].month);
+                //     console.log("Expired stock qty", expiredStock, "Month---->", m[es].month);
+                //     console.log("unallocatedConsumption",unallocatedConsumption)
+                //     if (expiredStock > 0) {
+                //         for (var unAlloCon = 0; unAlloCon < es; unAlloCon++) {
+                //             var remainingUnAllocated = unallocatedConsumption[unAlloCon] - expiredStock;
+                //             var remainingExpiredStock = expiredStock - unallocatedConsumption[unAlloCon];
+
+                //             if (remainingExpiredStock > 0) {
+                //                 expiredStock = expiredStock - unallocatedConsumption[unAlloCon];
+                //             } else {
+                //                 expiredStock = 0;
+                //             }
+                //             if (remainingUnAllocated > 0) {
+                //                 unallocatedConsumption[unAlloCon] = remainingUnAllocated;
+                //             }
+                //         }
+
+                //     }
+                //     console.log("final Expired stock qty", expiredStock, "Month---->", m[es].month);
                 // }
 
                 // Building json for graph
