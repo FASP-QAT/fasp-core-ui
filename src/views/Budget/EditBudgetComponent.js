@@ -510,7 +510,7 @@ class EditBudgetComponent extends Component {
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
 
                                                         />
@@ -525,7 +525,7 @@ class EditBudgetComponent extends Component {
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
 
                                                         />
