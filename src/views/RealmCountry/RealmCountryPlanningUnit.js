@@ -25,7 +25,7 @@ let initialValues = {
         }
     }
     , label: { label_en: '' },
-    skuCode: '',
+   skuCode: '',
     unit: {
         unitId: '',
         label: {
@@ -34,7 +34,7 @@ let initialValues = {
     },
     multiplier: '',
 
-    gtin: '',
+    // gtin: '',
     active: true
 
 
@@ -52,8 +52,9 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
         unitId: Yup.string()
             .required(i18n.t('static.product.productunittext')),
-        gtin: Yup.string()
-            .matches(/^[0-9]{0}(?:-[0-9]{13})?$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
+            // gtin: Yup.string()
+            // .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
+            // .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
     })
 }
 
@@ -123,7 +124,7 @@ realmCountryPlanningUnitId:'',
                 }
             }, isNew: true,
             updateRowStatus: 0,
-            gtin:''
+            // gtin:''
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.disableRow = this.disableRow.bind(this);
@@ -169,7 +170,7 @@ realmCountryPlanningUnitId:'',
                 },
                 unitId: this.state.rows[idx].unit.unitId,
                 multiplier: this.state.rows[idx].multiplier,
-                gtin: this.state.rows[idx].gtin==null?'':this.state.rows[idx].gtin,
+                // gtin: this.state.rows[idx].gtin==null?'':this.state.rows[idx].gtin,
                 active: this.state.rows[idx].active
             }
             const rows = [...this.state.rows]
@@ -191,7 +192,7 @@ realmCountryPlanningUnitId:'',
                 },
                 multiplier: this.state.rows[idx].multiplier,
 
-                gtin: this.state.rows[idx].gtin,
+                // gtin: this.state.rows[idx].gtin,
                 // active: this.state.rows[idx].active,
                 isNew: false,
                 updateRowStatus: 1
@@ -210,7 +211,7 @@ console.log(initialValues)
             skuCode: true,
             multiplier: true,
             unitId: true,
-            gtin: true
+            // gtin: true
 
         }
         )
@@ -270,12 +271,12 @@ console.log(initialValues)
                 })
             
         }
-        if (event.target.name === "gtin") {
-            this.setState({
-                gtin : event.target.value
-                })
+        // if (event.target.name === "gtin") {
+        //     this.setState({
+        //         gtin : event.target.value
+        //         })
            
-        }
+        // }
     }
     Capitalize(str) {
         if (str != null && str != "") {
@@ -530,8 +531,8 @@ console.log(initialValues)
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                     console.log("values", values)
-                                    console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.skuCode + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
-                                    if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != "" && this.state.skuCode != "" && this.state.unit.unitId != "" && this.state.multiplier != "") {
+                                    console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
+                                    if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != ""  && this.state.unit.unitId != "" && this.state.multiplier != "") {
                                         var json =
                                         {realmCountryPlanningUnitId:this.state.realmCountryPlanningUnitId,
                                             realmCountry: {
@@ -545,7 +546,7 @@ console.log(initialValues)
                                                 }
                                             }
                                             , label: { label_en: this.state.label.label_en },
-                                            skuCode: this.state.skuCode,
+                                             skuCode: this.state.skuCode,
                                             unit: {
                                                 unitId: this.state.unit.unitId,
                                                 label: {
@@ -554,7 +555,7 @@ console.log(initialValues)
                                             },
                                             multiplier: this.state.multiplier,
 
-                                            gtin: this.state.gtin,
+                                            // gtin: this.state.gtin,
                                             isNew: this.state.isNew,
                                             active: true
 
@@ -571,7 +572,7 @@ console.log(initialValues)
                                                 }
                                             }
                                             , label: { label_en: '' },
-                                            skuCode: '',
+                                             skuCode: '',
                                             unit: {
                                                 unitId: '',
                                                 label: {
@@ -580,7 +581,7 @@ console.log(initialValues)
                                             },
                                             multiplier: '',
     
-                                            gtin: '',
+                                            // gtin: '',
                                             active: true
     
                                         });
@@ -598,7 +599,7 @@ console.log(initialValues)
                                             }
                                         }
                                         , label: { label_en: '' },
-                                        skuCode: '',
+                                         skuCode: '',
                                         unit: {
                                             unitId: '',
                                             label: {
@@ -607,7 +608,7 @@ console.log(initialValues)
                                         },
                                         multiplier: '',
 
-                                        gtin: '',
+                                        // gtin: '',
                                         active: true
 
                                     });
@@ -684,7 +685,7 @@ console.log(initialValues)
                                                 required />
                                             <FormFeedback className="red">{errors.skuCode}</FormFeedback>
 
-                                        </FormGroup>
+                                </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
@@ -717,8 +718,8 @@ console.log(initialValues)
                                                 required />
                                             <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
+                                       {/* <FormGroup className="col-md-6">
+                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
 
                                                 type="text"
@@ -734,7 +735,7 @@ console.log(initialValues)
                                                 // placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                             />
                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
-                                        </FormGroup>
+                            </FormGroup>*/}
 
                                         <FormGroup className="col-md-6 mt-md-4">
                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
@@ -747,11 +748,11 @@ console.log(initialValues)
                                 <thead>
                                     <tr>
                                         <th className="text-left pl-1"> {i18n.t('static.dashboard.planningunit')} </th>
-                                        <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
+                                       <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
                                         <th className="text-center"> {i18n.t('static.procurementAgentProcurementUnit.skuCode')} </th>
                                         <th className="text-center">{i18n.t('static.unit.unit')}</th>
                                         <th className="text-center">{i18n.t('static.unit.multiplier')}</th>
-                                        <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>
+                                      {/*  <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>*/}
                                         <th className="text-center">{i18n.t('static.common.status')}</th>
                                         <th className="text-center">{i18n.t('static.common.action')}</th>
                                     </tr>
@@ -772,15 +773,15 @@ console.log(initialValues)
                                                 </td>
                                                 <td>
                                                     {this.state.rows[idx].skuCode}
-                                                </td><td>
+                                              </td><td>
                                                     {this.state.rows[idx].unit.label.label_en}
                                                 </td>
                                                 <td className="text-right">
                                                     {this.state.rows[idx].multiplier}
                                                 </td>
-                                                <td>
+                                               {/* <td>
                                                     {this.state.rows[idx].gtin}
-                                                </td>
+                                               </td>*/}
                                                 <td>
                                                     {this.state.rows[idx].active==true ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
