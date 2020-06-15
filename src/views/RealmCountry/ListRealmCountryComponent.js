@@ -250,37 +250,38 @@ class ListRealmCountryComponent extends Component {
         //     headerAlign: 'center',
         //     formatter: this.formatLabel
         // },
-        {
-            dataField: 'airFreightPercentage',
-            text: i18n.t('static.realmcountry.airFreightPercentage'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'seaFreightPercentage',
-            text: i18n.t('static.realmcountry.seaFreightPercentage'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'shippedToArrivedByAirLeadTime',
-            text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'shippedToArrivedBySeaLeadTime',
-            text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'arrivedToDeliveredLeadTime',
-            text: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
+        // {
+        //     dataField: 'airFreightPercentage',
+        //     text: i18n.t('static.realmcountry.airFreightPercentage'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'seaFreightPercentage',
+        //     text: i18n.t('static.realmcountry.seaFreightPercentage'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'shippedToArrivedByAirLeadTime',
+        //     text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'shippedToArrivedBySeaLeadTime',
+        //     text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'arrivedToDeliveredLeadTime',
+        //     text: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // },
+         {
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,
