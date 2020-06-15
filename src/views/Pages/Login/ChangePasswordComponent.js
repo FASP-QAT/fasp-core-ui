@@ -215,7 +215,7 @@ class ChangePasswordComponent extends Component {
                                                             required
                                                         />
                                                      <InputGroupAddon addonType="append">
-                              <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i></InputGroupText>
+                              <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="1.Sed posuere consectetur est at lobortis.<br>2. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum."></i></InputGroupText>
                             </InputGroupAddon>
                                  
                                   </InputGroup>
