@@ -627,10 +627,15 @@ export default class SupplyPlanComponent extends React.Component {
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                            <ul className="legend legend-supplypln">
+                            {/* <ul className="legend legend-supplypln">
                                 <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                                 <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
-                            </ul>
+                            </ul> */}
+                            <ul class="legendcommitversion">
+                          <li><span class="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
+                          <li><span class=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                          
+                        </ul>
                         </ModalHeader>
                         <ModalBody>
                             <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
@@ -5334,7 +5339,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="9 pl-0">
+                                            <Col md="12 pl-0">
                                                 <div className="d-md-flex">
                                                     <FormGroup className="tab-ml-1">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -5370,11 +5375,17 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <ul className="legend legendsync mt-0" >
+                                                    <ul class="legendcommitversion">
+                          <li><span class="skipedShipmentslegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.skippedShipments')}</span></li>
+                          <li><span class=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                          <li><span class="skipedShipmentsEmegencylegend legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.supplyPlan.skippedEmergencyShipments')} </span></li>
+                          
+                        </ul>
+                                                    {/* <ul className="legend legendsync mt-0" >
                                                         <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  {i18n.t('static.supplyPlan.skippedShipments')}</span></li>
                                                         <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.emergencyShipments')}</span></li>
                                                         <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.skippedEmergencyShipments')}</span></li>
-                                                    </ul>
+                                                    </ul> */}
                                                 </div>
                                             </Col>
                                         </Form>
