@@ -52,9 +52,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
         unitId: Yup.string()
             .required(i18n.t('static.product.productunittext')),
-            gtin: Yup.string()
-            .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
-            .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
+        gtin: Yup.string()
+            .matches(/^[0-9]{0}(?:-[0-9]{13})?$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
     })
 }
 
@@ -680,7 +679,7 @@ console.log(initialValues)
                                                 invalid={touched.skuCode && !!errors.skuCode}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
-                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                 value={this.CapitalizeFull(this.state.skuCode)}
                                                 required />
                                             <FormFeedback className="red">{errors.skuCode}</FormFeedback>
@@ -719,7 +718,7 @@ console.log(initialValues)
                                             <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
                                             <Input
 
                                                 type="text"
@@ -732,7 +731,7 @@ console.log(initialValues)
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 value={this.CapitalizeFull(this.state.gtin)}
-                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                             />
                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                         </FormGroup>

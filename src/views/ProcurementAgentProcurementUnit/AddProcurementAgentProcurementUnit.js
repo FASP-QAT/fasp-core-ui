@@ -518,7 +518,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 bsSize="sm"
                                                                 valid={!errors.skuCode && this.state.skuCode != ''}
                                                                 invalid={touched.skuCode && !!errors.skuCode}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                             <FormFeedback className="red">{errors.skuCode}</FormFeedback>
@@ -534,7 +534,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 valid={!errors.vendorPrice && this.state.vendorPrice != ''}
                                                                 invalid={touched.vendorPrice && !!errors.vendorPrice}
                                                                 value={this.state.vendorPrice}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                             <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
@@ -550,7 +550,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 valid={!errors.approvedToShippedLeadTime && this.state.approvedToShippedLeadTime != ''}
                                                                 invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                                 value={this.state.approvedToShippedLeadTime}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                             <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
@@ -564,7 +564,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 bsSize="sm"
                                                                 valid={!errors.gtin && this.state.gtin != ''}
                                                                 invalid={touched.gtin && !!errors.gtin}
-                                                                value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                                value={this.state.gtin} 
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>

@@ -276,7 +276,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                     console.log("ind", indendent);
                     console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
                     var productCategoryJson = {
-                        name: indendent.concat(response.data[k].payload.label.label_en),
+                        name: (response.data[k].payload.label.label_en),
                         id: response.data[k].payload.productCategoryId
                     }
                     productCategoryList.push(productCategoryJson);
