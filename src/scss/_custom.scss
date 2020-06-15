@@ -2294,6 +2294,29 @@ h6{
   border-color: 1px solid #e5edf5;
 }
 
+///supply plan
+.skipedShipmentslegend {
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+.redlegend {
+  background-color: red;
+  border-color: 1px solid red;
+}
+.skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
+///Consumption model color
+.purplelegend {
+  background-color: rgb(170, 85, 161);
+  border-color: 1px solid rgb(170, 85, 161);
+}
+.blacklegend {
+  background-color: #000;
+  border-color: 1px solid #000;
+}
+
 .legendcommitversionText{
   text-align: left;
   display: table;
@@ -2302,4 +2325,7 @@ h6{
   .ForgotmarginTop
   {
     margin-top: -3%!important;
+  }
+  .date-color{
+    color: #212721!important;
   }
