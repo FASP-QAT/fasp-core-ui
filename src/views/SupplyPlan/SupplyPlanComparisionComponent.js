@@ -1001,7 +1001,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var cancelledShipmentQty = 0;
                     var onHoldShipmentQty = 0;
 
-                    var plannedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS);
+                    var plannedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS ||c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS ||c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS);
                     for (var j = 0; j < plannedShipments.length; j++) {
                         plannedShipmentQty += parseInt((plannedShipments[j].shipmentQty));
                     }
@@ -1025,7 +1025,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     approvedTotalShipmentsBasedOnMonth.push(approvedShipmentQty);
 
-                    var shippedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS);
+                    var shippedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS);
                     for (var j = 0; j < shippedShipments.length; j++) {
                         shippedShipmentQty += parseInt((shippedShipments[j].shipmentQty));
                     }
@@ -2796,7 +2796,7 @@ export default class SupplyPlanComponent extends React.Component {
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                 datasets: [
                     {
-                        label: 'planned',
+                        label: 'Planned',
                         backgroundColor: '#000050',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -2804,15 +2804,6 @@ export default class SupplyPlanComponent extends React.Component {
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: 'rgba(179,181,198,1)',
                         data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
-                    }, {
-                        label: 'Draft',
-                        backgroundColor: '#1E1E6E',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.draft)),
                     }, {
                         label: 'Shipped',
                         backgroundColor: '#5A5AAA',
@@ -2823,16 +2814,7 @@ export default class SupplyPlanComponent extends React.Component {
                         pointHoverBorderColor: 'rgba(179,181,198,1)',
                         data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
                     },
-                    {
-                        label: 'Arrived',
-                        backgroundColor: '#5B5BF5',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.arrived)),
-                    }, {
+                     {
                         label: 'Delivered',
                         backgroundColor: '#AAAAFA',
                         borderColor: 'rgba(179,181,198,1)',
@@ -2842,23 +2824,14 @@ export default class SupplyPlanComponent extends React.Component {
                         pointHoverBorderColor: 'rgba(179,181,198,1)',
                         data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                     }, {
-                        label: 'Submitted',
-                        backgroundColor: '#0FB5FF',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.submitted)),
-                    }, {
-                        label: 'Approved',
+                        label: 'Ordered',
                         backgroundColor: '#52CAFF',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                        data: this.state.jsonArrForGraph.map((item, index) => (item.approved)),
                     }, {
                         label: "Stock",
                         type: 'line',
@@ -2868,6 +2841,7 @@ export default class SupplyPlanComponent extends React.Component {
                             fontSize: 2,
                             fontColor: 'transparent',
                         },
+                        lineTension: 0,
                         pointStyle: 'line',
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
@@ -2881,6 +2855,7 @@ export default class SupplyPlanComponent extends React.Component {
                             fontSize: 2,
                             fontColor: 'transparent',
                         },
+                        lineTension: 0,
                         pointStyle: 'line',
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
