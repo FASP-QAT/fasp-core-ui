@@ -717,7 +717,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/productCategory/productCategoryTree":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PRODUCT_CATEGORY")) {
+                    if (bfunction.includes("ROLE_BF_PRODUCT_CATEGORY")) {
                         return true;
                     }
                     break;
