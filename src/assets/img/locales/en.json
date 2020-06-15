@@ -5,7 +5,7 @@
     "static.common.select": "Please Select",
     "static.procurementagent.procurementagent": "Procurement Agent",
     "static.message.user.forgotPasswordTokenFailed": "Error while generating Token for forgot password",
-    "static.budget.budgetamountdesc": "Budget amount in USD",
+    "static.budget.budgetamountdesc": "Please enter budget name",
     "static.program.yes": "Yes",
     "static.program.healtharea": "Health Area",
     "static.country.countrycodetext": "Please enter country code",

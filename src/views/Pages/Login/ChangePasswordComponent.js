@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,Tooltip, CardBody,Form,FormGroup, Label,InputGroupAddon, InputGroupText,InputGroup, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, Tooltip, CardBody, Form, FormGroup, Label, InputGroupAddon, InputGroupText, InputGroup, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -12,6 +12,8 @@ import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 
@@ -75,6 +77,18 @@ class ChangePasswordComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.showPopUp = this.showPopUp.bind(this);
+    }
+    showPopUp() {
+        alert("1) Password has to be at least 6 characters\n2) Password should not contain password string\n3) Password must contain atleast 1 special character\n4) Password must contain atleast 1 number\n5) Password must contain atleast 1 uppercase alphabet\n6) Password must start with alphabet\n7) New password should not be same as username\n8) New password should not be same as old password")
+        // confirmAlert({
+        //     message: "Anchal&lt;br /&gt;Bhashkar",
+        //     buttons: [
+        //       {
+        //         label: i18n.t('static.common.close')
+        //       }
+        //     ]
+        //   });
     }
     hideFirstComponent() {
         setTimeout(function () {
@@ -89,11 +103,11 @@ class ChangePasswordComponent extends Component {
         //         document.getElementById('div1').style.display = 'block';
         //     });
         // }, 8000);
-        
+
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -167,23 +181,23 @@ class ChangePasswordComponent extends Component {
                                                             case 404:
                                                             case 406:
                                                             case 412:
-                                                                console.log("error.response.data.messageCode 111 ---",error.response);
-                                                                console.log("error.response.data.messageCode ---",error.response.data.messageCode);
-                                                                this.setState({ message: error.response.data.messageCode }, 
+                                                                console.log("error.response.data.messageCode 111 ---", error.response);
+                                                                console.log("error.response.data.messageCode ---", error.response.data.messageCode);
+                                                                this.setState({ message: error.response.data.messageCode },
                                                                     () => {
-                                                                    console.log("inside412");
-                                                                    document.getElementById('div1').style.display = 'block';
-                                                                    this.hideFirstComponent();
-                                                                });
+                                                                        console.log("inside412");
+                                                                        document.getElementById('div1').style.display = 'block';
+                                                                        this.hideFirstComponent();
+                                                                    });
 
                                                                 break;
                                                             default:
                                                                 this.setState({ message: 'static.unkownError' },
-                                                                () => {
-                                                                    console.log("inside412");
-                                                                    document.getElementById('div1').style.display = 'block';
-                                                                    this.hideFirstComponent();
-                                                                });
+                                                                    () => {
+                                                                        console.log("inside412");
+                                                                        document.getElementById('div1').style.display = 'block';
+                                                                        this.hideFirstComponent();
+                                                                    });
                                                                 break;
                                                         }
                                                     }
@@ -194,11 +208,11 @@ class ChangePasswordComponent extends Component {
                                         this.setState({
                                             message: 'static.common.onlinepasswordtext'
                                         },
-                                        () => {
-                                            console.log("inside412");
-                                            document.getElementById('div1').style.display = 'block';
-                                            this.hideFirstComponent();
-                                        });
+                                            () => {
+                                                console.log("inside412");
+                                                document.getElementById('div1').style.display = 'block';
+                                                this.hideFirstComponent();
+                                            });
                                     }
                                 }}
                                 render={
@@ -237,27 +251,27 @@ class ChangePasswordComponent extends Component {
                                                         <FormFeedback>{errors.oldPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                    
+
                                                         <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
                                                         <InputGroup>
-                                                        <Input type="password"
-                                                            name="newPassword"
-                                                            id="newPassword"
-                                                            bsSize="sm"
-                                                            valid={!errors.newPassword}
-                                                            invalid={touched.newPassword && !!errors.newPassword}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        />
-                                                     <InputGroupAddon addonType="append">
-                              <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="1.Sed posuere consectetur est at lobortis.<br>2. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum."></i></InputGroupText>
-                            </InputGroupAddon>
-                                 
-                                  </InputGroup>
-                                  
-                                                        <FormFeedback>{errors.newPassword}</FormFeedback>
-                                                       
+                                                            <Input type="password"
+                                                                name="newPassword"
+                                                                id="newPassword"
+                                                                bsSize="sm"
+                                                                valid={!errors.newPassword}
+                                                                invalid={touched.newPassword && !!errors.newPassword}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                            </InputGroupAddon>
+                                                            <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                        </InputGroup>
+
+
+
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>

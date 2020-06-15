@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback,InputGroupAddon, InputGroupText, InputGroup,CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -64,6 +64,19 @@ class ResetPasswordComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+
+        this.showPopUp = this.showPopUp.bind(this);
+    }
+    showPopUp() {
+        alert("1) Password has to be at least 6 characters\n2) Password should not contain password string\n3) Password must contain atleast 1 special character\n4) Password must contain atleast 1 number\n5) Password must contain atleast 1 uppercase alphabet\n6) Password must start with alphabet\n7) New password should not be same as username\n8) New password should not be same as old password")
+        // confirmAlert({
+        //     message: "Anchal&lt;br /&gt;Bhashkar",
+        //     buttons: [
+        //       {
+        //         label: i18n.t('static.common.close')
+        //       }
+        //     ]
+        //   });
     }
     hideFirstComponent() {
         setTimeout(function () {
@@ -78,7 +91,7 @@ class ResetPasswordComponent extends Component {
         //         document.getElementById('div1').style.display = 'block';
         //     });
         // }, 8000);
-        
+
     }
 
     cancelClicked() {
@@ -199,7 +212,7 @@ class ResetPasswordComponent extends Component {
                                                                                 this.hideFirstComponent();
                                                                             });
 
-                                                                       
+
                                                                         break;
                                                                     case 403:
                                                                     default:
@@ -241,17 +254,22 @@ class ResetPasswordComponent extends Component {
                                                             />
                                                             <FormGroup>
                                                                 <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
-                                                                <Input type="password"
-                                                                    name="newPassword"
-                                                                    id="newPassword"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.newPassword}
-                                                                    invalid={touched.newPassword && !!errors.newPassword}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                                <InputGroup>
+                                                                    <Input type="password"
+                                                                        name="newPassword"
+                                                                        id="newPassword"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.newPassword}
+                                                                        invalid={touched.newPassword && !!errors.newPassword}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    />
+                                                                    <InputGroupAddon addonType="append">
+                                                                        <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                    </InputGroupAddon>
+                                                                    <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                                </InputGroup>
                                                             </FormGroup>
                                                             <FormGroup>
                                                                 <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
