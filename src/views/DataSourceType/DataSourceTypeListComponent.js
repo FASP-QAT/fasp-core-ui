@@ -143,7 +143,7 @@ export default class DataSourceTypeListComponent extends Component {
     }
 
     editDataSourceType(dataSourceType) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASOURCE_TYPE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE')) {
             console.log(dataSourceType)
             this.props.history.push({
                 pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
@@ -246,7 +246,7 @@ export default class DataSourceTypeListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATASOURCE_TYPE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSourceType}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSourceType}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

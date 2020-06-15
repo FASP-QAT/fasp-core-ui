@@ -21,6 +21,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import bsCustomFileInput from 'bs-custom-file-input'
+
 const initialValues = {
     programId: ''
 }
@@ -55,7 +57,7 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 
-
+const entityname = i18n.t('static.dashboard.importprogram')
 export default class ImportProgram extends Component {
 
     constructor(props) {
@@ -70,6 +72,7 @@ export default class ImportProgram extends Component {
     }
 
     componentDidMount() {
+        bsCustomFileInput.init()
         document.getElementById("programIdDiv").style.display = "none";
         document.getElementById("formSubmitButton").style.display = "none";
         document.getElementById("fileImportDiv").style.display = "block";
@@ -146,7 +149,7 @@ export default class ImportProgram extends Component {
                             this.setState({
                                 message: i18n.t('static.program.dataimportsuccess')
                             })
-                            this.props.history.push(`/dashboard/`  + i18n.t('static.program.dataimportsuccess'))
+                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
                                 title: i18n.t('static.program.confirmsubmit'),
@@ -181,7 +184,7 @@ export default class ImportProgram extends Component {
                                             this.setState({
                                                 message: i18n.t('static.program.dataimportsuccess')
                                             })
-                                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataimportsuccess'))
+                                            this.props.history.push(`/dashboard/`+ 'green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },
                                     {
@@ -324,7 +327,7 @@ export default class ImportProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="4" className="custom-file">
                                                     {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" />
+                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
                                                     <label className="custom-file-label" id="file-input">Choose file</label>
                                                 </Col>
                                             </FormGroup>
@@ -345,10 +348,10 @@ export default class ImportProgram extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                
+
                                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                
+
                                                 <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                 <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                 &nbsp;
@@ -364,7 +367,7 @@ export default class ImportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/`+ 'red/'  + i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

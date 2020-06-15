@@ -54,7 +54,7 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 
-
+const entityname = i18n.t('static.dashboard.exportprogram')
 export default class ExportProgram extends Component {
 
     constructor(props) {
@@ -62,6 +62,7 @@ export default class ExportProgram extends Component {
         this.state = {
             programList: [],
             message: '',
+            selectProgramMessage: ''
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -111,40 +112,51 @@ export default class ExportProgram extends Component {
         var zip = new JSZip();
         var programId = this.state.programId;
         console.log("ProgramId", programId)
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                for (var i = 0; i < myResult.length; i++) {
-                    for (var j = 0; j < programId.length; j++) {
-                        if (myResult[i].id == programId[j].value) {
-                            var txt = JSON.stringify(myResult[i]);
-                            var labelName = (programId[j].label).replace("/", "-")
-                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+        if (programId != "" && programId != undefined) {
+            this.setState({
+                selectProgramMessage: ""
+            })
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var program = transaction.objectStore('programData');
+                var getRequest = program.getAll();
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    for (var i = 0; i < myResult.length; i++) {
+                        for (var j = 0; j < programId.length; j++) {
+                            if (myResult[i].id == programId[j].value) {
+                                var txt = JSON.stringify(myResult[i]);
+                                var labelName = (programId[j].label).replace("/", "-")
+                                zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                            }
+                        }
+                        if (i == myResult.length - 1) {
+                            zip.generateAsync({
+                                type: "blob"
+                            }).then(function (content) {
+                                FileSaver.saveAs(content, "download.zip");
+                                this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t('static.program.dataexportsuccess'))
+
+                            }.bind(this));
                         }
                     }
-                    if (i == myResult.length - 1) {
-                        zip.generateAsync({
-                            type: "blob"
-                        }).then(function (content) {
-                            FileSaver.saveAs(content, "download.zip");
-                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataexportsuccess'))
-                        }.bind(this));
-                    }
-                }
-            }.bind(this);
-        }.bind(this)
+                }.bind(this);
+            }.bind(this)
+        } else {
+            console.log("in ekse")
+            this.setState({
+                selectProgramMessage: i18n.t('static.program.validselectprogramtext')
+            })
+        }
     }
 
     touchAll(setTouched, errors) {
@@ -172,6 +184,15 @@ export default class ExportProgram extends Component {
     }
 
     updateFieldData(value) {
+        if (value != "" && value != undefined) {
+            this.setState({
+                selectProgramMessage: ""
+            })
+        } else {
+            this.setState({
+                selectProgramMessage: i18n.t('static.program.validselectprogramtext')
+            })
+        }
         console.log("Value", value);
         // console.log(event.value)
         this.setState({ programId: value });
@@ -210,12 +231,12 @@ export default class ExportProgram extends Component {
                                                     options={this.state.programList}
                                                     value={this.state.programId}
                                                 />
-                                                <FormFeedback>{errors.programId}</FormFeedback>
+                                                <span className="red">{this.state.selectProgramMessage}</span>
                                             </FormGroup>
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                
+
                                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -231,7 +252,7 @@ export default class ExportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

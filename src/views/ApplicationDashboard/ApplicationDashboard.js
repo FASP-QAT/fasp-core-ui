@@ -195,25 +195,7 @@ class ApplicationDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <h5  className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        <Row>
-          <Col md="12">
-            <Card>
-              <CardHeader className="text-center">
-                <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;{i18n.t('static.graph.totalRealmCount')} <span className="count-clr">4</span></b>
-                <div className="card-header-actions">
-                  <a className="card-header-action">
-                    {/* <small className="text-muted">98</small> */}
-                  </a>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <div className="chart-wrapper chart-graph">
-                  <Bar data={bar} options={options} />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+       
         {/* <Row>
         <Col md="8">
             <Card>

@@ -516,7 +516,7 @@ class AddprogramPlanningUnit extends Component {
 
 
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Local procurementAgent lead time<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">Local Procurement Agent Lead Time<span className="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 type="number"
                                                                 min='0'

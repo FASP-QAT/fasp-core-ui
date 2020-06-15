@@ -36,6 +36,7 @@ class Program extends Component {
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getTree = this.getTree.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.state = {
             dropdownOpen: false,
             radioSelected: 2,
@@ -46,6 +47,11 @@ class Program extends Component {
             lang: localStorage.getItem('lang'),
             realmId: AuthenticationService.getRealmId()
         };
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -98,106 +104,116 @@ class Program extends Component {
         console.log(this.state.realmId)
         document.getElementById("treeDiv").style.display = "block";
         AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.getRealmCountryForProgram(this.state.realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    console.log("response.data------------>", response.data)
-                    this.setState({
-                        countryList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+        console.log("This.state.realmId", this.state.realmId)
+        if (this.state.realmId != "" && this.state.realmId > 0) {
+            this.setState({
+                message: ""
+            })
+            RealmCountryService.getRealmCountryForProgram(this.state.realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        console.log("response.data------------>", response.data)
+                        this.setState({
+                            countryList: response.data
+                        })
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-        HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        healthAreaList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                );
+            HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            healthAreaList: response.data
+                        })
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
 
-        ProgramService.getProgramList()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        prgList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+            ProgramService.getProgramList()
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            prgList: response.data
+                        })
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
 
-
+        } else {
+            document.getElementById("treeDiv").style.display = "none";
+            this.setState({
+                message: i18n.t('static.common.realmtext')
+            })
+        }
     }
 
     toggle() {
@@ -233,7 +249,7 @@ class Program extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -347,7 +363,7 @@ class Program extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/`+ 'red/'  + i18n.t('static.program.actioncancelled') )
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     downloadClicked() {
@@ -403,7 +419,13 @@ class Program extends Component {
             }
         }
         if (programCheckedCount == 0) {
-            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
+            this.setState({
+                message: i18n.t('static.program.errorSelectAtleastOneProgram')
+            },
+            () => {
+                this.hideSecondComponent();
+            })
+            // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         } else {
@@ -553,7 +575,7 @@ class Program extends Component {
 
                                                         // }
                                                         transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
-                                                            this.props.history.push(`/dashboard/`+ 'green/'  + "Program downloaded successfully.")
+                                                            this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
                                                         }.bind(this);
                                                         transactionForOverwriteDownloadedProgramData.onerror = function (event) {
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
