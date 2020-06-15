@@ -345,12 +345,14 @@ export default class SupplyPlanComponent extends React.Component {
 
         let bar = {}
         if (this.state.jsonArrForGraph.length > 0)
+        console.log(this.state.jsonArrForGraph)
             bar = {
 
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                 datasets: [
                     {
                         label: 'Planned',
+                        stack: 1,
                         backgroundColor: '#000050',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -360,6 +362,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                     }, {
                         label: 'Shipped',
+                        stack: 1,
                         backgroundColor: '#5A5AAA',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -370,6 +373,7 @@ export default class SupplyPlanComponent extends React.Component {
                     },
                      {
                         label: 'Delivered',
+                        stack: 1,
                         backgroundColor: '#AAAAFA',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -379,6 +383,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                     }, {
                         label: 'Ordered',
+                        stack: 1,
                         backgroundColor: '#52CAFF',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -388,6 +393,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.approved)),
                     }, {
                         label: "Stock",
+                        stack: 2,
                         type: 'line',
                         borderColor: 'rgba(179,181,158,1)',
                         borderStyle: 'dotted',
@@ -402,6 +408,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }, {
                         label: "Consumption",
                         type: 'line',
+                        stack: 3,
                         backgroundColor: 'transparent',
                         borderColor: 'rgba(255.102.102.1)',
                         borderStyle: 'dotted',
