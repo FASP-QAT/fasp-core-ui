@@ -261,7 +261,7 @@ class AnnualShipmentCost extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
 
-        doc.setFontSize(8);
+        doc.setFontSize(9);
         doc.setTextColor("#002f6c");
         doc.setFont('helvetica', 'bold')
         doc.text(i18n.t('static.procurementagent.procurementagent'), doc.internal.pageSize.width / 8, 180, {
@@ -875,15 +875,17 @@ class AnnualShipmentCost extends Component {
                             <Col md="12 pl-0">
 
                                 <div className="row">
-                                    <div className="col-md-12" id="div_id">
-                                  { this.state.matricsList.length>0 && <div className="controls"> 
-                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
+                                    <div className="col-md-12 p-0" id="div_id">
+                                  { this.state.matricsList.length>0 &&  
+                                  <div className="col-md-12">
+
+                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
                               
                                         <p  style={{ width: '100%', height: '700px' }} id='pdf'></p>   </div>}
 
                                     </div>
                                 </div>
-                                </Col>
+                            </Col>
 
 
 
