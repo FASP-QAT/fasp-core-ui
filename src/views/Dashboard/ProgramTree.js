@@ -422,9 +422,9 @@ class Program extends Component {
             this.setState({
                 message: i18n.t('static.program.errorSelectAtleastOneProgram')
             },
-            () => {
-                this.hideSecondComponent();
-            })
+                () => {
+                    this.hideSecondComponent();
+                })
             // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
@@ -440,7 +440,7 @@ class Program extends Component {
                             console.log("ProgramThenCount", programThenCount)
                             console.log("Response data", response.data)
                             var json = response.data;
-
+                            console.log("Json-------->", json);
                             // console("version befor -1 check",version)
                             var version = json.requestedProgramVersion;
                             if (version == -1) {

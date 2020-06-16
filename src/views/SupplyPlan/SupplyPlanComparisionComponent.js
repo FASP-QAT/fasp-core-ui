@@ -372,10 +372,9 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                console.log("Program json", programJson);
                 for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
-                        name: programJson.regionList[i].regionId, //getLabelText(programJson.regionList[i].label, this.state.lang),
+                        name: getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
@@ -1072,7 +1071,6 @@ export default class SupplyPlanComponent extends React.Component {
                 //         }
                 //         var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == expiredBatchNumbers[ebn].batchNo)[0];
                 //         var totalStockForBatchNumber = stockForBatchNumber.qty;
-                //         console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", expiredBatchNumbers[ebn].batchNo);
 
                 //         var consumptionList = programJson.consumptionList;
                 //         var consumptionBatchArray = [];
@@ -1087,7 +1085,6 @@ export default class SupplyPlanComponent extends React.Component {
                 //         for (var b = 0; b < consumptionForBatchNumber.length; b++) {
                 //             consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
                 //         }
-                //         console.log("Total consumptions batch number", consumptionQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
                 //         var inventoryList = programJson.inventoryList;
                 //         var inventoryBatchArray = [];
                 //         for (var inv = 0; inv < inventoryList.length; inv++) {
@@ -1102,12 +1099,9 @@ export default class SupplyPlanComponent extends React.Component {
                 //             adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
                 //         }
 
-                //         console.log("Total adjustments batch number", adjustmentQty, "Batch number", expiredBatchNumbers[ebn].batchNo);
                 //         var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
                 //         expiredStock += parseInt(remainingBatchQty);
-                //         console.log("Expired stock",expiredStock, "Batch number", expiredBatchNumbers[ebn].batchNo)
                 //     }
-                //     console.log("Expired stock", expiredStock,"Month---->",m[es].month);
                 // }
 
                 // Building json for graph
@@ -1460,7 +1454,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         // var elInstance=this.state.plannedPsmShipmentsEl;
                                         var rowData = obj.getRowData(y)
                                         var batchInfo = rowData[10];
-                                        console.log("Batch Info", batchInfo);
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
                                             data[0] = batchInfo[sb].batch.batchId;
@@ -1920,10 +1913,7 @@ export default class SupplyPlanComponent extends React.Component {
                             //     expectedBalPlanningUnitQty = `=(G${j}+I${j})`
                             // }
                             var expectedBal = "";
-                            console.log("inventoryList[j].adjustmentQty", inventoryList[j].adjustmentQty)
-                            console.log("inventoryList[j].actualQty", inventoryList[j].actualQty);
                             if (inventoryList[j].adjustmentQty != "" && inventoryList[j].actualQty != "" && inventoryList[j].adjustmentQty != null && inventoryList[j].actualQty != null) {
-                                console.log("In if");
                                 expectedBal = parseInt(inventoryList[j].actualQty) - parseInt(inventoryList[j].adjustmentQty);
                             }
                             var readonlyCountrySKU = true;
@@ -3787,7 +3777,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var unitsPerPalletForUpdate = rowData[27];
                                                     var unitsPerContainerForUpdate = rowData[28];
                                                     var shipmentStatus = rowData[35];
-                                                    console.log("Shipment Status", shipmentStatus);
                                                     if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
                                                         for (var i = 0; i < colArr.length; i++) {
                                                             var cell = elInstance.getCell(`${colArr[i]}${y + 1}`)
@@ -4065,14 +4054,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                             var rowData = obj.getRowData(y);
                                                             var shipmentStatus = rowData[35];
                                                             var supplyPlanType = rowData[36];
-                                                            console.log("Shipment Status", shipmentStatus);
                                                             if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
                                                                 tableEditableBasedOnSupplyPlan = false;
                                                             } else if (shipmentStatus >= SUBMITTED_SHIPMENT_STATUS && supplyPlanType == 'psmShipments' && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
                                                                 tableEditableBasedOnSupplyPlan = false
                                                             }
                                                             var shipmentBudget = rowData[32];
-                                                            console.log("Shipment Budget", shipmentBudget);
                                                             for (var sb = 0; sb < shipmentBudget.length; sb++) {
                                                                 var data = [];
                                                                 data[0] = shipmentBudget[sb].shipmentBudgetId;

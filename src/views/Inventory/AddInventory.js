@@ -76,7 +76,7 @@ export default class AddInventory extends Component {
         data[0] = "";
         data[1] = "";
         data[2] = "";
-        data[3] = `=D${json.length}+E${json.length}`;
+        data[3] = ``;
         data[4] = "0";
         data[5] = "";
         // data[6] = "";
@@ -185,7 +185,7 @@ export default class AddInventory extends Component {
                                         name: regionResult[k].label.label_en,
                                         id: regionResult[k].regionId
                                     }
-                                    regionList[k] = regionJson
+                                    regionList.push(regionJson);
                                 }
                             }
                             var countrySKUId = document.getElementById('countrySKU').value;
@@ -206,36 +206,26 @@ export default class AddInventory extends Component {
                             if (inventoryList.length != 0) {
                                 for (var j = 0; j < inventoryList.length; j++) {
                                     if (inventoryList[j].realmCountryPlanningUnit.id == countrySKUId) {
-                                        if (count == 0) {
-                                            data = [];
-                                            data[0] = inventoryList[j].dataSource.id;
-                                            data[1] = inventoryList[j].region.id;
-                                            data[2] = inventoryList[j].inventoryDate;
-                                            data[3] = 0;
-                                            data[4] = inventoryList[j].adjustmentQty;
-                                            data[5] = inventoryList[j].actualQty;
-                                            // data[6] = inventoryList[j].batchNo;
-                                            // data[7] = inventoryList[j].expiryDate;
-                                            data[6] = inventoryList[j].active;
-                                            data[7] = j;
-                                            inventoryDataArr[count] = data;
-                                            count++;
-                                        } else {
-                                            data = [];
-                                            data[0] = inventoryList[j].dataSource.id;
-                                            data[1] = inventoryList[j].region.id;
-                                            data[2] = inventoryList[j].inventoryDate;
-                                            data[3] = `=D${count}+E${count}`;
-                                            data[4] = inventoryList[j].adjustmentQty;
-                                            data[5] = inventoryList[j].actualQty;
-                                            // data[6] = inventoryList[j].batchNo;
-                                            // data[7] = inventoryList[j].expiryDate;
-                                            data[6] = inventoryList[j].active;
-                                            data[7] = j;
-                                            inventoryDataArr[count] = data;
-                                            // inventoryDataArr[j] = data;
-                                            count++;
+                                        var expectedBal = "";
+                                        console.log("inventoryList[j].adjustmentQty", inventoryList[j].adjustmentQty)
+                                        console.log("inventoryList[j].actualQty", inventoryList[j].actualQty);
+                                        if (inventoryList[j].adjustmentQty != "" && inventoryList[j].actualQty != "" && inventoryList[j].adjustmentQty != null && inventoryList[j].actualQty != null) {
+                                            console.log("In if");
+                                            expectedBal = parseInt(inventoryList[j].actualQty) - parseInt(inventoryList[j].adjustmentQty);
                                         }
+                                        data = [];
+                                        data[0] = inventoryList[j].dataSource.id;
+                                        data[1] = inventoryList[j].region.id;
+                                        data[2] = inventoryList[j].inventoryDate;
+                                        data[3] = expectedBal;
+                                        data[4] = inventoryList[j].adjustmentQty;
+                                        data[5] = inventoryList[j].actualQty;
+                                        // data[6] = inventoryList[j].batchNo;
+                                        // data[7] = inventoryList[j].expiryDate;
+                                        data[6] = inventoryList[j].active;
+                                        data[7] = j;
+                                        inventoryDataArr[count] = data;
+                                        count++;
                                     }
                                 }
                             }
@@ -278,7 +268,6 @@ export default class AddInventory extends Component {
                                     {
                                         title: i18n.t('static.inventory.expectedStock'),
                                         type: 'text',
-                                        readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.inventory.manualAdjustment'),
@@ -387,14 +376,44 @@ export default class AddInventory extends Component {
                 }
             }
         }
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
+
+        if (x == 3) {
+            console.log("In x===5")
+            if (this.el.getValueFromCoords(3, y) != "") {
+                var reg = /^[0-9\b]+$/;
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    var col = ("D").concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    var col = ("D").concat(parseInt(y) + 1);
+                    if (this.el.getValueFromCoords(5, y) != "" && this.el.getValueFromCoords(3, y) != "") {
+                        var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                        this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                    }
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                var col = ("D").concat(parseInt(y) + 1);
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                // this.el.setValueFromCoords(4, y, 0, true)
+            }
+        }
+
+        if (x == 4) {
+            var reg = /-?\d+/
+            // var reg = /^[0-9\b]+$/;
+            var col = ("E").concat(parseInt(y) + 1);
+            console.log("Value-------->", value);
+            if (value === "") {
+                console.log("In if");
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value))) {
+                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -402,33 +421,38 @@ export default class AddInventory extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+
             }
         }
 
+
         if (x == 5) {
-            var reg = /^[0-9\b]+$/;
+            console.log("In x==9");
             if (this.el.getValueFromCoords(5, y) != "") {
+                var reg = /^[0-9\b]+$/;
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
+                    this.el.setValueFromCoords(4, y, "", true);
                     var col = ("F").concat(parseInt(y) + 1);
-                    var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                    this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                    if (this.el.getValueFromCoords(5, y) != "" && this.el.getValueFromCoords(3, y) != "") {
+                        var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                        this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                    }
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-            }
-        }
-        if (x == 3) {
-            if (this.el.getValueFromCoords(5, y) != "") {
+            } else {
                 var col = ("F").concat(parseInt(y) + 1);
-                var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
+
+
 
     }.bind(this);
     // -----end of changed function
@@ -436,6 +460,7 @@ export default class AddInventory extends Component {
     onedit = function (instance, cell, x, y, value) {
         if (x == 4) {
             this.el.setValueFromCoords(5, y, "", true);
+            this.el.setValueFromCoords(3, y, "", true);
         }
     }.bind(this);
 
@@ -490,73 +515,69 @@ export default class AddInventory extends Component {
                 // }
             }
 
-            var col = ("E").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(4, y);
-            var reg = /^[0-9\b]+$/;
-
-            if (value == "") {
+            var value = this.el.getValueFromCoords(3, y);
+            if (this.el.getValueFromCoords(3, y) != "") {
+                var reg = /^[0-9\b]+$/;
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    var col = ("D").concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false
+                } else {
+                    var col = ("D").concat(parseInt(y) + 1);
+                    // var manualAdj = this.el.getValueFromCoords(9, y) - this.el.getValueFromCoords(5, y);
+                    // this.el.setValueFromCoords(7, y, parseInt(manualAdj), true);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                var col = ("D").concat(parseInt(y) + 1);
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                // this.el.setValueFromCoords(4, y, 0, true)
+            }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(4, y);
+            var reg = /-?\d+/;
+            // var reg = /^[0-9\b]+$/;
+            if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                }
             } else {
-
-                // console.log("VALUE------>",value,"RESULT----------->",value);
-                // if(value % 1 === 0){
-                //     console.log("INT____",value);
-                // }else{
-                //     console.log("DEC____",value);
-                // }
-
-
-                if (isNaN(parseInt(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
 
-            var col = ("F").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(5, y);
-
-            if (value != "") {
+            if (this.el.getValueFromCoords(5, y) != "") {
+                var reg = /^[0-9\b]+$/;
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     valid = false;
                 } else {
-                    var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                    this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                    var col = ("F").concat(parseInt(y) + 1);
+                    // var manualAdj = this.el.getValueFromCoords(9, y) - this.el.getValueFromCoords(5, y);
+                    // this.el.setValueFromCoords(7, y, parseInt(manualAdj), true);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-            }
-
-
-            if (value != "") {
+            } else {
                 var col = ("F").concat(parseInt(y) + 1);
-                var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
 
 
-
-
-            // var col = ("D").concat(parseInt(y) + 1);
-            // var value = this.el.getValueFromCoords(3, y);
-            // if (value === "") {
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setStyle(col, "background-color", "yellow");
-            //     this.el.setComments(col, "This field is required.");
-            //     valid = false;
-            // } else {
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setComments(col, "");
-            // }
         }
         return valid;
     }
@@ -602,13 +623,13 @@ export default class AddInventory extends Component {
                         inventoryDataListNotFiltered[parseInt(map.get("7"))].region.id = map.get("1");
                         inventoryDataListNotFiltered[parseInt(map.get("7"))].inventoryDate = moment(map.get("2")).format("YYYY-MM-DD");
 
-                        if (i == 0) {
-                            expBalance = 0;
-                        } else {
-                            // var previousMap = new Map(Object.entries(tableJson[i - 1]))
-                            expBalance = parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].expectedBal) + parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].adjustmentQty);
-                        }
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].expectedBal = expBalance;
+                        // if (i == 0) {
+                        //     expBalance = 0;
+                        // } else {
+                        //     // var previousMap = new Map(Object.entries(tableJson[i - 1]))
+                        //     expBalance = parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].expectedBal) + parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].adjustmentQty);
+                        // }
+                        // inventoryDataListNotFiltered[parseInt(map.get("7"))].expectedBal = expBalance;
                         // console.log("expBaalalance---------->", expBalance);
                         inventoryDataListNotFiltered[parseInt(map.get("7"))].adjustmentQty = parseInt(map.get("4"));
                         inventoryDataListNotFiltered[parseInt(map.get("7"))].actualQty = map.get("5");
@@ -629,18 +650,18 @@ export default class AddInventory extends Component {
 
                     for (var i = inventoryDataList.length; i < tableJson.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]));
-                        var expBalance = 0
-                        if (i == 0) {
-                            expBalance = 0;
-                        } else {
-                            // var previousMap = new Map(Object.entries(tableJson[i - 1]))
-                            // console.log("previous--->", previousMap);
-                            // console.log("val1--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].expectedBal));
-                            // console.log("val2--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].adjustmentQty));
-                            // console.log("inventoryDataList----->", inventoryDataList[i - 1]);
-                            expBalance = parseInt(inventoryDataList[i - 1].expectedBal) + parseInt(inventoryDataList[i - 1].adjustmentQty);
-                            // console.log("expected bal--->", expBalance);
-                        }
+                        // var expBalance = 0
+                        // if (i == 0) {
+                        //     expBalance = 0;
+                        // } else {
+                        //     // var previousMap = new Map(Object.entries(tableJson[i - 1]))
+                        //     // console.log("previous--->", previousMap);
+                        //     // console.log("val1--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].expectedBal));
+                        //     // console.log("val2--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].adjustmentQty));
+                        //     // console.log("inventoryDataList----->", inventoryDataList[i - 1]);
+                        //     expBalance = parseInt(inventoryDataList[i - 1].expectedBal) + parseInt(inventoryDataList[i - 1].adjustmentQty);
+                        //     // console.log("expected bal--->", expBalance);
+                        // }
                         // var expiryDate = "";
                         // if (map.get("7") != null && map.get("7") != "") {
                         //     expiryDate = moment(map.get("7")).format("YYYY-MM-DD")
@@ -656,7 +677,7 @@ export default class AddInventory extends Component {
                                 id: map.get("1")
                             },
                             inventoryDate: moment(map.get("2")).format("YYYY-MM-DD"),
-                            expectedBal: expBalance,
+                            // expectedBal: expBalance,
                             adjustmentQty: map.get("4"),
                             actualQty: map.get("5"),
                             // batchNo: map.get("6"),
@@ -670,7 +691,8 @@ export default class AddInventory extends Component {
                             planningUnit: {
                                 id: planningUnitId
                             },
-                            notes: ""
+                            notes: "",
+                            batchInfoList: []
                         }
                         inventoryDataList.push(json);
                         inventoryDataListNotFiltered.push(json);
