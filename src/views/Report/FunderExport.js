@@ -90,7 +90,7 @@ class FunderExport extends Component {
             const pageCount = doc.internal.getNumberOfPages()
 
             doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+            doc.setFontSize(8)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
 
@@ -110,7 +110,7 @@ class FunderExport extends Component {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
             for (var i = 1; i <= pageCount; i++) {
-                doc.setFontSize(18)
+                doc.setFontSize(12)
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
@@ -118,10 +118,10 @@ class FunderExport extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFontSize(12)
-                    doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 90, {
-                        align: 'left'
-                    })
+                    doc.setFontSize(8)
+                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 90, planningText)
+
                 }
 
             }
@@ -133,7 +133,7 @@ class FunderExport extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
 
-        doc.setFontSize(15);
+        doc.setFontSize(8);
 
         const title = "Funder Report";
         // var canvas = document.getElementById("cool-canvas");
@@ -155,7 +155,7 @@ class FunderExport extends Component {
             startY: 150,
             head: headers,
             body: data,
-
+            styles: { lineWidth: 1, fontSize: 8 }
         };
         doc.autoTable(content);
         addHeaders(doc)
@@ -335,8 +335,7 @@ class FunderExport extends Component {
 
                                 <div className="row">
                                     <div className="col-md-12">
-                                        {/* {this.state.show && this.state.funders.length > 0 && */}
-
+                                     {this.state.funders.length > 0 && 
                                         <Table responsive className="table-striped  table-hover table-bordered text-center mt-2">
 
                                             <thead>
@@ -349,10 +348,9 @@ class FunderExport extends Component {
                                             </thead>
 
                                             <tbody>
-                                                {/* console.log("") */}
+                                            
                                                 {
-                                                    this.state.funders.length > 0
-                                                    &&
+                                                   
                                                     this.state.funders.map((item, idx) =>
                                                         <tr id="addr0" key={idx} >
                                                             <td>{getLabelText(this.state.funders[idx].program.label, this.state.lang)}</td>
@@ -364,7 +362,7 @@ class FunderExport extends Component {
                                                 }
                                             </tbody>
                                         </Table>
-                                        {/* } */}
+                                      }
 
                                     </div>
                                 </div>

@@ -483,7 +483,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.costOfInventory'),
                             url: '/report/costOfInventory',
                             icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT_COST_OF_INVERTORY') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.inventoryTurns'),

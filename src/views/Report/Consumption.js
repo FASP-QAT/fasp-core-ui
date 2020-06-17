@@ -64,19 +64,30 @@ const brandDanger = getStyle('--danger')
 const options = {
   title: {
     display: true,
-    text: i18n.t('static.dashboard.consumption')
+    text: i18n.t('static.dashboard.consumption'),
+    fontColor: 'black'
   },
+ 
   scales: {
+   
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: i18n.t('static.dashboard.consumption')
+        labelString: i18n.t('static.dashboard.consumption'),
+        fontColor: 'black'
       },
       ticks: {
-        beginAtZero: true
+        beginAtZero: true,
+        fontColor: 'black'
       }
-    }]
+    }],
+    xAxes: [{
+      ticks: {
+        fontColor: 'black'
+      }
+  }]
   },
+
   tooltips: {
     enabled: false,
     custom: CustomTooltips
@@ -87,6 +98,7 @@ const options = {
     position: 'bottom',
     labels: {
       usePointStyle: true,
+      fontColor: "black"
     }
   }
 }
@@ -161,6 +173,19 @@ class Consumption extends Component {
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+  formatter = value => {
+
+    var cell1 = value
+    cell1 += '';
+    var x = cell1.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
 
   exportCSV() {
 
@@ -200,7 +225,7 @@ class Consumption extends Component {
       const pageCount = doc.internal.getNumberOfPages()
 
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
+      doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
 
@@ -208,7 +233,7 @@ class Consumption extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -239,6 +264,7 @@ class Consumption extends Component {
           align: 'center'
         })
         if (i == 1) {
+          doc.setFont('helvetica', 'normal')
           doc.setFontSize(8)
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
@@ -275,19 +301,19 @@ class Consumption extends Component {
     var h1 = 100;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 220,750,290,'CANVAS');
+    doc.addImage(canvasImg, 'png', 50, 220,750,260,'CANVAS');
 
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
     i18n.t('static.report.actualConsumption')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, elt.forcast, elt.Actual]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, elt.forcast, elt.Actual]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date,this.formatter( elt.forcast),this.formatter( elt.Actual)]);
 
     let content = {
       margin: { top: 80 },
       startY: height,
       head: headers,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8 }
+      styles: { lineWidth: 1, fontSize: 8, halign : 'center' }
 
     };
 
@@ -313,7 +339,7 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-    if(productCategoryId>0 && planningUnitId>0&&programId>0){
+    if(productCategoryId>=0 && planningUnitId>0&&programId>0){
     
     if (navigator.onLine) {
       let realmId = AuthenticationService.getRealmId();
@@ -322,7 +348,8 @@ class Consumption extends Component {
         .then(response => {
           console.log(JSON.stringify(response.data));
           this.setState({
-            consumptions: response.data
+            consumptions: response.data,
+            message:''
           })
         }).catch(
           error => {
@@ -766,20 +793,11 @@ class Consumption extends Component {
 
         labels: this.state.consumptions.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
         datasets: [
-          {
-            label: i18n.t('static.report.actualConsumption'),
-            backgroundColor: '#86CD99',
-            borderColor: 'rgba(179,181,198,1)',
-            pointBackgroundColor: 'rgba(179,181,198,1)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgba(179,181,198,1)',
-            data: this.state.consumptions.map((item, index) => (item.Actual)),
-          }, {
+           {
             type: "line",
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
-            borderColor: 'rgba(179,181,158,1)',
+            borderColor: '#000',
             borderDash: [10, 10],
             ticks: {
               fontSize: 2,
@@ -789,6 +807,15 @@ class Consumption extends Component {
             pointStyle: 'line',
             yValueFormatString: "$#,##0",
             data: this.state.consumptions.map((item, index) => (item.forcast))
+          },{
+            label: i18n.t('static.report.actualConsumption'),
+            backgroundColor: '#86CD99',
+            borderColor: 'rgba(179,181,198,1)',
+            pointBackgroundColor: 'rgba(179,181,198,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(179,181,198,1)',
+            data: this.state.consumptions.map((item, index) => (item.Actual)),
           }
         ],
 
@@ -984,7 +1011,7 @@ class Consumption extends Component {
                                 bsSize="sm"
                                 onChange={this.getPlanningUnit}
                               >
-                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                <option value="0">{i18n.t('static.common.all')}</option>
                                 {productCategories.length > 0
                                   && productCategories.map((item, i) => {
                                     return (
@@ -1010,7 +1037,7 @@ class Consumption extends Component {
                                 bsSize="sm"
                                 onChange={this.getPlanningUnit}
                               >
-                                <option value="0">{i18n.t('static.common.select')}</option>
+                                <option value="0">{i18n.t('static.common.all')}</option>
                                 {offlineProductCategoryList.length > 0
                                   && offlineProductCategoryList.map((item, i) => {
                                     return (
@@ -1157,10 +1184,10 @@ class Consumption extends Component {
                               <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
                               <td>
 
-                                {this.state.consumptions[idx].forcast}
+                                {this.formatter(this.state.consumptions[idx].forcast)}
                               </td>
                               <td>
-                                {this.state.consumptions[idx].Actual}
+                                {this.formatter(this.state.consumptions[idx].Actual)}
                               </td></tr>)
 
                         }

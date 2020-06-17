@@ -71,19 +71,27 @@ const pickerLang = {
 const options = {
   title: {
     display: true,
-    text: i18n.t('static.dashboard.globalconsumption')
+    text: i18n.t('static.dashboard.globalconsumption'),
+    fontColor: 'black'
   },
   scales: {
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: i18n.t('static.dashboard.consumption')
+        labelString: i18n.t('static.dashboard.consumption'),
+        fontColor: 'black'
       },
       stacked: true,
       ticks: {
-        beginAtZero: true
+        beginAtZero: true,
+        fontColor: 'black'
       }
-    }]
+    }],
+    xAxes: [{
+      ticks: {
+        fontColor: 'black'
+      }
+  }]
   },
   tooltips: {
     enabled: false,
@@ -96,6 +104,7 @@ const options = {
     position: 'bottom',
     labels: {
       usePointStyle: true,
+      fontColor: 'black'
     }
   }
 }
@@ -205,6 +214,19 @@ class GlobalConsumption extends Component {
 
 
 
+  formatter = value => {
+
+    var cell1 = value
+    cell1 += '';
+    var x = cell1.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
 
 
 
@@ -214,7 +236,7 @@ class GlobalConsumption extends Component {
       const pageCount = doc.internal.getNumberOfPages()
 
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
+      doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
 
@@ -222,7 +244,7 @@ class GlobalConsumption extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -249,10 +271,11 @@ class GlobalConsumption extends Component {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.dashboard.globalconsumption'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
+          doc.setFont('helvetica', 'normal')
           doc.setFontSize(8)
           doc.text(i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
@@ -266,7 +289,7 @@ class GlobalConsumption extends Component {
           doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
             align: 'left'
           })
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
           doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
         }
@@ -292,17 +315,17 @@ class GlobalConsumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 220,750,290,'CANVAS');
+    doc.addImage(canvasImg, 'png', 50, 220,750,260,'CANVAS');
       
       const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.report.month'),i18n.t('static.consumption.consumptionqty')]]
-      const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),elt.consumptionDateString,elt.planningUnitQty]);
+      const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),elt.consumptionDateString,this.formatter(elt.planningUnitQty)]);
       
       let content = {
       margin: {top: 80},
       startY:  height,
       head: headers,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8 }
+      styles: { lineWidth: 1, fontSize: 8,halign : 'center' }
       
     };
     
@@ -951,7 +974,7 @@ if(productCategoryId!=-1){
                                     {this.state.consumptions[idx].consumptionDateString}
                                   </td>
                                   <td >
-                                    {this.state.consumptions[idx].planningUnitQty}
+                                    {this.formatter(this.state.consumptions[idx].planningUnitQty)}
                                   </td>
                                  </tr>)
 
