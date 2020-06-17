@@ -454,8 +454,7 @@ class StockStatusOverTime extends Component {
         const addHeaders = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
-
+           
             // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
             // var reader = new FileReader();
 
@@ -465,6 +464,8 @@ class StockStatusOverTime extends Component {
             //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 200, 50, 'FAST');
                 /*doc.addImage(data, 10, 30, {
