@@ -832,5 +832,6 @@
     "static.message.updateFailedAcl": "Failed to update",
     "static.message.allAclAccess": "Either provide All access or specific access.",
     "static.program.isincludeplannedshipment":"Include Planning Shipments",
-    "static.program.validversion": "Please select Version"
+    "static.program.validversion": "Please select Version",
+    "static.dashboard.regionreport":"Region Report"
 }
