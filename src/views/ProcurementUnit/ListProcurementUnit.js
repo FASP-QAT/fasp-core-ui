@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from 'react-router-dom';
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+// import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -73,6 +73,7 @@ hideSecondComponent() {
     this.hideFirstComponent();
     ProcurementUnitService.getProcurementUnitList().then(response => {
       if (response.status == 200) {
+        console.log("LIST-------",response.data);
         this.setState({
           procurementUnitList: response.data,
           selProcurementUnit: response.data,
@@ -159,8 +160,7 @@ hideSecondComponent() {
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
-      }
-      ,
+      },
       {
         dataField: 'supplier.label',
         text: i18n.t('static.procurementUnit.supplier'),
@@ -176,7 +176,6 @@ hideSecondComponent() {
         align: 'center',
         headerAlign: 'center'
       },
-      ,
       {
         dataField: 'active',
         text: i18n.t('static.common.status'),
