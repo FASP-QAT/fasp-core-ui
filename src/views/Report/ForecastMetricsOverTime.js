@@ -237,10 +237,11 @@ class ForcastMatrixOverTime extends Component {
     const addHeaders = doc => {
       const pageCount = doc.internal.getNumberOfPages()
     
-      doc.setFont('helvetica', 'bold')
      
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
+
         doc.setPage(i)
         
         doc.addImage(LOGO,'png', 0, 10,180,50,'','FAST');

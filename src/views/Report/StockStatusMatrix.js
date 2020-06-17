@@ -843,7 +843,7 @@ export default class StockStatusMatrix extends React.Component {
     const addHeaders = doc => {
 
       const pageCount = doc.internal.getNumberOfPages()
-      doc.setFont('helvetica', 'bold')
+    
 
       //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
       // var reader = new FileReader();
@@ -853,7 +853,8 @@ export default class StockStatusMatrix extends React.Component {
       //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
       //}); 
       for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(15)
+        doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
