@@ -18,12 +18,13 @@ import ToolkitProvider, { Search, CSVExport } from 'react-bootstrap-table2-toolk
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import {
     Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
-
+const entityname=""
 const options = {
     title: {
         display: true,
@@ -75,6 +76,7 @@ class SupplyPlanVersionAndReview extends Component {
             programs: [],
             countries: [],
             message:'',
+            programLst:[],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -129,8 +131,8 @@ class SupplyPlanVersionAndReview extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.fetchData();
+        this.setState({ rangeValue: value },()=>{this.fetchData();})
+        
     }
 
     _handleClickRangeBox(e) {
@@ -169,6 +171,21 @@ class SupplyPlanVersionAndReview extends Component {
                 }
             );
 
+    }
+    filterProgram=()=>{
+        let countryId = document.getElementById("countryId").value;
+    if (countryId != 0 ) {
+         const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
+        if(programLst.length>0){
+            
+         this.setState({
+            programLst:programLst
+        },()=>{this.fetchData()});
+    }else{
+        this.setState({
+            programLst:[]
+        });
+    }}
     }
 
     getPrograms() {
@@ -243,7 +260,7 @@ class SupplyPlanVersionAndReview extends Component {
         let countryId = document.getElementById("countryId").value;
         let versionStatusId = document.getElementById("versionStatusId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
         AuthenticationService.setupAxiosInterceptors();
         ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
@@ -332,7 +349,7 @@ class SupplyPlanVersionAndReview extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -443,9 +460,9 @@ class SupplyPlanVersionAndReview extends Component {
 
 
     render() {
-        const { programs } = this.state;
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
+        const { programLst } = this.state;
+        let programList = programLst.length > 0
+            && programLst.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
                         {getLabelText(item.label, this.state.lang)}
@@ -627,9 +644,12 @@ class SupplyPlanVersionAndReview extends Component {
         }
         return (
             <div className="animated fadeIn" >
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
-
+              <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
+        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+       
                 <Card>
                     <CardHeader className="pb-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong>
@@ -676,7 +696,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     bsSize="sm"
                                                     name="countryId"
                                                     id="countryId"
-                                                    onChange={(e) => { this.handleChange(e); this.fetchData() }}
+                                                    onChange={(e) => { this.filterProgram(); this.fetchData() }}
                                                 >  <option value="0">{i18n.t('static.common.select')}</option>
                                                     {countryList}</Input>
                                                 {!!this.props.error &&

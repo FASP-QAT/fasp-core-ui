@@ -110,7 +110,7 @@ class ProcurementAgentExport extends Component {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
             for (var i = 1; i <= pageCount; i++) {
-                doc.setFontSize(18)
+                doc.setFontSize(12)
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
@@ -118,10 +118,10 @@ class ProcurementAgentExport extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFontSize(12)
-                    doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 90, {
-                        align: 'left'
-                    })
+                    doc.setFontSize(8)
+                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 90, planningText)
+
                 }
 
             }
@@ -133,7 +133,7 @@ class ProcurementAgentExport extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
 
-        doc.setFontSize(15);
+        doc.setFontSize(8);
 
         const title = "Procurement Agent Report";
         // var canvas = document.getElementById("cool-canvas");
@@ -155,6 +155,7 @@ class ProcurementAgentExport extends Component {
             startY: 150,
             head: headers,
             body: data,
+            styles: { lineWidth: 1, fontSize: 8 }
 
         };
         doc.autoTable(content);
@@ -328,56 +329,55 @@ class ProcurementAgentExport extends Component {
 
                                 <div className="row">
                                     <div className="col-md-12">
-                                        {/* {this.state.show && this.state.procurementAgents.length > 0 && */}
+                                        {this.state.procurementAgents.length > 0 &&
 
-                                        <Table responsive className="table-striped  table-hover table-bordered text-center mt-2">
+                                            <Table responsive className="table-striped  table-hover table-bordered text-center mt-2">
 
-                                            <thead>
-                                                <tr>
-                                                    <th className="text-center "> Program Name </th>
-                                                    <th className="text-center"> Freight Cost Sea (%)</th>
-                                                    <th className="text-center"> Freight Cost Air (%)</th>
-                                                    <th className="text-center"> Plan to Draft LT (Months)</th>
-                                                    <th className="text-center"> Draft to Submitted LT (Months)</th>
-                                                    <th className="text-center"> Submitted to Approved LT (Months)</th>
-                                                    <th className="text-center"> Approved to Shipped LT (Months)</th>
-                                                    <th className="text-center"> Shipped to Arrived by Sea LT (Months)</th>
-                                                    <th className="text-center"> Shipped to Arrived by Air LT (Months)</th>
-                                                    <th className="text-center"> Arrived to Delivered LT (Months)</th>
-                                                    <th className="text-center"> Total LT By Sea (Months)</th>
-                                                    <th className="text-center"> Total LT By Air (Months)</th>
-                                                </tr>
-                                            </thead>
+                                                <thead>
+                                                    <tr>
+                                                        <th className="text-center "> Program Name </th>
+                                                        <th className="text-center"> Freight Cost Sea (%)</th>
+                                                        <th className="text-center"> Freight Cost Air (%)</th>
+                                                        <th className="text-center"> Plan to Draft LT (Months)</th>
+                                                        <th className="text-center"> Draft to Submitted LT (Months)</th>
+                                                        <th className="text-center"> Submitted to Approved LT (Months)</th>
+                                                        <th className="text-center"> Approved to Shipped LT (Months)</th>
+                                                        <th className="text-center"> Shipped to Arrived by Sea LT (Months)</th>
+                                                        <th className="text-center"> Shipped to Arrived by Air LT (Months)</th>
+                                                        <th className="text-center"> Arrived to Delivered LT (Months)</th>
+                                                        <th className="text-center"> Total LT By Sea (Months)</th>
+                                                        <th className="text-center"> Total LT By Air (Months)</th>
+                                                    </tr>
+                                                </thead>
 
-                                            <tbody>
-                                                {
-                                                    this.state.procurementAgents.length > 0
-                                                    &&
-                                                    this.state.procurementAgents.map((item, idx) =>
+                                                <tbody>
+                                                    {
 
-                                                        <tr id="addr0" key={idx} >
+                                                        this.state.procurementAgents.map((item, idx) =>
 
-                                                            <td>{getLabelText(this.state.procurementAgents[idx].label, this.state.lang)}</td>
+                                                            <tr id="addr0" key={idx} >
 
-                                                            <td>{this.state.procurementAgents[idx].seaFreightPerc}</td>
-                                                            <td>{this.state.procurementAgents[idx].airFreightPerc}</td>
+                                                                <td>{getLabelText(this.state.procurementAgents[idx].label, this.state.lang)}</td>
 
-                                                            <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].draftToSubmittedLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].submittedToApprovedLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].approvedToShippedLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].shippedToArrivedBySeaLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].shippedToArrivedByAirLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].seaFreightPerc}</td>
+                                                                <td>{this.state.procurementAgents[idx].airFreightPerc}</td>
 
-                                                            <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime + this.state.procurementAgents[idx].draftToSubmittedLeadTime + this.state.procurementAgents[idx].submittedToApprovedLeadTime + this.state.procurementAgents[idx].approvedToShippedLeadTime + this.state.procurementAgents[idx].shippedToArrivedBySeaLeadTime + this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
-                                                            <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime + this.state.procurementAgents[idx].draftToSubmittedLeadTime + this.state.procurementAgents[idx].submittedToApprovedLeadTime + this.state.procurementAgents[idx].approvedToShippedLeadTime + this.state.procurementAgents[idx].shippedToArrivedByAirLeadTime + this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
-                                                        </tr>)
+                                                                <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].draftToSubmittedLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].submittedToApprovedLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].approvedToShippedLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].shippedToArrivedBySeaLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].shippedToArrivedByAirLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
 
-                                                }
-                                            </tbody>
-                                        </Table>
-                                        {/* } */}
+                                                                <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime + this.state.procurementAgents[idx].draftToSubmittedLeadTime + this.state.procurementAgents[idx].submittedToApprovedLeadTime + this.state.procurementAgents[idx].approvedToShippedLeadTime + this.state.procurementAgents[idx].shippedToArrivedBySeaLeadTime + this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
+                                                                <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime + this.state.procurementAgents[idx].draftToSubmittedLeadTime + this.state.procurementAgents[idx].submittedToApprovedLeadTime + this.state.procurementAgents[idx].approvedToShippedLeadTime + this.state.procurementAgents[idx].shippedToArrivedByAirLeadTime + this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
+                                                            </tr>)
+
+                                                    }
+                                                </tbody>
+                                            </Table>
+                                        }
 
                                     </div>
                                 </div>
