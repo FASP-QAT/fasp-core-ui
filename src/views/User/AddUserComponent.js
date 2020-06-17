@@ -91,7 +91,7 @@ class AddUserComponent extends Component {
             languages: [],
             user: {
                 realm: {
-                    realmId: ''
+                    realmId: '0'
                 },
                 language: {
                     languageId: ''
@@ -336,7 +336,8 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                 <h5 style={{ color: "red" }} id="div2">
+                     {i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -350,7 +351,7 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log(JSON.stringify(this.state.user))
+                                    console.log("user object---",this.state.user)
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -410,7 +411,7 @@ class AddUserComponent extends Component {
                                                         id="showRealm"
                                                     />
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"

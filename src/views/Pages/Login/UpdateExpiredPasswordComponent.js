@@ -14,7 +14,7 @@ import UserService from '../../../api/UserService'
 import moment from 'moment';
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import image1 from '../../../assets/img/QAT-logo.png';
+import image1 from '../../../assets/img/QAT-login-logo.png';
 
 
 
@@ -77,6 +77,22 @@ class UpdateExpiredPasswordComponent extends Component {
             username: this.props.location.state.username
         }
         this.logoutClicked = this.logoutClicked.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+
+        // setTimeout(function () {
+        //     this.setState({
+        //         message:''
+        //     },
+        //     () => { 
+        //         document.getElementById('div1').style.display = 'block';
+        //     });
+        // }, 8000);
+        
     }
 
     logoutClicked() {
@@ -119,8 +135,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                     <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
-                            <Col md="9" lg="7" xl="6 " className="mt-4">
-                                <h5 className="mx-4">{this.state.message}</h5>
+                            <Col md="9" lg="7" xl="6 " className="ForgotmarginTop">
+                                <h5 style={{ color: "red" }} id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
                                         <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
@@ -149,23 +165,40 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('lang', decoded.user.language.languageCode);
-                                                        this.props.history.push(`/masterDataSync/static.message.user.passwordSuccess`)
+                                                        this.props.history.push(`/masterDataSync/`)
                                                     })
                                                     .catch(
                                                         error => {
                                                             if (error.message === "Network Error") {
-                                                                this.setState({ message: error.message });
+                                                                this.setState({ message: error.message }, () => {
+                                                                    console.log("inside412");
+                                                                    document.getElementById('div1').style.display = 'block';
+                                                                    this.hideFirstComponent();
+                                                                });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 500:
                                                                     case 401:
+                                                                    case 403:
                                                                     case 404:
                                                                     case 406:
                                                                     case 412:
-                                                                        this.setState({ message: error.response.data.messageCode });
+                                                                      
+                                                                        this.setState({ message: error.response.data.messageCode },
+                                                                            () => {
+                                                                                console.log("inside412");
+                                                                                document.getElementById('div1').style.display = 'block';
+                                                                                this.hideFirstComponent();
+                                                                            });
                                                                         break;
                                                                     default:
-                                                                        this.setState({ message: 'static.unkownError' });
+                                                                      
+                                                                        this.setState({  message: 'static.unkownError'},
+                                                                            () => {
+                                                                                console.log("inside412");
+                                                                                document.getElementById('div1').style.display = 'block';
+                                                                                this.hideFirstComponent();
+                                                                            });
                                                                         break;
                                                                 }
                                                             }
@@ -173,9 +206,13 @@ class UpdateExpiredPasswordComponent extends Component {
                                                     );
 
                                             } else {
-                                                this.setState({
-                                                    message: 'static.common.onlinepasswordtext'
-                                                });
+                                               
+                                                this.setState({message: 'static.common.onlinepasswordtext' },
+                                                    () => {
+                                                        console.log("inside412");
+                                                        document.getElementById('div1').style.display = 'block';
+                                                        this.hideFirstComponent();
+                                                    });
                                             }
                                         }}
                                         render={
@@ -243,8 +280,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
-                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
+                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>

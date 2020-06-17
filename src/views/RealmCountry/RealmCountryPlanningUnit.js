@@ -25,7 +25,7 @@ let initialValues = {
         }
     }
     , label: { label_en: '' },
-    skuCode: '',
+   skuCode: '',
     unit: {
         unitId: '',
         label: {
@@ -34,7 +34,7 @@ let initialValues = {
     },
     multiplier: '',
 
-    gtin: '',
+    // gtin: '',
     active: true
 
 
@@ -44,7 +44,7 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        label: Yup.string()
+            countrysku: Yup.string()
             .required(i18n.t('static.planningunit.Countrytext')),
         skuCode: Yup.string()
             .required(i18n.t('static.procurementAgentProcurementUnit.skuCodeText')),
@@ -52,14 +52,15 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
         unitId: Yup.string()
             .required(i18n.t('static.product.productunittext')),
-            gtin: Yup.string()
-            .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
-            .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
+            // gtin: Yup.string()
+            // .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
+            // .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
     })
 }
 
 const validate = (getValidationSchema) => {
     return (values) => {
+        console.log(values)
         const validationSchema = getValidationSchema(values, i18n.t)
         try {
             validationSchema.validateSync(values, { abortEarly: false })
@@ -123,7 +124,7 @@ realmCountryPlanningUnitId:'',
                 }
             }, isNew: true,
             updateRowStatus: 0,
-            gtin:''
+            // gtin:''
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.disableRow = this.disableRow.bind(this);
@@ -158,6 +159,7 @@ realmCountryPlanningUnitId:'',
                     }
                 },
                 label: this.state.rows[idx].label.label_en,
+                countrysku: this.state.rows[idx].label.label_en,
                 // , label: { label_en: this.state.rows[idx].label.label_en },
                 skuCode: this.state.rows[idx].skuCode,
                 unit: {
@@ -168,7 +170,7 @@ realmCountryPlanningUnitId:'',
                 },
                 unitId: this.state.rows[idx].unit.unitId,
                 multiplier: this.state.rows[idx].multiplier,
-                gtin: this.state.rows[idx].gtin,
+                // gtin: this.state.rows[idx].gtin==null?'':this.state.rows[idx].gtin,
                 active: this.state.rows[idx].active
             }
             const rows = [...this.state.rows]
@@ -190,13 +192,13 @@ realmCountryPlanningUnitId:'',
                 },
                 multiplier: this.state.rows[idx].multiplier,
 
-                gtin: this.state.rows[idx].gtin,
+                // gtin: this.state.rows[idx].gtin,
                 // active: this.state.rows[idx].active,
                 isNew: false,
                 updateRowStatus: 1
             }
             );
-
+console.log(initialValues)
             rows.splice(idx, 1);
             this.setState({ rows });
         }
@@ -209,7 +211,7 @@ realmCountryPlanningUnitId:'',
             skuCode: true,
             multiplier: true,
             unitId: true,
-            gtin: true
+            // gtin: true
 
         }
         )
@@ -232,33 +234,49 @@ realmCountryPlanningUnitId:'',
     }
 
     setTextAndValue = (event) => {
-        // let { budget } = this.state;
+         let { budget } = this.state;
         console.log(event.target.name)
+        console.log(event.target.value)
         if (event.target.name === "planningUnitId") {
-            this.state.planningUnit.planningUnitId = event.target.value;
-            this.state.planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
-           
+         let   {planningUnit}= this.state
+         planningUnit.planningUnitId = event.target.value;
+         planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
+         this.setState({
+            planningUnit
+        })
         }
-        if (event.target.name === "label") {
-            this.state.label.label_en = event.target.value;
+        if (event.target.name === "countrysku") {
+            this.setState({
+                label:{label_en : event.target.value}
+            })
+           // this.state.label.label_en = event.target.value;
         }
         if (event.target.name === "skuCode") {
-            this.state.skuCode = event.target.value;
-
+            this.setState({
+            skuCode : event.target.value
+            })
         }
         if (event.target.name === "unitId") {
-            this.state.unit.unitId = event.target.value;
-            this.state.unit.label.label_en = event.target[event.target.selectedIndex].text;
-            console.log(event.target.value)
+            let   {unit}= this.state
+            unit.unitId = event.target.value;
+          unit.label.label_en = event.target[event.target.selectedIndex].text;
+          this.setState({
+            unit
+        })
         }
+       
         if (event.target.name === "multiplier") {
-            this.state.multiplier = event.target.value;
-
+            this.setState({
+                multiplier : event.target.value
+                })
+            
         }
-        if (event.target.name === "gtin") {
-            this.state.gtin = event.target.value;
-
-        }
+        // if (event.target.name === "gtin") {
+        //     this.setState({
+        //         gtin : event.target.value
+        //         })
+           
+        // }
     }
     Capitalize(str) {
         if (str != null && str != "") {
@@ -507,14 +525,14 @@ realmCountryPlanningUnitId:'',
                             <strong>{i18n.t('static.dashboad.planningunitcountry')}</strong>
                         </CardHeader>
                         <CardBody>
-                            <Formik
+                            <Formik 
                                 enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                     console.log("values", values)
-                                    console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.skuCode + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
-                                    if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != "" && this.state.skuCode != "" && this.state.unit.unitId != "" && this.state.multiplier != "") {
+                                    console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
+                                    if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != ""  && this.state.unit.unitId != "" && this.state.multiplier != "") {
                                         var json =
                                         {realmCountryPlanningUnitId:this.state.realmCountryPlanningUnitId,
                                             realmCountry: {
@@ -528,7 +546,7 @@ realmCountryPlanningUnitId:'',
                                                 }
                                             }
                                             , label: { label_en: this.state.label.label_en },
-                                            skuCode: this.state.skuCode,
+                                             skuCode: this.state.skuCode,
                                             unit: {
                                                 unitId: this.state.unit.unitId,
                                                 label: {
@@ -537,7 +555,7 @@ realmCountryPlanningUnitId:'',
                                             },
                                             multiplier: this.state.multiplier,
 
-                                            gtin: this.state.gtin,
+                                            // gtin: this.state.gtin,
                                             isNew: this.state.isNew,
                                             active: true
 
@@ -554,7 +572,7 @@ realmCountryPlanningUnitId:'',
                                                 }
                                             }
                                             , label: { label_en: '' },
-                                            skuCode: '',
+                                             skuCode: '',
                                             unit: {
                                                 unitId: '',
                                                 label: {
@@ -563,7 +581,7 @@ realmCountryPlanningUnitId:'',
                                             },
                                             multiplier: '',
     
-                                            gtin: '',
+                                            // gtin: '',
                                             active: true
     
                                         });
@@ -581,7 +599,7 @@ realmCountryPlanningUnitId:'',
                                             }
                                         }
                                         , label: { label_en: '' },
-                                        skuCode: '',
+                                         skuCode: '',
                                         unit: {
                                             unitId: '',
                                             label: {
@@ -590,7 +608,7 @@ realmCountryPlanningUnitId:'',
                                         },
                                         multiplier: '',
 
-                                        gtin: '',
+                                        // gtin: '',
                                         active: true
 
                                     });
@@ -628,7 +646,7 @@ realmCountryPlanningUnitId:'',
                                         <Input type="hidden" name="realmCountryPlanningUnitId" id="realmCountryPlanningUnitId" value={this.state.realmCountryPlanningUnitId}>
                                        </Input></FormGroup> 
                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
                                                 valid={!errors.planningUnitId && this.state.planningUnit.planningUnitId != ''}
                                                 invalid={touched.planningUnitId && !!errors.planningUnitId}
@@ -642,16 +660,16 @@ realmCountryPlanningUnitId:'',
                                         <FormGroup className="col-md-6">
                                             <Label for="label">{i18n.t('static.planningunit.countrysku')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
-                                                name="label"
-                                                id="label"
+                                                name="countrysku"
+                                                id="countrysku"
                                                 bsSize="sm"
-                                                valid={!errors.label && this.state.label.label_en != ''}
-                                                invalid={touched.label && !!errors.label}
+                                                valid={!errors.countrysku && this.state.label.label_en != ''}
+                                                invalid={touched.countrysku && !!errors.countrysku}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.Capitalize(this.state.label.label_en)}
                                                 required />
-                                            <FormFeedback className="red">{errors.label}</FormFeedback>
+                                            <FormFeedback className="red">{errors.countrysku}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span class="red Reqasterisk">*</span></Label>
@@ -662,12 +680,12 @@ realmCountryPlanningUnitId:'',
                                                 invalid={touched.skuCode && !!errors.skuCode}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
-                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                 value={this.CapitalizeFull(this.state.skuCode)}
                                                 required />
                                             <FormFeedback className="red">{errors.skuCode}</FormFeedback>
 
-                                        </FormGroup>
+                                </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
@@ -700,8 +718,8 @@ realmCountryPlanningUnitId:'',
                                                 required />
                                             <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
+                                       {/* <FormGroup className="col-md-6">
+                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
 
                                                 type="text"
@@ -714,12 +732,12 @@ realmCountryPlanningUnitId:'',
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 value={this.CapitalizeFull(this.state.gtin)}
-                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                             />
                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
-                                        </FormGroup>
+                            </FormGroup>*/}
 
-                                        <FormGroup className="col-md-6 mt-md-4">
+                                        <FormGroup className="col-md-12 mt-md-0">
                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
                                            
@@ -730,11 +748,11 @@ realmCountryPlanningUnitId:'',
                                 <thead>
                                     <tr>
                                         <th className="text-left pl-1"> {i18n.t('static.dashboard.planningunit')} </th>
-                                        <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
+                                       <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
                                         <th className="text-center"> {i18n.t('static.procurementAgentProcurementUnit.skuCode')} </th>
                                         <th className="text-center">{i18n.t('static.unit.unit')}</th>
                                         <th className="text-center">{i18n.t('static.unit.multiplier')}</th>
-                                        <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>
+                                      {/*  <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>*/}
                                         <th className="text-center">{i18n.t('static.common.status')}</th>
                                         <th className="text-center">{i18n.t('static.common.action')}</th>
                                     </tr>
@@ -755,15 +773,15 @@ realmCountryPlanningUnitId:'',
                                                 </td>
                                                 <td>
                                                     {this.state.rows[idx].skuCode}
-                                                </td><td>
+                                              </td><td>
                                                     {this.state.rows[idx].unit.label.label_en}
                                                 </td>
                                                 <td className="text-right">
                                                     {this.state.rows[idx].multiplier}
                                                 </td>
-                                                <td>
+                                               {/* <td>
                                                     {this.state.rows[idx].gtin}
-                                                </td>
+                                               </td>*/}
                                                 <td>
                                                     {this.state.rows[idx].active==true ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>

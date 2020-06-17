@@ -24,14 +24,14 @@ const validationSchema = function (values) {
         //     .required(i18n.t('static.role.businessfunctiontext')),
         // canCreateRole: Yup.string()
         //     .required(i18n.t('static.role.cancreateroletext'))
-        businessFunctions: Yup.array()
-            .min(3, 'Pick at least 3 tags')
-            .of(
-                Yup.object().shape({
-                    label: Yup.string().required(),
-                    value: Yup.string().required(),
-                })
-            ),
+        // businessFunctions: Yup.array()
+        //     .min(3, 'Pick at least 3 tags')
+        //     .of(
+        //         Yup.object().shape({
+        //             label: Yup.string().required(),
+        //             value: Yup.string().required(),
+        //         })
+        //     ),
     })
 }
 

@@ -743,8 +743,6 @@ label.arrow_label:after {
 // user
 .userAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .userAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
-.userAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
-.userAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 // listRalm
 .listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
@@ -848,6 +846,7 @@ label.arrow_label:after {
     height: auto;
     left: 0;
     margin: 0;
+    
     min-height: 100%;
     padding: 0;
     background-attachment: fixed;
@@ -866,6 +865,13 @@ label.arrow_label:after {
   margin-left: 0%;
 }
 
+.card-marginTop
+{
+  flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: -26% !important;
+
+}
 @media only screen and (max-width: 767px) {
   .upper-logo {
     // min-width: 100%;
@@ -1058,6 +1064,7 @@ a:hover {
 
 .table-responsive {
   overflow-x: auto;
+  // margin-top: -1%;
   // max-height: 240px;
 }
 
@@ -1455,6 +1462,16 @@ h5,
   border-color: 1px solid red;
 }
 
+.legend .orangelegend {
+  background-color: orange;
+  border-color: 1px solid orange;
+}
+
+.legend .orangeredlegend{
+  background-color: orangered;
+  border-color: 1px solid orangered;
+}
+
 .legend .skipedShipmentslegend{
   background-color: #696969;
   border-color: 1px solid #696969;
@@ -1632,13 +1649,14 @@ input::placeholder {
   left: 31%;
 }
 .progressbartext4 {
-  left: 46.46%;
+  left: 47%;
 }
 .progressbartext5 {
   left: 64%;
 }
 .progressbartext6 {
-  left: 77.79%;
+  // left: 78.79%;
+  left:78%;
 }
 .progressbartext7 {
   left: 94.95%;
@@ -1674,7 +1692,7 @@ input::placeholder {
   left:72%;
 }
 .progresdatatext5 {
-  left: 94%;
+  left: 95%;
 }
 .progresdatatext6 {
   left: 94.79%;
@@ -1815,7 +1833,7 @@ input::placeholder {
 
 .react-confirm-alert-button-group {
   float: right !important;
-  margin-top: 11% !important;
+  margin-top: 6% !important;
 }
 
 .react-confirm-alert-button-group > button {
@@ -2059,7 +2077,7 @@ text-overflow: ellipsis;
 }
 .css-1pcexqc-container {
   position: relative;
-  width: 206px!important;
+  width: 190px!important;
   box-sizing: border-box;
 }
 
@@ -2209,3 +2227,105 @@ h6{
 {
   margin-top:5px !important;
 }
+
+.card-header
+{
+  padding: 10px 20px 10px 20px!important;
+} 
+  
+.costinventryinput{
+  width:234px!important;
+}
+.table-mt{
+  margin-top: -1%;
+}
+.table-accesscnl-mt{
+  margin-top: -3%;
+}
+/* commit version legend */
+.legendcommitversion { list-style: none;display: inline-flex; }
+.legendcommitversion li { float: left; margin-right: 10px; }
+.legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
+
+/* your colors */
+.legendcommitversion .lightpinklegend {
+  background-color: yellow;
+  border-color: 1px solid yellow;
+}
+.legendcommitversion .greenlegend {
+  background-color:#86cd99;
+  border-color: 1px solid #86cd99;
+}
+.legendcommitversion .redlegend {
+  background-color: red;
+  border-color: 1px solid red;
+}
+
+.legendcommitversion .orangelegend {
+  background-color: orange;
+  border-color: 1px solid orange;
+}
+
+.legendcommitversion .orangeredlegend{
+  background-color: orangered;
+  border-color: 1px solid orangered;
+}
+
+.legendcommitversion .skipedShipmentslegend{
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+
+.legendcommitversion .skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
+.legendcommitversion .purplelegend {
+  background-color: rgb(170, 85, 161);
+  border-color: 1px solid rgb(170, 85, 161);
+}
+.legendcommitversion .blacklegend {
+  background-color: #000;
+  border-color: 1px solid #000;
+}
+
+.legendcommitversion .notawesome {
+  background-color: #e5edf5;
+  border-color: 1px solid #e5edf5;
+}
+
+///supply plan
+.skipedShipmentslegend {
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+.redlegend {
+  background-color: red;
+  border-color: 1px solid red;
+}
+.skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
+///Consumption model color
+.purplelegend {
+  background-color: rgb(170, 85, 161);
+  border-color: 1px solid rgb(170, 85, 161);
+}
+.blacklegend {
+  background-color: #000;
+  border-color: 1px solid #000;
+}
+
+.legendcommitversionText{
+  text-align: left;
+  display: table;
+  padding: 0px 0px 0px 11px;
+  }
+  .ForgotmarginTop
+  {
+    margin-top: -3%!important;
+  }
+  .date-color{
+    color: #212721!important;
+  }

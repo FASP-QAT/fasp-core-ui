@@ -346,7 +346,7 @@ const routes = [
   { path: '/accessDenied', exact: true, component: AccessDenied },
 
   { path: '/dashboard/:message', component: Dashboard },
-
+  { path: '/dashboard/:color/:message', component: Dashboard },
   { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
   { path: '/program/syncPage', name: "Commit Version", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
@@ -403,18 +403,20 @@ const routes = [
   { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
   { path: '/forecastingUnit/listForecastingUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: ForecastingUnitList },
   // { path: '/forecastingUnit/listForecastingUnit/:message', component: ForecastingUnitList },
-  { path: '/forecastingUnit/listForecastingUnit/:color/:message', component: ListCurrency },
+  { path: '/forecastingUnit/listForecastingUnit/:color/:message', component: ForecastingUnitList },
   { path: '/forecastingUnit/editForecastingUnit/:forecastingUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: EditForecastingUnit },
 
   { path: '/planningUnit/addPlanningUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.planningunit') }), component: AddPlanningUnit },
   { path: '/planningUnit/listPlanningUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.planningunit') }), component: PlanningUnitList },
-  { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
+  // { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
+  { path: '/planningUnit/listPlanningUnit/:color/:message', component: PlanningUnitList },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
 
 
   { path: '/procurementUnit/addProcurementUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: AddProcurementUnit },
   { path: '/procurementUnit/listProcurementUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: ListProcurementUnit },
-  { path: '/procurementUnit/listProcurementUnit/:message', component: ListProcurementUnit },
+  // { path: '/procurementUnit/listProcurementUnit/:message', component: ListProcurementUnit },
+  { path: '/procurementUnit/listProcurementUnit/:color/:message', component: ListProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: EditProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId', component: EditProcurementUnit },
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },

@@ -83,6 +83,12 @@ export default class AddPlanningUnit extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -138,20 +144,32 @@ export default class AddPlanningUnit extends Component {
         AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
-                this.setState({
-                    units: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        units: response.data
+                    })
+                    AuthenticationService.setupAxiosInterceptors();
+                    ForecastingUnitService.getForecastingUnitList().then(response => {
+                        console.log(response.data)
+                        this.setState({
+                            forecastingUnits: response.data
+                        })
+                    })
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                
             })
 
-        AuthenticationService.setupAxiosInterceptors();
-        ForecastingUnitService.getForecastingUnitList().then(response => {
-            console.log(response.data)
-            this.setState({
-                forecastingUnits: response.data
-            })
-        })
+           
 
-    }
+    }  
 
 
     Capitalize(str) {
@@ -201,11 +219,14 @@ export default class AddPlanningUnit extends Component {
                                     PlanningUnitService.addPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -298,7 +319,7 @@ export default class AddPlanningUnit extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
@@ -320,7 +341,7 @@ export default class AddPlanningUnit extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/planningUnit/listPlanningUnit/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

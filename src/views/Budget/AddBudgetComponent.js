@@ -16,6 +16,7 @@ import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { confirmAlert } from 'react-confirm-alert';
 import CurrencyService from '../../api/CurrencyService.js';
+import moment from 'moment';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -90,7 +91,7 @@ class AddBudgetComponent extends Component {
                     label_fr: ''
                 },
                 program: {
-                    programId: '',
+                    id:'',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -171,7 +172,7 @@ class AddBudgetComponent extends Component {
             budget.label.label_en = event.target.value;
         }
         if (event.target.name === "programId") {
-            budget.program.programId = event.target.value;
+            budget.program.id = event.target.value;
         }
         if (event.target.name === "fundingSourceId") {
             budget.fundingSource.fundingSourceId = event.target.value;
@@ -324,10 +325,19 @@ class AddBudgetComponent extends Component {
                                     var getCurrencyId = this.state.budget.currency.currencyId;
                                     var currencyId = getCurrencyId.split("~");
                                     budget.currency.currencyId = currencyId[0];
-                                    this.setState({ budget: budget });
 
-                                    console.log("this.state.budget--->", this.state.budget);
-                                    BudgetService.addBudget(this.state.budget)
+                                    // alert(this.state.budget.startDate);
+                                    var startDate=moment(this.state.budget.startDate).format("YYYY-MM-DD");
+                                    budget.startDate=startDate;
+
+                                    var stopDate=moment(this.state.budget.stopDate).format("YYYY-MM-DD");
+                                    budget.stopDate=stopDate;
+
+                                    // alert("hiiiiii");
+                                    // this.setState({ budget: budget });
+
+                                    console.log("this.state.budget--->",budget);
+                                    BudgetService.addBudget(budget)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/budget/listBudget/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -385,12 +395,12 @@ class AddBudgetComponent extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            valid={!errors.programId && this.state.budget.program.programId != ''}
+                                                            valid={!errors.programId && this.state.budget.program.id != ''}
                                                             invalid={touched.programId && !!errors.programId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.budget.program.programId}
+                                                            value={this.state.budget.program.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -497,7 +507,7 @@ class AddBudgetComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             value={this.state.budget.budgetAmt}
-                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
@@ -576,14 +586,14 @@ class AddBudgetComponent extends Component {
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
 
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-
+ 
                                                         <DatePicker
                                                             id="stopDate"
                                                             name="stopDate"
@@ -592,7 +602,7 @@ class AddBudgetComponent extends Component {
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                         />
                                                     </FormGroup>

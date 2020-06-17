@@ -516,7 +516,7 @@ class AddprogramPlanningUnit extends Component {
 
 
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Local procurementAgent lead time<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">Local Procurement Lead Time<span className="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 type="number"
                                                                 min='0'
@@ -526,14 +526,14 @@ class AddprogramPlanningUnit extends Component {
                                                                 valid={!errors.localProcurementLeadTime && this.state.localProcurementLeadTime != ''}
                                                                 invalid={touched.localProcurementLeadTime && !!errors.localProcurementLeadTime}
                                                                 value={this.state.localProcurementLeadTime}
-                                                                placeholder='Local procurementAgent lead time'
+                                                                placeholder='Local procurement lead time'
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                             />
                                                             <FormFeedback className="red">{errors.localProcurementLeadTime}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Batch No Required<span className="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="company">Batch No Required</Label>
                                                             <FormGroup check inline>
                                                                 <Input
                                                                     className="form-check-input"
@@ -588,7 +588,7 @@ class AddprogramPlanningUnit extends Component {
                                             <th> {i18n.t('static.planningunit.planningunit')}</th>
                                             <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
                                             <th>Minimum month of stock</th>
-                                            <th>Local procurementAgent lead time</th>
+                                            <th>Local procurement lead time</th>
                                             <th>Batch no required</th>
                                             <th>{i18n.t('static.common.status')}</th>
                                             <th>{i18n.t('static.common.update')}</th>

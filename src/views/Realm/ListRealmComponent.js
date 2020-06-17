@@ -85,11 +85,12 @@ export default class ReactListComponent extends Component {
         // );
     }
     editRealm(realm) {
-        this.props.history.push({
-            pathname: `/realm/updateRealm/${realm.realmId}`,
-            // state: { realm: realm }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM')) {
+            this.props.history.push({
+                pathname: `/realm/updateRealm/${realm.realmId}`,
+                // state: { realm: realm }
+            });
+        }
     }
 
     addNewRealm() {
@@ -102,13 +103,15 @@ export default class ReactListComponent extends Component {
     }
     RealmCountry(event, row) {
         event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/realmCountry/RealmCountry/${row.realmId}`,
-            state: { realm: row }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {
+            console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/realmCountry/RealmCountry/${row.realmId}`,
+                state: { realm: row }
 
 
-        })
+            })
+        }
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -189,7 +192,7 @@ export default class ReactListComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                  <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
@@ -197,7 +200,7 @@ export default class ReactListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CREATE_REALM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

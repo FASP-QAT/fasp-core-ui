@@ -140,9 +140,12 @@ class Login extends Component {
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
-    console.log("htnl content.......", htmlContent);
-    if (htmlContent.includes('Cancelled')) {
+    console.log("htnl content....... ", htmlContent);
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('Logged')  ||  htmlContent.includes('cancelled')  )  {
       logoutMessage.style.color = 'red';
+    }
+    else if (htmlContent.includes('Access Denied')) {
+      logoutMessage.style.color = 'red'; 
     }
     else {
       logoutMessage.style.color = 'green';
@@ -173,7 +176,7 @@ class Login extends Component {
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
-                  <Card className="p-4 Login-card mt-2">
+                  <div className="p-4 Login-card card-marginTop" >
                     <CardBody>
                       <Formik
                         initialValues={initialValues}
@@ -184,6 +187,8 @@ class Login extends Component {
                           if (navigator.onLine) {
                             LoginService.authenticate(username, password)
                               .then(response => {
+                                console.log("response---", response);
+                                console.log("response data---", response.data);
                                 var decoded = jwt_decode(response.data.token);
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
@@ -238,7 +243,7 @@ class Login extends Component {
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng","lastActionTaken"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
@@ -331,7 +336,7 @@ class Login extends Component {
                               </Form>
                             )} />
                     </CardBody>
-                  </Card>
+                  </div>
 
                 </CardGroup>
               </Col>
@@ -348,8 +353,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                        official U.S. government information and does not represent the views or positions of the
-                                                        Agency for International Development or the U.S. government.
+                                                          official U.S. government information and does not represent the views or positions of the
+                                                          Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

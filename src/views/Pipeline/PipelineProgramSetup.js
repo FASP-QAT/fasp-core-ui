@@ -847,7 +847,7 @@ export default class PipelineProgramSetup extends Component {
                                                 </span>
                                             </CardFooter>
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Save <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
@@ -872,7 +872,7 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter> */}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Save<i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
@@ -896,9 +896,9 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter> */}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Save<i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Save <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>

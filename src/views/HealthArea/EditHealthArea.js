@@ -266,7 +266,7 @@ export default class EditHealthAreaComponent extends Component {
                                     HealthAreaService.editHealthArea(this.state.healthArea)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/healthArea/listHealthArea/` + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -294,20 +294,6 @@ export default class EditHealthAreaComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='healthAreaForm'>
                                                 <CardBody>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            type="text" name="healthAreaName" valid={!errors.healthAreaName}
-                                                            invalid={touched.healthAreaName && !!errors.healthAreaName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.healthArea.label.label_en}
-                                                            id="healthAreaName" />
-                                                        <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                                                    </FormGroup>
-
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
                                                         <Input
@@ -338,6 +324,19 @@ export default class EditHealthAreaComponent extends Component {
                                                             value={this.state.healthArea.realmCountryArray}
                                                         />
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="text" name="healthAreaName" valid={!errors.healthAreaName}
+                                                            invalid={touched.healthAreaName && !!errors.healthAreaName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.healthArea.label.label_en}
+                                                            id="healthAreaName" />
+                                                        <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
@@ -400,7 +399,7 @@ export default class EditHealthAreaComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/healthArea/listHealthArea/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/healthArea/listHealthArea/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

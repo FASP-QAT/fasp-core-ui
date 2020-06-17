@@ -135,7 +135,7 @@ export default class AddOrganisationComponent extends Component {
     }
 
     componentDidMount() {
-
+        console.log("IN componentDidMount------------------");
         AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryListAll()
             .then(response => {
@@ -244,17 +244,20 @@ export default class AddOrganisationComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // console.log("-------------------->" + this.state.healthArea);
-                                    OrganisationService.addOrganisation(this.state.organisation)
-                                        .then(response => {
-                                            if (response.status == 200) {
-                                                this.props.history.push(`/organisation/listOrganisation/` + i18n.t(response.data.messageCode, { entityname }))
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode
-                                                })
-                                            }
-                                        })
+                                    // console.log("-------------------->" + this.state.organisation.organisationCode);
+                                    if (this.state.organisation.organisationCode != '') {
+                                        OrganisationService.addOrganisation(this.state.organisation)
+                                            .then(response => {
+                                                if (response.status == 200) {
+                                                    this.props.history.push(`/organisation/listOrganisation/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                } else {
+                                                    this.setState({
+                                                        message: response.data.messageCode
+                                                    })
+                                                }
+                                            })
+                                    }
+
 
                                 }}
 
@@ -354,7 +357,7 @@ export default class AddOrganisationComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/organisation/listOrganisation/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/organisation/listOrganisation/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         let { organisation } = this.state

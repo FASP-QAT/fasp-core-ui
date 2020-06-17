@@ -93,11 +93,13 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    var budgetId = budget.budgetId
-    this.props.history.push({
-      pathname: `/budget/editBudget/${budgetId}`,
-      // state: { budget }
-    });
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+      var budgetId = budget.budgetId
+      this.props.history.push({
+        pathname: `/budget/editBudget/${budgetId}`,
+        // state: { budget }
+      });
+    }
   }
 
   addBudget(budget) {
@@ -203,7 +205,7 @@ class ListBudgetComponent extends Component {
     // rowIdx is index of row
     // console.log('in rowClassNameFormat')
     // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
-    return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedAmt) <= 0 ? 'background-red' : '';
+    return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedUsdAmt) <= 0 ? 'background-red' : '';
   }
   formatLabel(cell, row) {
     // console.log("celll----", cell);
@@ -258,6 +260,14 @@ class ListBudgetComponent extends Component {
         formatter: this.formatLabel
       },
       {
+        dataField: 'label',
+        text: i18n.t('static.budget.budget'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      },
+      {
         dataField: 'fundingSource.label',
         text: i18n.t('static.budget.fundingsource'),
         sort: true,
@@ -267,13 +277,6 @@ class ListBudgetComponent extends Component {
 
       },
       {
-        dataField: 'notes',
-        text: i18n.t('static.program.notes'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-      },
-      {
         dataField: 'budgetAmt',
         text: i18n.t('static.budget.budgetamount'),
         sort: true,
@@ -281,45 +284,43 @@ class ListBudgetComponent extends Component {
         headerAlign: 'center',
         formatter: this.addCommas
       },
-      // {
-
-      //   dataField: 'usedAmt',
-      //   text: i18n.t('static.budget.availableAmt'),
-      //   sort: true,
-      //   align: 'center',
-      //   headerAlign: 'center',
-      //   formatter: (cell, row) => {
-
-
-      //     var cell1 = row.budgetAmt - row.usedAmt
-      //     var currencyCode = row.currency.currencyCode;
-      //     cell1 += '';
-      //     var x = cell1.split('.');
-      //     var x1 = x[0];
-      //     var x2 = x.length > 1 ? '.' + x[1] : '';
-      //     var rgx = /(\d+)(\d{3})/;
-      //     while (rgx.test(x1)) {
-      //       x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      //     }
-      //     return currencyCode + " " + x1 + x2;
-      //   }
-      // }
       {
-        dataField: 'budgetUsdAmt',
-        text: i18n.t('static.budget.budgetamountUSD'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.addCommas
-      },
-      {
+
         dataField: 'usedUsdAmt',
         text: i18n.t('static.budget.availableAmt'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: this.addCommas
-      },
+        formatter: (cell, row) => {
+          var cell1 = row.budgetAmt - row.usedUsdAmt
+          var currencyCode = row.currency.currencyCode;
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return currencyCode + " " + x1 + x2;
+        }
+      }
+      // {
+      //   dataField: 'budgetUsdAmt',
+      //   text: i18n.t('static.budget.budgetamountUSD'),
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: this.addCommas
+      // },
+      // {
+      //   dataField: 'usedUsdAmt',
+      //   text: i18n.t('static.budget.availableAmt'),
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: this.addCommas
+      // },
 
       ,
       {
@@ -385,10 +386,10 @@ class ListBudgetComponent extends Component {
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <CardHeader className="mb-md-3 pb-lg-1">
-            <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
+            <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong>
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
+              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </CardHeader>
@@ -452,7 +453,7 @@ class ListBudgetComponent extends Component {
                         }
                       }}
                       {...props.baseProps}
-                    /><h5>*Row is in red color indicates there is no money left or budget hits the end date</h5>
+                    /><h5>*Rows in red indicate that Budget has either lapsed or has no money in it</h5>
                   </div>
                 )
               }

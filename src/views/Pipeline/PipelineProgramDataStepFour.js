@@ -167,7 +167,7 @@ export default class PipelineProgramDataStepFour extends Component {
                                         <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)}  >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

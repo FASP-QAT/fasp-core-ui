@@ -239,7 +239,7 @@ class Consumption extends Component {
           align: 'center'
         })
         if (i == 1) {
-          doc.setFontSize(8)
+          doc.setFontSize(9)
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -1090,7 +1090,7 @@ class Consumption extends Component {
                       {
                         this.state.consumptions.length > 0
                         &&
-                        <div className="col-md-12">
+                        <div className="col-md-12 p-0">
                           <div className="col-md-12">
                             <div className="chart-wrapper chart-graph-report">
                               <Bar id="cool-canvas" data={bar} options={options} />
@@ -1098,7 +1098,7 @@ class Consumption extends Component {
                             </div>
                           </div>
                           <div className="col-md-12">
-                            <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                            <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                               {this.state.show ? 'Hide Data' : 'Show Data'}
                             </button>
 
@@ -1112,7 +1112,7 @@ class Consumption extends Component {
                       {
                         this.state.offlineConsumptionList.length > 0
                         &&
-                        <div className="col-md-12">
+                        <div className="col-md-12 p-0">
                           <div className="col-md-12">
                             <div className="chart-wrapper chart-graph-report">
                               <Bar id="cool-canvas" data={bar} options={options} />

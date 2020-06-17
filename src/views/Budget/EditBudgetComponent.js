@@ -254,9 +254,17 @@ class EditBudgetComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    let { budget } = this.state;
+
+                                    var startDate=moment(this.state.budget.startDate).format("YYYY-MM-DD");
+                                    budget.startDate=startDate;
+
+                                    var stopDate=moment(this.state.budget.stopDate).format("YYYY-MM-DD");
+                                    budget.stopDate=stopDate;
+
                                     AuthenticationService.setupAxiosInterceptors();
-                                    console.log("this.state.budget----->", this.state.budget);
-                                    BudgetService.editBudget(this.state.budget)
+                                    console.log("this.state.budget----->",budget);
+                                    BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
                                                 this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -391,7 +399,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="number"
-                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                         />
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
@@ -502,7 +510,7 @@ class EditBudgetComponent extends Component {
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
 
                                                         />
@@ -517,7 +525,7 @@ class EditBudgetComponent extends Component {
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
 
                                                         />

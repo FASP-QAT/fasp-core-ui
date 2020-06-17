@@ -109,7 +109,7 @@ export default class DataSourceTypeListComponent extends Component {
                     selSource: response.data
                 })
             }
-            else{
+            else {
 
                 this.setState({
                     message: response.data.messageCode
@@ -118,7 +118,7 @@ export default class DataSourceTypeListComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-           
+
         })
         // .catch(
         //     error => {
@@ -143,12 +143,13 @@ export default class DataSourceTypeListComponent extends Component {
     }
 
     editDataSourceType(dataSourceType) {
-        console.log(dataSourceType)
-        this.props.history.push({
-            pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
-            // state: { dataSourceType: dataSourceType }
-        });
-
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE')) {
+            console.log(dataSourceType)
+            this.props.history.push({
+                pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
+                // state: { dataSourceType: dataSourceType }
+            });
+        }
     }
 
     addNewDataSourceType() {
@@ -245,7 +246,7 @@ export default class DataSourceTypeListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSourceType}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSourceType}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

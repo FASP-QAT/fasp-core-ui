@@ -58,10 +58,12 @@ export default class LanguageListComponent extends Component {
     }
 
     editLanguage(language) {
-        this.props.history.push({
-            pathname: `/language/editLanguage/${language.languageId}`,
-            // state: { language }
-        });
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+            this.props.history.push({
+                pathname: `/language/editLanguage/${language.languageId}`,
+                // state: { language }
+            });
+        }
     }
 
     addLanguage() {
@@ -185,7 +187,7 @@ export default class LanguageListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>
@@ -220,7 +222,17 @@ export default class LanguageListComponent extends Component {
                             }
                         </ToolkitProvider>
                     </CardBody>
-                </Card>
+                </Card><div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );

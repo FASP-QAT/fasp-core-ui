@@ -495,7 +495,8 @@ class AccessControlComponent extends Component {
                         </CardBody>
                    
                         <CardBody>
-                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                            <div className="table-accesscnl-mt">
+                             <Table responsive className="table-striped table-hover table-bordered text-center ">
 
                                     <thead>
                                         <tr>
@@ -534,6 +535,7 @@ class AccessControlComponent extends Component {
                                     </tbody>
 
                                 </Table>
+                                </div>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>

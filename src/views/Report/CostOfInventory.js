@@ -242,7 +242,7 @@ export default class CostOfInventory extends Component {
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Program</Label>
-                                                <div className="controls SelectGo">
+                                                <div className="controls ">
                                                     <InputGroup>
                                                         <Input
                                                             type="select"
@@ -261,7 +261,7 @@ export default class CostOfInventory extends Component {
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Include Planning Shipments</Label>
-                                                <div className="controls SelectGo">
+                                                <div className="controls ">
                                                     <InputGroup>
                                                         <Input
                                                             type="select"
@@ -280,7 +280,7 @@ export default class CostOfInventory extends Component {
 
                                             <FormGroup className="col-md-3">
                                                 <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                <div className="controls SelectGo">
+                                                <div className="controls ">
                                                     <InputGroup>
                                                         <DatePicker
                                                             id="startDate"
@@ -291,7 +291,7 @@ export default class CostOfInventory extends Component {
                                                             selected={this.state.CostOfInventoryInput.dt}
                                                             onChange={(date) => { this.dataChangeDate(date); this.formSubmit() }}
                                                             // placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control costinventryinput"
                                                             disabledKeyboardNavigation
 
                                                         />

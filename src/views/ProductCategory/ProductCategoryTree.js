@@ -443,7 +443,7 @@ export default class ProductCategoryTree extends Component {
                                 <Col md="3 pl-0" >
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls ">
                                             <InputGroup>
                                                 <Input
                                                     bsSize="sm"
@@ -492,6 +492,7 @@ export default class ProductCategoryTree extends Component {
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='productCategoryForm'>
                                                     <FormGroup>
+                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                         <Row>
                                                             <Col md={4} className="pr-lg-1">
                                                                 <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}</Label>
@@ -509,7 +510,7 @@ export default class ProductCategoryTree extends Component {
                                                             <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
                                                                 <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
                                                             </Col>
-                                                        </Row>
+                                                        </Row>}
                                                     </FormGroup>
                                                 </Form>
                                             )} />
@@ -568,12 +569,13 @@ export default class ProductCategoryTree extends Component {
                                     </div>
                                 </FormGroup>
                             </CardBody>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="reset" size="md" onClick={this.reSetTree} color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                                    <Button type="reset" size="md" onClick={this.reSetTree} color="warning" className="float-right mr-1 text-white"><i className="fa fa-refresh"></i> Reset</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 </ FormGroup>
-                            </CardFooter>
+                            </CardFooter>}
                         </Card>
                     </Col>
                 </Row>

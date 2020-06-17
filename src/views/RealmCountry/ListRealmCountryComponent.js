@@ -81,23 +81,27 @@ class ListRealmCountryComponent extends Component {
     }
     PlanningUnitCountry(event, row) {
         event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
-            state: { realmCountry: row }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT')) {
+            console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
+                state: { realmCountry: row }
 
 
-        })
+            })
+        }
     }
     RealmCountryRegion(event, row) {
         event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
-            state: { realmCountry: row }
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REGION')) {
+            console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
+                state: { realmCountry: row }
 
 
-        })
+            })
+        }
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -246,37 +250,38 @@ class ListRealmCountryComponent extends Component {
         //     headerAlign: 'center',
         //     formatter: this.formatLabel
         // },
-        {
-            dataField: 'airFreightPercentage',
-            text: i18n.t('static.realmcountry.airFreightPercentage'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'seaFreightPercentage',
-            text: i18n.t('static.realmcountry.seaFreightPercentage'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'shippedToArrivedByAirLeadTime',
-            text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'shippedToArrivedBySeaLeadTime',
-            text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'arrivedToDeliveredLeadTime',
-            text: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
+        // {
+        //     dataField: 'airFreightPercentage',
+        //     text: i18n.t('static.realmcountry.airFreightPercentage'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'seaFreightPercentage',
+        //     text: i18n.t('static.realmcountry.seaFreightPercentage'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'shippedToArrivedByAirLeadTime',
+        //     text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'shippedToArrivedBySeaLeadTime',
+        //     text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // }, {
+        //     dataField: 'arrivedToDeliveredLeadTime',
+        //     text: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // },
+         {
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,
@@ -294,7 +299,7 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<div className="forInlinebtnMappinglistRealm">
+                return (<div className="" align="center">
                     <Button className="mapUnitbtn" type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.planningunitupdate')}</Button>
                     <Button className="ml-1 mapRegionbtn" type="button" size="sm" color="success" onClick={(event) => this.RealmCountryRegion(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realmcountry.regionupdate')}</Button>
                 </div>)

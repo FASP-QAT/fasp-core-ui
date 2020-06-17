@@ -8,8 +8,22 @@ class Dashboard extends Component {
 
     this.state = {
     };
+    this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
+  hideFirstComponent() {
+    setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
+    }, 8000);
+}
+
+hideSecondComponent() {
+    setTimeout(function () {
+        document.getElementById('div2').style.display = 'none';
+    }, 8000);
+}
   componentDidMount() {
+    this.hideFirstComponent();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
     }
@@ -21,8 +35,9 @@ class Dashboard extends Component {
     return (
       <div className="animated fadeIn">
         {this.props.message}
-        <h5>{i18n.t(this.props.match.params.message)}</h5>
-        <h5>{i18n.t(this.state.message)}</h5>
+        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+        
       </div>
     );
   }

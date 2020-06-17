@@ -1033,7 +1033,7 @@ export default class PipelineProgramShipment extends Component {
                     <div id="shipmenttableDiv">
                     </div>
                     <div>
-                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                         &nbsp;
                                        {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>Save<i className="fa fa-angle-double-right"></i></Button>}
                         {this.state.isValidData && !this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitProgram}>Submit Program</Button>}
