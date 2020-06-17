@@ -363,7 +363,7 @@ class SupplyPlanVersionAndReview extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFontSize(8)
+                    doc.setFontSize(9)
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })

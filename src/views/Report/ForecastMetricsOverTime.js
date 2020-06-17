@@ -212,7 +212,7 @@ class ForcastMatrixOverTime extends Component {
       const pageCount = doc.internal.getNumberOfPages()
     
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(8)
+      doc.setFontSize(10)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
       
@@ -243,7 +243,7 @@ class ForcastMatrixOverTime extends Component {
           align: 'center'
         })
         if(i==1){
-          doc.setFontSize(8)
+          doc.setFontSize(9)
           doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -688,7 +688,7 @@ class ForcastMatrixOverTime extends Component {
                     {
                         this.state.matricsList.length > 0
                         &&
-                        <div className="col-md-12">
+                        <div className="col-md-12 p-0">
                           <div className="col-md-12">
                         <div   className="chart-wrapper chart-graph-report">
                           <Bar id="cool-canvas" data={bar} options={options} />

@@ -345,12 +345,14 @@ export default class SupplyPlanComponent extends React.Component {
 
         let bar = {}
         if (this.state.jsonArrForGraph.length > 0)
+        console.log(this.state.jsonArrForGraph)
             bar = {
 
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                 datasets: [
                     {
                         label: 'Planned',
+                        stack: 1,
                         backgroundColor: '#000050',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -360,6 +362,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                     }, {
                         label: 'Shipped',
+                        stack: 1,
                         backgroundColor: '#5A5AAA',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -370,6 +373,7 @@ export default class SupplyPlanComponent extends React.Component {
                     },
                      {
                         label: 'Delivered',
+                        stack: 1,
                         backgroundColor: '#AAAAFA',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -379,6 +383,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                     }, {
                         label: 'Ordered',
+                        stack: 1,
                         backgroundColor: '#52CAFF',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -388,6 +393,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.approved)),
                     }, {
                         label: "Stock",
+                        stack: 2,
                         type: 'line',
                         borderColor: 'rgba(179,181,158,1)',
                         borderStyle: 'dotted',
@@ -402,6 +408,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }, {
                         label: "Consumption",
                         type: 'line',
+                        stack: 3,
                         backgroundColor: 'transparent',
                         borderColor: 'rgba(255.102.102.1)',
                         borderStyle: 'dotted',
@@ -627,10 +634,15 @@ export default class SupplyPlanComponent extends React.Component {
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                            <ul className="legend legend-supplypln">
+                            {/* <ul className="legend legend-supplypln">
                                 <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                                 <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
-                            </ul>
+                            </ul> */}
+                            <ul class="legendcommitversion">
+                          <li><span class="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
+                          <li><span class=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                          
+                        </ul>
                         </ModalHeader>
                         <ModalBody>
                             <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
@@ -5334,7 +5346,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="9 pl-0">
+                                            <Col md="12 pl-0">
                                                 <div className="d-md-flex">
                                                     <FormGroup className="tab-ml-1">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -5370,11 +5382,17 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <ul className="legend legendsync mt-0" >
+                                                    <ul class="legendcommitversion">
+                          <li><span class="skipedShipmentslegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.skippedShipments')}</span></li>
+                          <li><span class=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                          <li><span class="skipedShipmentsEmegencylegend legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.supplyPlan.skippedEmergencyShipments')} </span></li>
+                          
+                        </ul>
+                                                    {/* <ul className="legend legendsync mt-0" >
                                                         <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  {i18n.t('static.supplyPlan.skippedShipments')}</span></li>
                                                         <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.emergencyShipments')}</span></li>
                                                         <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.skippedEmergencyShipments')}</span></li>
-                                                    </ul>
+                                                    </ul> */}
                                                 </div>
                                             </Col>
                                         </Form>

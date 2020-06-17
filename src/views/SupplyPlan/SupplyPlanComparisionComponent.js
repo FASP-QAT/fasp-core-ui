@@ -331,7 +331,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + "~v" + myResult[i].version,
+                            name: getLabelText(programNameLabel, this.state.lang) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -2797,6 +2797,7 @@ export default class SupplyPlanComponent extends React.Component {
                 datasets: [
                     {
                         label: 'Planned',
+                        stack: 1,
                         backgroundColor: '#000050',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -2806,6 +2807,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                     }, {
                         label: 'Shipped',
+                        stack: 1,
                         backgroundColor: '#5A5AAA',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -2816,6 +2818,7 @@ export default class SupplyPlanComponent extends React.Component {
                     },
                      {
                         label: 'Delivered',
+                        stack: 1,
                         backgroundColor: '#AAAAFA',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -2825,6 +2828,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                     }, {
                         label: 'Ordered',
+                        stack: 1,
                         backgroundColor: '#52CAFF',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -2834,6 +2838,7 @@ export default class SupplyPlanComponent extends React.Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.approved)),
                     }, {
                         label: "Stock",
+                        stack: 2,
                         type: 'line',
                         borderColor: 'rgba(179,181,158,1)',
                         borderStyle: 'dotted',
@@ -2844,10 +2849,11 @@ export default class SupplyPlanComponent extends React.Component {
                         lineTension: 0,
                         pointStyle: 'line',
                         showInLegend: true,
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                        data:this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
                         label: "Consumption",
                         type: 'line',
+                        stack: 3,
                         backgroundColor: 'transparent',
                         borderColor: 'rgba(255.102.102.1)',
                         borderStyle: 'dotted',
@@ -2860,7 +2866,7 @@ export default class SupplyPlanComponent extends React.Component {
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     }
-                ]
+               ]
 
             };
 
@@ -3072,9 +3078,10 @@ export default class SupplyPlanComponent extends React.Component {
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                        <ul className="legend legend-supplypln">
-                            <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
-                            <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
+                        <ul class="legendcommitversion">
+                          <li><span class="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
+                          <li><span class=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                          
                         </ul>
                     </ModalHeader>
                     <ModalBody>
