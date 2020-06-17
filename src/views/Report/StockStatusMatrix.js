@@ -25,6 +25,7 @@ import "jspdf-autotable";
 import { Online, Offline } from "react-detect-offline";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -48,6 +49,8 @@ export default class StockStatusMatrix extends React.Component {
       years: [],
       pulst: [],
       message: '',
+      planningUnitValues: [],
+      planningUnitLabels: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -86,6 +89,42 @@ export default class StockStatusMatrix extends React.Component {
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
+  getversion=()=>{
+    let programId = document.getElementById("programId").value;
+    if (programId != 0 ) {
+         const program = this.state.programs.filter(c => c.programId == programId)
+        if(program.length==1){
+         return   program[0].currentVersion.versionId
+       
+    }else{
+        return -1
+    }}
+
+  }
+
+  handlePlanningUnitChange=(planningUnitIds)=> {
+
+
+    var planningUnitIdArray = [];
+    var planningUnitLabel = [];
+    planningUnitIdArray = planningUnitIds.map(ele => ele.value)
+    planningUnitLabel = planningUnitIds.map(ele => ele.label)
+    /* for (var i = 0; i < planningUnitIds.length; i++) {
+       planningUnitIdArray[i] = planningUnitIds[i].value;
+       planningUnitLabel[i] = planningUnitIds[i].label
+ 
+     }*/
+
+    this.setState({
+        planningUnitValues: planningUnitIds.map(ele => ele.value),
+        planningUnitLabels: planningUnitIds.map(ele => ele.label)
+    }, () => {
+
+        this.filterData()
+    })
+
+
+}
 
   filterData() {
     console.log('In filter data---' + this.state.rangeValue.from.year)
@@ -93,14 +132,24 @@ export default class StockStatusMatrix extends React.Component {
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
     let programId = document.getElementById("programId").value;
     let productCategoryId = document.getElementById("productCategoryId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
+    let planningUnitId =  this.state.planningUnitValues;
     let view = document.getElementById("view").value;
-    if(productCategoryId>0 && planningUnitId>0&&programId>0){
+    let versionId=this.getversion();
+    if(productCategoryId>=0 && planningUnitId.length>0&&programId>0){
+      var inputjson={
+        "programId":programId,
+        "versionId":versionId,
+        "startDate":startDate,
+        "stopDate":endDate,
+        "planningUnitIds":planningUnitId,
+        "includePlannedShipments":1,
+        "view":view
+      }
     
     if (navigator.onLine) {
       let realmId = AuthenticationService.getRealmId();
       AuthenticationService.setupAxiosInterceptors();
-      ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId, view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
+      ProductService.getStockStatusMatrixData(inputjson)
         .then(response => {
           console.log("data---", response.data)
           if (view == 1) {
@@ -110,15 +159,15 @@ export default class StockStatusMatrix extends React.Component {
             })
           } else {
 
-            let years = [...new Set(response.data.map(ele => (ele.YEAR)))]
-            let pulst = [...new Set(response.data.map(ele => (ele.PLANNING_UNIT_LABEL_EN)))]
+            let years = [...new Set(response.data.map(ele => (ele.YR)))]
+            let pulst = [...new Set(response.data.map(ele => (ele.LABEL_EN)))]
             let consumptiondata = [];
             console.log(years + " " + pulst)
             for (var j = 0; j < pulst.length; j++) {
 
               let data = [];
               for (var i = 0; i < years.length; i++) {
-                let d1 = response.data.filter(c => years[i] == c.YEAR && pulst[j] == c.PLANNING_UNIT_LABEL_EN).map(ele => ([ele.Q1, ele.Q2, ele.Q3, ele.Q4]))
+                let d1 = response.data.filter(c => years[i] == c.YR && pulst[j] == c.LABEL_EN).map(ele => ([ele.Q1, ele.Q2, ele.Q3, ele.Q4]))
                 var d2 = [];
                 for (var k = 0; k < d1.length; k++)
                   d2 = [...d2, ...d1[k]]
@@ -366,7 +415,7 @@ export default class StockStatusMatrix extends React.Component {
             for (var j = 0; j < pulst.length; j++) {
               let data = [];
               for (var i = 0; i < years.length; i++) {
-                let d1 = finalOfflineInventory.filter(c => years[i] == c.YEAR && pulst[j] == c.PLANNING_UNIT_LABEL_EN).map(ele => ([ele.Q1, ele.Q2, ele.Q3, ele.Q4]))
+                let d1 = finalOfflineInventory.filter(c => years[i] == c.YEAR && pulst[j] == c.ABEL_EN).map(ele => ([ele.Q1, ele.Q2, ele.Q3, ele.Q4]))
                 var d2 = [];
                 for (var k = 0; k < d1.length; k++)
                   d2 = [...d2, ...d1[k]]
@@ -702,8 +751,10 @@ export default class StockStatusMatrix extends React.Component {
     csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.productcategory.productcategory').replaceAll(' ', '%20') + '  :  ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + '  :  ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push('')
+    this.state.planningUnitLabels.map(ele =>
+      csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+  csvRow.push('')
+   csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
@@ -734,7 +785,7 @@ export default class StockStatusMatrix extends React.Component {
     }
     if (navigator.onLine) {
       if (this.state.view == 1) {
-        this.state.data.map(ele => A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+        this.state.data.map(ele => A.push([(ele.LABEL_EN.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.YR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
           , ele.Dec]));
       } else {
         this.state.data.map(ele => A.push([ele.map(item => ((item.toString()).replaceAll(',', ' ')).replaceAll(' ', '%20'))]));
@@ -813,7 +864,8 @@ export default class StockStatusMatrix extends React.Component {
           align: 'center'
         })
         if (i == 1) {
-          doc.setFontSize(12)
+          doc.setFontSize(8)
+          doc.setFont('helvetica', 'normal')
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -823,9 +875,9 @@ export default class StockStatusMatrix extends React.Component {
           doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-            align: 'left'
-          })
+         var  planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
+
+                    doc.text(doc.internal.pageSize.width / 8, 150, planningText)
         }
 
       }
@@ -869,8 +921,8 @@ export default class StockStatusMatrix extends React.Component {
       data = this.state.data.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
     }
     else if (navigator.onLine && this.state.view == 1) {
-      data = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
-        , ele.Dec]);
+      data = this.state.data.map(ele => [ele.LABEL_EN, ele.YR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+      .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
 
     } else {
       data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
@@ -880,25 +932,13 @@ export default class StockStatusMatrix extends React.Component {
     // console.log(data1);
     let content = {
       margin: { top: 40 },
-      startY: 180,
+      startY: 200,
       head: header,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8 },
+      styles: { lineWidth: 1, fontSize: 8,cellWidth: 40 },
       columnStyles: {
         0: { cellWidth: 120 },
-        1: { cellWidth: 15 },
-        2: { cellWidth: 15 },
-        3: { cellWidth: 15 },
-        4: { cellWidth: 15 },
-        5: { cellWidth: 15 },
-        6: { cellWidth: 15 },
-        7: { cellWidth: 15 },
-        8: { cellWidth: 15 },
-        9: { cellWidth: 15 },
-        10: { cellWidth: 15 },
-        11: { cellWidth: 15 },
-        12: { cellWidth: 15 },
-        13: { cellWidth: 15 },
+       
 
         1: { halign: 'right' },
         2: { halign: 'right' },
@@ -946,11 +986,8 @@ export default class StockStatusMatrix extends React.Component {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
-        return (
-          <option key={i} value={item.planningUnit.id}>
-            {getLabelText(item.planningUnit.label, this.state.lang)}
-          </option>
-        )
+        return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
       }, this);
     const { productCategories } = this.state;
     let productCategoryList = productCategories.length > 0
@@ -1003,14 +1040,14 @@ export default class StockStatusMatrix extends React.Component {
       }, this);
     let columns = [
       {
-        dataField: 'PLANNING_UNIT_LABEL_EN',
+        dataField: 'LABEL_EN',
         text: i18n.t('static.planningunit.planningunit'),
         sort: true,
         align: 'left',
         headerAlign: 'left',
         width: '180'
       }, {
-        dataField: 'YEAR',
+        dataField: 'YR',
         text: i18n.t('static.common.year'),
         sort: true,
         align: 'center',
@@ -1437,7 +1474,7 @@ export default class StockStatusMatrix extends React.Component {
                           bsSize="sm"
                           onChange={(e) => { this.getPlanningUnit(e); this.filterData(e) }}
                         >
-                          <option value="-1">{i18n.t('static.common.select')}</option>
+                          <option value="0">{i18n.t('static.common.all')}</option>
                           {productCategoryList}
                         </Input>
 
@@ -1532,25 +1569,16 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
                 <Online>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                    <div className="controls">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
-                          onChange={this.filterData}>
-
-                          <option value="0">{i18n.t('static.common.select')}</option>
-                          {planningUnitList}
-                        </Input>
-
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                </Online>
+                <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <div className="controls">
+                                                <InputGroup>   <ReactMultiSelectCheckboxes
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="md"
+                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                /> </InputGroup>    </div></FormGroup> </Online>
               </div>
             </Col>
             {/* ---------------{this.state.offlineInventoryList} */}
@@ -1621,12 +1649,12 @@ export default class StockStatusMatrix extends React.Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                
                     {this.state.data.map(ele => {
-                      return (ele.map((item, index) => { return (index == 0 ? <td style={{ "text-align": "left" }}>{item}</td> : <td style={{ "text-align": "right" }}>{formatter(item)}</td>) }
-                      ))
+                      return (<tr> {ele.map((item, index) => { return (index == 0 ? <td style={{ "text-align": "left" }}>{item}</td> : <td style={{ "text-align": "right" }}>{formatter(item)}</td>) }
+                      )}</tr>)
                     })}
-                  </tr>
+                 
                 </tbody>
               </Table>
             }
