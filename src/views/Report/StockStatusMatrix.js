@@ -876,7 +876,7 @@ export default class StockStatusMatrix extends React.Component {
           doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-         var  planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
+         var  planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
                     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
         }

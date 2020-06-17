@@ -252,12 +252,6 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLIER') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.region'),
-                            url: '/region/listRegion',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
-                          },
-                          {
                             name: i18n.t('static.healtharea.healtharea'),
                             url: '/healthArea/listHealthArea',
                             icon: 'fa fa-medkit',
@@ -433,6 +427,12 @@ class DefaultLayout extends Component {
                             url: '/supplyPlan',
                             icon: 'fa fa-calculator',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.regionreport'),
+                            url: '/region/listRegion',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.productcatalog'),
