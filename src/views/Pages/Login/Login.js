@@ -141,7 +141,7 @@ class Login extends Component {
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
     console.log("htnl content....... ", htmlContent);
-    if (htmlContent.includes('Cancelled') || htmlContent.includes('Logged')  ||  htmlContent.includes('cancelled')  )  {
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled')  )  {
       logoutMessage.style.color = 'red';
     }
     else if (htmlContent.includes('Access Denied')) {
