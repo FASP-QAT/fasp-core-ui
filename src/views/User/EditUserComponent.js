@@ -23,10 +23,10 @@ const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
         username: Yup.string()
-            .min(6, i18n.t('static.user.valid6char'))
-            .max(30, i18n.t('static.user.validpasswordlength'))
-            .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
-            .matches(/^\S*$/, i18n.t('static.user.nospace'))
+            // .min(6, i18n.t('static.user.valid6char'))
+            // .max(30, i18n.t('static.user.validpasswordlength'))
+            // .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
+            // .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
