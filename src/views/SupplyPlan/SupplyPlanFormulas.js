@@ -29,7 +29,7 @@ class SupplyPlanFormulas extends Component {
             <h5></h5>
             <Card>
               <CardHeader>
-                <i className="fa fa-align-justify"></i><strong>Supply Plan Formulas</strong>
+                <i className="fa fa-align-justify"></i><strong>Supply Plan Formulae</strong>
               </CardHeader>
               <CardBody>
                 <ListGroup>
@@ -64,7 +64,7 @@ Ending balance = 22,642</p><br></br>
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">AMC (Average Monthly Consumption)</ListGroupItemHeading>
+                    <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
                     <p><span className="formulastext-p">Example :</span><br></br>
