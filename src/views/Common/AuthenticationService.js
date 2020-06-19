@@ -934,7 +934,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/costOfInventory":
-                    if (bfunction.includes("ROLE_BF_REPORT_COST_OF_INVERTORY")) {
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
                     break;
@@ -944,6 +944,8 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/supplyPlanVersionAndReview":
+                        case "/report/editStatus/:programId/:versionId":
+                                case "/report/supplyPlanVersionAndReview/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
                         return true;
                     }

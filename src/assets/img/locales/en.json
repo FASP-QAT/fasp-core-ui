@@ -580,7 +580,7 @@
     "static.common.quarter2": "Quarter 2",
     "static.common.quarter3": "Quarter 3",
     "static.common.quarter4": "Quarter 4",
-    "static.common.display": "Display",
+    "static.common.display": "Report View",
     "static.common.monthly": "Monthly",
     "static.common.quarterly": "Quarterly",
     "static.footer": "Quantification Analytics Tool",
@@ -796,7 +796,7 @@
     "static.report.consupmtionqty": "Consumption Quantity",
     "static.report.amc": "AMC",
     "static.report.mos": "MOS",
-    "static.report.comment": "Comments",
+    "static.report.comment": " Version Comments",
     "static.report.mospast": "MOS Past(In Months)",
     "static.report.mosfuture": "MOS Future(In Months)",
     "static.program.validstatus": "Please select Status",
@@ -830,5 +830,8 @@
     "static.masterDataSync.masterDataSyncFailed": "Master data sync failed.",
     "static.message.duplicateOrg": "Duplicate organisation code",
     "static.message.updateFailedAcl": "Failed to update",
-    "static.message.allAclAccess": "Either provide All access or specific access."
+    "static.message.allAclAccess": "Either provide All access or specific access.",
+    "static.program.isincludeplannedshipment":"Include Planning Shipments",
+    "static.program.validversion": "Please select Version",
+    "static.dashboard.regionreport":"Region Report"
 }

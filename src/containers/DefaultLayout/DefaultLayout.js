@@ -252,12 +252,6 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLIER') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.region'),
-                            url: '/region/listRegion',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
-                          },
-                          {
                             name: i18n.t('static.healtharea.healtharea'),
                             url: '/healthArea/listHealthArea',
                             icon: 'fa fa-medkit',
@@ -435,6 +429,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
+                            name: i18n.t('static.dashboard.regionreport'),
+                            url: '/region/listRegion',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
                             icon: 'fa fa-th',
@@ -483,7 +483,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.costOfInventory'),
                             url: '/report/costOfInventory',
                             icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT_COST_OF_INVERTORY') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.inventoryTurns'),

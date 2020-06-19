@@ -640,7 +640,7 @@ class EditSupplyPlanStatus extends Component {
 
     }
     cancelClicked = () => {
-        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/report/supplyPlanVersionAndReview/`+ i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked = () => {
         AuthenticationService.setupAxiosInterceptors();
