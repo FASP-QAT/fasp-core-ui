@@ -1515,6 +1515,7 @@ export default class StockStatusMatrix extends React.Component {
                     </div>
                   </FormGroup>
                 </Offline>
+          
                 <Offline>
                   <FormGroup className="col-md-3">
                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
@@ -1573,13 +1574,19 @@ export default class StockStatusMatrix extends React.Component {
                 <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <div className="controls">
-                                                <InputGroup>   <ReactMultiSelectCheckboxes
+                                                <InputGroup>  
+                                                 <ReactMultiSelectCheckboxes
                                                     name="planningUnitId"
                                                     id="planningUnitId"
-                                                    bsSize="md"
+                                                    bsSize="sm"
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                /> </InputGroup>    </div></FormGroup> </Online>
+                                                />
+                                                 </InputGroup>   
+                                                 </div>
+                                                </FormGroup>
+                                                 </Online>
+               
               </div>
             </Col>
             {/* ---------------{this.state.offlineInventoryList} */}

@@ -491,7 +491,7 @@ class StockStatus extends Component {
         
             <Card>
               <CardHeader>
-              <i className="icon-menu"></i><strong>StockStatus Report</strong>
+              <i className="icon-menu"></i><strong>Stock Status Report</strong>
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <Pdf targetRef={ref} filename="StockStatus.pdf">
