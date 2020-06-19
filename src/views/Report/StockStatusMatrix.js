@@ -1539,7 +1539,9 @@ export default class StockStatusMatrix extends React.Component {
                         check htmlFor="inline-active2">
                         {i18n.t('static.productcategory.productcategory')}
                       </Label>
-                    </FormGroup></div>
+                    </FormGroup>
+                    
+                    </div>
                 </FormGroup>
                 <FormGroup className="col-md-3">
                 <div className="controls ">
