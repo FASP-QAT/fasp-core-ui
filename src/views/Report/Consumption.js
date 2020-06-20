@@ -1,3 +1,4 @@
+// my report 
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
@@ -64,12 +65,12 @@ const brandDanger = getStyle('--danger')
 const options = {
   title: {
     display: true,
-    text: i18n.t('static.dashboard.consumption'),
+    // text: i18n.t('static.dashboard.consumption'),
     fontColor: 'black'
   },
- 
+
   scales: {
-   
+
     yAxes: [{
       scaleLabel: {
         display: true,
@@ -85,7 +86,7 @@ const options = {
       ticks: {
         fontColor: 'black'
       }
-  }]
+    }]
   },
 
   tooltips: {
@@ -190,7 +191,7 @@ class Consumption extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
@@ -243,7 +244,7 @@ class Consumption extends Component {
     const addHeaders = doc => {
 
       const pageCount = doc.internal.getNumberOfPages()
-     
+
 
       // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
       // var reader = new FileReader();
@@ -292,7 +293,7 @@ class Consumption extends Component {
 
     doc.setFontSize(8);
 
-   // const title = "Consumption Report";
+    // const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
     //creates image
 
@@ -302,19 +303,19 @@ class Consumption extends Component {
     var h1 = 100;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 220,750,260,'CANVAS');
+    doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
     i18n.t('static.report.actualConsumption')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date,this.formatter( elt.forcast),this.formatter( elt.Actual)]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
 
     let content = {
       margin: { top: 80 },
       startY: height,
       head: headers,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, halign : 'center' }
+      styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
 
@@ -340,128 +341,129 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-    if(productCategoryId>=0 && planningUnitId>0&&programId>0){
-    
-    if (navigator.onLine) {
-      let realmId = AuthenticationService.getRealmId();
-      AuthenticationService.setupAxiosInterceptors();
-      ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
-        .then(response => {
-          console.log(JSON.stringify(response.data));
-          this.setState({
-            consumptions: response.data,
-            message:''
-          })
-        }).catch(
-          error => {
-            this.setState({
-              consumptions: []
-            })
+    if (productCategoryId >= 0 && planningUnitId > 0 && programId > 0) {
 
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
+      if (navigator.onLine) {
+        let realmId = AuthenticationService.getRealmId();
+        AuthenticationService.setupAxiosInterceptors();
+        ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+          .then(response => {
+            console.log(JSON.stringify(response.data));
+            this.setState({
+              consumptions: response.data,
+              message: ''
+            })
+          }).catch(
+            error => {
+              this.setState({
+                consumptions: []
+              })
+
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
               }
             }
-          }
-        );
-    } else {
-      // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
+          );
+      } else {
+        // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
 
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var programRequest = programTransaction.get(programId);
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var programRequest = programTransaction.get(programId);
 
-        programRequest.onsuccess = function (event) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          var offlineConsumptionList = (programJson.consumptionList);
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            var offlineConsumptionList = (programJson.consumptionList);
 
-          const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
+            const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
 
-          const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-          const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
+            const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+            const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
 
-          // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-          const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
+            // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+            const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
-          const sorted = dateFilter.sort((a, b) => {
-            var dateA = new Date(a.consumptionDate).getTime();
-            var dateB = new Date(b.consumptionDate).getTime();
-            return dateA > dateB ? 1 : -1;
-          });
-          let previousDate = "";
-          let finalOfflineConsumption = [];
-          var json;
+            const sorted = dateFilter.sort((a, b) => {
+              var dateA = new Date(a.consumptionDate).getTime();
+              var dateB = new Date(b.consumptionDate).getTime();
+              return dateA > dateB ? 1 : -1;
+            });
+            let previousDate = "";
+            let finalOfflineConsumption = [];
+            var json;
 
-          for (let i = 0; i <= sorted.length; i++) {
-            let forcast = 0;
-            let actual = 0;
-            if (sorted[i] != null && sorted[i] != "") {
-              previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
-              for (let j = 0; j <= sorted.length; j++) {
-                if (sorted[j] != null && sorted[j] != "") {
-                  if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
-                    if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
-                      forcast = forcast + parseFloat(sorted[j].consumptionQty);
-                    }
-                    if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
-                      actual = actual + parseFloat(sorted[j].consumptionQty);
+            for (let i = 0; i <= sorted.length; i++) {
+              let forcast = 0;
+              let actual = 0;
+              if (sorted[i] != null && sorted[i] != "") {
+                previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+                for (let j = 0; j <= sorted.length; j++) {
+                  if (sorted[j] != null && sorted[j] != "") {
+                    if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+                      if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
+                        forcast = forcast + parseFloat(sorted[j].consumptionQty);
+                      }
+                      if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
+                        actual = actual + parseFloat(sorted[j].consumptionQty);
+                      }
                     }
                   }
                 }
+
+                let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+                json = {
+                  consumption_date: date,
+                  Actual: actual,
+                  forcast: forcast
+                }
+
+                if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+                  finalOfflineConsumption.push(json);
+                }
+
+                // console.log("finalOfflineConsumption---", finalOfflineConsumption);
+
               }
-
-              let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
-              json = {
-                consumption_date: date,
-                Actual: actual,
-                forcast: forcast
-              }
-
-              if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
-                finalOfflineConsumption.push(json);
-              }
-
-              // console.log("finalOfflineConsumption---", finalOfflineConsumption);
-
             }
-          }
-          console.log("final consumption---", finalOfflineConsumption);
-          this.setState({
-            offlineConsumptionList: finalOfflineConsumption
-          });
+            console.log("final consumption---", finalOfflineConsumption);
+            this.setState({
+              offlineConsumptionList: finalOfflineConsumption
+            });
+
+          }.bind(this)
 
         }.bind(this)
+        // }
+      }
+    } else if (programId == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-      }.bind(this)
-      // }
-    }}else   if(programId==0){
-      this.setState({ message: i18n.t('static.common.selectProgram') ,consumptions:[]});
-              
-    }else if(productCategoryId==-1){
-      this.setState({ message: i18n.t('static.common.selectProductCategory'),consumptions:[] });
-  
-    }else{
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'),consumptions:[] });
- 
+    } else if (productCategoryId == -1) {
+      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
+
+    } else {
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+
     }
   }
 
@@ -550,7 +552,7 @@ class Consumption extends Component {
         console.log('**' + JSON.stringify(response.data))
         this.setState({
           planningUnits: response.data,
-        },() => {
+        }, () => {
           this.filterData();
         })
       })
@@ -625,7 +627,7 @@ class Consumption extends Component {
           console.log(JSON.stringify(response.data))
           this.setState({
             productCategories: response.data
-          },() => {
+          }, () => {
             this.filterData();
           })
         }).catch(
@@ -767,7 +769,7 @@ class Consumption extends Component {
     //
   }
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value },() => {
+    this.setState({ rangeValue: value }, () => {
       this.filterData();
     })
 
@@ -794,8 +796,9 @@ class Consumption extends Component {
 
         labels: this.state.consumptions.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
         datasets: [
-           {
+          {
             type: "line",
+            linetension: 0,
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: '#000',
@@ -806,9 +809,10 @@ class Consumption extends Component {
             },
             showInLegend: true,
             pointStyle: 'line',
+            pointBorderWidth: 5,
             yValueFormatString: "$#,##0",
             data: this.state.consumptions.map((item, index) => (item.forcast))
-          },{
+          }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
             borderColor: 'rgba(179,181,198,1)',
@@ -840,6 +844,7 @@ class Consumption extends Component {
             data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
           }, {
             type: "line",
+            linetension: 0,
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
@@ -1075,8 +1080,8 @@ class Consumption extends Component {
                                   }, this)}
                               </Input>
                               {/* <InputGroupAddon addonType="append">
-                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                         </InputGroupAddon> */}
+ <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+ </InputGroupAddon> */}
                             </InputGroup>
                           </div>
                         </FormGroup>
@@ -1102,8 +1107,8 @@ class Consumption extends Component {
                                   }, this)}
                               </Input>
                               {/* <InputGroupAddon addonType="append">
-                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                      </InputGroupAddon> */}
+ <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+ </InputGroupAddon> */}
                             </InputGroup>
                           </div>
                         </FormGroup>
@@ -1120,9 +1125,11 @@ class Consumption extends Component {
                         &&
                         <div className="col-md-12 p-0">
                           <div className="col-md-12">
-                            <div className="chart-wrapper chart-graph-report">
+                            <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
                               <Bar id="cool-canvas" data={bar} options={options} />
+                              <div>
 
+                              </div>
                             </div>
                           </div>
                           <div className="col-md-12">
@@ -1131,10 +1138,10 @@ class Consumption extends Component {
                             </button>
 
                           </div>
-                          </div>}
-                       
-                    
-                      
+                        </div>}
+
+
+
                     </Online>
                     <Offline>
                       {
@@ -1153,76 +1160,134 @@ class Consumption extends Component {
                             </button>
                           </div>
                         </div>}
-                      
+
                     </Offline>
                   </div>
-                
-              
-             
-                <div className="row">
-                <div className="col-md-12">
-                  {this.state.show && 
-                  <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                    <thead>
-                      <tr>
-                        <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
-                        <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
-                        <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
-                      </tr>
-                    </thead>
-                    <Online>
-                      <tbody>
-                        {
-                          this.state.consumptions.length > 0
-                          &&
-                          this.state.consumptions.map((item, idx) =>
 
-                            <tr id="addr0" key={idx} >
-                              {/* <td>
-                                {this.state.consumptions[idx].consumption_date}
-                               </td> */}
-                              <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
-                              <td>
 
-                                {this.formatter(this.state.consumptions[idx].forcast)}
-                              </td>
-                              <td>
-                                {this.formatter(this.state.consumptions[idx].Actual)}
-                              </td></tr>)
+                  <div className="row">
+                    <div className="col-md-12 pl-0 pr-0">
+                      {this.state.show &&
+                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                        }
-                      </tbody>
-                    </Online>
-                    <Offline>
-                      <tbody>
-                        {
-                          this.state.offlineConsumptionList.length > 0
-                          &&
-                          this.state.offlineConsumptionList.map((item, idx) =>
+                          {/* <thead>
+ <tr>
+ <th style={{ width: '140px' }}></th>
+ <td>Oct 2019</td>
+ <td>Nov 2019</td>
+ <td>Dec 2019</td>
+ <td>Jan 2020</td>
+ <td>Feb 2020</td>
+ <td>Mar 2020</td>
+ </tr>
+ </thead>
 
-                            <tr id="addr0" key={idx} >
-                              {/* <td>
-                               {this.state.offlineConsumptionList[idx].consumption_date}
-                              </td> */}
-                              <td>{moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
-                              <td>
+ <tbody>
+ <tr>
+ <th>Forecasted</th>
+ <td>71</td>
+ <td>56</td>
+ <td>70</td>
+ <td>40</td>
+ <td>70</td>
+ <td>40</td>
+ </tr>
+ <tr>
+ <th>Actual</th>
+ <td>71</td>
+ <td>56</td>
+ <td>44</td>
+ <td>40</td>
+ <td>70</td>
+ <td>40</td>
+ </tr>
+ </tbody> */}
 
-                                {this.state.offlineConsumptionList[idx].forcast}
-                              </td>
-                              <td>
-                                {this.state.offlineConsumptionList[idx].Actual}
-                              </td>
-                            </tr>)
+                          {/* <style>{`
+ tr {
+ display: inline-flex;
+ flex-direction: column;
+ }
+ `}</style> */}
+                          {/* <style>{`
+ tr { display: block; float: left; }
+ th, td { display: block; }
+ `}</style> */}
 
-                        }
-                      </tbody>
-                    </Offline>
-                  </Table>}
+
+                          <thead>
+                            <tr>
+                              <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
+                              <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
+                              <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {
+                              this.state.consumptions.length > 0
+                              &&
+                              this.state.consumptions.map((item, idx) =>
+
+                                <tr id="addr0" key={idx} >
+                                  {/* <td>
+ {this.state.consumptions[idx].consumption_date}
+ </td> */}
+                                  <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
+                                  <td>
+
+                                    {this.formatter(this.state.consumptions[idx].forcast)}
+                                  </td>
+                                  <td>
+                                    {this.formatter(this.state.consumptions[idx].Actual)}
+                                  </td></tr>)
+
+                            }
+                          </tbody>
+
+
+
+
+
+
+
+
+
+
+                          {/* {
+ this.state.consumptions.length > 0
+ &&
+ this.state.consumptions.map((item, idx) =>
+ 
+ <tr id="addr0" key={idx} >
+ <th style={{ width: '140px' }}></th>
+ <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
+ </tr>
+
+ <tr id="addr0" key={idx} >
+ <th>Forecasted</th>
+ <td>{this.formatter(this.state.consumptions[idx].forcast)}</td>
+ </tr>
+
+ <tr id="addr0" key={idx} >
+ <th>Actual</th>
+ <td> {this.formatter(this.state.consumptions[idx].Actual)}</td>
+ </tr>
+ 
+ )
+ } */}
+
+
+
+
+
+
+                        </Table>}
+                    </div>
                   </div>
-                </div>
-              
-              </Col>
+
+                </Col>
               </div>
             </div>
           </CardBody>
