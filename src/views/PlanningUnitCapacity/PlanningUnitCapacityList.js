@@ -157,7 +157,7 @@ export default class PlanningUnitCapacityList extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i>{i18n.t('static.dashboard.capacitylist')}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.capacitylist')}</strong>
                         <div className="card-header-actions">
 
                         </div>

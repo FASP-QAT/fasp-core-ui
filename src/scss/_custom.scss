@@ -1921,7 +1921,7 @@ input::placeholder {
 .showdatabtn{
   margin-top:-1%;
 }
-///////Report Consumption globe
+///////Report react mutiselect checkbox Consumption globe
 .css-1r4vtzz {
 padding: 1px 8px 5px 10px !important;
 background-color: #FFF;
@@ -1944,7 +1944,8 @@ white-space: normal;
 text-overflow: ellipsis;
 align-items: stretch!important;
 // width: 238%!important;
-width: 330px!important;
+min-width: 238px;
+width: 0 auto!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1971,7 +1972,8 @@ border-radius: 0.2rem!important;
   display: flex!important;
   // flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 330px!important;
+  min-width: 238px;
+  width: 0 auto!important;
   overflow: hidden;
 word-wrap: normal !important;
 white-space: normal;
@@ -1989,9 +1991,14 @@ text-overflow: ellipsis;
 
   margin: 0px -12px!important;
 }
+.css-1pcexqc-container {
+  position: relative;
+  box-sizing: border-box;
+  width: 244px!important;
+}
 
 
-@media (max-width: 992px){
+@media screen and (max-width: 992px){
 
   .css-1r4vtzz {
     padding: 1px 8px 5px 10px !important;
@@ -2015,7 +2022,7 @@ text-overflow: ellipsis;
     text-overflow: ellipsis;
     align-items: stretch!important;
     // width: 238%!important;
-    width: 355px!important;
+    min-width: 355px;
     height: calc(1.5em + 0.5rem + 2px)!important;
     background-clip: padding-box!important;
     border: 1px solid #e4e7ea!important;
@@ -2042,7 +2049,7 @@ text-overflow: ellipsis;
       display: flex!important;
       // flex-wrap: wrap!important;
       align-items: stretch!important;
-      width: 355px!important;
+      min-width: 355px;
       overflow: hidden;
     word-wrap: normal !important;
     white-space: normal;
@@ -2060,11 +2067,11 @@ text-overflow: ellipsis;
 @media (max-width: 768px){
 .css-1r4vtzz
 {
-  width: 380px!important;
+  min-width: 238px;
 }
 .css-48ayfv
 {
-  width: 380px!important;
+  min-width: 238px;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
@@ -2085,16 +2092,17 @@ text-overflow: ellipsis;
 @media only screen and (max-width: 1024px) {
   .css-1r4vtzz
 {
-  width: 157px!important;
+  min-width: 157px
 }
 .css-48ayfv
 {
-  width: 157px!important;
+  min-width: 157px
 }
 }
+
 @media screen and (min-width: 1920px) {
   .css-48ayfv{
-    width: 380px!important;
+    min-width: 380px;
     overflow: hidden;
   word-wrap: normal !important;
   white-space: normal;
@@ -2108,11 +2116,12 @@ text-overflow: ellipsis;
     text-overflow: ellipsis;
     align-items: stretch!important;
     // width: 238%!important;
-    width: 380px!important;
+    min-width: 380px
 
     
     }
   }
+  
 .css-1hwfws3
 {
   height: calc(1.5em + 0.5rem + -1px) !important;
@@ -2138,7 +2147,7 @@ text-overflow: ellipsis;
 //   box-sizing: border-box;
 //   width: 206px!important;
 // }
-
+/////multi select checkout css//
 .supplyplanformulas{
   color: #20a8d8 !important;
   font-size: 12px!important;
@@ -2329,3 +2338,4 @@ h6{
   .date-color{
     color: #212721!important;
   }
+  
