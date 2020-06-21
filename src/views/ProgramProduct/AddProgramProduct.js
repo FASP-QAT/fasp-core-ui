@@ -533,7 +533,7 @@ class AddprogramPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.localProcurementLeadTime}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Batch No Required</Label>
+                                                            <Label htmlFor="company">Batch Number Required</Label>
                                                             <FormGroup check inline>
                                                                 <Input
                                                                     className="form-check-input"
@@ -587,9 +587,9 @@ class AddprogramPlanningUnit extends Component {
                                             <th className="text-left"> {i18n.t('static.program.program')} </th>
                                             <th> {i18n.t('static.planningunit.planningunit')}</th>
                                             <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
-                                            <th>Minimum month of stock</th>
-                                            <th>Local procurement lead time</th>
-                                            <th>Batch no required</th>
+                                            <th>Minimum Month of Stock</th>
+                                            <th>Local Procurement Lead Time</th>
+                                            <th>Batch Number Required</th>
                                             <th>{i18n.t('static.common.status')}</th>
                                             <th>{i18n.t('static.common.update')}</th>
 
