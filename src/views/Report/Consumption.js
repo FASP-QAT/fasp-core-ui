@@ -1238,6 +1238,7 @@
 
 
 
+
 // my report 
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
@@ -2411,38 +2412,15 @@ class Consumption extends Component {
                       {this.state.show &&
                         <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                          {/* <thead>
+
+
+                          <thead>
                             <tr>
-                              <th style={{ width: '140px' }}></th>
-                              <td>Oct 2019</td>
-                              <td>Nov 2019</td>
-                              <td>Dec 2019</td>
-                              <td>Jan 2020</td>
-                              <td>Feb 2020</td>
-                              <td>Mar 2020</td>
+                              <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
+                              <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
+                              <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
                             </tr>
                           </thead>
-
-                          <tbody>
-                            <tr>
-                              <th>Forecasted</th>
-                              <td>71</td>
-                              <td>56</td>
-                              <td>70</td>
-                              <td>40</td>
-                              <td>70</td>
-                              <td>40</td>
-                            </tr>
-                            <tr>
-                              <th>Actual</th>
-                              <td>71</td>
-                              <td>56</td>
-                              <td>44</td>
-                              <td>40</td>
-                              <td>70</td>
-                              <td>40</td>
-                            </tr>
-                          </tbody> */}
 
                           <tbody>
                             <>
@@ -2485,53 +2463,7 @@ class Consumption extends Component {
                                 }
                               </tr>
                             </>
-
-
-
-
                           </tbody>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                          {/* {
-                            this.state.consumptions.length > 0
-                            &&
-                            this.state.consumptions.map((item, idx) =>
-                              
-                                <tr id="addr0" key={idx} >
-                                  <th style={{ width: '140px' }}></th>
-                                  <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
-                                </tr>
-
-                                <tr id="addr0" key={idx} >
-                                  <th>Forecasted</th>
-                                  <td>{this.formatter(this.state.consumptions[idx].forcast)}</td>
-                                </tr>
-
-                                <tr id="addr0" key={idx} >
-                                  <th>Actual</th>
-                                  <td> {this.formatter(this.state.consumptions[idx].Actual)}</td>
-                                </tr>
-                              
-                            )
-                          } */}
-
-
-
-
-
 
                         </Table>}
                     </div>

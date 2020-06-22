@@ -346,7 +346,7 @@ const routes = [
   { path: '/user/accessControl', exact: true, name: i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
   { path: '/accessDenied', exact: true, component: AccessDenied },
 
-  { path: '/dashboard/:message', component: Dashboard },
+  // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
   { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
   { path: '/program/syncPage', name: "Commit Version", component: syncPage },

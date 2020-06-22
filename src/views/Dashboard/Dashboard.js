@@ -23,6 +23,8 @@ hideSecondComponent() {
     }, 8000);
 }
   componentDidMount() {
+    console.log("COLOR===",this.props.match.params.color);
+    console.log("MESSAGE===",this.props.match.params.message);
     this.hideFirstComponent();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();

@@ -518,7 +518,7 @@ class Program extends Component {
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             console.log("in transaction complete");
 
-                                            this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
+                                            this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))

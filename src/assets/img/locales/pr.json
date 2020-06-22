@@ -394,7 +394,7 @@
     "static.dashboard.listprogramproduct": "Listar produto do programa",
     "static.program.region": "Região",
     "static.program.programmanager": "Gerenciador de programa",
-    "static.login.username": "Nome do usuário",
+    "static.login.emailId": "Nome do usuário",
     "static.budget.startdatetext": "Digite a data de início",
     "static.dashboard.addhealtharea": "Adicionar área de saúde",
     "static.region.country": "País",

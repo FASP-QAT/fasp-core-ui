@@ -44,7 +44,7 @@ class DefaultLayout extends Component {
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
       for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-        bfunction.push(curUserBusinessFunctions[i].authority);
+        bfunction.push(curUserBusinessFunctions[i]);
       }
       this.setState({ businessFunctions: bfunction });
       console.log("log--------------"+this.state.businessFunctions.includes('ROLE_BF_CREATE_PROGRAM'));

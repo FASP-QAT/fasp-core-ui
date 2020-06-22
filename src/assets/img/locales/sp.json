@@ -400,7 +400,7 @@
     "static.program.seafreightperctext": "Porcentaje de carga marítima",
     "static.program.region": "Región",
     "static.program.programmanager": "Director del programa",
-    "static.login.username": "Nombre de usuario",
+    "static.login.emailId": "Nombre de usuario",
     "static.budget.startdatetext": "Por favor, introduzca la fecha de inicio",
     "static.region.country": "País",
     "static.currency.currencysymbol": "Símbolo de moneda",
