@@ -960,6 +960,12 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/report/shipmentSummery":
+                case "/report/shipmentSummery/:message":
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/dashboard/:message":
                 case "/dashboard/:color/:message":
                     if (bfunction.includes("ROLE_BF_APPLICATION_DASHBOARD")) {

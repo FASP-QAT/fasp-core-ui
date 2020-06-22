@@ -538,6 +538,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                           },
+                          {
+                            name: i18n.t('static.report.shipmentSummeryReport'),
+                            url: '/report/shipmentSummery',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
                           // {
                           //   name: i18n.t('static.report.supplyplanversionandreviewReport'),
                           //   url: '/report/supplyPlanVersionAndReview',

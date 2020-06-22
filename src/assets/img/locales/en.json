@@ -836,6 +836,7 @@
     "static.program.isincludeplannedshipment":"Include Planning Shipments",
     "static.program.validversion": "Please select Version",
     "static.dashboard.regionreport":"Region Report",
+    "static.report.shipmentSummeryReport": "Shipment Summery",
     "static.common.product":"Planning Unit",
     "static.common.type":"Category",
     "static.common.min":"Min"
