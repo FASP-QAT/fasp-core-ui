@@ -663,7 +663,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                             <th className="text-left"> Planing Unit</th>
                                             <th className="text-left"> SKU Code </th>
                                             <th className="text-left">Catlog Price </th>
-                                            <th className="text-left">MOQ </th>
+                                            <th className="text-left">Minimum Order Quantity (MOQ) </th>
                                             <th className="text-left">Unit Per Pallet </th>
                                             <th className="text-left">Unit Per Container </th>
                                             <th className="text-left">Volume </th>

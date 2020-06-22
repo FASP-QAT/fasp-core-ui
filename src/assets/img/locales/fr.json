@@ -393,7 +393,7 @@
     "static.dashboard.listprogramproduct": "Liste des produits du programme",
     "static.program.region": "Région",
     "static.program.programmanager": "Gestionnaire de programme",
-    "static.login.username": "Nom d'utilisateur",
+    "static.login.emailId": "Nom d'utilisateur",
     "static.budget.startdatetext": "Veuillez entrer la date de début",
     "static.dashboard.addhealtharea": "Ajouter un domaine de santé",
     "static.region.country": "Pays",

@@ -28,12 +28,13 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 const initialValues = {
-  username: "",
+  emailId: "",
   password: ""
 }
 const validationSchema = function (values) {
   return Yup.object().shape({
-    username: Yup.string()
+    emailId: Yup.string()
+      .email(i18n.t('static.user.invalidemail'))
       .required(i18n.t('static.login.usernametext')),
     password: Yup.string()
       .required(i18n.t('static.login.passwordtext'))
@@ -75,7 +76,7 @@ class Login extends Component {
 
   touchAll(setTouched, errors) {
     setTouched({
-      username: true,
+      emailId: true,
       password: true
     }
     )
@@ -141,11 +142,11 @@ class Login extends Component {
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
     console.log("htnl content....... ", htmlContent);
-    if (htmlContent.includes('Cancelled') || htmlContent.includes('Logged')  ||  htmlContent.includes('cancelled')  )  {
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled')  )  {
       logoutMessage.style.color = 'red';
     }
     else if (htmlContent.includes('Access Denied')) {
-      logoutMessage.style.color = 'red'; 
+      logoutMessage.style.color = 'red';
     }
     else {
       logoutMessage.style.color = 'green';
@@ -182,21 +183,20 @@ class Login extends Component {
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                          var username = values.username;
+                          var emailId = values.emailId;
                           var password = values.password;
                           if (navigator.onLine) {
-                            LoginService.authenticate(username, password)
+                            LoginService.authenticate(emailId, password)
                               .then(response => {
-                                console.log("response---", response);
-                                console.log("response data---", response.data);
                                 var decoded = jwt_decode(response.data.token);
+                                console.log("decoded token---", decoded);
+
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
-
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 // decoded.user.syncExpiresOn = moment("2020-04-29 13:13:19").format("YYYY-MM-DD HH:mm:ss");
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-                                localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
+                                // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
@@ -221,7 +221,7 @@ class Login extends Component {
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {
-                                            username
+                                            emailId
                                           }
                                         });
                                         break;
@@ -234,7 +234,7 @@ class Login extends Component {
                               );
                           }
                           else {
-                            var decryptedPassword = AuthenticationService.isUserLoggedIn(username);
+                            var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
@@ -294,16 +294,16 @@ class Login extends Component {
                                   </InputGroupAddon>
                                   <Input
                                     type="text"
-                                    placeholder={i18n.t('static.login.username')}
-                                    autoComplete="username"
-                                    name="username"
-                                    id="username"
-                                    valid={!errors.username}
-                                    invalid={touched.username && !!errors.username}
+                                    placeholder={i18n.t('static.login.emailId')}
+                                    autoComplete="emailId"
+                                    name="emailId"
+                                    id="emailId"
+                                    valid={!errors.emailId}
+                                    invalid={touched.emailId && !!errors.emailId}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     required />
-                                  <FormFeedback>{errors.username}</FormFeedback>
+                                  <FormFeedback>{errors.emailId}</FormFeedback>
                                 </InputGroup>
                                 <InputGroup className="mb-4">
                                   <InputGroupAddon addonType="prepend">
@@ -353,8 +353,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                          official U.S. government information and does not represent the views or positions of the
-                                                          Agency for International Development or the U.S. government.
+                                                                  official U.S. government information and does not represent the views or positions of the
+                                                                  Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

@@ -199,7 +199,7 @@ class AnnualShipmentCost extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -225,15 +225,15 @@ class AnnualShipmentCost extends Component {
                     doc.setFontSize(7)
                     var splittext = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
-                    doc.text(doc.internal.pageSize.width / 8, 70, splittext)
+                    doc.text(doc.internal.pageSize.width / 8, 80, splittext)
                     splittext = doc.splitTextToSize('Run Date:' + moment(new Date()).format('DD-MMM-YY') + '\n Run Time:' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
 
-                    doc.text(doc.internal.pageSize.width * 3 / 4, 70, splittext)
+                    doc.text(doc.internal.pageSize.width * 3 / 4, 80, splittext)
                     doc.setFontSize(8)
-                    doc.text('Cost of product + Freight', doc.internal.pageSize.width / 2, 80, {
+                    doc.text('Cost of product + Freight', doc.internal.pageSize.width / 2, 90, {
                         align: 'center'
                     })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
                         align: 'center'
                     })
                     doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -261,7 +261,7 @@ class AnnualShipmentCost extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
 
-        doc.setFontSize(8);
+        doc.setFontSize(9);
         doc.setTextColor("#002f6c");
         doc.setFont('helvetica', 'bold')
         doc.text(i18n.t('static.procurementagent.procurementagent'), doc.internal.pageSize.width / 8, 180, {
@@ -875,15 +875,17 @@ class AnnualShipmentCost extends Component {
                             <Col md="12 pl-0">
 
                                 <div className="row">
-                                    <div className="col-md-12" id="div_id">
-                                  { this.state.matricsList.length>0 && <div className="controls"> 
-                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
+                                    <div className="col-md-12 p-0" id="div_id">
+                                  { this.state.matricsList.length>0 &&  
+                                  <div className="col-md-12">
+
+                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>Preview</button>
                               
-                                        <p  style={{ width: '100%', height: '700px' }} id='pdf'></p>   </div>}
+                                        <p  style={{ width: '100%', height: '700px',    overflow:'hidden' }} id='pdf'></p>   </div>}
 
                                     </div>
                                 </div>
-                                </Col>
+                            </Col>
 
 
 

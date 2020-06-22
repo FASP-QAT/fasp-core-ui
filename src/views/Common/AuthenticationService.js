@@ -10,14 +10,14 @@ import moment from 'moment';
 let myDt;
 class AuthenticationService {
 
-    isUserLoggedIn(username) {
+    isUserLoggedIn(emailId) {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
             if (localStorage.key(i).includes("user-")) {
                 let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                let decryptedUsername = user.username;
-                if (decryptedUsername == username) {
+                let decryptedEmailId = user.emailId;
+                if (decryptedEmailId == emailId) {
                     localStorage.setItem("tempUser", user.userId);
                     decryptedPassword = user.password;
                 }
@@ -58,9 +58,9 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-            let roles = "";
-            for (let i = 0; i <= decryptedUser.roles.length; i++) {
-                let role = decryptedUser.roles[i];
+            let roleList = "";
+            for (let i = 0; i <= decryptedUser.roleList.length; i++) {
+                let role = decryptedUser.roleList[i];
                 // if (role != null && role != "") {
                 //     if (i > 0) {
                 //         roles += "," + role.label.label_en;
@@ -69,8 +69,8 @@ class AuthenticationService {
                 //     }
                 // }
             }
-            console.log("decryptedUser.roles---" + decryptedUser.roles);
-            return decryptedUser.roles;
+            console.log("decryptedUser.roles---" + decryptedUser.roleList);
+            return decryptedUser.roleList;
         }
     }
 
@@ -87,7 +87,10 @@ class AuthenticationService {
 
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("get realm id decryptedCurUser---",decryptedCurUser);
+        console.log("user before decrypt---",localStorage.getItem("user-" + decryptedCurUser))
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        console.log("get realm id decryptedUser---",decryptedUser);
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
@@ -367,8 +370,8 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-            let businessFunctions = decryptedUser.businessFunction;
-            console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
+            let businessFunctions = decryptedUser.businessFunctionList;
+            console.log("decryptedUser.businessfunctions--->>>>" + decryptedUser.businessFunctionList);
             return businessFunctions;
         }
         return "";
@@ -376,13 +379,15 @@ class AuthenticationService {
 
     getLoggedInUserRoleBusinessFunctionArray() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("decryptedCurUser---",decryptedCurUser);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        let businessFunctions = decryptedUser.businessFunction;
-        console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
+        console.log("decryptedUser---",decryptedUser);
+        let businessFunctionList = decryptedUser.businessFunctionList;
+        console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 
         var bfunction = [];
-        for (let i = 0; i < businessFunctions.length; i++) {
-            bfunction.push(businessFunctions[i].authority);
+        for (let i = 0; i < businessFunctionList.length; i++) {
+            bfunction.push(businessFunctionList[i]);
         }
         return bfunction;
     }
@@ -929,7 +934,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/costOfInventory":
-                    if (bfunction.includes("ROLE_BF_REPORT_COST_OF_INVERTORY")) {
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
                     break;
@@ -939,6 +944,14 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/supplyPlanVersionAndReview":
+                case "/report/editStatus/:programId/:versionId":
+                case "/report/supplyPlanVersionAndReview/:message":
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/shipmentSummery":
+                case "/report/shipmentSummery/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
                         return true;
                     }
@@ -975,7 +988,7 @@ class AuthenticationService {
                     break;
                 case "/changePassword":
                     // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
-                        return true;
+                    return true;
                     // }
                     break;
                 case "/logout/:message":
