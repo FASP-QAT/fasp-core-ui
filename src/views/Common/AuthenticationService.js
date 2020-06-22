@@ -939,8 +939,14 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/supplyPlanVersionAndReview":
-                        case "/report/editStatus/:programId/:versionId":
-                                case "/report/supplyPlanVersionAndReview/:message":
+                case "/report/editStatus/:programId/:versionId":
+                case "/report/supplyPlanVersionAndReview/:message":
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/shipmentSummery":
+                case "/report/shipmentSummery/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
                         return true;
                     }
@@ -977,7 +983,7 @@ class AuthenticationService {
                     break;
                 case "/changePassword":
                     // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
-                        return true;
+                    return true;
                     // }
                     break;
                 case "/logout/:message":
