@@ -777,6 +777,12 @@ label.arrow_label:after {
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
+
+.prductCat-search-align{
+  position: absolute;
+    top: 75px;
+    right: 20px;
+}
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
 
@@ -833,6 +839,11 @@ label.arrow_label:after {
 }
 @media only screen and (min-width: 1200px) {
   .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+  .prodCatselect{
+    position: absolute;
+    top: -6px;
+    margin-bottom: 0.5rem;
+  }
   
 }
 
