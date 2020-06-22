@@ -512,6 +512,21 @@ class DefaultLayout extends Component {
                           }
                           ,
                           {
+                            name: i18n.t('static.dashboard.supplierLeadTimes'),
+                            url: '/report/supplierLeadTimes',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.dashboard.shipmentGlobalDemandView'),
+                            url: '/report/shipmentGlobalDemandView',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          }
+                          ,
+                          
+                          {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text',
@@ -520,6 +535,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.report.shipmentSummeryReport'),
+                            url: '/report/shipmentSummery',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                           },
