@@ -691,6 +691,8 @@
     "static.common.youdatastart": "Your data has started from here",
     "static.dashboard.funderExport": "Funder Report",
     "static.dashboard.procurementAgentExport": "Procurement Agent Report",
+    "static.dashboard.supplierLeadTimes": "Supplier Lead Times",
+    "static.dashboard.shipmentGlobalDemandView": "Shipment Global Demand View",
     "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
     "static.user.accessControlText": "Access Control",
     "static.dashboard.supplyPlan": "Supply Plan",

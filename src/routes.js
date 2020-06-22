@@ -201,6 +201,9 @@ const ForecastMetrics = React.lazy(() => import('./views/Report/ForecastMetrics'
 const QatProblemPlusActionReport = React.lazy(() => import('./views/Report/QatProblemPlusActionReport'));
 const FunderExport = React.lazy(() => import('./views/Report/FunderExport'));
 const ProcurementAgentExport = React.lazy(() => import('./views/Report/ProcurementAgentExport'));
+const SupplierLeadTimes = React.lazy(() => import('./views/Report/SupplierLeadTimes'));
+const ShipmentGlobalDemandView = React.lazy(() => import('./views/Report/ShipmentGlobalDemandView'));
+
 const AnnualShipmentCost = React.lazy(() => import('./views/Report/AnnualShipmentCost'));
 const SupplyPlanVersionAndReview = React.lazy(() => import('./views/Report/SupplyPlanVersionAndReview'));
 const EditSupplyPlanStatus= React.lazy(() => import('./views/Report/EditSupplyPlanStatus'));
@@ -438,6 +441,9 @@ const routes = [
 
   { path: '/report/funderExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.funderExport'), component: FunderExport },
   { path: '/report/procurementAgentExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
+  { path: '/report/supplierLeadTimes', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: SupplierLeadTimes },
+  { path: '/report/shipmentGlobalDemandView', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ShipmentGlobalDemandView },
+  
 
   { path: '/report/annualShipmentCost', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.annualshipmentcost'), component: AnnualShipmentCost },
 
