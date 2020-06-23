@@ -87,10 +87,10 @@ class AuthenticationService {
 
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("get realm id decryptedCurUser---",decryptedCurUser);
-        console.log("user before decrypt---",localStorage.getItem("user-" + decryptedCurUser))
+        console.log("get realm id decryptedCurUser---", decryptedCurUser);
+        console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log("get realm id decryptedUser---",decryptedUser);
+        console.log("get realm id decryptedUser---", decryptedUser);
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
@@ -379,9 +379,9 @@ class AuthenticationService {
 
     getLoggedInUserRoleBusinessFunctionArray() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---",decryptedCurUser);
+        console.log("decryptedCurUser---", decryptedCurUser);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log("decryptedUser---",decryptedUser);
+        console.log("decryptedUser---", decryptedUser);
         let businessFunctionList = decryptedUser.businessFunctionList;
         console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 
@@ -902,6 +902,26 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/report/supplierLeadTimes":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/shipmentGlobalDemandView":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/aggregateShipmentByProduct":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/shipmentGlobalView":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/report/annualShipmentCost":
                     if (bfunction.includes("ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT")) {
                         return true;
@@ -944,8 +964,14 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/supplyPlanVersionAndReview":
-                        case "/report/editStatus/:programId/:versionId":
-                                case "/report/supplyPlanVersionAndReview/:message":
+                case "/report/editStatus/:programId/:versionId":
+                case "/report/supplyPlanVersionAndReview/:message":
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/shipmentSummery":
+                case "/report/shipmentSummery/:message":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
                         return true;
                     }
@@ -982,7 +1008,7 @@ class AuthenticationService {
                     break;
                 case "/changePassword":
                     // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
-                        return true;
+                    return true;
                     // }
                     break;
                 case "/logout/:message":
