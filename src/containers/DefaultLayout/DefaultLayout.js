@@ -525,6 +525,20 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           }
                           ,
+                          {
+                            name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                            url: '/report/aggregateShipmentByProduct',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.dashboard.shipmentGlobalView'),
+                            url: '/report/shipmentGlobalView',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          }
+                          ,
                           
                           {
                             name: i18n.t('static.report.annualshipmentcost'),

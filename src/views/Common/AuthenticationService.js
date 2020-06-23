@@ -912,6 +912,16 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/report/aggregateShipmentByProduct":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/shipmentGlobalView":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/report/annualShipmentCost":
                     if (bfunction.includes("ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT")) {
                         return true;

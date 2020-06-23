@@ -693,6 +693,8 @@
     "static.dashboard.procurementAgentExport": "Procurement Agent Report",
     "static.dashboard.supplierLeadTimes": "Supplier Lead Times",
     "static.dashboard.shipmentGlobalDemandView": "Shipment Global Demand View",
+    "static.dashboard.aggregateShipmentByProduct":"Aggregate Shipment By Product",
+    "static.dashboard.shipmentGlobalView":"Shipment Global View",
     "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
     "static.user.accessControlText": "Access Control",
     "static.dashboard.supplyPlan": "Supply Plan",

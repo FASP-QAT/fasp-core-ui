@@ -102,25 +102,25 @@ const chartData = {
     datasets: [{
         label: 'Planned',
         data: [0, 0, 0, 0],
-        backgroundColor: '#000050',
+        backgroundColor: 'red',
         borderWidth: 0
     },
     {
         label: 'Ordered',
         data: [0, 17000, 15000],
-        backgroundColor: '#52CAFF',
+        backgroundColor: 'green',
         borderWidth: 0,
     },
     {
         label: 'Received',
         data: [20000, 0, 0],
-        backgroundColor: '#AAAAFA',
+        backgroundColor: 'blue',
         borderWidth: 0,
     },
     {
         label: 'Today',
         data: [0, 0, 0],
-        backgroundColor: 'black',
+        backgroundColor: '#yellow',
         borderWidth: 0,
     }
     ]
@@ -149,7 +149,7 @@ const pickerLang = {
 }
 
 
-class Consumption extends Component {
+class AggregateShipmentByProduct extends Component {
     constructor(props) {
         super(props);
 
@@ -902,11 +902,11 @@ class Consumption extends Component {
 
                 <Card>
                     <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong>
+                        <i className="icon-menu"></i><strong>Aggregate Shipment By Product</strong>
                         {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                         <Online>
-                            {
-                                this.state.consumptions.length > 0 &&
+                            {/* {
+                                this.state.consumptions.length > 0 && */}
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
 
@@ -923,7 +923,7 @@ class Consumption extends Component {
                                     </a>
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
-                            }
+                            {/* } */}
                         </Online>
                         <Offline>
                             {
@@ -1135,7 +1135,7 @@ class Consumption extends Component {
                                             </Offline>
                                             <Online>
                                                 <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">Shipment Status</Label>
+                                                    <Label htmlFor="appendedInputButton">Include Planned Shipments</Label>
                                                     <div className="controls">
                                                         <InputGroup>
                                                             <Input
@@ -1145,8 +1145,8 @@ class Consumption extends Component {
                                                                 bsSize="sm"
                                                             // onChange={this.filterData}
                                                             >
-                                                                <option value="0">All</option>
-
+                                                                <option value="0">Yes</option>
+                                                                <option value="1">No</option>
                                                             </Input>
                                                         </InputGroup>
                                                     </div>
@@ -1172,23 +1172,6 @@ class Consumption extends Component {
                                                 </FormGroup>
 
                                             </Offline>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Report View</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="shipmentStatusId"
-                                                            id="shipmentStatusId"
-                                                            bsSize="sm"
-                                                        // onChange={this.filterData}
-                                                        >
-                                                            <option value="0">Planning Unit</option>
-                                                            <option value="0">Forecasting Unit</option>
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
                                         </div>
                                     </Col>
                                 </Form>
@@ -1199,11 +1182,14 @@ class Consumption extends Component {
                                             {/* {
                                                 this.state.consumptions.length > 0
                                                 && */}
-                                            <div className="col-md-12 p-0">
+                                            {/* <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}> */}
                                                         {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                        <Bar id="cool-canvas" data={chartData} options={options} />
+                                                        {/* <Bar id="cool-canvas" data={chartData} options={options} />
+                                                        <div>
+
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="col-md-12">
@@ -1212,140 +1198,60 @@ class Consumption extends Component {
                                                     </button>
 
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             {/* } */}
 
 
 
                                         </Online>
                                         <Offline>
-                                            {
+                                            {/* {
                                                 this.state.offlineConsumptionList.length > 0
                                                 &&
                                                 <div className="col-md-12 p-0">
                                                     <div className="col-md-12">
                                                         <div className="chart-wrapper chart-graph-report">
-                                                            <Bar id="cool-canvas" data={bar} options={options} />
+                                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
 
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-12">
-                                                        <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                            {this.state.show ? 'Hide Data' : 'Show Data'}
-                                                        </button>
-                                                    </div>
-                                                </div>}
+                                                        {/* </div> */}
+                                                    {/* </div> */}
+                                                    {/* <div className="col-md-12"> */}
+                                                        {/* <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}> */}
+                                                            {/* {this.state.show ? 'Hide Data' : 'Show Data'} */}
+                                                        {/* </button> */}
+                                                    {/* </div> */}
+                                                {/* </div>} */}
 
                                         </Offline>
                                     </div>
 
 
-                                    <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.show &&
-                                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}></th>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}># Orders</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}>Qty(Base units)</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}>$ Cost</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Global Fund</td>
-                                                            <td>2</td>
-                                                            <td>400,000</td>
-                                                            <td>$37,000</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>GHSC-PSM</td>
-                                                            <td>1</td>
-                                                            <td>1,500,000</td>
-                                                            <td>$15,000</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </Table>}
-                                        </div>
-                                    </div>
-
 
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.show &&
+                                            {/* {this.state.show && */}
                                                 <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th>Planning Unit/Forecasting Unit</th>
-                                                            <th>ID</th>
-                                                            <th>Procurement Agent</th>
-                                                            <th>Funder</th>
-                                                            <th>Status</th>
-                                                            <th>Notes</th>
-                                                            <th>Date/Month Receipt Expected</th>
-                                                            <th>Product Cost($)</th>
-                                                            <th>Freight Cost($)</th>
-                                                            <th>Total Cost($)</th>
-                                                            <th>Containers</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Planning Unit</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Quantity</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Product Cost($)</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Freight Cost($)</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Total Cost($)</th>
                                                         </tr>
-
                                                     </thead>
 
                                                     <tbody>
-                                                        <tr>
-                                                            <th colSpan="6">Feb 2020</th>
-                                                            <th colSpan="5">1</th>
-                                                        </tr>
                                                         <tr>
                                                             <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
-                                                            <td>PEPFAR</td>
-                                                            <td>Global Fund</td>
-                                                            <td>Received</td>
-                                                            <td></td>
-                                                            <td>04-25-2020</td>
+                                                            <td>10</td>
                                                             <td>17,000</td>
                                                             <td>3,000</td>
                                                             <td>20,000</td>
-                                                            <td>2</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th colSpan="6">May 2020</th>
-                                                            <th colSpan="5">1</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
-                                                            <td>PEPFAR</td>
-                                                            <td>Global Fund</td>
-                                                            <td>Ordered</td>
-                                                            <td></td>
-                                                            <td>09-25-2020</td>
-                                                            <td>15,000</td>
-                                                            <td>2,000</td>
-                                                            <td>17,000</td>
-                                                            <td>1.5</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th colSpan="6">Jul 2020</th>
-                                                            <th colSpan="5">1</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
-                                                            <td>PEPFAR</td>
-                                                            <td>GHSC-PSM</td>
-                                                            <td>Ordered</td>
-                                                            <td></td>
-                                                            <td>11-25-2020</td>
-                                                            <td>13,000</td>
-                                                            <td>2,000</td>
-                                                            <td>15,000</td>
-                                                            <td>1</td>
                                                         </tr>
                                                     </tbody>
-                                                </Table>}
+                                                </Table>
+                                                {/* } */}
                                         </div>
                                     </div>
 
@@ -1359,4 +1265,4 @@ class Consumption extends Component {
     }
 }
 
-export default Consumption;
+export default AggregateShipmentByProduct;
