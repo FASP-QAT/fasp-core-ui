@@ -218,18 +218,34 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.userId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.programNotes && this.props.items.program.programNotes != ''}
-                                            invalid={touched.programNotes && !!errors.programNotes}
+                                            valid={!errors.monthsInPastForAmc && this.props.items.program.monthsInPastForAmc != ''}
+                                            invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="textarea" name="programNotes" id="programNotes" />
-                                        <FormFeedback className="red">{errors.programNotes}</FormFeedback>
+                                            type="number"
+                                            min="0"
+                                            name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
+                                        <FormFeedback className="red">{errors.monthsInPastForAmc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.monthsInFutureForAmc && this.props.items.program.monthsInFutureForAmc != ''}
+                                            invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
+                                        <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
+                                    </FormGroup>
+                                   
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
@@ -242,7 +258,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%)<span class="red ">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.seaFreightPerc && this.props.items.program.seaFreightPerc != ''}
@@ -351,34 +367,21 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                     </FormGroup>
 
+                                   
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.monthsInPastForAmc && this.props.items.program.monthsInPastForAmc != ''}
-                                            invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
+                                            valid={!errors.programNotes && this.props.items.program.programNotes != ''}
+                                            invalid={touched.programNotes && !!errors.programNotes}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="number"
-                                            min="0"
-                                            name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
-                                        <FormFeedback className="red">{errors.monthsInPastForAmc}</FormFeedback>
+                                            type="textarea" name="programNotes" id="programNotes" />
+                                        <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            valid={!errors.monthsInFutureForAmc && this.props.items.program.monthsInFutureForAmc != ''}
-                                            invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="number"
-                                            min="0"
-                                            name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
-                                        <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
-                                    </FormGroup>
+                                    
                                     <FormGroup className="col-md-12">
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                          <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
 

@@ -65,7 +65,7 @@ export default class HealthAreaListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false 
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({
@@ -159,15 +159,15 @@ export default class HealthAreaListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'label',
-            text: i18n.t('static.healthArea.healthAreaName'),
+            dataField: 'realm.label',
+            text: i18n.t('static.healtharea.realm'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
-            dataField: 'realm.label',
-            text: i18n.t('static.healtharea.realm'),
+            dataField: 'label',
+            text: i18n.t('static.healthArea.healthAreaName'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
@@ -217,12 +217,12 @@ export default class HealthAreaListComponent extends Component {
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card  style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_HEALTHAREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -297,7 +297,7 @@ export default class HealthAreaListComponent extends Component {
     }
 
     editHealthArea(healthArea) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTHAREA')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA')) {
             this.props.history.push({
                 // pathname: "/healthArea/editHealthArea/",
                 // state: { healthArea: healthArea }

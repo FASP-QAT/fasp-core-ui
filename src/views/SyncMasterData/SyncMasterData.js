@@ -15,6 +15,9 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
+import { SECRET_KEY } from '../../Constants.js'
+import CryptoJS from 'crypto-js'
+import UserService from '../../api/UserService'
 
 export default class SyncMasterData extends Component {
 
@@ -37,8 +40,16 @@ export default class SyncMasterData extends Component {
     }
 
     componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
         document.getElementById("retryButtonDiv").style.display = "none";
-        this.syncMasters();
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        UserService.getUserByUserId(decryptedCurUser).then(response => {
+            console.log("user----------------------", response.data);
+            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data).toString(), `${SECRET_KEY}`));
+            this.syncMasters();
+        })
+
+        
         // confirmAlert({
         //     // title: i18n.t('static.masterDataSync.masterDataSync'),
         //     message: i18n.t('static.masterDataSync.confirmSyncMessage'),

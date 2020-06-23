@@ -743,8 +743,6 @@ label.arrow_label:after {
 // user
 .userAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .userAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
-.userAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
-.userAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 // listRalm
 .listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
@@ -848,6 +846,7 @@ label.arrow_label:after {
     height: auto;
     left: 0;
     margin: 0;
+    
     min-height: 100%;
     padding: 0;
     background-attachment: fixed;
@@ -866,6 +865,13 @@ label.arrow_label:after {
   margin-left: 0%;
 }
 
+.card-marginTop
+{
+  flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: -26% !important;
+
+}
 @media only screen and (max-width: 767px) {
   .upper-logo {
     // min-width: 100%;
@@ -1827,7 +1833,7 @@ input::placeholder {
 
 .react-confirm-alert-button-group {
   float: right !important;
-  margin-top: 11% !important;
+  margin-top: 6% !important;
 }
 
 .react-confirm-alert-button-group > button {
@@ -1915,7 +1921,7 @@ input::placeholder {
 .showdatabtn{
   margin-top:-1%;
 }
-///////Report Consumption globe
+///////Report react mutiselect checkbox Consumption globe
 .css-1r4vtzz {
 padding: 1px 8px 5px 10px !important;
 background-color: #FFF;
@@ -1938,7 +1944,8 @@ white-space: normal;
 text-overflow: ellipsis;
 align-items: stretch!important;
 // width: 238%!important;
-width: 229px!important;
+min-width: 238px;
+width: 0 auto!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1965,7 +1972,8 @@ border-radius: 0.2rem!important;
   display: flex!important;
   // flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 229px!important;
+  min-width: 238px;
+  width: 0 auto!important;
   overflow: hidden;
 word-wrap: normal !important;
 white-space: normal;
@@ -1983,9 +1991,14 @@ text-overflow: ellipsis;
 
   margin: 0px -12px!important;
 }
+.css-1pcexqc-container {
+  position: relative;
+  box-sizing: border-box;
+  width: 244px!important;
+}
 
 
-@media (max-width: 992px){
+@media screen and (max-width: 992px){
 
   .css-1r4vtzz {
     padding: 1px 8px 5px 10px !important;
@@ -2009,7 +2022,7 @@ text-overflow: ellipsis;
     text-overflow: ellipsis;
     align-items: stretch!important;
     // width: 238%!important;
-    width: 355px!important;
+    min-width: 355px;
     height: calc(1.5em + 0.5rem + 2px)!important;
     background-clip: padding-box!important;
     border: 1px solid #e4e7ea!important;
@@ -2036,7 +2049,7 @@ text-overflow: ellipsis;
       display: flex!important;
       // flex-wrap: wrap!important;
       align-items: stretch!important;
-      width: 355px!important;
+      min-width: 355px;
       overflow: hidden;
     word-wrap: normal !important;
     white-space: normal;
@@ -2054,11 +2067,11 @@ text-overflow: ellipsis;
 @media (max-width: 768px){
 .css-1r4vtzz
 {
-  width: 380px!important;
+  min-width: 238px;
 }
 .css-48ayfv
 {
-  width: 380px!important;
+  min-width: 238px;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
@@ -2079,16 +2092,17 @@ text-overflow: ellipsis;
 @media only screen and (max-width: 1024px) {
   .css-1r4vtzz
 {
-  width: 157px!important;
+  min-width: 157px
 }
 .css-48ayfv
 {
-  width: 157px!important;
+  min-width: 157px
 }
 }
+
 @media screen and (min-width: 1920px) {
   .css-48ayfv{
-    width: 380px!important;
+    min-width: 380px;
     overflow: hidden;
   word-wrap: normal !important;
   white-space: normal;
@@ -2102,11 +2116,12 @@ text-overflow: ellipsis;
     text-overflow: ellipsis;
     align-items: stretch!important;
     // width: 238%!important;
-    width: 380px!important;
+    min-width: 380px
 
     
     }
   }
+  
 .css-1hwfws3
 {
   height: calc(1.5em + 0.5rem + -1px) !important;
@@ -2132,7 +2147,7 @@ text-overflow: ellipsis;
 //   box-sizing: border-box;
 //   width: 206px!important;
 // }
-
+/////multi select checkout css//
 .supplyplanformulas{
   color: #20a8d8 !important;
   font-size: 12px!important;
@@ -2236,3 +2251,91 @@ h6{
 .table-accesscnl-mt{
   margin-top: -3%;
 }
+/* commit version legend */
+.legendcommitversion { list-style: none;display: inline-flex; }
+.legendcommitversion li { float: left; margin-right: 10px; }
+.legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
+
+/* your colors */
+.legendcommitversion .lightpinklegend {
+  background-color: yellow;
+  border-color: 1px solid yellow;
+}
+.legendcommitversion .greenlegend {
+  background-color:#86cd99;
+  border-color: 1px solid #86cd99;
+}
+.legendcommitversion .redlegend {
+  background-color: red;
+  border-color: 1px solid red;
+}
+
+.legendcommitversion .orangelegend {
+  background-color: orange;
+  border-color: 1px solid orange;
+}
+
+.legendcommitversion .orangeredlegend{
+  background-color: orangered;
+  border-color: 1px solid orangered;
+}
+
+.legendcommitversion .skipedShipmentslegend{
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+
+.legendcommitversion .skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
+.legendcommitversion .purplelegend {
+  background-color: rgb(170, 85, 161);
+  border-color: 1px solid rgb(170, 85, 161);
+}
+.legendcommitversion .blacklegend {
+  background-color: #000;
+  border-color: 1px solid #000;
+}
+
+.legendcommitversion .notawesome {
+  background-color: #e5edf5;
+  border-color: 1px solid #e5edf5;
+}
+
+///supply plan
+.skipedShipmentslegend {
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+.redlegend {
+  background-color: red;
+  border-color: 1px solid red;
+}
+.skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
+///Consumption model color
+.purplelegend {
+  background-color: rgb(170, 85, 161);
+  border-color: 1px solid rgb(170, 85, 161);
+}
+.blacklegend {
+  background-color: #000;
+  border-color: 1px solid #000;
+}
+
+.legendcommitversionText{
+  text-align: left;
+  display: table;
+  padding: 0px 0px 0px 11px;
+  }
+  .ForgotmarginTop
+  {
+    margin-top: -3%!important;
+  }
+  .date-color{
+    color: #212721!important;
+  }
+  

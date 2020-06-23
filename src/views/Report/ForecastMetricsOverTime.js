@@ -70,14 +70,16 @@ const pickerLang = {
 const options = {
   title: {
     display: true,
-    text: i18n.t('static.report.forecasterrorovertime')
+    text: i18n.t('static.report.forecasterrorovertime'),
+    fontColor: 'black'
   },
   scales: {
     yAxes: [
       {
         scaleLabel: {
           display: true,
-          labelString: i18n.t('static.report.errorperc')
+          labelString: i18n.t('static.report.errorperc'),
+          fontColor: 'black'
         },
         ticks: { yValueFormatString: "$#####%",
         beginAtZero:true,
@@ -86,7 +88,11 @@ const options = {
             return value+"%";
         }}
       }
-    ]
+    ] ,xAxes: [{
+      ticks: {
+        fontColor: 'black'
+      }
+  }]
   },
   tooltips: { mode: 'index',
     callbacks: {
@@ -104,6 +110,7 @@ const options = {
     position: 'bottom',
     labels: {
       usePointStyle: true,
+      fontColor: 'black'
     }
   }
 }
@@ -186,13 +193,13 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.errorperc')).replaceAll(' ','%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
+    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.error')).replaceAll(' ','%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
    
       re = this.state.matricsList
    
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100), re[item].monthsInCalc])
+      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100)+'%', re[item].monthsInCalc])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -212,7 +219,7 @@ class ForcastMatrixOverTime extends Component {
       const pageCount = doc.internal.getNumberOfPages()
     
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(8)
+      doc.setFontSize(10)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
       
@@ -220,7 +227,7 @@ class ForcastMatrixOverTime extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
         align: 'center'
         })
-        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
+        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
         align: 'center'
         })
       
@@ -230,10 +237,11 @@ class ForcastMatrixOverTime extends Component {
     const addHeaders = doc => {
       const pageCount = doc.internal.getNumberOfPages()
     
-      doc.setFont('helvetica', 'bold')
      
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
+
         doc.setPage(i)
         
         doc.addImage(LOGO,'png', 0, 10,180,50,'','FAST');
@@ -243,7 +251,7 @@ class ForcastMatrixOverTime extends Component {
           align: 'center'
         })
         if(i==1){
-          doc.setFontSize(8)
+          doc.setFontSize(9)
           doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -278,10 +286,10 @@ class ForcastMatrixOverTime extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png',  50, 200,750,290,'CANVAS' );
+    doc.addImage(canvasImg, 'png',  50, 200,750,260,'CANVAS' );
     const headers =[ [   i18n.t('static.report.month'),
-    i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,this.roundN(elt.forecastError*100),elt.monthsInCalc]);
+    i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.error'),i18n.t('static.report.noofmonth')]];
+    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,this.roundN(elt.forecastError*100)+'%',elt.monthsInCalc]);
     
     let content = {
     margin: {top: 80},
@@ -688,7 +696,7 @@ class ForcastMatrixOverTime extends Component {
                     {
                         this.state.matricsList.length > 0
                         &&
-                        <div className="col-md-12">
+                        <div className="col-md-12 p-0">
                           <div className="col-md-12">
                         <div   className="chart-wrapper chart-graph-report">
                           <Bar id="cool-canvas" data={bar} options={options} />
@@ -713,7 +721,7 @@ class ForcastMatrixOverTime extends Component {
                             <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.month')} </th>
                             <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.forecastConsumption')} </th>
                             <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.actualConsumption')}</th>
-                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.errorperc')}</th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.error')}</th>
                             <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.noofmonth')}</th>
                           </tr>
                         </thead>
@@ -735,7 +743,7 @@ class ForcastMatrixOverTime extends Component {
                                     {this.state.matricsList[idx].actualConsumption}
                                   </td>
                                   <td>
-                                    {this.roundN(this.state.matricsList[idx].forecastError*100)}
+                                    {this.roundN(this.state.matricsList[idx].forecastError*100)+'%'}
                                   </td>
                                   <td>
                                     {this.state.matricsList[idx].monthsInCalc}

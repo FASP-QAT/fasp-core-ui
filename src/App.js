@@ -38,7 +38,7 @@ class App extends Component {
               <Route exact path="/masterDataSync" exact name="Master data sync" render={props => <MasterDataSync {...props}/>} />
               <Route exact path="/masterDataSync/:message" exact name="Master data sync" render={props => <MasterDataSync {...props}/>} />
               <Route exact path="/updateExpiredPassword" exact name="Update expired password" render={props => <UpdateExpiredPassword {...props}/>} />
-              <Route exact path="/resetPassword/:username/:token" exact name="Reset password" render={props => <ResetPassword {...props}/>} />
+              <Route exact path="/resetPassword/:emailId/:token" exact name="Reset password" render={props => <ResetPassword {...props}/>} />
               <Route path="/" name={i18n.t('static.home')} render={props => <DefaultLayout {...props}/>} />
             </Switch>
           </React.Suspense>

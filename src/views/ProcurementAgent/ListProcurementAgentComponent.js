@@ -52,7 +52,7 @@ class ListProcurementAgentComponent extends Component {
 
     addPlanningUnitMapping(event, cell) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PLANNING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
             });
@@ -100,7 +100,7 @@ class ListProcurementAgentComponent extends Component {
 
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT_PROCUREMENT_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
             });
@@ -162,7 +162,7 @@ class ListProcurementAgentComponent extends Component {
         }
     }
     editProcurementAgent(procurementAgent) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
                 // state: { procurementAgent }
@@ -388,7 +388,7 @@ class ListProcurementAgentComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

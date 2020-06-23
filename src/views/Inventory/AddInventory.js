@@ -31,6 +31,12 @@ export default class AddInventory extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getCountrySKUList = this.getCountrySKUList.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
     }
     componentDidMount() {
         const lan = 'en';
@@ -719,15 +725,22 @@ export default class AddInventory extends Component {
                             // $("#saveButtonDiv").hide();
                             this.setState({
                                 message: 'static.message.inventorysuccess',
-                                changedFlag: 0
+                                changedFlag: 0,
+                                color: 'green'
                             })
+                           
+                            this.hideFirstComponent();
                             this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
                         }.bind(this)
                     } else {
                         this.setState({
                             message: 'Duplicate Inventory Details Found',
-                            changedFlag: 0
+                            changedFlag: 0,
+                            color: 'red'
                         })
+                        
+                        this.hideFirstComponent();
+
                     }
 
                 }.bind(this)
@@ -768,7 +781,7 @@ export default class AddInventory extends Component {
                     this.setState({ message: message })
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Card>
 
@@ -848,7 +861,7 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

@@ -26,8 +26,10 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
-        budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
+        budgetAmt: Yup.string()
+        // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^[0-9]+([,\.][0-9]+)?/,i18n.t('static.program.validBudgetAmount')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
         // stopDate: Yup.string()
@@ -116,7 +118,29 @@ class EditBudgetComponent extends Component {
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.addMonths=this.addMonths.bind(this);
+        this.CommaFormatted=this.CommaFormatted.bind(this);
     }
+
+    CommaFormatted(cell) {
+        cell += '';
+        cell = cell.replace(/,/g, '');
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return  x1 + x2;
+    }
+    
+
+    addMonths(date, months) {
+        date.setMonth(date.getMonth() + months);
+        return date;
+    }
+
     changeMessage(message) {
         this.setState({ message: message })
     }
@@ -135,7 +159,7 @@ class EditBudgetComponent extends Component {
 
     dataChangeEndDate(date) {
         let { budget } = this.state;
-        budget.stopDate = date;
+        budget.stopDate = date; 
         this.setState({ budget: budget });
     }
 
@@ -145,8 +169,12 @@ class EditBudgetComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                    
                     response.data.startDate = new Date(response.data.startDate);
                     response.data.stopDate = new Date(response.data.stopDate);
+                    var getBudgetAmount= this.CommaFormatted(response.data.budgetAmt);
+                    response.data.budgetAmt = getBudgetAmount;
+
                     this.setState({
                         budget: response.data
                     });
@@ -190,7 +218,8 @@ class EditBudgetComponent extends Component {
             budget.label.label_en = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
-            budget.budgetAmt = event.target.value;
+            var chnageValue=this.CommaFormatted(event.target.value);
+            budget.budgetAmt = chnageValue;
         }
         // if (event.target.name === "startDate") {
         //     budget.startDate = event.target.value;
@@ -255,6 +284,9 @@ class EditBudgetComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     let { budget } = this.state;
+
+                                    var amount=this.state.budget.budgetAmt.replace(/,/g, '');
+                                    budget.budgetAmt = amount;
 
                                     var startDate=moment(this.state.budget.startDate).format("YYYY-MM-DD");
                                     budget.startDate=startDate;
@@ -390,16 +422,16 @@ class EditBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input type="number"
-                                                            min="0"
+                                                            // min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
                                                             valid={!errors.budgetAmt}
                                                             invalid={touched.budgetAmt && !!errors.budgetAmt}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => {this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            type="number"
-                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                            type="text"
+                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                         />
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
@@ -506,13 +538,13 @@ class EditBudgetComponent extends Component {
                                                             id="startDate"
                                                             name="startDate"
                                                             bsSize="sm"
-                                                            minDate={new Date()}
+                                                            minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
-
+                                                            autoComplete={"off"}
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
@@ -525,9 +557,9 @@ class EditBudgetComponent extends Component {
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
-
+                                                            autoComplete={"off"}
                                                         />
                                                     </FormGroup>
                                                 </CardBody>

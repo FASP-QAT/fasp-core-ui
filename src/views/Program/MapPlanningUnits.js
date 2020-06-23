@@ -225,7 +225,7 @@ export default class MapPlanningUnits extends Component {
                         console.log("ind", indendent);
                         console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
                         var productCategoryJson = {
-                            name: indendent.concat(response.data[k].payload.label.label_en),
+                            name: (response.data[k].payload.label.label_en),
                             id: response.data[k].payload.productCategoryId
                         }
                         productCategoryList.push(productCategoryJson);
@@ -253,13 +253,13 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170,170],
+                                    colWidths: [290, 290, 170, 170,170,170],
                                     columns: [
 
                                         {
                                             title: 'Product Category',
                                             type: 'dropdown',
-                                            source: productCategoryList
+                                            source:productCategoryList
                                         },
                                         {
                                             title: 'Planning Unit',
@@ -279,6 +279,10 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: 'Local Procurment Lead Time',
                                             type: 'number'
+                                        },
+                                        {
+                                            title: 'Batch Required',
+                                            type: 'checkbox'
                                         }
 
                                     ],
@@ -332,7 +336,8 @@ export default class MapPlanningUnits extends Component {
                 minMonthsOfStock: map.get("3"),
                 localProcurementLeadTime:map.get("4"),
                 active: true,
-                programPlanningUnitId: 0
+                programPlanningUnitId: 0,
+                batchNoRequired:map.get("5")
             }
             planningUnitArray.push(planningUnitJson);
         }

@@ -243,23 +243,27 @@ export default class AddHealthAreaComponent extends Component {
                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader>
               <Formik
+                enableReinitialize={true}
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   console.log("-------------------->" + this.state.healthArea);
-                  HealthAreaService.addHealthArea(this.state.healthArea)
-                    .then(response => {
-                      if (response.status == 200) {
-                        this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                      } else {
-                        this.setState({
-                          message: response.data.messageCode
-                        },
-                          () => {
-                            this.hideSecondComponent();
-                          })
-                      }
-                    })
+                  if (this.state.healthArea.label.label_en != '') {
+                    HealthAreaService.addHealthArea(this.state.healthArea)
+                      .then(response => {
+                        if (response.status == 200) {
+                          this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        } else {
+                          this.setState({
+                            message: response.data.messageCode
+                          },
+                            () => {
+                              this.hideSecondComponent();
+                            })
+                        }
+                      })
+                  }
+
 
                 }}
 
@@ -279,19 +283,6 @@ export default class AddHealthAreaComponent extends Component {
                   }) => (
                       <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm'>
                         <CardBody>
-
-                          <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
-                            <Input
-                              bsSize="sm"
-                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
-                              invalid={touched.healthAreaName && !!errors.healthAreaName}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                              onBlur={handleBlur}
-                              value={this.state.healthArea.label.label_en}
-                              id="healthAreaName" />
-                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                          </FormGroup>
 
                           <FormGroup>
                             <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
@@ -323,6 +314,18 @@ export default class AddHealthAreaComponent extends Component {
                             />
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>
+                          <FormGroup>
+                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
+                            <Input
+                              bsSize="sm"
+                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
+                              invalid={touched.healthAreaName && !!errors.healthAreaName}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                              onBlur={handleBlur}
+                              value={this.state.healthArea.label.label_en}
+                              id="healthAreaName" />
+                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                          </FormGroup>
 
                         </CardBody>
 
@@ -330,7 +333,7 @@ export default class AddHealthAreaComponent extends Component {
                           <FormGroup>
                             <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                             <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                                                   </FormGroup>
@@ -356,11 +359,11 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   cancelClicked() {
-    this.props.history.push(`/healthArea/listHealthArea/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/healthArea/listHealthArea/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {
-    let { healthArea } = this.state
+    let { healthArea } = this.state;
 
     healthArea.label.label_en = ''
     healthArea.realm.id = ''
@@ -372,6 +375,7 @@ export default class AddHealthAreaComponent extends Component {
     ) => {
       console.log("state after update---", this.state.healthArea)
     })
+
   }
 
 }

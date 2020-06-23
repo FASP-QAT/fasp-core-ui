@@ -24,21 +24,28 @@ import ProgramService from '../../api/ProgramService';
 const options = {
     title: {
         display: true,
-        text: i18n.t('static.dashboard.stockstatusovertime')
+        text: i18n.t('static.dashboard.stockstatusovertime'),
+        fontColor: 'black'
     },
     scales: {
         yAxes: [
             {
                 scaleLabel: {
                     display: true,
-                    labelString: i18n.t('static.report.mos')
+                    labelString: i18n.t('static.report.mos'),
+                    fontColor: 'black'
                 },
                 ticks: {
                     beginAtZero: true,
-                    Max: 900
+                    Max: 900,
+                    fontColor: 'black'
                 }
             }
-        ]
+        ], xAxes: [{
+            ticks: {
+                fontColor: 'black'
+            }
+        }]
     },
     tooltips: {
         mode: 'index',
@@ -106,7 +113,7 @@ class StockStatusOverTime extends Component {
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
-      }
+    }
 
     roundN = num => {
         return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
@@ -158,8 +165,8 @@ class StockStatusOverTime extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.fetchData();
+        this.setState({ rangeValue: value }, () => { this.fetchData(); })
+
     }
 
     _handleClickRangeBox(e) {
@@ -336,7 +343,7 @@ class StockStatusOverTime extends Component {
                         lineData[i] = response.data[i].map(ele => (ele.mos))
                     }
                     lineDates = response.data[0].map(ele => (ele.dt))
-                    planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang)+'-'+getLabelText(ele.planningUnit.label, this.state.lang))))])
+                    planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
 
                     this.setState({
                         matricsList: response.data,
@@ -382,15 +389,15 @@ class StockStatusOverTime extends Component {
 
         }
 
-        
+
     }
 
 
     exportCSV() {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.report.dateRange')+' , '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
-     this.state.programLabels.map(ele => csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+        this.state.programLabels.map(ele => csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("mosPast").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("mosFuture").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
@@ -400,10 +407,10 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
 
-        var A = [[i18n.t('static.report.month'),i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]]
+        var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]]
 
 
-        this.state.matricsList.map(ele => ele.map(elt => A.push([elt.dt,((getLabelText(elt.program.label,this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label,this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.roundN(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(ele => ele.map(elt => A.push([elt.dt, ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.roundN(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -437,7 +444,7 @@ class StockStatusOverTime extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -447,8 +454,7 @@ class StockStatusOverTime extends Component {
         const addHeaders = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
-
+           
             // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
             // var reader = new FileReader();
 
@@ -458,6 +464,8 @@ class StockStatusOverTime extends Component {
             //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 200, 50, 'FAST');
                 /*doc.addImage(data, 10, 30, {
@@ -469,9 +477,10 @@ class StockStatusOverTime extends Component {
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
-                      })
+                    })
                     var planningText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString()), doc.internal.pageSize.width * 3 / 4);
 
                     doc.text(doc.internal.pageSize.width / 8, 110, planningText)
@@ -485,7 +494,7 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("mosFuture").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
-                    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
+                    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
                     doc.text(doc.internal.pageSize.width / 8, 190, planningText)
                 }
@@ -512,12 +521,12 @@ class StockStatusOverTime extends Component {
         var aspectwidth1 = (width - h1);
 
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
-        doc.addImage(canvasImg, 'png', 50, 220, 750, 290, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(ele => ele.map(elt => data.push([elt.dt,getLabelText(elt.program.label,this.state.lang),getLabelText(elt.planningUnit.label,this.state.lang), elt.stock, elt.consumptionQty, this.roundN(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(ele => ele.map(elt => data.push([elt.dt, getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.roundN(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
 
         let content = {
             margin: { top: 80 },
@@ -578,9 +587,26 @@ class StockStatusOverTime extends Component {
             return color;
         }
         console.log(this.state.lineData)
+        const backgroundColor = [
+            '#4dbd74',
+            '#c8ced3',
+            '#000',
+            '#ffc107',
+            '#f86c6b',
+            '#205493',
+            '#20a8d8',
+            '#a6c4ec',
+            '#ca3828',
+            '#388b70',
+            '#f4862a',
+            '#ed5626',
+            '#4dbd74',
+            '#ffc107',
+            '#f86c6b'
+        ]
         const bar = {
             labels: this.state.lineDates,
-            datasets: this.state.planningUnitlines.map((item, index) => ({ type: "line", pointStyle: 'line', lineTension: 0.8, backgroundColor: 'transparent', label: item, data: this.state.lineData[index], borderColor: getRandomColor() }))
+            datasets: this.state.planningUnitlines.map((item, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: item, data: this.state.lineData[index], borderColor: backgroundColor[index] }))
             /*  [
              {
                    type: "line",
@@ -644,19 +670,19 @@ class StockStatusOverTime extends Component {
                         {
                             this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
-                            <a className="card-header-action">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
-                                {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
  
  {({ toPdf }) =>
  <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
  }
  </Pdf>*/}
-                            </a>
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                        </div>
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
                         }
                     </CardHeader>
                     <CardBody>
@@ -749,7 +775,7 @@ class StockStatusOverTime extends Component {
                                                         <option value="7">{7}</option>
                                                         <option value="8">{8}</option>
                                                         <option value="9">{9}</option>
-                                                        <option value="10">10}</option>
+                                                        <option value="10">{10}</option>
                                                         <option value="11">{11}</option>
                                                         <option value="12">{12}</option>
                                                     </Input></InputGroup></div>
@@ -776,7 +802,7 @@ class StockStatusOverTime extends Component {
                                                         <option value="7">{7}</option>
                                                         <option value="8">{8}</option>
                                                         <option value="9">{9}</option>
-                                                        <option value="10">10}</option>
+                                                        <option value="10">{10}</option>
                                                         <option value="11">{11}</option>
                                                         <option value="12">{12}</option>
                                                     </Input></InputGroup></div>
@@ -790,7 +816,7 @@ class StockStatusOverTime extends Component {
                         <div className="row">
                             <div className="col-md-12">{this.state.matricsList.length > 0}
                                 {
-                                    (this.state.matricsList.length > 0 )
+                                    (this.state.matricsList.length > 0)
                                     &&
 
                                     <div className="col-md-12">

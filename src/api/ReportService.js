@@ -49,5 +49,10 @@ class ReportService {
         );
     }
 
+    getStockStatusData(json) {
+        return axios.post(`${API_URL}/api/report/stockStatus`,json,{}
+        );
+    }
+
 }
 export default new ReportService();

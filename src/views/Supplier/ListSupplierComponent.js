@@ -42,7 +42,7 @@ class SupplierListComponent extends Component {
         }, 8000);
     }
     editSupplier(supplier) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLIER')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_SUPPLIER')) {
             this.props.history.push({
                 pathname: `/supplier/editSupplier/${supplier.supplierId}`,
                 // state: { supplier }
@@ -224,7 +224,7 @@ class SupplierListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_SUPPLIER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_SUPPLIER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </CardHeader>

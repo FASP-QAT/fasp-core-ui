@@ -219,7 +219,7 @@ export default class ProgramOnboarding extends Component {
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
                     console.log("in success--------");
-                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -323,7 +323,7 @@ export default class ProgramOnboarding extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        } 
+        }
         // if (event.target.name == 'deliveredToReceivedLeadTime') {
         //     program.deliveredToReceivedLeadTime = event.target.value;
         // } 
@@ -343,7 +343,7 @@ export default class ProgramOnboarding extends Component {
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
-        }if (event.target.name == 'shippedToArrivedByAirLeadTime') {
+        } if (event.target.name == 'shippedToArrivedByAirLeadTime') {
             program.shippedToArrivedByAirLeadTime = event.target.value;
         }
         if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
@@ -730,7 +730,7 @@ export default class ProgramOnboarding extends Component {
 
                                     <FormGroup>
 
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1 nextbtn" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
@@ -869,12 +869,12 @@ export default class ProgramOnboarding extends Component {
                                 </div>
                                 <div id="stepSeven">
                                     <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
-                                    <FormGroup>
+                                    <FormGroup className="mt-2">
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Back</Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>

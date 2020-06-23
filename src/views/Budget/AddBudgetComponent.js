@@ -1,22 +1,20 @@
-import React, { Component, useState } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, FormText, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import BudgetService from "../../api/BudgetService";
-import ProgramService from "../../api/ProgramService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import FundingSourceService from '../../api/FundingSourceService';
-import getLabelText from '../../CommonComponent/getLabelText'
 import { Date } from 'core-js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import NumberFormat from 'react-number-format';
-import DatePicker from 'react-datepicker';
-import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
-import { confirmAlert } from 'react-confirm-alert';
-import CurrencyService from '../../api/CurrencyService.js';
+import { Formik } from 'formik';
 import moment from 'moment';
+import React, { Component } from 'react';
+import DatePicker from 'react-datepicker';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
+import BudgetService from "../../api/BudgetService";
+import CurrencyService from '../../api/CurrencyService.js';
+import FundingSourceService from '../../api/FundingSourceService';
+import ProgramService from "../../api/ProgramService";
+import getLabelText from '../../CommonComponent/getLabelText';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -41,8 +39,10 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.programtext')),
         fundingSourceId: Yup.string()
             .required(i18n.t('static.budget.fundingtext')),
-        budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
+        budgetAmt: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^[0-9]+([,\.][0-9]+)?/,i18n.t('static.program.validBudgetAmount')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
         // stopDate: Yup.string()
@@ -91,7 +91,7 @@ class AddBudgetComponent extends Component {
                     label_fr: ''
                 },
                 program: {
-                    id:'',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -134,7 +134,31 @@ class AddBudgetComponent extends Component {
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.addMonths = this.addMonths.bind(this);
+        this.CommaFormatted = this.CommaFormatted.bind(this);
+
     }
+
+    CommaFormatted(cell) {
+        cell += '';
+        cell = cell.replace(/,/g, '');
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        // return "(" + currencyCode + ")" + "  " + x1 + x2;
+        return x1 + x2;
+    }
+
+    addMonths(date, months) {
+        date.setMonth(date.getMonth() + months);
+        return date;
+    }
+
+
 
     Capitalize(str) {
         let { budget } = this.state
@@ -178,7 +202,8 @@ class AddBudgetComponent extends Component {
             budget.fundingSource.fundingSourceId = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
-            budget.budgetAmt = event.target.value;
+            var chnageValue = this.CommaFormatted(event.target.value);
+            budget.budgetAmt = chnageValue;
         }
         if (event.target.name === "currencyId") {
             var currencyAndrate = event.target.value;
@@ -309,7 +334,7 @@ class AddBudgetComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                  <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -320,27 +345,29 @@ class AddBudgetComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                                    console.log("this.state--->", this.state);
                                     let { budget } = this.state;
                                     var getCurrencyId = this.state.budget.currency.currencyId;
                                     var currencyId = getCurrencyId.split("~");
                                     budget.currency.currencyId = currencyId[0];
 
+                                    var amount = this.state.budget.budgetAmt.replace(/,/g, '');
+                                    budget.budgetAmt = amount;
                                     // alert(this.state.budget.startDate);
-                                    var startDate=moment(this.state.budget.startDate).format("YYYY-MM-DD");
-                                    budget.startDate=startDate;
+                                    var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
+                                    budget.startDate = startDate;
 
-                                    var stopDate=moment(this.state.budget.stopDate).format("YYYY-MM-DD");
-                                    budget.stopDate=stopDate;
+                                    var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
+                                    budget.stopDate = stopDate;
 
                                     // alert("hiiiiii");
                                     // this.setState({ budget: budget });
 
-                                    console.log("this.state.budget--->",budget);
+                                    console.log("this.state.budget--->", budget);
                                     BudgetService.addBudget(budget)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/budget/listBudget/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -497,17 +524,17 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input
                                                             type="number"
-                                                            min="0"
+                                                            // min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
                                                             valid={!errors.budgetAmt && this.state.budget.budgetAmt != ''}
                                                             invalid={touched.budgetAmt && !!errors.budgetAmt}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e);this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            type="number"
+                                                            type="text"
                                                             value={this.state.budget.budgetAmt}
-                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
@@ -582,19 +609,18 @@ class AddBudgetComponent extends Component {
                                                             id="startDate"
                                                             name="startDate"
                                                             bsSize="sm"
-                                                            minDate={new Date()}
+                                                            minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
-                                                            autoComplete="off"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
-
+                                                            autoComplete={"off"}
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
- 
+
                                                         <DatePicker
                                                             id="stopDate"
                                                             name="stopDate"
@@ -603,9 +629,9 @@ class AddBudgetComponent extends Component {
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control"
-                                                            autoComplete="off"
+                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
+                                                            autoComplete={"off"}
                                                         />
                                                     </FormGroup>
                                                 </CardBody>
@@ -633,7 +659,7 @@ class AddBudgetComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/budget/listBudget/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

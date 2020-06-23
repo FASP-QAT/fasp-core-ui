@@ -35,7 +35,6 @@ const validationSchema = function (values, t) {
         gtin: Yup.string()
             .required(i18n.t('static.mapProcurementUnit.validGtinText'))
             .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
-            .min(14, i18n.t('static.procurementUnit.validMinValueText'))
             .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
         approvedToShippedLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -304,7 +303,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 if (response.status == 200) {
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse , loading: false });
+                        this.setState({ rows: myResponse, loading: false });
                     }
                 } else {
                     this.setState({
@@ -519,7 +518,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 bsSize="sm"
                                                                 valid={!errors.skuCode && this.state.skuCode != ''}
                                                                 invalid={touched.skuCode && !!errors.skuCode}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                             <FormFeedback className="red">{errors.skuCode}</FormFeedback>
@@ -535,7 +534,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 valid={!errors.vendorPrice && this.state.vendorPrice != ''}
                                                                 invalid={touched.vendorPrice && !!errors.vendorPrice}
                                                                 value={this.state.vendorPrice}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                             <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
@@ -551,7 +550,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 valid={!errors.approvedToShippedLeadTime && this.state.approvedToShippedLeadTime != ''}
                                                                 invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                                 value={this.state.approvedToShippedLeadTime}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                             <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
@@ -565,7 +564,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                                 bsSize="sm"
                                                                 valid={!errors.gtin && this.state.gtin != ''}
                                                                 invalid={touched.gtin && !!errors.gtin}
-                                                                value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                                value={this.state.gtin} 
+                                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                                                 onBlur={handleBlur}
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
@@ -579,7 +579,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table style={{ display: this.state.loading ? "none" : "block" }} responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2" >
                                     <thead>
                                         <tr>
                                             <th className="text-center">{i18n.t('static.procurementagent.procurementagent')}</th>
