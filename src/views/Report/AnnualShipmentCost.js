@@ -165,7 +165,19 @@ class AnnualShipmentCost extends Component {
             );
 
     }
+    formatter = value => {
 
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+      }
     show() {
         /* if (!this.state.showed) {
              setTimeout(() => {this.state.closeable = true}, 250)
@@ -191,7 +203,7 @@ class AnnualShipmentCost extends Component {
             const pageCount = doc.internal.getNumberOfPages()
 
             doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+            doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
 
@@ -277,18 +289,18 @@ class AnnualShipmentCost extends Component {
         var year = [];
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++)
             year.push(from);
-        // var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
-         var data =this.state.matricsList;
-        //  var data= [{2019: 17234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM",planningUnit: "Ceftriaxone 1 gm Powder Vial, 50"},
-        // {2019: 17234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM",planningUnit: "Ceftriaxone 1 gm Powder Vial, 50"},
-        // {2019: 17234, 2020: 0, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM",planningUnit: "Ceftriaxone 1 gm Powder Vial, 50"}      ]
+         var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
+        // var data =this.state.matricsList;
+          var data= [{2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM",planningUnit: "Ceftriaxone 1 gm Powder Vial, 50"},
+        {2019: 15234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "PEPFAR", procurementAgent: "PSM",planningUnit: "Ceftriaxone 1 gm Powder Vial, 50"},
+        {2019: 0, 2020: 17234, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "GF",planningUnit: "Ceftriaxone 1 gm Powder Vial, 50"}      ]
         //this.state.matricsList;//[['GHSC-PSM \n PEPFAR \nplanning unit 1', 200000, 300000], ['PPM \nGF \n planning unit 1', 15826, 2778993]]
         var index = doc.internal.pageSize.width / (year.length + 3);
         var initalvalue = index + 10
         for (var i = 0; i < year.length; i++) {
             initalvalue = initalvalue + index
             doc.text(year[i].toString(), initalvalue, 180, {
-                align: 'left'
+                align: 'left',
             })
         }
         initalvalue += index
@@ -320,13 +332,15 @@ class AnnualShipmentCost extends Component {
                         initalvalue=initalvalue+index
                         totalAmount[x] = totalAmount[x] == null ? values[n] : totalAmount[x] + values[n]
                         GrandTotalAmount[x] = GrandTotalAmount[x] == null ? values[n] : GrandTotalAmount[x] + values[n]
-                        doc.text(values[n].toString(), initalvalue, yindex, {
+                        doc.setFont('helvetica', 'normal')
+                        doc.text(this.formatter(values[n]).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
                     }
                 }
             }
-            doc.text(total.toString(), initalvalue + index, yindex, {
+            doc.setFont('helvetica', 'bold')
+            doc.text(this.formatter(total).toString(), initalvalue + index, yindex, {
                 align: 'left'
             });
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] +total
@@ -346,7 +360,7 @@ class AnnualShipmentCost extends Component {
                     for (var l = 0; l < totalAmount.length; l++) {
                         initalvalue += index;
                         Gtotal = Gtotal + totalAmount[l]
-                        doc.text(totalAmount[l].toString(), initalvalue, yindex, {
+                        doc.text(this.formatter(totalAmount[l]).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
                         totalAmount[l]=0;
@@ -368,7 +382,7 @@ class AnnualShipmentCost extends Component {
                 for (var l = 0; l < totalAmount.length; l++) {
                     initalvalue += index;
                     Gtotal = Gtotal + totalAmount[l]
-                    doc.text(totalAmount[l].toString(), initalvalue, yindex, {
+                    doc.text(this.formatter(totalAmount[l]).toString(), initalvalue, yindex, {
                         align: 'left'
                     })
                 }    
@@ -389,11 +403,11 @@ class AnnualShipmentCost extends Component {
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             initalvalue += index;
             Gtotal = Gtotal + GrandTotalAmount[l]
-            doc.text(GrandTotalAmount[l].toString(), initalvalue, yindex, {
+            doc.text(this.formatter(GrandTotalAmount[l]).toString(), initalvalue, yindex, {
                 align: 'left'
             })
         }
-        doc.text(Gtotal.toString(), initalvalue + index, yindex, {
+        doc.text(this.formatter(Gtotal).toString(), initalvalue + index, yindex, {
             align: 'left'
         });
         doc.setFontSize(8);

@@ -488,6 +488,7 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
+  table-layout: auto !important; 
   max-height: 540px;
 }
 
@@ -1955,7 +1956,7 @@ white-space: normal;
 text-overflow: ellipsis;
 align-items: stretch!important;
 // width: 238%!important;
-min-width: 238px;
+min-width: 370px;
 width: 0 auto!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
@@ -1983,7 +1984,7 @@ border-radius: 0.2rem!important;
   display: flex!important;
   // flex-wrap: wrap!important;
   align-items: stretch!important;
-  min-width: 238px;
+  min-width: 370px;
   width: 0 auto!important;
   overflow: hidden;
 word-wrap: normal !important;
@@ -2127,7 +2128,7 @@ text-overflow: ellipsis;
     text-overflow: ellipsis;
     align-items: stretch!important;
     // width: 238%!important;
-    min-width: 380px
+    min-width: 465px
 
     
     }
