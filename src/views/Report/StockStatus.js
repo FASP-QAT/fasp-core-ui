@@ -45,6 +45,10 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import actualIcon from '../../assets/img/actual.png';
+import csvicon from '../../assets/img/csv.png'
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -58,24 +62,24 @@ const brandDanger = getStyle('--danger')
 
 const options = {
   scales: {
-   
+
     yAxes: [{
       id: 'A',
       position: 'left',
       scaleLabel: {
         display: true,
-        
+        fontSize:"12"
       },
       ticks: {
         beginAtZero: true,
         fontColor: 'black'
       }
-    },{
+    }, {
       id: 'B',
       position: 'right',
       scaleLabel: {
         display: true,
-        
+
       },
       ticks: {
         beginAtZero: true,
@@ -86,7 +90,7 @@ const options = {
       ticks: {
         fontColor: 'black'
       }
-  }]
+    }]
   },
 
   tooltips: {
@@ -122,7 +126,10 @@ for (var i = 0; i <= elements; i++) {
   data2.push(random(80, 100));
   data3.push(65);
 }
-
+const pickerLang = {
+  months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  from: 'From', to: 'To',
+}
 
 
 
@@ -169,6 +176,165 @@ class StockStatus extends Component {
     }
     return x1 + x2;
   }
+   makeText = m => {
+    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+    return '?'
+  }
+
+  exportCSV() {
+
+    var csvRow = [];
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.productcategory.productcategory').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push('')
+    csvRow.push('')
+    csvRow.push('')
+    csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+    csvRow.push('')
+
+    const headers = [[i18n.t('static.report.month').replaceAll(' ', '%20'),
+    i18n.t('static.dashboard.consumption').replaceAll(' ', '%20'),
+    i18n.t('static.consumption.actual').replaceAll(' ', '%20'),
+    i18n.t('static.supplyPlan.shipmentQty').replaceAll(' ', '%20'),
+    (i18n.t('static.budget.fundingsource')+"-"+i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
+    i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
+    i18n.t('static.report.closingbalance').replaceAll(' ', '%20'),
+    i18n.t('static.report.mos').replaceAll(' ', '%20'),
+    i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
+    i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]];
+
+    var A = headers
+    var re;
+      this.state.stockStatusList.map(ele => A.push([ele.transDate.replaceAll(' ', '%20'), ele.consumptionQty, ele.actual?'Yes':'', ele.shipmentQty,
+      (( ele.shipmentList.map(item=>{return(
+         " [ "+getLabelText(item.fundingSource.label,this.state.lang)+" : "+getLabelText(item.shipmentStatus.label,this.state.lang)+" ] "
+       )}).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')
+       , ele.adjustmentQty, ele.closingBalance, ele.mos, ele.minMonths, ele.maxMonths]));
+    
+    /*for(var item=0;item<re.length;item++){
+      A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
+    } */
+    for (var i = 0; i < A.length; i++) {
+      console.log(A[i])
+      csvRow.push(A[i].join(","))
+
+    }
+
+    var csvString = csvRow.join("%0A")
+    console.log('csvString' + csvString)
+    var a = document.createElement("a")
+    a.href = 'data:attachment/csv,' + csvString
+    a.target = "_Blank"
+    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    document.body.appendChild(a)
+    a.click()
+  }
+
+  exportPDF = (columns) => {
+    const addFooters = doc => {
+      const pageCount = doc.internal.getNumberOfPages()
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(6)
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+
+        doc.setPage(i)
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+          align: 'center'
+        })
+        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+          align: 'center'
+        })
+      }
+    }
+    const addHeaders = doc => {
+      const pageCount = doc.internal.getNumberOfPages()
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
+        doc.setPage(i)
+        doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+        /*doc.addImage(data, 10, 30, {
+          align: 'justify'
+        });*/
+        doc.setTextColor("#002f6c");
+        doc.text(i18n.t('static.dashboard.stockstatus'), doc.internal.pageSize.width / 2, 60, {
+          align: 'center'
+        })
+        if (i == 1) {
+          doc.setFontSize(8)
+          doc.setFont('helvetica', 'normal')
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+            align: 'left'
+          })
+
+        }
+
+      }
+    }
+
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "landscape"; // portrait or landscape
+    const marginLeft = 10;
+    const doc = new jsPDF(orientation, unit, size);
+    doc.setFontSize(8);
+    var canvas = document.getElementById("cool-canvas");
+    //creates image
+
+    var canvasImg = canvas.toDataURL("image/png", 1.0);
+    var width = doc.internal.pageSize.width;
+    var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    var aspectwidth1 = (width - h1);
+
+    doc.addImage(canvasImg, 'png', 50, 220,750,260,'CANVAS');
+
+    const header = [[i18n.t('static.report.month'),
+    i18n.t('static.dashboard.consumption'),
+    i18n.t('static.consumption.actual'),
+    i18n.t('static.supplyPlan.shipmentQty'),
+    (i18n.t('static.budget.fundingsource')+" : "+i18n.t('static.supplyPlan.shipmentStatus')),
+    i18n.t('static.report.adjustmentQty'),
+    i18n.t('static.report.closingbalance'),
+    i18n.t('static.report.mos'),
+    i18n.t('static.report.minmonth'),
+    i18n.t('static.report.maxmonth')]];
+
+  let data=
+      this.state.stockStatusList.map(ele => [ele.transDate, this.formatter(ele.consumptionQty), ele.actual?'Yes':'', this.formatter(ele.shipmentQty),
+       ele.shipmentList.map(item=>{return(
+         " [ "+getLabelText(item.fundingSource.label,this.state.lang) +" : "+getLabelText(item.shipmentStatus.label,this.state.lang)+" ] "
+       ) })
+       , this.formatter(ele.adjustmentQty), this.formatter(ele.closingBalance), this.formatter(ele.mos), this.formatter(ele.minMonths), this.formatter(ele.maxMonths)]);
+  
+    let content = {
+      margin: { top: 80 },
+      startY: height,
+      head: header,
+      body: data,
+      styles: { lineWidth: 1, fontSize: 8, cellWidth: 67, halign: 'center' },
+      columnStyles: {
+        4: { cellWidth: 158.89 },
+      }
+    };
+    doc.autoTable(content);
+    addHeaders(doc)
+    addFooters(doc)
+    doc.save(i18n.t('static.dashboard.stockstatus') + ".pdf")
+  }
+
 
   filterData() {
     let programId = document.getElementById("programId").value;
@@ -186,48 +352,61 @@ class StockStatus extends Component {
         "planningUnitId": planningUnitId,
 
       }
-      this.setState({ stockStatusList:[{transDate:'Jan-20',consumptionQty:25135,actual:true,shipmentQty:0,shipmentList:[
-         ],adjustmentQty:3999,closingBalance:27230,mos:0.21,minMonths:1.2,maxMonths:2.5},
-      {transDate:'Feb-20',consumptionQty:49880,actual:true,shipmentQty:78900,shipmentList:[
-        {shipmentQty:78900,fundingSource:{id:1,label:{label_en:'PEPFAR'}},shipmentStatus:{id:1,label:{label_en:'deliverd'}}}
-        ],adjustmentQty:1050,closingBalance:6067,mos:1.34,minMonths:1.0,maxMonths:2.0}
-      ,{transDate:'Mar-20',consumptionQty:25177,actual:false,shipmentQty:0,shipmentList:[ ],adjustmentQty:-13597,closingBalance:22540,mos:0.44,minMonths:1.0,maxMonths:2.5},
-      {transDate:'Apr-20',consumptionQty:16750,actual:false,shipmentQty:0,shipmentList:[ ],adjustmentQty:-5790,closingBalance:0,mos:0,minMonths:1.0,maxMonths:1.5},
-      {transDate:'May-20',consumptionQty:14000,actual:false,shipmentQty:40000,shipmentList:[
-        {shipmentQty:40000,fundingSource:{id:1,label:{label_en:'PEPFAR'}},shipmentStatus:{id:1,label:{label_en:'deliverd'}}}
-       
-       ],adjustmentQty:0,closingBalance:26000,mos:2.1,minMonths:2.0,maxMonths:3.5}]})
-    /*  AuthenticationService.setupAxiosInterceptors();
-      ReportService.getStockStatusData(inputjson)
-        .then(response => {
-          console.log(JSON.stringify(response.data));
-          this.setState({
-            stockStatusList: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              stockStatusList: []
-            })
+      this.setState({
+        stockStatusList: [{
+          transDate: 'Jan 20', consumptionQty: 17475, actual: true, shipmentQty: 0, shipmentList: [
+          ], adjustmentQty: -10122, closingBalance: 27203, mos: 1.28, minMonths: 1.2, maxMonths: 2.5
+        },
+        {
+          transDate: 'Feb 20', consumptionQty: 25135, actual: false, shipmentQty: 0, shipmentList: [], adjustmentQty: 3999
+          , closingBalance: 6067, mos: 1.21, minMonths: 1.0, maxMonths: 1.5
+        },
+        {
+          transDate: 'Mar 20', consumptionQty: 49880, actual: true, shipmentQty: 78900, shipmentList: [
+            { shipmentQty: 78900, fundingSource: { id: 1, label: { label_en: 'PEPFAR' } }, shipmentStatus: { id: 1, label: { label_en: 'Delivered' } } }
+          ], adjustmentQty: 105, closingBalance: 36137, mos: 1.34, minMonths: 1.0, maxMonths: 2.0
+        }
+          , { transDate: 'Apr 20', consumptionQty: 25177, actual: false, shipmentQty: 0, shipmentList: [], adjustmentQty: -135, closingBalance: 10960, mos: 0.54, minMonths: 0.5, maxMonths: 2.5 },
+        { transDate: 'May 20', consumptionQty: 16750, actual: false, shipmentQty: 0, shipmentList: [], adjustmentQty: -579, closingBalance: 0, mos: 1.2, minMonths: 1.0, maxMonths: 1.5 },
+        {
+          transDate: 'Jun 20', consumptionQty: 14000, actual: false, shipmentQty: 40000, shipmentList: [
+            { shipmentQty: 40000, fundingSource: { id: 1, label: { label_en: 'PEPFAR' } }, shipmentStatus: { id: 1, label: { label_en: 'Planned' } } }
 
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
+          ], adjustmentQty: 0, closingBalance: 26000, mos: 2.1, minMonths: 2.0, maxMonths: 3.5
+        }
+       ]
+      })
+      /*  AuthenticationService.setupAxiosInterceptors();
+        ReportService.getStockStatusData(inputjson)
+          .then(response => {
+            console.log(JSON.stringify(response.data));
+            this.setState({
+              stockStatusList: response.data
+            })
+          }).catch(
+            error => {
+              this.setState({
+                stockStatusList: []
+              })
+  
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
               }
             }
-          }
-        );*/
+          );*/
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
 
@@ -541,19 +720,21 @@ class StockStatus extends Component {
 
       labels: this.state.stockStatusList.map((item, index) => (item.transDate)),
       datasets: [
-       {
+        {
           type: "line",
           yAxisID: 'B',
-          label: "Min Months",
-          backgroundColor: 'transparent',
+          label: i18n.t('static.report.minmonth'),
+          backgroundColor: 'rgba(255,193,8,0.2)',
           borderColor: '#f86c6b',
           borderStyle: 'dotted',
+          borderDash: [10, 10],
+          fill: '+1',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
           },
           showInLegend: true,
-            pointStyle: 'line',
+          pointStyle: 'line',
           yValueFormatString: "$#,##0",
           lineTension: 0,
           data: this.state.stockStatusList.map((item, index) => (item.minMonths))
@@ -561,10 +742,12 @@ class StockStatus extends Component {
         , {
           type: "line",
           yAxisID: 'B',
-          label: "Max Months",
-          backgroundColor: 'transparent',
+          label: i18n.t('static.report.maxmonth'),
+          backgroundColor: 'rgba(0,0,0,0)',
           borderColor: '#ffc107',
           borderStyle: 'dotted',
+          borderDash: [10, 10],
+          fill: true,
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
@@ -579,9 +762,8 @@ class StockStatus extends Component {
           type: "line",
           yAxisID: 'B',
           label: "MOS",
+          borderColor: '#205493',
           backgroundColor: 'transparent',
-          borderColor: '#388b70',
-          borderStyle: 'dotted',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
@@ -597,13 +779,12 @@ class StockStatus extends Component {
           yAxisID: 'A',
           label: "Consumption",
           backgroundColor: 'transparent',
-          borderColor: '#205493',
-          borderStyle: 'dotted',
+          borderColor: '#388b70',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
           },
-          lineTension:0,
+          lineTension: 0,
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
@@ -614,44 +795,76 @@ class StockStatus extends Component {
           yAxisID: 'A',
           type: 'line',
           borderColor: 'rgba(179,181,158,1)',
-          borderStyle: 'dotted',
           ticks: {
-              fontSize: 2,
-              fontColor: 'transparent',
+            fontSize: 2,
+            fontColor: 'transparent',
           },
           lineTension: 0,
           pointStyle: 'line',
           showInLegend: true,
-          data:this.state.stockStatusList.map((item, index) => (item.closingBalance))
-      }, 
-       {
-        type: "line",
-        yAxisID: 'A',
-        label: "Adjustment",
-        backgroundColor: 'transparent',
-        borderColor: '#20a8d8',
-        borderStyle: 'dotted',
-        ticks: {
-          fontSize: 2,
-          fontColor: 'transparent',
-        },
-        lineTension:0,
-        showInLegend: true,
-        pointStyle: 'line',
-        yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item, index) => (item.adjustmentQty))
-      },
-       {
-        label: 'ShipmentQty',
-        yAxisID: 'A',
-        backgroundColor: '#86CD99',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
-        data: this.state.stockStatusList.map((item, index) => (item.shipmentQty)),
-      }
+          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
+        }, {
+          label: 'Delivered',
+          yAxisID: 'A',
+          stack: 1,
+          backgroundColor: '#042e6a',
+          borderColor: 'rgba(179,181,198,1)',
+          pointBackgroundColor: 'rgba(179,181,198,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(179,181,198,1)',
+          data: this.state.stockStatusList.map((item, index) => {let count=0;
+            count=+(item.shipmentList.map((ele,index)=>{
+             return(ele.shipmentStatus.label.label_en=="Delivered"? count=count+ele.shipmentQty:count)}))
+          return count
+        })},
+        {
+          label: 'Shipped',
+          yAxisID: 'A',
+          stack: 1,
+          backgroundColor: '#6a82a8',
+          borderColor: 'rgba(179,181,198,1)',
+          pointBackgroundColor: 'rgba(179,181,198,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(179,181,198,1)',
+          data: this.state.stockStatusList.map((item, index) => {let count=0;
+            count=+(item.shipmentList.map((ele,index)=>{
+             return(ele.shipmentStatus.label.label_en=="Shipped"? count=count+ele.shipmentQty:count)}))
+          return count
+        }) },
+       
+        {
+          label: 'Ordered',
+          yAxisID: 'A',
+          stack: 1,
+          backgroundColor: '#8aa9e6',
+          borderColor: 'rgba(179,181,198,1)',
+          pointBackgroundColor: 'rgba(179,181,198,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(179,181,198,1)',
+          data: this.state.stockStatusList.map((item, index) => {let count=0;
+            count=+(item.shipmentList.map((ele,index)=>{
+             return(ele.shipmentStatus.label.label_en=="Ordered"? count=count+ele.shipmentQty:count)}))
+          return count
+        })},
+        {
+          label: 'Planned',
+          backgroundColor: '#cfd5ea',
+          borderColor: 'rgba(179,181,198,1)',
+          pointBackgroundColor: 'rgba(179,181,198,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(179,181,198,1)',
+          yAxisID: 'A',
+          stack: 1,
+          data: this.state.stockStatusList.map((item, index) => {let count=0;
+            count=+(item.shipmentList.map((ele,index)=>{
+             return(ele.shipmentStatus.label.label_en=="Planned"? count=count+ele.shipmentQty:count)}))
+          return count
+        })  }
+        
       ],
 
     };
@@ -664,16 +877,10 @@ class StockStatus extends Component {
           </option>
         )
       }, this);
-    const pickerLang = {
-      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      from: 'From', to: 'To',
-    }
+    
     const { rangeValue } = this.state
 
-    const makeText = m => {
-      if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-      return '?'
-    }
+   
 
     return (
       <div className="animated fadeIn" >
@@ -681,15 +888,13 @@ class StockStatus extends Component {
 
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i><strong>StockStatus Report</strong>
+            <i className="icon-menu"></i><strong>Stock Status Report</strong>
             <div className="card-header-actions">
               <a className="card-header-action">
-               {/* <Pdf targetRef={ref} filename="StockStatus.pdf">
-                  {({ toPdf }) =>
-                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
-
-                  }
-                </Pdf>*/}
+              {this.state.stockStatusList.length > 0 && <div className="card-header-actions">
+                <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV( )} />
+              </div>}
               </a>
             </div>
           </CardHeader>
@@ -713,7 +918,7 @@ class StockStatus extends Component {
                             onChange={this.handleRangeChange}
                             onDismiss={this.handleRangeDissmis}
                           >
-                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                           </Picker>
                         </div>
 
@@ -783,93 +988,93 @@ class StockStatus extends Component {
                 </Form>
                 <Col md="12 pl-0">
                   <div className="row">
+                    {
+                      this.state.stockStatusList.length > 0
+                      &&
+                      <div className="col-md-12 p-0">
+                        <div className="col-md-12">
+                          <div className="chart-wrapper chart-graph-report">
+                            <Bar id="cool-canvas" data={bar} options={options} />
+
+                          </div>
+                        </div>
+                        <div className="col-md-12">
+                          <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                            {this.state.show ? 'Hide Data' : 'Show Data'}
+                          </button>
+
+                        </div>
+                      </div>}
+
+
+                  </div>
+
+
+
+                  {this.state.show && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+
+                    <thead>
+                      <tr><th rowSpan="2" style ={{width:"200px"}}>{i18n.t('static.report.month')}</th> <th className="text-center" colSpan="2"> {i18n.t('static.dashboard.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="5"> {i18n.t('static.report.stock')} </th> </tr><tr>
+
+                        <th className="text-center"style ={{width:"200px"}}> {i18n.t('static.dashboard.consumption')} </th>
+                        <th className="text-center" style ={{width:"200px"}}>{i18n.t('static.consumption.actual')  }</th>
+                        <th className="text-center"style ={{width:"200px"}}>{i18n.t('static.supplyPlan.shipmentQty')}</th>
+                        <th className="text-center" style ={{width:"200px"}}>{ (i18n.t('static.budget.fundingsource')+" : "+i18n.t('static.supplyPlan.shipmentStatus'))}</th>
+                        <th className="text-center" style ={{width:"200px"}}>{i18n.t('static.report.adjustmentQty')}</th>
+                        <th className="text-center" style ={{width:"200px"}}>{i18n.t('static.report.closingbalance')}</th>
+                        <th className="text-center" style ={{width:"200px"}}>{ i18n.t('static.report.mos')}</th>
+                        <th className="text-center" style ={{width:"200px"}}>{i18n.t('static.report.minmonth')}</th>
+                        <th className="text-center" style ={{width:"200px"}}>{i18n.t('static.report.maxmonth')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {
                         this.state.stockStatusList.length > 0
                         &&
-                        <div className="col-md-12 p-0">
-                          <div className="col-md-12">
-                            <div className="chart-wrapper chart-graph-report">
-                              <Bar id="cool-canvas" data={bar} options={options} />
+                        this.state.stockStatusList.map((item, idx) =>
 
-                            </div>
-                          </div>
-                          <div className="col-md-12">
-                            <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? 'Hide Data' : 'Show Data'}
-                            </button>
+                          <tr id="addr0" key={idx} >
+                            <td>
+                              {this.state.stockStatusList[idx].transDate}
+                            </td>
+                            <td>
 
-                          </div>
-                          </div>}
-                       
-                    
-                  </div>
-                
-              
+                              {this.formatter(this.state.stockStatusList[idx].consumptionQty)}
+                            </td>
+                            <td>
+                              {this.state.stockStatusList[idx].actual ? <img src={actualIcon} /> : ''}
+                            </td>
+                            <td>
+                              {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
+                            </td>
+                            <td align="center">
+                              {this.state.stockStatusList[idx].shipmentList.map((item, index) => {
+                                return (`[ ${item.fundingSource.label.label_en} : ${item.shipmentStatus.label.label_en} ]  `)
+                                //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
+                              })}
+                            </td>
+                            <td>
+                              {this.formatter(this.state.stockStatusList[idx].adjustmentQty)}
+                            </td>
+                            <td>
+                              {this.formatter(this.state.stockStatusList[idx].closingBalance)}
+                            </td>
+                            <td>
+                              {this.state.stockStatusList[idx].mos}
+                            </td>
+                            <td>
+                              {this.state.stockStatusList[idx].minMonths}
+                            </td>
+                            <td>
+                              {this.state.stockStatusList[idx].maxMonths}
+                            </td>
+                          </tr>)
 
-                  {this.state.show &&  <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                      }
+                    </tbody>
 
-              <thead>
-                <tr><th rowSpan="2">Month</th> <th className="text-center" colSpan="2"> Consumption </th> <th className="text-center"colSpan="2"> Shipment </th> <th className="text-center" colSpan="5"> Stock </th> </tr><tr>
-                 
-                  <th className="text-center"> Consumption </th>
-                  <th className="text-center">Actual</th>
-                  <th className="text-center">Shipment Qty</th>
-                  <th className="text-center">Funding Source and Shipment Status</th>
-                  <th className="text-center">Adjustment Qty</th>
-                  <th className="text-center">Closing Balance</th>
-                  <th className="text-center">MOS</th>
-                  <th className="text-center">Min(Months)</th>
-                  <th className="text-center">Max(Months)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  this.state.stockStatusList.length > 0
-                  &&
-                  this.state.stockStatusList.map((item, idx) =>
-
-                    <tr id="addr0" key={idx} >
-                      <td>
-                        {this.state.stockStatusList[idx].transDate}
-                      </td>
-                      <td>
-
-                        {this.formatter(this.state.stockStatusList[idx].consumptionQty)}
-                      </td>
-                      <td>
-                        {this.state.stockStatusList[idx].actual?<img src={actualIcon}/>:''}
-                      </td>
-                      <td>
-                        {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
-                      </td>
-                      <td align="center">
-                        {this.state.stockStatusList[idx].shipmentList.map((item, index) => {
-                         return(`[ ${item.fundingSource.label.label_en} , ${item.shipmentStatus.label.label_en} ]  `)
-                         //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
-                        })}
-                      </td>
-                      <td>
-                        {this.formatter(this.state.stockStatusList[idx].adjustmentQty)}
-                      </td>
-                      <td>
-                        {this.formatter(this.state.stockStatusList[idx].closingBalance)}
-                      </td>
-                      <td>
-                        {this.state.stockStatusList[idx].mos}
-                      </td>
-                      <td>
-                        {this.state.stockStatusList[idx].minMonths}
-                      </td>
-                      <td>
-                        {this.state.stockStatusList[idx].maxMonths}
-                      </td>
-                    </tr>)
-
-                }
-              </tbody>
-
-            </Table>}
-</Col></div></div>
+                  </Table>}
+                </Col></div></div>
 
 
 
