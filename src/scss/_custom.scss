@@ -488,6 +488,7 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
+  table-layout: auto !important; 
   max-height: 540px;
 }
 
@@ -797,6 +798,12 @@ label.arrow_label:after {
   .Regioncalender .input-group .month-picker {
     width: 220px;
     }
+
+.prductCat-search-align{
+  position: absolute;
+    top: 75px;
+    right: 20px;
+}
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
 
@@ -854,6 +861,11 @@ label.arrow_label:after {
 }
 @media only screen and (min-width: 1200px) {
   .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+  .prodCatselect{
+    position: absolute;
+    top: -6px;
+    margin-bottom: 0.5rem;
+  }
   
 }
 
@@ -1965,7 +1977,7 @@ white-space: normal;
 text-overflow: ellipsis;
 align-items: stretch!important;
 // width: 238%!important;
-min-width: 238px;
+min-width: 370px;
 width: 0 auto!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
@@ -1993,7 +2005,7 @@ border-radius: 0.2rem!important;
   display: flex!important;
   // flex-wrap: wrap!important;
   align-items: stretch!important;
-  min-width: 238px;
+  min-width: 370px;
   width: 0 auto!important;
   overflow: hidden;
 word-wrap: normal !important;
@@ -2137,7 +2149,7 @@ text-overflow: ellipsis;
     text-overflow: ellipsis;
     align-items: stretch!important;
     // width: 238%!important;
-    min-width: 380px
+    min-width: 465px
 
     
     }
