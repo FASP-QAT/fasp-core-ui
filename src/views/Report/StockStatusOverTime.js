@@ -17,15 +17,16 @@ import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import ReportService from '../../api/ReportService';
 import {
-    Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
+    Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form,Table
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 
 const options = {
     title: {
         display: true,
-        text: i18n.t('static.dashboard.stockstatusovertime'),
-        fontColor: 'black'
+        fontColor: 'black',
+        fontStyle: "normal",
+        fontSize: "12"
     },
     scales: {
         yAxes: [
@@ -58,6 +59,7 @@ const options = {
         position: 'bottom',
         labels: {
             usePointStyle: true,
+            fontColor: 'black'
         }
     }
 }
@@ -116,8 +118,23 @@ class StockStatusOverTime extends Component {
     }
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
+
+  formatter = value => {
+
+    var cell1 = value
+    cell1 += '';
+    var x = cell1.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
+ 
     handlePlanningUnitChange(planningUnitIds) {
 
 
@@ -310,6 +327,7 @@ class StockStatusOverTime extends Component {
             );
 
     }
+    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
     fetchData() {
         let productCategoryId = document.getElementById("productCategoryId").value;
         let planningUnitIds = this.state.planningUnitValues;
@@ -335,6 +353,27 @@ class StockStatusOverTime extends Component {
 
             ReportService.getStockOverTime(input)
                 .then(response => {
+                    response.data = [[{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 54800, "consumptionQty": 0, "amc": 23122, "amcMonthCount": 4, "mos": 2.37 },
+                    { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 27203, "consumptionQty": 17475, "amc": 23533, "amcMonthCount": 5, "mos": 1.1559 },
+                    { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 6067, "consumptionQty": 25135, "amc": 22402, "amcMonthCount": 6, "mos": 0.2708 },
+                    { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 36137, "consumptionQty": 49880, "amc": 21202, "amcMonthCount": 7, "mos": 1.7044 },
+                    { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10960, "consumptionQty": 25177, "amc": 23631, "amcMonthCount": 7, "mos": 0.4638 },
+                    { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 0, "consumptionQty": 16750, "amc": 23706, "amcMonthCount": 7, "mos": 0.0 },
+                    { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 26000, "consumptionQty": 14000, "amc": 22401, "amcMonthCount": 7, "mos": 1.1607 }],
+                    [{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 28648, "consumptionQty": 0, "amc": 8604, "amcMonthCount": 4, "mos": 3.3293 },
+                    { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17103, "consumptionQty": 11522, "amc": 9351, "amcMonthCount": 5, "mos": 1.829 },
+                    { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 20500, "consumptionQty": 11513, "amc": 9709, "amcMonthCount": 6, "mos": 2.1114 },
+                    { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 9116, "consumptionQty": 11384, "amc": 9965, "amcMonthCount": 7, "mos": 0.9148 },
+                    { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 31757, "consumptionQty": 12336, "amc": 11607, "amcMonthCount": 7, "mos": 2.7358 },
+                    { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 20257, "consumptionQty": 11500, "amc": 11604, "amcMonthCount": 7, "mos": 1.7456 },
+                    { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 28757, "consumptionQty": 11500, "amc": 11602, "amcMonthCount": 7, "mos": 2.4784 }],
+                    [{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 15865, "consumptionQty": 0, "amc": 4608, "amcMonthCount": 4, "mos": 3.4427 },
+                    { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 9789, "consumptionQty": 6053, "amc": 4854, "amcMonthCount": 5, "mos": 2.0166 },
+                    { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 23393, "consumptionQty": 6398, "amc": 5070, "amcMonthCount": 6, "mos": 4.6139 },
+                    { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 15903, "consumptionQty": 5982, "amc": 5224, "amcMonthCount": 7, "mos": 3.044 },
+                    { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10063, "consumptionQty": 5838, "amc": 6103, "amcMonthCount": 7, "mos": 1.6489 },
+                    { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 3913, "consumptionQty": 6150, "amc": 6116, "amcMonthCount": 7, "mos": 0.6397 },
+                    { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17763, "consumptionQty": 6150, "amc": 6081, "amcMonthCount": 7, "mos": 2.9209 }]];
                     console.log(JSON.stringify(response.data))
                     var lineData = [];
                     var lineDates = [];
@@ -351,8 +390,6 @@ class StockStatusOverTime extends Component {
                         planningUnitlines: planningUnitlines,
                         lineData: lineData,
                         lineDates: lineDates
-                    }, () => {
-                        console.log('##' + JSON.stringify(this.state.lineData[0] + this.state.planningUnitlines))
                     })
                 }).catch(
                     error => {
@@ -410,7 +447,7 @@ class StockStatusOverTime extends Component {
         var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]]
 
 
-        this.state.matricsList.map(ele => ele.map(elt => A.push([elt.dt, ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.roundN(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(ele => ele.map(elt => A.push([elt.dt, ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, elt.amc, elt.amcMonthCount, this.roundN(elt.mos)])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -436,7 +473,7 @@ class StockStatusOverTime extends Component {
             const pageCount = doc.internal.getNumberOfPages()
 
             doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+            doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
 
@@ -454,7 +491,7 @@ class StockStatusOverTime extends Component {
         const addHeaders = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
-           
+
             // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
             // var reader = new FileReader();
 
@@ -521,12 +558,12 @@ class StockStatusOverTime extends Component {
         var aspectwidth1 = (width - h1);
 
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
-        doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 220, 750, 230, 'CANVAS');
 
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(ele => ele.map(elt => data.push([elt.dt, getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.roundN(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(ele => ele.map(elt => data.push([elt.dt, getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
 
         let content = {
             margin: { top: 80 },
@@ -586,7 +623,7 @@ class StockStatusOverTime extends Component {
             }
             return color;
         }
-        console.log(this.state.lineData)
+        console.log(this.state.matricsList)
         const backgroundColor = [
             '#4dbd74',
             '#c8ced3',
@@ -817,21 +854,82 @@ class StockStatusOverTime extends Component {
                             </Form>
                         </div>
                         <div className="row">
-                            <div className="col-md-12">{this.state.matricsList.length > 0}
-                                {
-                                    (this.state.matricsList.length > 0)
-                                    &&
+                            {(this.state.matricsList.length > 0) && <div className="col-md-12">
 
-                                    <div className="col-md-12">
-                                        <div className="chart-wrapper chart-graph-report">
-                                            <Line id="cool-canvas" data={bar} options={options} />
 
-                                        </div>
+
+                                <div className="col-md-12">
+                                    <div className="chart-wrapper chart-graph-report">
+                                        <Line id="cool-canvas" data={bar} options={options} />
+
                                     </div>
+                                </div>
+                                <div className="col-md-12">
+                                    <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                        {this.state.show ? 'Hide Data' : 'Show Data'}
+                                    </button>
 
-                                }
+                                </div>
+
                                 <br></br>
-                            </div></div>
+                            </div>}</div>
+                                
+                         <div className="row">
+                    <div className="col-md-12">
+                      {this.state.show && this.state.matricsList.length > 0 &&
+                       <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+
+                        <thead>
+                          <tr>
+                            <th className="text-center" style={{width:'10%'}}> {i18n.t('static.report.month')} </th>
+                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.dashboard.program')} </th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.planningunit.planningunit')}</th>
+                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.stock')}</th>
+                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.consupmtionqty')}</th>
+                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.amc')}</th>
+                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.noofmonth')}</th>
+                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.mos')}</th>
+                            </tr>
+                        </thead>
+                       
+                          <tbody>
+                             { this.state.matricsList.length > 0
+                              &&
+                              this.state.matricsList.map(ele => ele.map(item => 
+
+                                <tr id="addr0" >    
+                                
+                                  <td>{item.dt}</td>
+                                  <td>
+                                    {getLabelText(item.program.label,this.state.lang)}
+                                  </td>
+                                  <td>
+                                    {getLabelText(item.planningUnit.label,this.state.lang)}
+                                  </td>
+                                  <td>
+                                    {this.formatter(item.stock)}
+                                  </td>
+                                  <td>
+                                    {this.formatter(item.consumptionQty)}
+                                  </td>
+                                  <td>
+                                    {this.formatter(item.amc)}
+                                  </td>
+                                  <td>
+                                    {this.formatter(item.amcMonthCount)}
+                                  </td>
+                                  <td>
+                                    {this.roundN(item.mos)}
+                                  </td>
+
+        </tr>))}
+
+                            
+                          </tbody>
+                 </Table>}
+
+                   </div>
+                   </div>
                     </CardBody></Card>
             </div>
 

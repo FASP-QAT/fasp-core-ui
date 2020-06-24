@@ -490,7 +490,7 @@ class DefaultLayout extends Component {
                             url: '/report/inventoryTurns',
                             // icon: 'fa fa-exchange'
                             icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT_INVENTORY_TURN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
                             name: 'QAT PROBLEM+ACTION REPORT',
@@ -521,6 +521,20 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.shipmentGlobalDemandView'),
                             url: '/report/shipmentGlobalDemandView',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                            url: '/report/aggregateShipmentByProduct',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.dashboard.shipmentGlobalView'),
+                            url: '/report/shipmentGlobalView',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           }

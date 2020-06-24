@@ -488,6 +488,7 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
+  table-layout: auto !important; 
   max-height: 540px;
 }
 
@@ -777,6 +778,12 @@ label.arrow_label:after {
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
+
+.prductCat-search-align{
+  position: absolute;
+    top: 75px;
+    right: 20px;
+}
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
 
@@ -833,6 +840,11 @@ label.arrow_label:after {
 }
 @media only screen and (min-width: 1200px) {
   .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+  .prodCatselect{
+    position: absolute;
+    top: -6px;
+    margin-bottom: 0.5rem;
+  }
   
 }
 
@@ -1921,7 +1933,7 @@ input::placeholder {
 .showdatabtn{
   margin-top:-1%;
 }
-///////Report react mutiselect checkbox Consumption globe
+///////Report react mutiselect checkbox 
 .css-1r4vtzz {
 padding: 0px 8px 5px 10px !important;
 margin: -4px 0px 0px -8px!important;
@@ -1938,20 +1950,16 @@ text-decoration: none;
  max-width: none!important; 
 position: relative!important;
 display: flex!important;
-// flex-wrap: wrap!important;
 overflow: hidden;
 word-wrap: normal !important;
 white-space: normal;
 text-overflow: ellipsis;
 align-items: stretch!important;
-// width: 238%!important;
-// min-width: 238px;
 width: 100%!important;
 min-width: 233px!important;
 width: 0 auto!important;
 height: calc(0.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
-// border: 1px solid #e4e7ea!important;
 font-size: 0.76562rem!important;
 line-height: 1.5!important;
 border-radius: 0.2rem!important;
@@ -1974,9 +1982,7 @@ border-radius: 0.2rem!important;
    max-width: none!important; 
   position: relative!important;
   display: flex!important;
-  // flex-wrap: wrap!important;
   align-items: stretch!important;
-  // min-width: 238px;
   width: 100%!important;
   min-width: 233px!important;
   width: 0 auto!important;
@@ -1984,10 +1990,8 @@ border-radius: 0.2rem!important;
 word-wrap: normal !important;
 white-space: normal;
 text-overflow: ellipsis;
-  // width: 238%!important;
   height: calc(0.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
-  // border: 1px solid #e4e7ea!important;
   font-size: 0.76562rem!important;
   line-height: 1.5!important;
   border-radius: 0.2rem!important;
@@ -2039,21 +2043,8 @@ text-overflow: ellipsis;
 .css-1vr111p-option{
   min-width: 171px!important;
 }
-// @media only screen and (min-width: 770px) {
-// .css-1pcexqc-container {
-//   position: relative;
-//   box-sizing: border-box;
-//   /* width: 244px !important; */
-//   width: 100%!important;
-//   background-color: white;
-//   border-radius: 4px;
-//   margin-top: 5px;
-//   position: absolute;
-//   margin-left: -11px !important;
-//   z-index: 2;
-// }
-// }
-/////multi select checkout css//
+
+/////multi select checkbox css//
 .supplyplanformulas{
   color: #20a8d8 !important;
   font-size: 12px!important;
@@ -2245,20 +2236,3 @@ h6{
     color: #212721!important;
   }
   
-//   .grid-divider {
-//     position: relative;
-//     padding: 0;
-// }
-// .grid-divider>[class*='col-'] {
-//     position: static;
-// }
-// .grid-divider>[class*='col-']:nth-child(n+2):before {
-//     content: "";
-//     border-left: 1px solid #DDD;
-//     position: absolute;
-//     top: 0;
-//     bottom: 0;
-// }
-// .col-padding {
-//     padding: 0 15px;
-// }

@@ -83,12 +83,12 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        // text: i18n.t('static.dashboard.globalconsumption'),
+        text: "Global Demand",
         fontColor: 'black'
     },
     scales: {
         xAxes: [{
-            
+            labelMaxWidth: 100,
             stacked: true,
             gridLines: {
                 display: false
@@ -96,7 +96,40 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            
+        }],
+    },
+    tooltips: {
+        enabled: false,
+        custom: CustomTooltips
+    },
+    maintainAspectRatio: false
+    ,
+    legend: {
+        display: true,
+        position: 'top',
+        labels: {
+            usePointStyle: true,
+            fontColor: 'black'
+        }
+    }
+}
+
+const options1 = {
+    title: {
+        display: true,
+        text: "Shipment/Orders Procurement Agent",
+        fontColor: 'black'
+    },
+    scales: {
+        xAxes: [{
+            labelMaxWidth: 100,
+            stacked: true,
+            gridLines: {
+                display: false
+            },
+        }],
+        yAxes: [{
+            stacked: true,
         }],
     },
     tooltips: {
@@ -116,18 +149,40 @@ const options = {
 }
 
 const chartData = {
-    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each','Female Condom (Nitrile) Lubricated, 17 cm, 20 Each' ],
+    labels: ["Malawi", "Kenya", "Zimbabwe"],
     datasets: [{
         label: 'Ship Actual',
         data: [20000, 10000, 2000],
-        backgroundColor: '#F48521',
+        backgroundColor: '#000050',
         borderWidth: 0
-        
     },
     {
         label: 'Ship Forecast',
         data: [20000, 20000, 2000],
-        backgroundColor: '#ED5626',
+        backgroundColor: '#52CAFF',
+        borderWidth: 0,
+    }
+    ]
+};
+
+const chartData1 = {
+    labels: ["May 19", "Jun 19", "Jul 19"],
+    datasets: [{
+        label: 'GF',
+        data: [30000, 10000, 0],
+        backgroundColor: '#000050',
+        borderWidth: 0
+    },
+    {
+        label: 'Govt',
+        data: [10000, 10000, 1000],
+        backgroundColor: '#52CAFF',
+        borderWidth: 0,
+    },
+    {
+        label: 'PSM',
+        data: [1000, 1000, 2000],
+        backgroundColor: '#AAAAFA',
         borderWidth: 0,
     }
     ]
@@ -159,7 +214,7 @@ for (var i = 0; i <= elements; i++) {
 
 
 
-class ShipmentGlobalDemandView extends Component {
+class ShipmentGlobalView extends Component {
     constructor(props) {
         super(props);
 
@@ -853,7 +908,7 @@ class ShipmentGlobalDemandView extends Component {
 
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Shipment Global Demand View</strong>
+                        <i className="icon-menu"></i><strong>Shipment Global View</strong>
                         {/* {this.state.consumptions.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -888,6 +943,25 @@ class ShipmentGlobalDemandView extends Component {
                                             </div>
 
                                         </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="programIds">Country</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
+                                                <ReactMultiSelectCheckboxes
+
+                                                    bsSize="sm"
+                                                    name="programIds"
+                                                    id="programIds"
+                                                    onChange={(e) => { this.handleChangeProgram(e) }}
+                                                    options={programList && programList.length > 0 ? programList : []}
+                                                />
+                                                {!!this.props.error &&
+                                                    this.props.touched && (
+                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                    )}
+                                            </InputGroup>
+                                        </FormGroup>
+
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -949,27 +1023,24 @@ class ShipmentGlobalDemandView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">Funder</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <div className="controls edit">
-                                                    <ReactMultiSelectCheckboxes
-
+                                            <Label htmlFor="appendedInputButton">Report View</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="shipmentStatusId"
+                                                        id="shipmentStatusId"
                                                         bsSize="sm"
-                                                        name="countrysId"
-                                                        id="countrysId"
-                                                        onChange={(e) => { this.handleChange(e) }}
-                                                        options={countryList && countryList.length > 0 ? countryList : []}
-                                                    />
-                                                    {!!this.props.error &&
-                                                        this.props.touched && (
-                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                        )}
-                                                </div>
-                                            </InputGroup>
+                                                    // onChange={this.filterData}
+                                                    >
+                                                        <option value="0">Procurement Agent</option>
+                                                        <option value="0">Funder</option>
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">Shipment Status</Label>
+                                            <Label htmlFor="countrysId">Procurement Agent</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <InputGroup className="box">
                                                 <div className="controls edit">
@@ -988,25 +1059,33 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </InputGroup>
                                         </FormGroup>
+
                                     </div>
                                 </Col>
                             </Form>
                             <Col md="12 pl-0">
-                                <div className="row grid-divider">
-                                    <Col md="8 pl-0">
-                                        <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
-                                            <HorizontalBar id="cool-canvas" data={chartData} options={options} />
+                                <div className="row">
+                                    {/* <div className="col-md-6 p-0 grapg-margin " > */}
+                                        <div className="col-md-6">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                <Bar id="cool-canvas" data={chartData} options={options} />
+                                            </div>
                                         </div>
-                                    </Col>
-                                    <Col md="4 pl-0">
-                                        <div className="chart-wrapper">
-                                            <Pie data={{
-                                                labels: this.state.labels,
-                                                datasets: this.state.datasets
-                                            }}
-                                            /><br />
+                                    {/* </div> */}
+                                    {/* <div className="col-md-6 p-0 grapg-margin " > */}
+                                        <div className="col-md-6">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                <Bar id="cool-canvas" data={chartData1} options={options1} />
+                                            </div>
                                         </div>
-                                    </Col>
+                                    {/* </div> */}
+                                    {/* <Col md="12 pl-0"> */}
+                                    {/* <div className="chart-wrapper">
+                                        <Bar id="cool-canvas" data={chartData} options={options} />
+                                    </div> */}
+                                    {/* </Col> */}
                                 </div>
                             </Col>
                             <Col md="12 pl-0">
@@ -1045,42 +1124,35 @@ class ShipmentGlobalDemandView extends Component {
 
                                                     <thead>
                                                         <tr>
-                                                            <th className="text-center" style={{ width: '34%' }}> Planning Unit </th>
-                                                            <th className="text-center " style={{ width: '34%' }}> GF </th>
-                                                            <th className="text-center" style={{ width: '34%' }}>Gov't</th>
-                                                            <th className="text-center" style={{ width: '34%' }}>Other</th>
-                                                            <th className="text-center" style={{ width: '34%' }}>PSM</th>
-                                                            <th className="text-center" style={{ width: '34%' }}>Total</th>
+                                                            <th className="text-center" style={{ width: '350px' }}> Country </th>
+                                                            <th className="text-center " style={{ width: '350px' }}> GF </th>
+                                                            <th className="text-center" style={{ width: '350px' }}>Gov't</th>
+                                                            <th className="text-center" style={{ width: '350px' }}>Other</th>
+                                                            <th className="text-center" style={{ width: '350px' }}>PSM</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
                                                         <tr id="addr0" key={1} >
-
-                                                            <td>Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each</td>
+                                                            <td>Kenya</td>
+                                                            <td></td>
+                                                            <td>30,000</td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td></td>
-                                                            <td>2,826</td>
-                                                            <td >2,826</td>
                                                         </tr>
                                                         <tr id="addr0" key={2} >
-
-                                                            <td>Female Condom (Nitrile) Lubricated, 17 cm, 20 Each </td>
+                                                            <td>Malawi</td>
+                                                            <td>40,000</td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td>5,612,440</td>
-                                                            <td >5,612,440</td>
                                                         </tr>
                                                         <tr id="addr0" key={3} >
-
-                                                            <td>Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces </td>
-                                                            <td>13,824,000</td>
-                                                            <td>26,849,952</td>
+                                                            <td>Zimbabwe</td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td >40,673,952</td>
+                                                            <td>4000</td>
+                                                            <td></td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>
@@ -1102,4 +1174,4 @@ class ShipmentGlobalDemandView extends Component {
     }
 }
 
-export default ShipmentGlobalDemandView;
+export default ShipmentGlobalView;

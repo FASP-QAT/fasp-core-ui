@@ -53,6 +53,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/stockStatus`,json,{}
         );
     }
+    inventoryTurns(json){
+        return axios.post(`${API_URL}/api/report/inventoryTurns`,json,{}
+        );
+    }
 
 }
 export default new ReportService();

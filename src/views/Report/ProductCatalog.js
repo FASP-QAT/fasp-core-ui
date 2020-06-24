@@ -1173,10 +1173,10 @@ export default class ProductCatalog extends React.Component {
 
                         </div>}
                     </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Form >
-                            <Col md="6 pl-0">
-                                <div className="d-md-flex Selectdiv2">
+                            <Col md="9 pl-0">
+                                <div className="d-md-flex prodCatselect">
                                     {/* <FormGroup>
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                         <div className="controls SelectGo">
@@ -1214,7 +1214,7 @@ export default class ProductCatalog extends React.Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup> */}
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="">
                                         <Label htmlFor="appendedInputButton">Product Category</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
@@ -1349,7 +1349,7 @@ export default class ProductCatalog extends React.Component {
                             {
                                 props => (
                                     <div className="TableCust prodCatlogAlignThtd">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left prductCat-search-align">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
