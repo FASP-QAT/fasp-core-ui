@@ -849,4 +849,8 @@
     "static.report.adjustmentQty": "Adjustment Qty",
     "static.report.monthsOfStock": "Months of Stock (MoS)",
     "static.report.avergeStock": "Average Stock",
-    "static.report.totconsumption": "Total Consumption"}
+    "static.report.totconsumption": "Total Consumption",
+    "static.report.warehouseCapacity": "Warehouse Capacity",
+    "static.report.stockAdjustment": "Stock Adjustment"
+
+}
