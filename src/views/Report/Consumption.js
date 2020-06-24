@@ -2039,7 +2039,7 @@ class Consumption extends Component {
         datasets: [
           {
             type: "line",
-            linetension: 0,
+            lineTension: 0,
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: '#000',
@@ -2085,7 +2085,6 @@ class Consumption extends Component {
             data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
           }, {
             type: "line",
-            linetension: 0,
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
@@ -2096,6 +2095,7 @@ class Consumption extends Component {
             },
             showInLegend: true,
             yValueFormatString: "$#,##0",
+            lineTension: 0,
             data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
           }
         ],
@@ -2354,6 +2354,27 @@ class Consumption extends Component {
                           </div>
                         </FormGroup>
                       </Offline>
+
+
+                      <FormGroup className="col-md-3">
+                        <Label htmlFor="appendedInputButton">Report View</Label>
+                        <div className="controls">
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="planningUnitId"
+                              id="planningUnitId"
+                              bsSize="sm"
+                            >
+                              <option value="0">Please select</option>
+                              <option value="1">Planning Unit</option>
+                              <option value="2">Forecasting Unit</option>
+                            </Input>
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
+
+
                     </div>
                   </Col>
                 </Form>
@@ -2411,16 +2432,6 @@ class Consumption extends Component {
                     <div className="col-md-12 pl-0 pr-0">
                       {this.state.show &&
                         <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
-
-
-
-                          <thead>
-                            <tr>
-                              <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
-                              <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
-                              <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
-                            </tr>
-                          </thead>
 
                           <tbody>
                             <>

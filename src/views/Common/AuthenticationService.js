@@ -87,10 +87,10 @@ class AuthenticationService {
 
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("get realm id decryptedCurUser---",decryptedCurUser);
-        console.log("user before decrypt---",localStorage.getItem("user-" + decryptedCurUser))
+        console.log("get realm id decryptedCurUser---", decryptedCurUser);
+        console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log("get realm id decryptedUser---",decryptedUser);
+        console.log("get realm id decryptedUser---", decryptedUser);
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
@@ -379,9 +379,9 @@ class AuthenticationService {
 
     getLoggedInUserRoleBusinessFunctionArray() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---",decryptedCurUser);
+        console.log("decryptedCurUser---", decryptedCurUser);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log("decryptedUser---",decryptedUser);
+        console.log("decryptedUser---", decryptedUser);
         let businessFunctionList = decryptedUser.businessFunctionList;
         console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 

@@ -449,7 +449,6 @@ const routes = [
   { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
 
-
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
