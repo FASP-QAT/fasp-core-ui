@@ -59,7 +59,7 @@ class ResetPasswordComponent extends Component {
         super(props);
         this.state = {
             message: '',
-            username: this.props.match.params.username,
+            emailId: this.props.match.params.emailId,
             token: this.props.match.params.token
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -122,7 +122,7 @@ class ResetPasswordComponent extends Component {
     }
     componentDidMount() {
         this.hideFirstComponent();
-        UserService.confirmForgotPasswordToken(this.state.username, this.state.token)
+        UserService.confirmForgotPasswordToken(this.state.emailId, this.state.token)
             .then(response => {
                 this.setState({
                     message: response.data.messageCode
@@ -177,7 +177,7 @@ class ResetPasswordComponent extends Component {
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
 
                                             if (navigator.onLine) {
-                                                UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
+                                                UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
                                                     .then(response => {
                                                         if (response.status == 200) {
                                                             this.props.history.push(`/login/static.message.user.passwordSuccess`)

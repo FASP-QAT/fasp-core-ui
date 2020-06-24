@@ -44,7 +44,7 @@ class DefaultLayout extends Component {
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
       for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-        bfunction.push(curUserBusinessFunctions[i].authority);
+        bfunction.push(curUserBusinessFunctions[i]);
       }
       this.setState({ businessFunctions: bfunction });
       console.log("log--------------"+this.state.businessFunctions.includes('ROLE_BF_CREATE_PROGRAM'));
@@ -252,12 +252,6 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLIER') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.region'),
-                            url: '/region/listRegion',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
-                          },
-                          {
                             name: i18n.t('static.healtharea.healtharea'),
                             url: '/healthArea/listHealthArea',
                             icon: 'fa fa-medkit',
@@ -435,6 +429,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
+                            name: i18n.t('static.dashboard.regionreport'),
+                            url: '/region/listRegion',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REGION') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
                             icon: 'fa fa-th',
@@ -483,7 +483,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.costOfInventory'),
                             url: '/report/costOfInventory',
                             icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT_COST_OF_INVERTORY') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.inventoryTurns'),
@@ -520,6 +520,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.supplyplanversionandreviewReport'),
                             url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.report.shipmentSummeryReport'),
+                            url: '/report/shipmentSummery',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                           },

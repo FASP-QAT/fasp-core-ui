@@ -64,9 +64,10 @@ Ending balance = 22,642</p><br></br>
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">AMC (Average Monthly Consumption)</ListGroupItemHeading>
+                    <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <p>* Consider non zero values over a 12 month range in case a few values are zero/not available while taking AMC</p>
                     <p><span className="formulastext-p">Example :</span><br></br>
                     Current month = May 2020<br></br>
 Consumption in Feb 2020 = 5,000<br></br>
@@ -76,8 +77,8 @@ Consumption in May 2020 = 7,087<br></br>
 Consumption in Jun 2020 = 5,678<br></br>
 Consumption in Jul 2020 = 6,789<br></br>
 <br></br>
-AMC = Consumption in last 3 months+current month+future 2 months/number of months(Considering +/- 12 months for no consumption)<br></br>
-AMC = (Consumption in Feb 2020+ Consumption in Mar 2020 + Consumption in Apr 2020 + consumption in May 2020 + consumption in Jun 2020 + consumption in Jul 2020)/6<br></br>
+AMC = Consumption in last 3 months + current month + Next 2 months / number of months(Consider + or - 12 months )<br></br>
+AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
 AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
 AMC = 6,392</p>
                     {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}

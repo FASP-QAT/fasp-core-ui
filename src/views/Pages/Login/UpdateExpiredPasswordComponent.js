@@ -29,9 +29,9 @@ const validationSchema = function (values) {
             .matches(/^(?=.*\d).*$/, i18n.t('static.message.newPasswordNumber'))
             .matches(/^(?=.*[A-Z]).*$/, i18n.t('static.message.newPasswordUppercase'))
             .matches(/^[a-zA-Z]/i, i18n.t('static.message.newPasswordStartAlphabet'))
-            .test('username', i18n.t('static.message.newPasswordNotSameAsUsername'),
+            .test('emailId', i18n.t('static.message.newPasswordNotSameAsUsername'),
                 function (value) {
-                    if ((values.username != value)) {
+                    if ((values.emailId != value)) {
                         return true;
                     }
                 })
@@ -74,7 +74,7 @@ class UpdateExpiredPasswordComponent extends Component {
         super(props);
         this.state = {
             message: '',
-            username: this.props.location.state.username
+            emailId: this.props.location.state.emailId
         }
         this.logoutClicked = this.logoutClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -104,7 +104,7 @@ class UpdateExpiredPasswordComponent extends Component {
             oldPassword: true,
             newPassword: true,
             confirmNewPassword: true,
-            username: true
+            emailId: true
         }
         )
         this.validateForm(errors)
@@ -146,12 +146,12 @@ class UpdateExpiredPasswordComponent extends Component {
                                             oldPassword: "",
                                             newPassword: "",
                                             confirmNewPassword: "",
-                                            username: this.state.username
+                                            emailId: this.state.emailId
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (navigator.onLine) {
-                                                UserService.updateExpiredPassword(values.username, values.oldPassword, values.newPassword)
+                                                UserService.updateExpiredPassword(values.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
                                                         let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
@@ -160,7 +160,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                                         // decoded.user.syncExpiresOn = moment("2020-05-12 15:13:19").format("YYYY-MM-DD HH:mm:ss");
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-                                                        localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
+                                                        // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
@@ -230,8 +230,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                     <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
                                                         <CardBody>
                                                             <Input type="text"
-                                                                name="username"
-                                                                id="username"
+                                                                name="emailId"
+                                                                id="emailId"
                                                                 onChange={handleChange}
                                                                 hidden
                                                             />

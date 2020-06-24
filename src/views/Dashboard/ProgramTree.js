@@ -251,7 +251,7 @@ class Program extends Component {
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>{i18n.t('static.program.download')}</strong>
@@ -260,7 +260,7 @@ class Program extends Component {
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls ">
                                             <InputGroup>
                                                 <Input
                                                     bsSize="sm"
@@ -518,7 +518,7 @@ class Program extends Component {
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             console.log("in transaction complete");
 
-                                            this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
+                                            this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))

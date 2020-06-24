@@ -125,7 +125,7 @@ export default class ProductCatalog extends React.Component {
         this.filterDataForRealm();
 
         let realmId = AuthenticationService.getRealmId();
-        TracerCategoryService.getTracerCategoryByRealmId(realmId)
+        TracerCategoryService.getTracerCategoryByRealmId(1)
             .then(response => {
                 this.setState({
                     tracerCategories: response.data,loading: false

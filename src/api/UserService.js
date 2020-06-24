@@ -36,6 +36,10 @@ class UserService {
         return axios.get(`${API_URL}/api/user/${userId}`, {
         });
     }
+    getUserDetailsByUserId(userId) {
+        return axios.get(`${API_URL}/api/user/${userId}`, {
+        });
+    }
     editUser(json) {
         return axios.put(`${API_URL}/api/user/`, json, {
         });
@@ -49,8 +53,8 @@ class UserService {
         return axios.put(`${API_URL}/api/unlockAccount/${userId}/${emailId}`, {
         });
     }
-    updateExpiredPassword(username, oldPassword, newPassword) {
-        return axios.post(`${API_URL}/api/updateExpiredPassword/`, { username, oldPassword, newPassword }, {});
+    updateExpiredPassword(emailId, oldPassword, newPassword) {
+        return axios.post(`${API_URL}/api/updateExpiredPassword/`, { emailId, oldPassword, newPassword }, {});
     }
 
     changePassword(userId, oldPassword, newPassword) {
@@ -59,11 +63,11 @@ class UserService {
     forgotPassword(emailId) {
         return axios.post(`${API_URL}/api/forgotPassword/`, { emailId });
     }
-    confirmForgotPasswordToken(username, token) {
-        return axios.post(`${API_URL}/api/confirmForgotPasswordToken/`, { username, token }, {});
+    confirmForgotPasswordToken(emailId, token) {
+        return axios.post(`${API_URL}/api/confirmForgotPasswordToken/`, { emailId, token }, {});
     }
-    updatePassword(username, token, password) {
-        return axios.post(`${API_URL}/api/updatePassword/`, { username, token, password }, {});
+    updatePassword(emailId, token, password) {
+        return axios.post(`${API_URL}/api/updatePassword/`, { emailId, token, password }, {});
     }
     accessControls(json) {
         return axios.put(`${API_URL}/api/accessControls/`, json, {
