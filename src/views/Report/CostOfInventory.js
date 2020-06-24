@@ -18,11 +18,18 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import moment from 'moment'
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+
 
 const entityname = i18n.t('static.dashboard.costOfInventory');
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
-
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+  }
+  
 export default class CostOfInventory extends Component {
     constructor(props) {
         super(props);
@@ -32,7 +39,7 @@ export default class CostOfInventory extends Component {
                 planningUnitIds: [],
                 regionIds: [],
                 versionId: -1,
-                dt: '',
+                dt: new Date(),
                 includePlanningShipments: true
             },
             programList: [],
@@ -40,17 +47,22 @@ export default class CostOfInventory extends Component {
             planningUnitList: [],
             costOfInventory: [],
             versionList:[],
-            message:''
+            message:'',
+            singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+     
         }
         this.getDependentList = this.getDependentList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         // this.filterRegionList = this.filterRegionList.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.dataChangeDate = this.dataChangeDate.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
-        this.exportCSV=this.exportCSV.bind(this);
-
+       
     }
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+      }
+     
 filterVersion=()=>{
     let programId = document.getElementById("programId").value;
     console.log(programId)
@@ -67,7 +79,23 @@ filterVersion=()=>{
         });
     }}
 }
+ dateformatter=value=>{
+    var dt=new Date(value)
+    return moment(dt).format('MMM-DD-YYYY');
+    }
+    formatter = value => {
 
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+      }
 exportCSV=(columns)=> {
 
     var csvRow = [];
@@ -75,7 +103,7 @@ exportCSV=(columns)=> {
     csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
     csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.common.startdate') + ' , ' + new moment(this.state.CostOfInventoryInput.dt).format("DD-MMM-yyy")).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -86,7 +114,7 @@ exportCSV=(columns)=> {
     columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
     var A = [headers]
-   this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.batchNo, ele.expiryDate.replaceAll(' ', '%20'),  ele.stock, ele.cost]));
+   this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.batchNo, this.dateformatter(ele.expiryDate).replaceAll(' ', '%20'),  ele.stock,getLabelText(ele.currency.label,this.state.lang)+'%20'+ele.rate,getLabelText(ele.currency.label,this.state.lang)+'%20'+ele.cost]));
    
     for (var i = 0; i < A.length; i++) {
         csvRow.push(A[i].join(","))
@@ -105,7 +133,7 @@ exportPDF = (columns) => {
         const pageCount = doc.internal.getNumberOfPages()
 
         doc.setFont('helvetica', 'bold')
-        doc.setFontSize(8)
+        doc.setFontSize(6)
         for (var i = 1; i <= pageCount; i++) {
             doc.setPage(i)
 
@@ -123,9 +151,10 @@ exportPDF = (columns) => {
     const addHeaders = doc => {
 
         const pageCount = doc.internal.getNumberOfPages()
-        doc.setFont('helvetica', 'bold')
         for (var i = 1; i <= pageCount; i++) {
             doc.setFontSize(12)
+            doc.setFont('helvetica', 'bold')
+      
             doc.setPage(i)
             doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
             doc.setTextColor("#002f6c");
@@ -134,16 +163,17 @@ exportPDF = (columns) => {
             })
             if (i == 1) {
                 doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
                 doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                     align: 'left'
                   })
-                  doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 100, {
+                  doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                     align: 'left'
                   })
-                  doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                  doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                     align: 'left'
                   })
-                  doc.text(i18n.t('static.common.startdate') + ' : ' + new moment(this.state.CostOfInventoryInput.dt).format("DD-MMM-yyy"), doc.internal.pageSize.width / 8, 120, {
+                  doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 150, {
                     align: 'left'
                   })
             }
@@ -171,14 +201,14 @@ exportPDF = (columns) => {
     // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
     const headers = columns.map((item, idx) =>  (item.text));
-    const data =this.state.costOfInventory.map(ele =>[getLabelText(ele.planningUnit.label), ele.batchNo, ele.expiryDate,  ele.stock, ele.cost]);
+    const data =this.state.costOfInventory.map(ele =>[getLabelText(ele.planningUnit.label), ele.batchNo,this.dateformatter( ele.expiryDate),  this.formatter(ele.stock),getLabelText(ele.currency.label,this.state.lang)+" "+this.formatter(ele.rate), getLabelText(ele.currency.label,this.state.lang)+" "+this.formatter(ele.cost)]);
    
     let content = {
         margin: { top: 80 },
-        startY: 150,
+        startY: 170,
         head: [headers],
         body: data,
-        styles: { lineWidth: 1, fontSize: 8 }
+        styles: { lineWidth: 1, fontSize: 8,halign: 'center' }
     };
     doc.autoTable(content);
     addHeaders(doc)
@@ -186,6 +216,22 @@ exportPDF = (columns) => {
     doc.save("Cost Of Inventory Report.pdf")
 }
 
+handleClickMonthBox2 = (e) => {
+    this.refs.pickAMonth2.show()
+  }
+  handleAMonthChange2 = (value, text) => {
+    //
+    //
+  }
+  handleAMonthDissmis2 = (value) => {
+    let costOfInventoryInput = this.state.CostOfInventoryInput;
+    var dt=new Date(`${value.year}-${value.month}-01`)
+    costOfInventoryInput.dt=dt
+    this.setState({ singleValue2: value,costOfInventoryInput}, () => {
+      this.formSubmit();
+    })
+
+  }
 
 
     dataChange(event) {
@@ -204,11 +250,7 @@ exportPDF = (columns) => {
         }
         this.setState({ costOfInventoryInput }, () => {this.formSubmit() })
     }
-    dataChangeDate(date) {
-        let costOfInventoryInput = this.state.CostOfInventoryInput;
-        costOfInventoryInput.dt = date;
-        this.setState({ costOfInventoryInput: costOfInventoryInput },()=>{this.formSubmit()});
-    }
+    
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList().then(response => {
@@ -221,11 +263,7 @@ exportPDF = (columns) => {
 
         });
 
-        let costOfInventoryInput = this.state.CostOfInventoryInput;
-        costOfInventoryInput.dt = new Date();
-        // var CurrentDate=new Date();
-        this.setState({ costOfInventoryInput });
-
+       
     }
 
     getDependentList() {
@@ -247,7 +285,12 @@ exportPDF = (columns) => {
         AuthenticationService.setupAxiosInterceptors();
         ReportService.costOfInventory(this.state.CostOfInventoryInput).then(response => {
             console.log("costOfInentory=====>", response.data);
-            this.setState({ costOfInventory: response.data ,message:''});
+            this.setState({ costOfInventory: [{"planningUnit":{"id":152,"label":{"active":false,"labelId":9098,"label_en":"Abacavir 20 mg/mL Solution, 240 mL","label_sp":null,"label_fr":null,"label_pr":null}},"batchNo":"A1001","expiryDate":"2020-04-01","cost":3800.0,"stock":3800,currency:{"id":156,"label":{"active":false,"labelId":9102,"label_en":"USD","label_sp":null,"label_fr":null,"label_pr":null}},rate:1.00},
+            {"planningUnit":{"id":152,"label":{"active":false,"labelId":9098,"label_en":"Abacavir 20 mg/mL Solution, 240 mL","label_sp":null,"label_fr":null,"label_pr":null}},"batchNo":"T2480","expiryDate":"2020-04-01","cost":1000.0,"stock":1000,currency:{"id":156,"label":{"active":false,"labelId":9102,"label_en":"USD","label_sp":null,"label_fr":null,"label_pr":null}},rate:1.00},
+            {"planningUnit":{"id":152,"label":{"active":false,"labelId":9098,"label_en":"Abacavir 20 mg/mL Solution, 240 mL","label_sp":null,"label_fr":null,"label_pr":null}},"batchNo":"Z4051","expiryDate":"2020-04-01","cost":50000.0,"stock":50000,currency:{"id":156,"label":{"active":false,"labelId":9102,"label_en":"USD","label_sp":null,"label_fr":null,"label_pr":null}},rate:1.00},
+            {"planningUnit":{"id":154,"label":{"active":false,"labelId":9100,"label_en":"Abacavir 300 mg Tablet, 60 Tablets","label_sp":null,"label_fr":null,"label_pr":null}},"batchNo":null,"expiryDate":"2099-12-31","cost":15865.0,"stock":15865,currency:{"id":156,"label":{"active":false,"labelId":9102,"label_en":"USD","label_sp":null,"label_fr":null,"label_pr":null}},rate:1.00},
+            {"planningUnit":{"id":156,"label":{"active":false,"labelId":9102,"label_en":"Abacavir 60 mg Tablet, 1000 Tablets","label_sp":null,"label_fr":null,"label_pr":null}},"batchNo":null,"expiryDate":"2099-12-31","cost":28648.0,"stock":28648,currency:{"id":156,"label":{"active":false,"labelId":9102,"label_en":"USD","label_sp":null,"label_fr":null,"label_pr":null}},rate:1.00},
+            {"planningUnit":{"id":157,"label":{"active":false,"labelId":9103,"label_en":"Abacavir 60 mg Tablet, 60 Tablets","label_sp":null,"label_fr":null,"label_pr":null}},"batchNo":null,"expiryDate":"2099-12-31","cost":21653.0,"stock":21653,currency:{"id":156,"label":{"active":false,"labelId":9102,"label_en":"USD","label_sp":null,"label_fr":null,"label_pr":null}},rate:1.00}] ,message:''});
         });
     }else if(this.state.CostOfInventoryInput.programId==0){
         this.setState({ costOfInventory: [] , message: i18n.t('static.common.selectProgram')});
@@ -263,6 +306,7 @@ exportPDF = (columns) => {
     }
 
        render() {
+        const { singleValue2 } = this.state
 
         const { programList } = this.state;
         let programs = programList.length > 0
@@ -300,7 +344,8 @@ exportPDF = (columns) => {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                style: {  align: 'center' },
+                formatter:this.formatLabel
             },
             {
                 dataField: 'batchNo',
@@ -315,24 +360,58 @@ exportPDF = (columns) => {
                 text: 'Expiry Date',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
-                
+                headerAlign: 'center',
+                formatter:this.dateformatter
             },
             {
                 dataField: 'stock',
                 text: 'Stock',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
-                
+                headerAlign: 'center',
+                style: { align: 'center' },
+                formatter:this.formatter
+            }, {
+                dataField: 'rate',
+                text: 'Rate',
+                sort: true,
+                align: 'center',
+                style: { align: 'center' },
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+
+                    var cell1 = cell
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return getLabelText(row.currency.label,this.state.lang)+" "+x1 + x2;
+                  }
             },
             {
                 dataField: 'cost',
                 text: 'Cost',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
-                
+                style: { align: 'center' },
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+
+                    var cell1 = cell
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return getLabelText(row.currency.label,this.state.lang)+" "+x1 + x2;
+                  }
             }
         ];
         const options = {
@@ -368,7 +447,7 @@ exportPDF = (columns) => {
 
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong>
                 
                         <div className="card-header-actions">
                       <a className="card-header-action">
@@ -425,7 +504,7 @@ exportPDF = (columns) => {
 
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Include Planning Shipments</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -443,27 +522,25 @@ exportPDF = (columns) => {
                                                 </div>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-3">
-                                                <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <DatePicker
-                                                            id="startDate"
-                                                            name="startDate"
-                                                            bsSize="sm"
-                                                            selected={this.state.CostOfInventoryInput.dt}
-                                                            maxDate={new Date()}
-                                                            selected={this.state.CostOfInventoryInput.dt}
-                                                            onChange={(date) => { this.dataChangeDate(date); this.formSubmit() }}
-                                                            // placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control costinventryinput"
-                                                            disabledKeyboardNavigation
 
-                                                        />
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                        </div>
+                                            <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <div className="controls edit">
+                        <Picker
+                          ref="pickAMonth2"
+                          years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                          value={singleValue2}
+                          lang={pickerLang.months}
+                          theme="dark"
+                          onChange={this.handleAMonthChange2}
+                          onDismiss={this.handleAMonthDissmis2}
+                        >
+                          <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                        </Picker>
+                      </div>
+
+                    </FormGroup>
+                                           </div>
                                     </Col>
                                 </Form>
                             </div>
@@ -478,7 +555,7 @@ exportPDF = (columns) => {
                         >
                             {
                                 props => (
-                                    <div className="TableCust listBudgetAlignThtd">
+                                    <div className="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                            
                                         </div>

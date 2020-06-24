@@ -959,7 +959,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/inventoryTurns":
-                    if (bfunction.includes("ROLE_BF_REPORT_INVENTORY_TURN")) {
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
                     break;
