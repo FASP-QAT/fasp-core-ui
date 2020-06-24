@@ -490,7 +490,7 @@ class DefaultLayout extends Component {
                             url: '/report/inventoryTurns',
                             // icon: 'fa fa-exchange'
                             icon: 'fa fa-line-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT_INVENTORY_TURN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
                             name: 'QAT PROBLEM+ACTION REPORT',

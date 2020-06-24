@@ -78,7 +78,7 @@ export default class StockStatusMatrix extends React.Component {
      }*/
   }
   handleRangeChange(value, text, listIndex) {
-
+    //this.filterData();
   }
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => {
@@ -115,6 +115,7 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   handleProductCategoryChange = (planningUnitIds) => {
+    console.log('###########################')
     this.setState({
       planningUnitValues: planningUnitIds.map(ele => ele.value),
       planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -124,22 +125,13 @@ export default class StockStatusMatrix extends React.Component {
     })
   }
   viewChange = (event) => {
-
-    if (event.target.name == "view") {
-     
-      this.setState({
-        view: event.target.id === "view2" ? 2 : 1,
-        data: [],
-        planningUnitValues: []
-      },()=>{this.filterData()})
-      if (event.target.id == 1) {
-        this.getPlanningUnit();
-      }
-    } else {
-     
-      this.setState({
-        includePlannedShipments: event.target.checked ? false : true
-      }, () => { this.filterData() })
+    this.setState({
+      view: event.target.value,
+      data: [],
+      planningUnitIds: []
+    })
+    if (event.target.value == 1) {
+      this.getPlanningUnit();
     }
   }
 
@@ -150,9 +142,9 @@ export default class StockStatusMatrix extends React.Component {
     let programId = document.getElementById("programId").value;
     let productCategoryId = document.getElementById("productCategoryId") != null ? document.getElementById("productCategoryId").value : 0;
     let planningUnitId = this.state.planningUnitValues;
-    let view = this.state.view;
+    let view = document.getElementById("view").value;
     let versionId = this.getversion();
-    let includePlannedShipments = document.getElementById("includePlanningShipments").checked
+    let includePlannedShipments = document.getElementById("includePlanningShipments").value
     if (planningUnitId.length > 0 && programId > 0) {
       var inputjson = {
         "programId": programId,
@@ -163,26 +155,39 @@ export default class StockStatusMatrix extends React.Component {
         "includePlannedShipments": includePlannedShipments,
         "view": view
       }
-      console.log(inputjson)
+
       if (navigator.onLine) {
         let realmId = AuthenticationService.getRealmId();
         AuthenticationService.setupAxiosInterceptors();
         ProductService.getStockStatusMatrixData(inputjson)
           .then(response => {
             console.log("data---", response.data)
-            // if (view == 1) {
-            this.setState({
-              data: [{
-                name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019,
-                units: 240, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
-              },
-              {
-                name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020,
-                units: 240, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
-              }],
-              view: view
-            })
-            // } else {
+            if (view == 2) {
+              this.setState({
+                data: [{
+                  name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
+                  units: { id: 1, label: { label_en: "" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
+                },
+                {
+                  name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
+                  units: { id: 1, label: { label_en: "" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
+                }],
+                view: view, message: ''
+              })
+            } else {
+
+              this.setState({
+                data: [{
+                  name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
+                  units: { id: 1, label: { label_en: "240" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
+                },
+                {
+                  name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
+                  units: { id: 1, label: { label_en: "240" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
+                }],
+                view: view, message: ''
+              })
+            }
 
             //   let years = [...new Set(response.data.map(ele => (ele.YR)))]
             //   let pulst = [...new Set(response.data.map(ele => (ele.LABEL_EN)))]
@@ -706,9 +711,6 @@ export default class StockStatusMatrix extends React.Component {
 
 
   }
-  componentDidUpdate() {
-    setTimeout(() => this.setState({ message: '' }), 3000);
-  }
 
 
   componentDidMount() {
@@ -774,10 +776,10 @@ export default class StockStatusMatrix extends React.Component {
   exportCSV(columns) {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     if (this.state.view == 1) {
-      csvRow.push(i18n.t('static.productcategory.productcategory').replaceAll(' ', '%20') + '  :  ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+      csvRow.push(i18n.t('static.productcategory.productcategory').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
       this.state.planningUnitLabels.map(ele =>
         csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     } else {
@@ -794,7 +796,7 @@ export default class StockStatusMatrix extends React.Component {
     csvRow.push('')
 
     const headers = [];
-    columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
+    columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
 
 
     if (this.state.view == 0) {
@@ -807,7 +809,7 @@ export default class StockStatusMatrix extends React.Component {
         headers[j++] = ('Q4 ' + this.state.years[i]).replaceAll(' ', '%20')
       }
     } else {
-      columns.map((item, idx) => { headers[idx] = item.text });
+      columns.map((item, idx) => { headers[idx] = item.text.replaceAll(' ', '%20') });
     }
     var A = [headers]
     var re;
@@ -818,7 +820,7 @@ export default class StockStatusMatrix extends React.Component {
       re = this.state.offlineInventoryList
     }
     if (navigator.onLine) {
-      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.units, ele.min, ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.units.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.min,ele.reorderFrequency, ele.year,  ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
         , ele.Dec]));
     } else {
       if (this.state.view == 1) {
@@ -950,9 +952,28 @@ export default class StockStatusMatrix extends React.Component {
       header = [header1, quarterheader]
       console.log(header)
     } else {
-      let headers = [];
-      columns.map((item, idx) => { headers[idx] = item.text });
-      header = [headers];
+      let header1 = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
+      ,[ 
+      { content: i18n.t('static.month.jan'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.feb'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.mar'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.apr'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.may'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.jun'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.jul'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.aug'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.sep'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.oct'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.nov'), styles: { halign: 'center' }} ,
+      { content: i18n.t('static.month.dec'), styles: { halign: 'center' }} ,]
+      ]
+      
+      header = header1;
     }
 
 
@@ -962,7 +983,7 @@ export default class StockStatusMatrix extends React.Component {
       data = this.state.data.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
     }
     else if (navigator.onLine) {
-      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang),  ele.units, ele.min, ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), getLabelText(ele.units.label, this.state.lang), ele.min, ele.reorderFrequency, ele.year,  ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
         .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
 
     } else {
@@ -976,10 +997,9 @@ export default class StockStatusMatrix extends React.Component {
       startY: 200,
       head: header,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, cellWidth: 40, halign: 'center' },
+      styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 100 },
-     
+        0: { cellWidth: 153.89 },
       }
     };
 
@@ -1017,23 +1037,22 @@ export default class StockStatusMatrix extends React.Component {
 
       }, this);
     const { productCategories } = this.state;
-    let productCategoryList =[]
-    if (this.state.view == 1) {
-      productCategoryList= productCategories.length > 0
+    let productCategoryList = productCategories.length > 0
       && productCategories.map((item, i) => {
         return (
           <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
             {Array(item.level).fill('   ').join('') + (getLabelText(item.payload.label, this.state.lang))}
           </option>
         )
-      }, this);}
-    let productCategoryListcheck = [];
-    if (this.state.view == 2) {
-      productCategoryListcheck = productCategories.length > 0
-        && productCategories.filter(c => c.payload.active == true).map((item, i) => {
-          return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
-        }, this);
-    }
+      }, this);
+    let productCategoryListcheck = productCategories.length > 0
+      && productCategories.filter(c => c.payload.active == true).map((item, i) => {
+        console.log(item)
+
+        return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
+
+      }, this);
+    console.log(productCategoryListcheck)
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
       from: 'From', to: 'To',
@@ -1074,27 +1093,35 @@ export default class StockStatusMatrix extends React.Component {
           </option>
         )
       }, this);
+
     let columns = [
       {
-        dataField: 'name.label.label_en',
-        text:this.state.view==1?i18n.t('static.planningunit.planningunit'): i18n.t('static.productcategory.productcategory'),
+        dataField: 'name.label',
+        text: this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory'),
         sort: true,
-        align: 'left',
-        headerAlign: 'left',
-        width: '180'
+        align: 'center',
+        headerAlign: 'center',
+        style: { width: '350px' },
+        formatter: this.formatLabel
       },
 
       {
-        dataField: 'units',
+        dataField: 'units.label',
         text: i18n.t('static.dashboard.unit'),
         sort: true,
-        align: 'left',
-        headerAlign: 'left',
-        width: '180'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
         dataField: 'min',
         text: i18n.t('static.common.min'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      },{
+        dataField: 'reorderFrequency',
+        text: i18n.t('static.program.reorderFrequencyInMonths'),
         sort: true,
         align: 'center',
         headerAlign: 'center'
@@ -1104,235 +1131,91 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'center',
         headerAlign: 'center'
-      },
+      }, 
       {
         dataField: 'Jan',
         text: i18n.t('static.month.jan'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Jan
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Feb',
         text: i18n.t('static.month.feb'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Feb
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Mar',
         text: i18n.t('static.month.mar'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Mar
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Apr',
         text: i18n.t('static.month.apr'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Apr
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'May',
         text: i18n.t('static.month.may'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.May
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Jun',
         text: i18n.t('static.month.jun'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Jun
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Jul',
         text: i18n.t('static.month.jul'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Jul
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Aug',
         text: i18n.t('static.month.aug'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Aug
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Sep',
         text: i18n.t('static.month.sep'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Sep
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Oct',
         text: i18n.t('static.month.oct'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Oct
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Nov',
         text: i18n.t('static.month.nov'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Nov
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }, {
         dataField: 'Dec',
         text: i18n.t('static.month.dec'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-
-          var cell1 = row.Dec
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
+        formatter: formatter
       }
 
 
@@ -1448,7 +1331,7 @@ export default class StockStatusMatrix extends React.Component {
               <div className="row">
                 <FormGroup className="col-md-3" title="click here to select period">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                  <div className="controls edit">
+                  <div className="controls">
 
                     <Picker
                       ref="pickRange"
@@ -1474,7 +1357,7 @@ export default class StockStatusMatrix extends React.Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={(e) => { this.getProductCategories(e); }}
+                        onChange={(e) => { this.getProductCategories(e); this.filterData(e) }}
 
 
                       >
@@ -1485,75 +1368,25 @@ export default class StockStatusMatrix extends React.Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-                {/*} <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
-                    <div className="controls">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="view"
-                          id="view"
-                          bsSize="sm"
-                          onChange={(e) => { this.viewChange(e);}}
-                        >
-                          <option value="1">{i18n.t('static.common.product')}</option>
-                          <option value="2">{i18n.t('static.common.type')}</option>
-
-                        </Input>
-
-                      </InputGroup>
-                    </div>
-      </FormGroup>*/}
-                <FormGroup>
-
-                  <Label className="appendedInputButton">{i18n.t('static.common.display')}</Label>
-                  <div className="controls ">
-                    <FormGroup check inline>
-                      <Input
-                        className="form-check-input"
-                        type="radio"
-                        id="view1"
-                        name="view"
-                        value={true}
-                        checked={this.state.view === 1}
-                        onChange={(e) => { this.viewChange(e); }}
-                      />
-                      <Label
-                        className="form-check-label"
-                        check htmlFor="inline-active1">
-                        {i18n.t('static.common.product')}
-                      </Label>
-                    </FormGroup>
-                    <FormGroup check inline>
-                      <Input
-                        className="form-check-input"
-                        type="radio"
-                        id="view2"
-                        name="view"
-                        value={false}
-                        checked={this.state.view === 2}
-                        onChange={(e) => { this.viewChange(e); this.filterData() }}
-                      />
-                      <Label
-                        className="form-check-label"
-                        check htmlFor="inline-active2">
-                        {i18n.t('static.productcategory.productcategory')}
-                      </Label>
-                    </FormGroup>
-                    
-                    </div>
-                </FormGroup>
                 <FormGroup className="col-md-3">
-                <div className="controls ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                  <div className="controls">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="view"
+                        id="view"
+                        bsSize="sm"
+                        onChange={(e) => { this.viewChange(e); }}
+                      >
+                        <option value="1">{i18n.t('static.common.product')}</option>
+                        <option value="2">{i18n.t('static.productcategory.productcategory')}</option>
 
-                  <Input type="checkbox"
+                      </Input>
 
-                    name="includePlanningShipments" value={this.state.includePlanningShipments} defaultChecked={true}
-                    onChange={this.viewChange} id="includePlanningShipments" />
-                  <label htmlFor="includePlanningShipments">Include Planning Shipments</label>
-</div>
+                    </InputGroup>
+                  </div>
                 </FormGroup>
-
 
                 {this.state.view == 1 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
@@ -1597,7 +1430,24 @@ export default class StockStatusMatrix extends React.Component {
                       onChange={(e) => { this.handlePlanningUnitChange(e) }}
                       options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                     /> </InputGroup>    </div></FormGroup>}
+                <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                  <div className="controls ">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="includePlanningShipments"
+                        id="includePlanningShipments"
+                        bsSize="sm"
+                        onChange={(e) => { this.viewChange(); this.formSubmit() }}
+                      >
+                        <option value="true">{i18n.t('static.program.yes')}</option>
+                        <option value="false">{i18n.t('static.program.no')}</option>
+                      </Input>
 
+                    </InputGroup>
+                  </div>
+                </FormGroup>
 
 
                 <Offline>
@@ -1694,7 +1544,7 @@ export default class StockStatusMatrix extends React.Component {
               </div>
             </Col>
             {/* ---------------{this.state.offlineInventoryList} */}
-            {this.state.data.length > 0 && <ToolkitProvider
+            {/*this.state.data.length > 0 && <ToolkitProvider
               keyField="procurementUnitId"
               data={this.state.data}
               columns={columns}
@@ -1709,7 +1559,7 @@ export default class StockStatusMatrix extends React.Component {
 
                     {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
                       <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div> */}
+                      <ClearSearchButton {...props.searchProps} /></div> }
                     <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                       pagination={paginationFactory(options)}
 
@@ -1718,7 +1568,7 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 )
               }
-            </ToolkitProvider>}
+            </ToolkitProvider>*/}
             {this.state.view == 1 && this.state.offlineInventoryList.length > 0 && <ToolkitProvider
               keyField="procurementUnitId"
               data={this.state.offlineInventoryList}
@@ -1770,7 +1620,59 @@ export default class StockStatusMatrix extends React.Component {
                 </tbody>
               </Table>
             }
+            <div class="TableCust">
+            {this.state.data.length > 0 &&
+              <Table striped bordered hover responsive="md" style={{ width:"100%"}}>
+                <thead>
+                  <tr>
+                    <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')}</th>
+                    <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.dashboard.unit')}</th>
+                    <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.common.min')}</th>
+                    <th rowSpan="2" className="text-center" style={{width: "5%" }}>{i18n.t('static.program.reorderFrequencyInMonths')}</th>
+                    <th rowSpan="2" className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
+                    <th colSpan="12" className="text-center">{i18n.t('static.report.monthsOfStock')}</th>
 
+                  </tr>
+                  <tr> <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.mar')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.apr')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.may')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jun')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jul')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.aug')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.sep')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.oct')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.nov')}</th>
+                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.dec')}</th></tr>
+                </thead>
+                <tbody>
+
+                  {this.state.data.map(ele => {
+                    return (<tr>
+                      <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
+                      <td className="text-center"> {getLabelText(ele.units.label, this.state.lang)}</td>
+                      <td className="text-center">{ele.min}</td>
+                      <td className="text-center">{ele.reorderFrequency}</td>
+                      <td className="text-center">{ele.year}</td>
+                      <td className="text-center">{ele.Jan}</td>
+                      <td className="text-center">{ele.Feb}</td>
+                      <td className="text-center">{ele.Mar}</td>
+                      <td className="text-center">{ele.Apr}</td>
+                      <td className="text-center">{ele.May}</td>
+                      <td className="text-center">{ele.Jun}</td>
+                      <td className="text-center">{ele.Jul}</td>
+                      <td className="text-center">{ele.Aug}</td>
+                      <td className="text-center">{ele.Sep}</td>
+                      <td className="text-center">{ele.Oct}</td>
+                      <td className="text-center">{ele.Nov}</td>
+                      <td className="text-center">{ele.Dec}</td></tr>)
+                  })}
+
+                </tbody>
+              </Table>
+            }
+</div>
           </CardBody>
         </Card>
 

@@ -70,16 +70,19 @@ const pickerLang = {
 const options = {
   title: {
     display: true,
-    text: i18n.t('static.report.forecasterrorovertime'),
-    fontColor: 'black'
+    fontColor: 'black',
+    fontStyle:"normal",
+    fontSize:"12"
   },
   scales: {
     yAxes: [
       {
         scaleLabel: {
           display: true,
-          labelString: i18n.t('static.report.errorperc'),
-          fontColor: 'black'
+          labelString: i18n.t('static.report.error'),
+          fontColor: 'black',
+          fontStyle:"normal",
+    fontSize:"12"
         },
         ticks: { yValueFormatString: "$#####%",
         beginAtZero:true,
@@ -89,10 +92,41 @@ const options = {
         }}
       }
     ] ,xAxes: [{
+      
+        scaleLabel: {
+          display: true,
+          labelString: i18n.t('static.report.month'),
+          fontColor: 'black',
+          fontStyle:"normal",
+    fontSize:"12"
+        },
       ticks: {
-        fontColor: 'black'
+        fontColor: 'black',
+        fontStyle:"normal",
+  fontSize:"12"
       }
   }]
+  },
+  hover: {
+    animationDuration: 0
+  },
+  animation: {
+    onComplete: function() {
+      const chartInstance = this.chart,
+        ctx = chartInstance.ctx;
+
+     
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      this.data.datasets.forEach(function(dataset, i) {
+        const meta = chartInstance.controller.getDatasetMeta(i);
+        meta.data.forEach(function(bar, index) {
+          const data = dataset.data[index]+ "%";
+          ctx.fillStyle = "#000";
+          ctx.fillText(data, bar._model.x, bar._model.y - 2);
+        });
+      });
+    }
   },
   tooltips: { mode: 'index',
     callbacks: {
@@ -101,8 +135,8 @@ const options = {
           return tooltipItems.yLabel + "%";
        }
     },
-    enabled: false,
-    custom: CustomTooltips
+    enabled: true,
+//    custom: CustomTooltips
   },
   maintainAspectRatio: false,
   legend:{
@@ -110,9 +144,12 @@ const options = {
     position: 'bottom',
     labels: {
       usePointStyle: true,
-      fontColor: 'black'
+      fontColor: 'black',
+      fontStyle:"normal",
+fontSize:"12"
     }
-  }
+  },
+  
 }
 
 
@@ -169,7 +206,19 @@ class ForcastMatrixOverTime extends Component {
 
   }
 
+  formatter = value => {
 
+    var cell1 = value
+    cell1 += '';
+    var x = cell1.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
  
    makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -193,13 +242,13 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.error')).replaceAll(' ','%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
+    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'),( (i18n.t('static.report.error')).replaceAll(' ','%20')).replaceAll(' ','%20')]]
    
       re = this.state.matricsList
    
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100)+'%', re[item].monthsInCalc])
+      A.push([re[item].consumptionDateString.replaceAll(' ','%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100)+'%'])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -219,7 +268,7 @@ class ForcastMatrixOverTime extends Component {
       const pageCount = doc.internal.getNumberOfPages()
     
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
+      doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
       
@@ -251,7 +300,9 @@ class ForcastMatrixOverTime extends Component {
           align: 'center'
         })
         if(i==1){
-          doc.setFontSize(9)
+          doc.setFont('helvetica', 'normal')
+
+          doc.setFontSize(8)
           doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -286,17 +337,17 @@ class ForcastMatrixOverTime extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png',  50, 200,750,260,'CANVAS' );
+    doc.addImage(canvasImg, 'png',  50, 220,750,210,'CANVAS' );
     const headers =[ [   i18n.t('static.report.month'),
-    i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.error'),i18n.t('static.report.noofmonth')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,this.roundN(elt.forecastError*100)+'%',elt.monthsInCalc]);
+    i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.error')]];
+    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,this.formatter(elt.forecastedConsumption),this.formatter(elt.actualConsumption),this.roundN(elt.forecastError*100)+'%']);
     
     let content = {
     margin: {top: 80},
     startY:  height,
     head: headers,
     body: data,
-    styles: { lineWidth: 1, fontSize: 8 }
+    styles: { lineWidth: 1, fontSize: 8 , halign: 'center'}
     
   };
   
@@ -722,8 +773,7 @@ class ForcastMatrixOverTime extends Component {
                             <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.forecastConsumption')} </th>
                             <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.actualConsumption')}</th>
                             <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.error')}</th>
-                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.noofmonth')}</th>
-                          </tr>
+                             </tr>
                         </thead>
                        
                           <tbody>
@@ -737,17 +787,15 @@ class ForcastMatrixOverTime extends Component {
                                   <td>{this.state.matricsList[idx].consumptionDateString}</td>
                                   <td>
 
-                                    {this.state.matricsList[idx].forecastedConsumption}
+                                    {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].actualConsumption}
+                                    {this.formatter(this.state.matricsList[idx].actualConsumption)}
                                   </td>
                                   <td>
                                     {this.roundN(this.state.matricsList[idx].forecastError*100)+'%'}
                                   </td>
-                                  <td>
-                                    {this.state.matricsList[idx].monthsInCalc}
-                                  </td></tr>)
+                                 </tr>)
 
                             }
                           </tbody>

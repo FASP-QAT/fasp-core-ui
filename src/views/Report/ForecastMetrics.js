@@ -206,7 +206,7 @@ class ForecastMetrics extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
+    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
     (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')]]
 
@@ -240,7 +240,7 @@ class ForecastMetrics extends Component {
       const pageCount = doc.internal.getNumberOfPages()
 
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
+      doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
 
@@ -260,7 +260,7 @@ class ForecastMetrics extends Component {
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
       for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(15)
+        doc.setFontSize(12)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
@@ -272,6 +272,7 @@ class ForecastMetrics extends Component {
         })
         if (i == 1) {
           doc.setFontSize(8)
+          doc.setFont('helvetica', 'normal')
           doc.text(i18n.t('static.report.selectMonth') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 80, {
             align: 'left'
           })
@@ -302,7 +303,7 @@ class ForecastMetrics extends Component {
 
   
     var height = doc.internal.pageSize.height;
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.dashboard.program'), i18n.t('static.dashboard.planningunit'),
+    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
@@ -314,6 +315,13 @@ class ForecastMetrics extends Component {
       startY: startY,
       head: headers,
       body: data,
+      styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+      columnStyles: {
+        0: { cellWidth: 130 },
+        1: { cellWidth: 186 },
+        2: { cellWidth: 186 },
+        3: { cellWidth: 130 },
+        4: { cellWidth: 130 }}
 
     };
 
@@ -764,7 +772,7 @@ class ForecastMetrics extends Component {
         formatter: this.formatLabel
       }, {
         dataField: 'program.label',
-        text: i18n.t('static.dashboard.program'),
+        text: i18n.t('static.program.program'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -989,7 +997,8 @@ class ForecastMetrics extends Component {
                   </div>
                 </Col>
               </Form>
-              <Col md="12 pl-0 mt-reporttabl">
+              <br/><br/>
+              <Col md="12 pl-0">
 
                 <div className="row">
                   <div className="col-md-12">
