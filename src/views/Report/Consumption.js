@@ -2366,7 +2366,6 @@ class Consumption extends Component {
                               id="planningUnitId"
                               bsSize="sm"
                             >
-                              <option value="0">Please select</option>
                               <option value="1">Planning Unit</option>
                               <option value="2">Forecasting Unit</option>
                             </Input>

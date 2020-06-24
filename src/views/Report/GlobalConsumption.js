@@ -2143,11 +2143,11 @@ class GlobalConsumption extends Component {
       }, this);
 
     const backgroundColor = [
-      '#4dbd74',
-      '#c8ced3',
-      '#000',
-      '#ffc107',
-      '#f86c6b',
+      '#002f6c',
+      '#118b70',
+      '#EDB944',
+      '#20a8d8',
+      '#d1e3f5',
     ]
     let country = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))]
     let consumptiondata = [];
