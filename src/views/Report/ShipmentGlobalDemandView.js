@@ -88,7 +88,7 @@ const options = {
     },
     scales: {
         xAxes: [{
-            labelMaxWidth: 100,
+            
             stacked: true,
             gridLines: {
                 display: false
@@ -96,6 +96,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
+            
         }],
     },
     tooltips: {
@@ -115,12 +116,13 @@ const options = {
 }
 
 const chartData = {
-    labels: ["Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces", "Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each", "Female Condom (Nitrile) Lubricated, 17 cm, 20 Each "],
+    labels: [['Male Condom (Latex)',' Lubricated,Be Safe','53 mm,3000 Pieces'], ['Female Condom (Nitrile)',' Lubricated, 17 cm', '1000 Each'], ['Female Condom (Nitrile)','Lubricated, 17 cm', '20 Each' ]],
     datasets: [{
         label: 'Ship Actual',
         data: [20000, 10000, 2000],
         backgroundColor: '#F48521',
         borderWidth: 0
+        
     },
     {
         label: 'Ship Forecast',
@@ -888,7 +890,8 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
 
                                                     bsSize="sm"
@@ -931,8 +934,9 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                <InputGroup>
+                                                <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
 
                                                         name="planningUnitId"
@@ -946,7 +950,8 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="countrysId">Funder</Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <div className="controls edit">
                                                     <ReactMultiSelectCheckboxes
 
@@ -965,7 +970,8 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="countrysId">Shipment Status</Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <div className="controls edit">
                                                     <ReactMultiSelectCheckboxes
 
@@ -986,7 +992,7 @@ class ShipmentGlobalDemandView extends Component {
                                 </Col>
                             </Form>
                             <Col md="12 pl-0">
-                                <div className="row">
+                                <div className="row grid-divider">
                                     <Col md="8 pl-0">
                                         <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
                                             <HorizontalBar id="cool-canvas" data={chartData} options={options} />

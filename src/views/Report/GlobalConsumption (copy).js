@@ -1884,8 +1884,7 @@ class GlobalConsumption extends Component {
                       </InputGroup>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <InputGroup className="box">
                         <ReactMultiSelectCheckboxes
 
@@ -1903,7 +1902,7 @@ class GlobalConsumption extends Component {
                     </FormGroup>
 
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')} <span className="red Reqasterisk">*</span></Label>
                       <div className="controls ">
                         <InputGroup>
                           <Input
@@ -1928,8 +1927,7 @@ class GlobalConsumption extends Component {
 
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls">
                         <InputGroup className="box">
                           <ReactMultiSelectCheckboxes

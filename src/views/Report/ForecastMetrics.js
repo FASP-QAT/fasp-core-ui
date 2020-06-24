@@ -911,7 +911,8 @@ class ForecastMetrics extends Component {
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                      <InputGroup>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
 
                         <ReactMultiSelectCheckboxes
 
@@ -930,7 +931,8 @@ class ForecastMetrics extends Component {
                     </FormGroup>
                     <FormGroup className="col-md-3">
                       <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                      <InputGroup>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
                         <ReactMultiSelectCheckboxes
 
                           bsSize="sm"
@@ -972,8 +974,9 @@ class ForecastMetrics extends Component {
                     </FormGroup>
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <InputGroup>
+                        <InputGroup className="box">
                           <ReactMultiSelectCheckboxes
 
                             name="planningUnitId"

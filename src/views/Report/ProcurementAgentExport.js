@@ -304,11 +304,12 @@ class ProcurementAgentExport extends Component {
                     <CardBody>
                         <div ref={ref}>
                             <Form >
-                                <Col md="2 pl-0">
+                                <Col md="12 pl-0">
                                     <div className="row">
-                                        <FormGroup className="col-md-1">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
                                                     bsSize="sm"
                                                     name="programIds"
