@@ -1233,21 +1233,31 @@ class AggregateShipmentByProduct extends Component {
                                                 <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Planning Unit</th>
+                                                            <th style={{width: '700px', cursor: 'pointer' }}>Planning Unit</th>
                                                             <th style={{width: '325px', cursor: 'pointer' }}>Quantity</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Product Cost($)</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Freight Cost($)</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Total Cost($)</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Product Cost(USD)</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Freight(%)</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Freight Cost(USD)</th>
+                                                            <th style={{width: '325px', cursor: 'pointer' }}>Total Cost(USD)</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
                                                         <tr>
                                                             <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
+                                                            <td>3000</td>
+                                                            <td>5,100,000</td>
                                                             <td>10</td>
-                                                            <td>17,000</td>
-                                                            <td>3,000</td>
-                                                            <td>20,000</td>
+                                                            <td>510,000</td>
+                                                            <td>5,610,000</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Ceftriaxone 1 gm Powder Vial, 50 Vials</td>
+                                                            <td>5000</td>
+                                                            <td>8,500,000</td>
+                                                            <td>10</td>
+                                                            <td>850,000</td>
+                                                            <td>9,350,000</td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>
