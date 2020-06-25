@@ -83,20 +83,25 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        // text: i18n.t('static.dashboard.globalconsumption'),
+        text: "Global Demand(Orders over selected time period)",
         fontColor: 'black'
     },
     scales: {
         xAxes: [{
             
             stacked: true,
+            labelString: "Amount",
             gridLines: {
                 display: false
             },
         }],
         yAxes: [{
             stacked: true,
+<<<<<<< HEAD
+            labelString: "Planning Unit"
+=======
             
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
         }],
     },
     tooltips: {
@@ -107,27 +112,40 @@ const options = {
     ,
     legend: {
         display: true,
-        position: 'top',
+        position: 'bottom',
         labels: {
             usePointStyle: true,
             fontColor: 'black'
         }
     }
 }
+const optionsPie = {
+    title: {
+        display: true,
+        text: "Funder Split",
+        fontColor: 'black'
+    },
+    legend: {
+      position: 'bottom'
+    //   labels: {
+    //     boxWidth: 10
+    //   }
+    }
+  }
 
 const chartData = {
     labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each','Female Condom (Nitrile) Lubricated, 17 cm, 20 Each' ],
     datasets: [{
-        label: 'Ship Actual',
+        label: 'Ordered Shipments',
         data: [20000, 10000, 2000],
-        backgroundColor: '#F48521',
+        backgroundColor: '#6a82a8',
         borderWidth: 0
         
     },
     {
-        label: 'Ship Forecast',
+        label: 'Planned Shipments',
         data: [20000, 20000, 2000],
-        backgroundColor: '#ED5626',
+        backgroundColor: '#dee7f8',
         borderWidth: 0,
     }
     ]
@@ -167,10 +185,13 @@ class ShipmentGlobalDemandView extends Component {
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
         this.state = {
-            labels: ['GF', 'Govt', 'Other', 'PSM'],
+            labels: ['PSM', 'GF', 'Local', 'Govt'],
             datasets: [{
-                data: [13824000, 26849952, 0, 5615266],
-                backgroundColor: ['#F48521', '#118b70', '#002f6c', '#EDB944']
+                data: [5615266, 13824000, 0, 26849952],
+                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944'],
+                legend: {
+                    position: 'bottom'
+                }
             }],
             dropdownOpen: false,
             radioSelected: 2,
@@ -890,7 +911,7 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
 
@@ -934,7 +955,7 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
@@ -950,7 +971,7 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="countrysId">Funder</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <InputGroup className="box">
                                                 <div className="controls edit">
                                                     <ReactMultiSelectCheckboxes
@@ -968,9 +989,9 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </InputGroup>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        {/* <FormGroup className="col-md-3">
                                             <Label htmlFor="countrysId">Shipment Status</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <InputGroup className="box">
                                                 <div className="controls edit">
                                                     <ReactMultiSelectCheckboxes
@@ -987,11 +1008,15 @@ class ShipmentGlobalDemandView extends Component {
                                                         )}
                                                 </div>
                                             </InputGroup>
-                                        </FormGroup>
+                                        </FormGroup> */}
                                     </div>
                                 </Col>
                             </Form>
+<<<<<<< HEAD
+                            <Col md="12 pl-0  mt-4">
+=======
                             <Col md="12 pl-0">
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
                                 <div className="row grid-divider">
                                     <Col md="8 pl-0">
                                         <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
@@ -1003,7 +1028,7 @@ class ShipmentGlobalDemandView extends Component {
                                             <Pie data={{
                                                 labels: this.state.labels,
                                                 datasets: this.state.datasets
-                                            }}
+                                            }} options={optionsPie}
                                             /><br />
                                         </div>
                                     </Col>
@@ -1045,42 +1070,42 @@ class ShipmentGlobalDemandView extends Component {
 
                                                     <thead>
                                                         <tr>
-                                                            <th className="text-center" style={{ width: '34%' }}> Planning Unit </th>
-                                                            <th className="text-center " style={{ width: '34%' }}> GF </th>
-                                                            <th className="text-center" style={{ width: '34%' }}>Gov't</th>
-                                                            <th className="text-center" style={{ width: '34%' }}>Other</th>
-                                                            <th className="text-center" style={{ width: '34%' }}>PSM</th>
-                                                            <th className="text-center" style={{ width: '34%' }}>Total</th>
+                                                            <th className="text-left" style={{ width: '600px' }}> Planning Unit </th>
+                                                            <th className="text-right " style={{ width: '350px' }}> GF (USD) </th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Gov't (USD)</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Local (USD)</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>PSM (USD)</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Total (USD)</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
                                                         <tr id="addr0" key={1} >
 
-                                                            <td>Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each</td>
+                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each</td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td>2,826</td>
-                                                            <td >2,826</td>
+                                                            <td className="text-right">2,826</td>
+                                                            <td className="text-right">2,826</td>
                                                         </tr>
                                                         <tr id="addr0" key={2} >
 
-                                                            <td>Female Condom (Nitrile) Lubricated, 17 cm, 20 Each </td>
+                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Each </td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td>5,612,440</td>
-                                                            <td >5,612,440</td>
+                                                            <td className="text-right">5,612,440</td>
+                                                            <td className="text-right">5,612,440</td>
                                                         </tr>
                                                         <tr id="addr0" key={3} >
 
-                                                            <td>Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces </td>
-                                                            <td>13,824,000</td>
-                                                            <td>26,849,952</td>
+                                                            <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces </td>
+                                                            <td className="text-right">13,824,000</td>
+                                                            <td className="text-right">26,849,952</td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td >40,673,952</td>
+                                                            <td className="text-right">40,673,952</td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>
