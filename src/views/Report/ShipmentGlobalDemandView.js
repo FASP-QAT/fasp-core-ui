@@ -88,7 +88,7 @@ const options = {
     },
     scales: {
         xAxes: [{
-            labelMaxWidth: 100,
+            
             stacked: true,
             labelString: "Amount",
             gridLines: {
@@ -97,7 +97,11 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
+<<<<<<< HEAD
             labelString: "Planning Unit"
+=======
+            
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
         }],
     },
     tooltips: {
@@ -130,12 +134,13 @@ const optionsPie = {
   }
 
 const chartData = {
-    labels: ["Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces", "Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each", "Female Condom (Nitrile) Lubricated, 17 cm, 20 Each "],
+    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each','Female Condom (Nitrile) Lubricated, 17 cm, 20 Each' ],
     datasets: [{
         label: 'Ordered Shipments',
         data: [20000, 10000, 2000],
         backgroundColor: '#6a82a8',
         borderWidth: 0
+        
     },
     {
         label: 'Planned Shipments',
@@ -1007,7 +1012,11 @@ class ShipmentGlobalDemandView extends Component {
                                     </div>
                                 </Col>
                             </Form>
+<<<<<<< HEAD
                             <Col md="12 pl-0  mt-4">
+=======
+                            <Col md="12 pl-0">
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
                                 <div className="row grid-divider">
                                     <Col md="8 pl-0">
                                         <div className="chart-wrapper" style={{ marginTop: '-5%' }}>

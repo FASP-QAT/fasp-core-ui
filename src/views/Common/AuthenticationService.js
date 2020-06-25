@@ -922,6 +922,16 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/report/warehouseCapacity":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockAdjustment":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/report/annualShipmentCost":
                     if (bfunction.includes("ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT")) {
                         return true;
@@ -959,7 +969,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/inventoryTurns":
-                    if (bfunction.includes("ROLE_BF_REPORT_INVENTORY_TURN")) {
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
                     break;

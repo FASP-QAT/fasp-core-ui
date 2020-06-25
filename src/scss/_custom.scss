@@ -488,6 +488,7 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
+  table-layout: auto !important; 
   max-height: 540px;
 }
 
@@ -777,6 +778,26 @@ label.arrow_label:after {
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(2){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(3){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(4){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(5){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(6){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(7){width: 300px !important;}
+
+.listPrportFundingAlignThtd .react-bootstrap-table .table td{width: 150px !important;}
+
+.Region-box-icon {
+  position: absolute;
+  top: 33px;
+  left: 168px;
+  color: 697069 !important;
+  }
+
+  .Regioncalender .input-group .month-picker {
+    width: 220px;
+    }
 
 .prductCat-search-align{
   position: absolute;
@@ -785,6 +806,7 @@ label.arrow_label:after {
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
+
 
 
 
@@ -1932,8 +1954,43 @@ input::placeholder {
 .showdatabtn{
   margin-top:-1%;
 }
-///////Report react mutiselect checkbox Consumption globe
+///////Report react mutiselect checkbox 
 .css-1r4vtzz {
+<<<<<<< HEAD
+=======
+padding: 0px 8px 5px 10px !important;
+margin: -4px 0px 0px -8px!important;
+background-color: transparent!important;
+ box-shadow: none !important;
+color: #515151;
+cursor: pointer;
+display: -webkit-inline-box;
+display: -webkit-inline-flex;
+display: -ms-inline-flexbox;
+text-align: left;
+-webkit-text-decoration: none;
+text-decoration: none;
+ max-width: none!important; 
+position: relative!important;
+display: flex!important;
+overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
+align-items: stretch!important;
+width: 100%!important;
+min-width: 233px!important;
+width: 0 auto!important;
+height: calc(0.5em + 0.5rem + 2px)!important;
+background-clip: padding-box!important;
+font-size: 0.76562rem!important;
+line-height: 1.5!important;
+border-radius: 0.2rem!important;
+
+}
+.css-48ayfv
+{
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
   padding: 0px 8px 5px 10px !important;
   margin: -4px 0px 0px -8px!important;
   background-color: transparent!important;
@@ -1949,20 +2006,31 @@ input::placeholder {
    max-width: none!important; 
   position: relative!important;
   display: flex!important;
+<<<<<<< HEAD
   overflow: hidden;
   word-wrap: normal !important;
   white-space: normal;
   text-overflow: ellipsis;
+=======
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
   align-items: stretch!important;
   width: 100%!important;
   min-width: 233px!important;
   width: 0 auto!important;
+<<<<<<< HEAD
+=======
+  overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
   height: calc(0.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
   font-size: 0.76562rem!important;
   line-height: 1.5!important;
   border-radius: 0.2rem!important;
   
+<<<<<<< HEAD
   }
   .css-48ayfv
   {
@@ -2043,6 +2111,57 @@ input::placeholder {
     min-width: 171px!important;
   }
 /////multi select checkout css//
+=======
+}
+.css-1gpjby2 {
+
+  margin: 0px -12px!important;
+  visibility: hidden;
+}
+.css-1pcexqc-container {
+  position: relative;
+  box-sizing: border-box;
+  width: 244px;
+  background-color: white;
+    border-radius: 4px;
+    margin-top: 5px;
+    position: absolute;
+    margin-left: -11px!important;
+    z-index: 2;
+}
+
+.reportdown-box-icon {
+  position: absolute;
+  top: 32px;
+  z-index: 2;
+  right: 23px;
+  color: 697069;
+}
+
+
+.css-1hwfws3
+{
+  height: calc(1.5em + 0.5rem + -1px) !important;
+}
+.css-1jllj6i-control {
+  min-height: 30px!important;
+  min-width: 183px!important;
+}
+.css-6y1x9t-control {
+  min-height: 30px!important;
+  border-color: #e4e7ea !important;
+  min-width: 183px!important;
+}
+.css-6y1x9t-control:hover {
+
+  border-color:#e4e7ea !important;
+}
+.css-1vr111p-option{
+  min-width: 171px!important;
+}
+
+/////multi select checkbox css//
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
 .supplyplanformulas{
   color: #20a8d8 !important;
   font-size: 12px!important;
@@ -2233,6 +2352,7 @@ h6{
   .date-color{
     color: #212721!important;
   }
+<<<<<<< HEAD
   .grid-divider {
     position: relative;
     padding: 0;
@@ -2250,3 +2370,6 @@ h6{
     .col-padding {
     padding: 0 15px;
     }
+=======
+  
+>>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5

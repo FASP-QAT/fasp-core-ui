@@ -253,7 +253,7 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170,170],
+                                    colWidths: [290, 290, 170, 170,170,170],
                                     columns: [
 
                                         {
@@ -279,6 +279,10 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: 'Local Procurment Lead Time',
                                             type: 'number'
+                                        },
+                                        {
+                                            title: 'Batch Required',
+                                            type: 'checkbox'
                                         }
 
                                     ],
@@ -332,7 +336,8 @@ export default class MapPlanningUnits extends Component {
                 minMonthsOfStock: map.get("3"),
                 localProcurementLeadTime:map.get("4"),
                 active: true,
-                programPlanningUnitId: 0
+                programPlanningUnitId: 0,
+                batchNoRequired:map.get("5")
             }
             planningUnitArray.push(planningUnitJson);
         }

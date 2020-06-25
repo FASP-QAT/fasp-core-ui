@@ -218,6 +218,9 @@ const CostOfInventoryReport=React.lazy(() => import('./views/Report/CostOfInvent
 const InventoryTurnsReport=React.lazy(() => import('./views/Report/InventoryTurns'));
 const ShipmentSummery = React.lazy(() => import('./views/Report/ShipmentSummery'));
 
+const WarehouseCapacity = React.lazy(() => import('./views/Report/WarehouseCapacity'));
+const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/report/inventoryTurns',name: 'Report  / Inventory Turns',component: InventoryTurnsReport },
@@ -459,7 +462,6 @@ const routes = [
   { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
 
-
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
@@ -526,5 +528,7 @@ const routes = [
   { path: '/shipment/ShipmentList', exact: true, name: 'Shipment Details', component: ShipmentList },
   { path: '/shipment/shipmentList/:message', component: ShipmentList },
   { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: 'Edit Shipment Details', component: EditShipment },
+  { path: '/report/warehouseCapacity', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
+  { path: '/report/stockAdjustment', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
 ];
 export default routes;
