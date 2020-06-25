@@ -83,14 +83,14 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        text: "Global Demand(Orders over selected time period)",
+        text: "Global Demand (Units)",
         fontColor: 'black'
     },
     scales: {
         xAxes: [{
-            
+
             stacked: true,
-            labelString: "Amount",
+            labelString: "Units",
             gridLines: {
                 display: false
             },
@@ -118,25 +118,25 @@ const options = {
 const optionsPie = {
     title: {
         display: true,
-        text: "Funder Split",
+        text: "Funding Source (USD)",
         fontColor: 'black'
     },
     legend: {
-      position: 'bottom'
-    //   labels: {
-    //     boxWidth: 10
-    //   }
+        position: 'bottom'
+        //   labels: {
+        //     boxWidth: 10
+        //   }
     }
-  }
+}
 
 const chartData = {
-    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each','Female Condom (Nitrile) Lubricated, 17 cm, 20 Each' ],
+    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each', 'Female Condom (Nitrile) Lubricated, 17 cm, 20 Each'],
     datasets: [{
         label: 'Ordered Shipments',
         data: [20000, 10000, 2000],
         backgroundColor: '#6a82a8',
         borderWidth: 0
-        
+
     },
     {
         label: 'Planned Shipments',
@@ -1062,12 +1062,29 @@ class ShipmentGlobalDemandView extends Component {
 
                                                     <thead>
                                                         <tr>
-                                                            <th className="text-left" style={{ width: '600px' }}> Planning Unit </th>
-                                                            <th className="text-right " style={{ width: '350px' }}> GF (USD) </th>
-                                                            <th className="text-right" style={{ width: '350px' }}>Gov't (USD)</th>
-                                                            <th className="text-right" style={{ width: '350px' }}>Local (USD)</th>
-                                                            <th className="text-right" style={{ width: '350px' }}>PSM (USD)</th>
-                                                            <th className="text-right" style={{ width: '350px' }}>Total (USD)</th>
+                                                            <th className="text-left" style={{ width: '300px' }} rowSpan="2"> Planning Unit </th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">GF</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">Govt</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">Local</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">PSM</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">Total</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Total Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Total Amount (USD) </th>
+                                                            {/* <th className="text-right " style={{ width: '350px' }}> GF</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Gov't</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Local</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>PSM</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Total</th> */}
                                                         </tr>
                                                     </thead>
 
@@ -1075,13 +1092,46 @@ class ShipmentGlobalDemandView extends Component {
                                                         <tr id="addr0" key={1} >
 
                                                             <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td className="text-right">2,826</td>
-                                                            <td className="text-right">2,826</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>3,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}>7,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
                                                         </tr>
                                                         <tr id="addr0" key={2} >
+
+                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Each</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>3,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}>7,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
+                                                        </tr>
+                                                        <tr id="addr0" key={3} >
+
+                                                            <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>3,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}>7,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
+                                                        </tr>
+                                                        {/* <tr id="addr0" key={2} >
 
                                                             <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Each </td>
                                                             <td></td>
@@ -1098,7 +1148,7 @@ class ShipmentGlobalDemandView extends Component {
                                                             <td></td>
                                                             <td></td>
                                                             <td className="text-right">40,673,952</td>
-                                                        </tr>
+                                                        </tr> */}
                                                     </tbody>
                                                 </Table>
                                             </div>
