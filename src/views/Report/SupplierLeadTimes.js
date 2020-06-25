@@ -403,20 +403,20 @@ class SupplierLeadTimes extends Component {
                                                     <th colSpan="10" className="text-center ">Lead Time In Months</th>
                                                 </tr>
                                                 <tr>
-                                                    <th className="text-center " style={{ 'width': '79px' }}> Country </th>
-                                                    <th className="text-center "style={{ 'width': '300px' }}> Program </th>
-                                                    <th className="text-center " style={{ 'width': '300px' }}> Planning Unit </th>
-                                                    <th className="text-center"> Procurement Agent</th>
-                                                    <th className="text-center" style={{ 'width': '102px' }}> Plan to Draft</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Draft to Submitted</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Submitted to Approved</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Approved to Shipped</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Shipped to Arrived by Sea</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Shipped to Arrived by Air</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Arrived to Delivered</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Total LT By Sea</th>
-                                                    <th className="text-center" style={{ 'width': '79px' }}> Total LT By Air</th>
-                                                    <th className="text-center" style={{ 'width': '78px' }}> Local Procurement</th>
+                                                    <th className="text-center " style={{ 'width': '2%' }}> Country </th>
+                                                    <th className="text-center "style={{ 'width': '2%' }}> Program </th>
+                                                    <th className="text-center " style={{ 'width': '2%' }}> Planning Unit </th>
+                                                    <th className="text-center" style={{ 'width': '2%' }}> Procurement Agent</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Plan to Draft</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Draft to Submitted</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Submitted to Approved</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Approved to Shipped</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Sea</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Air</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Arrived to Delivered</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Sea</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Air</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Local Procurement</th>
                                                 </tr>
                                             </thead>
 
