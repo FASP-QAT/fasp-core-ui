@@ -82,7 +82,8 @@ export default class PipelineProgramConsumption extends Component {
             if (dataSourceId != "" && !isNaN(parseInt(dataSourceId))) {
                 dataSourceId = map.get("5");
             } else {
-                dataSourceId = list[i].dataSourceId;
+                dataSourceId = list[map.get("8")].dataSourceId;
+                
             }
 
             var consumptionJson = {
