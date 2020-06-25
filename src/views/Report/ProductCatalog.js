@@ -216,7 +216,7 @@
 
 //         const marginLeft = 10;
 //         const doc = new jsPDF(orientation, unit, size,true);
-    
+
 //         doc.setFontSize(15);
 
 //         const title = "Product Catalog";
@@ -428,7 +428,7 @@
 //                         {  this.state.data.length > 0 && <div className="card-header-actions">
 //                         <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
 //                         <img style={{ height: '25px', width: '25px', cursor:'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />                  
-                                        
+
 //                         </div>}
 //                     </CardHeader>
 //                     <CardBody className="pb-lg-0">
@@ -567,7 +567,8 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 const entityname = i18n.t('static.dashboard.productcatalog');
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
-const data = [{ "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "ProcurementUnit": "(Campaign Bulk) LLIN 190x180x150 cm (LxWxH) Single Pyrethroid Rectangular (White)", "Supplier": "A To Z TEXTTILE LIMITED", "Weight": "1.115", "Height": "", "Length": "", "Width": "", "gtin": "", "Labeling": "Olyset 150 Denier Polyethylene" }];
+const data = [{ "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "ProcurementUnit": "(Campaign Bulk) LLIN 190x180x150 cm (LxWxH) Single Pyrethroid Rectangular (White)", "Supplier": "A To Z TEXTTILE LIMITED", "Weight": "1.115", "Height": "", "Length": "", "Width": "", "gtin": "12345678912345", "Labeling": "Olyset 150 Denier Polyethylene" }];
+const data1 = [{ "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "paskuCode": "100000DGA04S", "PlanningUnitMOQ": "3000", "PlanningUnitsperPallet": "1", "PlanningUnitsperContainer": "0.5", "PlanningUnitVolumem3": "4090", "PlanningUnitWeightkg": "500", "ProcurementUnit": "(Campaign Bulk) LLIN 190x180x150 cm (LxWxH) Single Pyrethroid Rectangular (White)", "Supplier": "A To Z TEXTTILE LIMITED", "Weight": "1.115", "Height": "", "Length": "", "Width": "", "gtin": "12345678912345", "Labeling": "Olyset 150 Denier Polyethylene", "UnitsperCase": "10,000", "UnitsperPallet": "5,000", "UnitsperContainer": "3,000", "ESTPrice": "2,456" }];
 export default class ProductCatalog extends React.Component {
     constructor(props) {
         super(props);
@@ -945,8 +946,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'pc',
                 text: i18n.t('static.dashboard.productcategory'),
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             },
             {
                 dataField: 'tc',
@@ -959,8 +960,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'fc',
                 text: i18n.t('static.forecastingunit.forecastingunit'),
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             },
             {
                 dataField: 'UOMCode',
@@ -980,8 +981,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'PlanningUnit',
                 text: "Planning Unit",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             },
             {
                 dataField: 'UOMCodeP',
@@ -1001,28 +1002,28 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'ProcurementUnit',
                 text: "Procurement Unit",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             }
             ,
             {
                 dataField: 'Supplier',
                 text: "Supplier",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             }
             ,
             {
                 dataField: 'Weight',
-                text: "Weight",
+                text: "Weight(Kg)",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'Height',
-                text: "Height",
+                text: "Height(m)",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1030,7 +1031,7 @@ export default class ProductCatalog extends React.Component {
             ,
             {
                 dataField: 'Length',
-                text: "Length",
+                text: "Length(m)",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1038,7 +1039,7 @@ export default class ProductCatalog extends React.Component {
             ,
             {
                 dataField: 'Width',
-                text: "Width",
+                text: "Width(m)",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -1048,8 +1049,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'gtin',
                 text: "GTIN",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             }
             ,
             {
@@ -1059,7 +1060,7 @@ export default class ProductCatalog extends React.Component {
                 align: 'center',
                 headerAlign: 'center'
             }
-            
+
 
 
             //  {
@@ -1121,6 +1122,197 @@ export default class ProductCatalog extends React.Component {
             //         );
             //     }
             // }
+        ];
+        const columns1 = [
+            {
+                dataField: 'pc',
+                text: i18n.t('static.dashboard.productcategory'),
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
+                dataField: 'tc',
+                text: i18n.t('static.dashboard.tracercategory'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'fc',
+                text: i18n.t('static.forecastingunit.forecastingunit'),
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
+                dataField: 'UOMCode',
+                text: "Unit",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'genericName',
+                text: "Generic Name",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnit',
+                text: "Planning Unit",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
+                dataField: 'UOMCodeP',
+                text: "Unit",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'MultipliertoForecastingUnit',
+                text: "Multiplier",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'paskuCode',
+                text: "Procurement Agent SKU Code",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitMOQ',
+                text: "MOQ",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitsperPallet',
+                text: "Planning Units Per Pallet",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitsperContainer',
+                text: "Planning Units Per Container",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitVolumem3',
+                text: "Planning Unit Volume (m3)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitWeightkg',
+                text: "Planning Unit Weight (Kg)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+
+            {
+                dataField: 'ProcurementUnit',
+                text: "Procurement Unit",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            }
+            ,
+            {
+                dataField: 'Supplier',
+                text: "Supplier",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            }
+            ,
+            {
+                dataField: 'Weight',
+                text: "Weight(Kg)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'Height',
+                text: "Height(m)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+            ,
+            {
+                dataField: 'Length',
+                text: "Length(m)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+            ,
+            {
+                dataField: 'Width',
+                text: "Width(m)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+            ,
+            {
+                dataField: 'gtin',
+                text: "GTIN",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            }
+            ,
+            {
+                dataField: 'Labeling',
+                text: "Labeling",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'UnitsperCase',
+                text: "Units Per Case",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'UnitsperPallet',
+                text: "Units Per Pallet",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'UnitsperContainer',
+                text: "Units Per Container",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'ESTPrice',
+                text: "EST Price",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
         ];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -1338,8 +1530,8 @@ export default class ProductCatalog extends React.Component {
 
                         <ToolkitProvider
                             keyField="procurementUnitId"
-                            data={data}
-                            columns={columns}
+                            data={data1}
+                            columns={columns1}
                             exportCSV exportCSV
                             search={{ searchFormatted: true }}
                             hover
