@@ -348,9 +348,9 @@
 //                                             </thead>
 
 //                                             <tbody>
-                                            
+
 //                                                 {
-                                                   
+
 //                                                     this.state.funders.map((item, idx) =>
 //                                                         <tr id="addr0" key={idx} >
 //                                                             <td>{getLabelText(this.state.funders[idx].program.label, this.state.lang)}</td>
@@ -482,58 +482,58 @@ class FunderExport extends Component {
                     this.setState({
                         regionList: response.data,
                         selRegion: [
-                        {
-                            "active": true,
-                            "regionId": 1,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "fundingSource": "Global Fund",
-                            "planningUnit": "Ceftriaxone 1 gm Vial,50 Vials",
-                            "qty": "50,000",
-                            "productCost": "7.00",
-                            "totalProductCost": "350,000",
-                            "freightPer": "10",
-                            "freightCost": "35,000",
-                            "totalCost": "385,000",
-                        },
-                        {
-                            "active": true,
-                            "regionId": 2,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "fundingSource": "Bill & Melinda Gates Foundation",
-                            "planningUnit": "Ceftriaxone 1 gm Vial,10 Vials",
-                            "qty": "60,000",
-                            "productCost": "8.00",
-                            "totalProductCost": "480,000",
-                            "freightPer": "12",
-                            "freightCost": "57,600",
-                            "totalCost": "537,600",
-                        },
-                        {
-                            "active": true,
-                            "regionId": 3,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "fundingSource": "USAID",
-                            "planningUnit": "Ceftriaxone 250 gm Powder Vial,10 Vials",
-                            "qty": "40,000",
-                            "productCost": "9.00",
-                            "totalProductCost": "360,000",
-                            "freightPer": "10",
-                            "freightCost": "36,000",
-                            "totalCost": "396,000",
-                        },
-                        {
-                            "active": true,
-                            "regionId": 4,
-                            "programName": "HIV/AIDS - Malawi - National",
-                            "fundingSource": "UNFPA",
-                            "planningUnit": "Abacavir 20mg/mL Solution,240 mL",
-                            "qty": "50,000",
-                            "productCost": "10.00",
-                            "totalProductCost": "500,000",
-                            "freightPer": "15",
-                            "freightCost": "75,000",
-                            "totalCost": "575,000",
-                        },
+                            {
+                                "active": true,
+                                "regionId": 1,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "fundingSource": "Global Fund",
+                                "planningUnit": "Ceftriaxone 1 gm Vial,50 Vials",
+                                "qty": "50,000",
+                                "productCost": "7.00",
+                                "totalProductCost": "350,000",
+                                "freightPer": "10",
+                                "freightCost": "35,000",
+                                "totalCost": "385,000",
+                            },
+                            {
+                                "active": true,
+                                "regionId": 2,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "fundingSource": "Bill & Melinda Gates Foundation",
+                                "planningUnit": "Ceftriaxone 1 gm Vial,10 Vials",
+                                "qty": "60,000",
+                                "productCost": "8.00",
+                                "totalProductCost": "480,000",
+                                "freightPer": "12",
+                                "freightCost": "57,600",
+                                "totalCost": "537,600",
+                            },
+                            {
+                                "active": true,
+                                "regionId": 3,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "fundingSource": "USAID",
+                                "planningUnit": "Ceftriaxone 250 gm Powder Vial,10 Vials",
+                                "qty": "40,000",
+                                "productCost": "9.00",
+                                "totalProductCost": "360,000",
+                                "freightPer": "10",
+                                "freightCost": "36,000",
+                                "totalCost": "396,000",
+                            },
+                            {
+                                "active": true,
+                                "regionId": 4,
+                                "programName": "HIV/AIDS - Malawi - National",
+                                "fundingSource": "UNFPA",
+                                "planningUnit": "Abacavir 20mg/mL Solution,240 mL",
+                                "qty": "50,000",
+                                "productCost": "10.00",
+                                "totalProductCost": "500,000",
+                                "freightPer": "15",
+                                "freightCost": "75,000",
+                                "totalCost": "575,000",
+                            },
                         ],
                         loading: false
                     })
@@ -614,7 +614,7 @@ class FunderExport extends Component {
             },
             {
                 dataField: 'totalProductCost',
-                text: 'Product Cost ($)',
+                text: 'Product Cost (USD)',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -628,14 +628,14 @@ class FunderExport extends Component {
             },
             {
                 dataField: 'freightCost',
-                text: 'Freight Cost ($)',
+                text: 'Freight Cost (USD)',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'totalCost',
-                text: 'Total Cost ($)',
+                text: 'Total Cost (USD)',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -754,6 +754,25 @@ class FunderExport extends Component {
                                                 type="select"
                                                 name="realmCountryId"
                                                 id="realmCountryId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {realmCountries}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Shipment Status</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="shipmentStatusID"
+                                                id="shipmentStatusID"
                                                 bsSize="sm"
                                                 onChange={this.filterData}
                                             >

@@ -1177,6 +1177,7 @@ class GlobalConsumption extends Component {
     this.getRandomColor = this.getRandomColor.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
+    this.hideDiv = this.hideDiv.bind(this)
   }
 
   makeText = m => {
@@ -1393,6 +1394,16 @@ class GlobalConsumption extends Component {
     })
   }
 
+  hideDiv() {
+    setTimeout(function () {
+      var theSelect = document.getElementById('planningUnitId').length;
+      
+      console.log("INHIDEDIV------------------------------------------------------", theSelect);
+
+    }, 9000);
+
+  }
+
 
   filterData(rangeValue) {
     /*this.setState({
@@ -1548,7 +1559,7 @@ class GlobalConsumption extends Component {
               //   "forecastingUnitQty": 3,
               //   "consumptionDateString": "Jul 2020"
               // },
-//malawi
+              //malawi
               {
                 "realmCountry": {
                   "id": 8,
@@ -1675,7 +1686,7 @@ class GlobalConsumption extends Component {
                 "forecastingUnitQty": 2.5,
                 "consumptionDateString": "Jan 2020"
               },
-//zimbabwe
+              //zimbabwe
               {
                 "realmCountry": {
                   "id": 15,
@@ -2307,10 +2318,10 @@ class GlobalConsumption extends Component {
                       </div>
 
                     </FormGroup>
-                    <FormGroup className="col-sm-3">
+                    <FormGroup className="col-sm-3" id="hideDiv">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <div className="controls">
-                        <InputGroup>
+                        <InputGroup onClick={this.hideDiv} id="pul">
                           <ReactMultiSelectCheckboxes
 
                             name="planningUnitId"
@@ -2352,7 +2363,7 @@ class GlobalConsumption extends Component {
                       &&
                       <div className="col-md-12 p-0 grapg-margin " >
                         <div className="offset-md-1 col-md-11">
-                        <div className="chart-wrapper chart-graph-report">
+                          <div className="chart-wrapper chart-graph-report">
                             <Bar id="cool-canvas" data={bar} options={options} />
                           </div>
                         </div>
