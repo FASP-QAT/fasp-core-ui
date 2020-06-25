@@ -776,7 +776,7 @@ label.arrow_label:after {
 .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
-.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: left !important;}
 
 .listRegionAlignThtd .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
 .listRegionAlignThtd .react-bootstrap-table .table td:nth-child(2){width: 150px !important;}
@@ -2294,4 +2294,11 @@ input::placeholder {
       .col-padding {
       padding: 0 15px;
       }
-  
+  /////////product catlog table css
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){width:2% !important;}
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(2){width:2% !important;}
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(3){width:2% !important;}
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(7){ width:20px !important; }
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(12){ width:4% !important; }
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(14){ width:7% !important; word-break: break-all;}
+ 

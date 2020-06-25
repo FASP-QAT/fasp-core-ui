@@ -988,8 +988,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'MultiplierForecastingUnitToPlanningUnit',
                 text: "Forecasting Unit To Planning Unit Multiplier",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
                 dataField: 'PlanningUnit',
@@ -1002,8 +1002,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'NoOfItems',
                 text: "No. Of Items",
                 sort: true,
-                align: 'left',
-                headerAlign: 'left'
+                align: 'right',
+                headerAlign: 'right'
             },
 
             {
@@ -1017,36 +1017,36 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'MultipliertoForecastingUnit',
                 text: "Multiplier",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
                 dataField: 'Min',
                 text: "Min",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
                 dataField: 'ReorderFrequecy',
                 text: "Reorder Frequecy",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
                 dataField: 'ShelfLife',
                 text: "Shelf Life(Months)",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
                 dataField: 'CatalogPrice',
                 text: "Catalog Price",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             }
 
 
