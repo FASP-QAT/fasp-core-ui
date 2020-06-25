@@ -137,11 +137,69 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
+
+        if (x == 7) {
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 8) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("I").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 9) {
+            // var reg = /^[0-9]+.[0-9]+$/;
+            var reg=/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("J").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
     }
 
     checkValidation() {
 
         var reg = /^[0-9\b]+$/;
+        var regDec =/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
@@ -216,6 +274,67 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
 
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(8, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("J").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(9, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+        
+
         }
         return valid;
     }
@@ -245,7 +364,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 reorderFrequencyInMonths: map.get("4"),
                 minMonthsOfStock: map.get("5"),
                 programPlanningUnitId: map.get("6"),
-                localProcurmentLeadTime:map.get("7")
+                localProcurmentLeadTime:map.get("7"),
+                shelfLife:map.get("8"),
+                catalogPrice:map.get("9")
                 
             }
             planningUnitArray.push(planningUnitJson);
@@ -329,6 +450,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[5] = planningUnitList[j].minMonthsOfStock;
                                                     data[6] = planningUnitList[j].programPlanningUnitId
                                                     data[7] = planningUnitList[j].localProcurmentLeadTime
+
+                                                    data[8] = planningUnitList[j].shelfLife
+                                                    data[9] = planningUnitList[j].catalogPrice
                                                     productDataArr.push(data);
 
                                                 }
@@ -384,14 +508,21 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     {
                                                         title: 'Local Procurment Lead Time',
                                                         type: 'number',
-
                                                     },
+                                                    {
+                                                        title: 'Shelf Life',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Catalog Price',
+                                                        type: 'number'
+                                                    }
                                                 ],
                                                 pagination: 10,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
-                                                wordWrap: true,
+                                                wordWrap: true, 
                                                 // paginationOptions: [10, 25, 50, 100],
                                                 // position: 'top',
                                                 allowInsertColumn: false,

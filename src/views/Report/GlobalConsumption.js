@@ -2859,7 +2859,8 @@ class GlobalConsumption extends Component {
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
-                      <InputGroup>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
                         <div className="controls edit">
                           <ReactMultiSelectCheckboxes
 
@@ -2878,7 +2879,8 @@ class GlobalConsumption extends Component {
                     </FormGroup>
                     <FormGroup className="col-md-3">
                       <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                      <InputGroup>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
                         <ReactMultiSelectCheckboxes
 
                           bsSize="sm"
@@ -2921,8 +2923,9 @@ class GlobalConsumption extends Component {
                     </FormGroup>
                     <FormGroup className="col-sm-3" id="hideDiv">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <InputGroup onClick={this.hideDiv} id="pul">
+                        <InputGroup className="box">
                           <ReactMultiSelectCheckboxes
 
                             name="planningUnitId"

@@ -17,7 +17,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 
 let initialValues = {
     realmId: '',
-    healthAreaName: ''
+    healthAreaName: '',
+    healthAreaCode: '',
 }
 const entityname = i18n.t('static.healtharea.healtharea');
 const validationSchema = function (values) {
@@ -25,7 +26,10 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         healthAreaName: Yup.string()
-            .required(i18n.t('static.healtharea.healthareatext'))
+            .required(i18n.t('static.healtharea.healthareatext')),
+        healthAreaCode: Yup.string()
+            .max(3, 'Technical Area Code Is 3 Digit')
+            .required(i18n.t('static.country.countrycodetext')),
     })
 }
 
@@ -74,7 +78,8 @@ export default class EditHealthAreaComponent extends Component {
                         label_fr: ''
                     }
                 },
-                realmCountryArray: []
+                realmCountryArray: [],
+                healthAreaCode: '',
 
             },
             // healthArea: this.props.location.state.healthArea,
@@ -121,6 +126,8 @@ export default class EditHealthAreaComponent extends Component {
             healthArea.realm.id = event.target.value
         } else if (event.target.name === "active") {
             healthArea.active = event.target.id === "active2" ? false : true
+        } else if (event.target.name === "healthAreaCode") {
+            healthArea.healthAreaCode = event.target.value.toUpperCase();
         }
         this.setState({
             healthArea
@@ -133,7 +140,8 @@ export default class EditHealthAreaComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
-            healthAreaName: true
+            healthAreaName: true,
+            healthAreaCode: true,
         }
         )
         this.validateForm(errors)
@@ -176,6 +184,7 @@ export default class EditHealthAreaComponent extends Component {
 
             initialValues = {
                 healthAreaName: this.state.healthArea.label.label_en,
+                healthAreaCode: this.state.healthArea.healthAreaCode,
                 realmId: this.state.healthArea.realm.id
             }
 
@@ -337,6 +346,19 @@ export default class EditHealthAreaComponent extends Component {
                                                             value={this.state.healthArea.label.label_en}
                                                             id="healthAreaName" />
                                                         <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">Technical Area Code<span class="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
+                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.healthArea.healthAreaCode}
+                                                            id="healthAreaCode" />
+                                                        <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>

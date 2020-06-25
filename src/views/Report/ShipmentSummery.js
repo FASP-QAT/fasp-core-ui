@@ -66,7 +66,7 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        // text: i18n.t('static.dashboard.globalconsumption'),
+        text: "Shipments",
         fontColor: 'black'
     },
     scales: {
@@ -76,8 +76,15 @@ const options = {
             gridLines: {
                 display: false
             },
+
+        fontColor: 'black'
         }],
         yAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: "Amount (USD)",
+                fontColor: 'black'
+            },
             stacked: true,
         }],
     },
@@ -89,7 +96,7 @@ const options = {
     ,
     legend: {
         display: true,
-        position: 'top',
+        position: 'bottom',
         labels: {
             usePointStyle: true,
             fontColor: 'black'
@@ -98,31 +105,28 @@ const options = {
 }
 
 const chartData = {
-    labels: ["Feb 2020", "May 2020", "Jun 2020"],
-    datasets: [{
-        label: 'Planned',
-        data: [0, 0, 0, 0],
-        backgroundColor: '#000050',
-        borderWidth: 0
-    },
-    {
-        label: 'Ordered',
-        data: [0, 17000, 15000],
-        backgroundColor: '#52CAFF',
-        borderWidth: 0,
-    },
-    {
-        label: 'Received',
-        data: [20000, 0, 0],
-        backgroundColor: '#AAAAFA',
-        borderWidth: 0,
-    },
-    {
-        label: 'Today',
-        data: [0, 0, 0],
-        backgroundColor: 'black',
-        borderWidth: 0,
-    }
+    labels: ["Jan 2020", "Feb 2020", "Mar 2020", "Apr 2020", "May 2020", "Jun 2020", "Jul 2020", "Aug 2020", "Sep 2020", "Oct 2020", "Nov 2020", "Dec 2020"],
+    datasets: [
+        {
+            label: 'Received',
+            data: [0, 3740000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#042e6a',
+            borderWidth: 0,
+        },
+
+        {
+            label: 'Ordered',
+            data: [0, 0, 0, 0, 5610000, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#6a82a8',
+            borderWidth: 0,
+        },
+        {
+            label: 'Planned',
+            data: [0, 0, 0, 0, 0, 7480000, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#dee7f8',
+            borderWidth: 0
+        }
+
     ]
 };
 
@@ -905,14 +909,14 @@ class Consumption extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong>
                         {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                         <Online>
-                            {
-                                this.state.consumptions.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
+                            {/* {
+                                this.state.consumptions.length > 0 && */}
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
 
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
-                                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
 
  
  {({ toPdf }) =>
@@ -920,10 +924,10 @@ class Consumption extends Component {
 
  }
  </Pdf>*/}
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                                </div>
-                            }
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                            {/* } */}
                         </Online>
                         <Offline>
                             {
@@ -1037,7 +1041,7 @@ class Consumption extends Component {
                                                                 bsSize="sm"
                                                                 onChange={this.getPlanningUnit}
                                                             >
-                                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                                <option value="0">Please select</option>
                                                                 {productCategories.length > 0
                                                                     && productCategories.map((item, i) => {
                                                                         return (
@@ -1133,7 +1137,7 @@ class Consumption extends Component {
                                                     </div>
                                                 </FormGroup>
                                             </Offline>
-                                            <Online>
+                                            {/* <Online>
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">Shipment Status</Label>
                                                     <div className="controls">
@@ -1151,7 +1155,7 @@ class Consumption extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
-                                            </Online>
+                                            </Online> */}
                                             <Offline>
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">Shipment Status</Label>
@@ -1207,7 +1211,7 @@ class Consumption extends Component {
                                                     </div>
                                                 </div>
                                                 <div className="col-md-12">
-                                                    <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                    <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
                                                         {this.state.show ? 'Hide Data' : 'Show Data'}
                                                     </button>
 
@@ -1228,7 +1232,7 @@ class Consumption extends Component {
                                                             <Bar id="cool-canvas" data={bar} options={options} />
 
                                                         </div>
-                                                    </div>
+                                                    </div><br />
                                                     <div className="col-md-12">
                                                         <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
@@ -1243,27 +1247,27 @@ class Consumption extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.show &&
-                                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                                <Table responsive className="table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
                                                             <th style={{ width: '225px', cursor: 'pointer' }}></th>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}># Orders</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}>Qty(Base units)</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer' }}>$ Cost</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}># Orders</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>Qty (Base units)</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>Cost (USD)</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>Global Fund</td>
-                                                            <td>2</td>
-                                                            <td>400,000</td>
-                                                            <td>$37,000</td>
+                                                            <td style={{ 'text-align': 'center' }}>Global Fund</td>
+                                                            <td style={{ 'text-align': 'right' }}>2</td>
+                                                            <td style={{ 'text-align': 'right' }}>5,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>9,350,000</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>GHSC-PSM</td>
-                                                            <td>1</td>
-                                                            <td>1,500,000</td>
-                                                            <td>$15,000</td>
+                                                            <td style={{ 'text-align': 'center' }}>GHSC-PSM</td>
+                                                            <td style={{ 'text-align': 'right' }}>1</td>
+                                                            <td style={{ 'text-align': 'right' }}>4,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>}
@@ -1277,72 +1281,81 @@ class Consumption extends Component {
                                                 <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th>Planning Unit/Forecasting Unit</th>
+                                                            <th style={{ 'text-align': 'left' }}>Planning Unit/Forecasting Unit</th>
                                                             <th>ID</th>
                                                             <th>Procurement Agent</th>
                                                             <th>Funder</th>
                                                             <th>Status</th>
                                                             <th>Notes</th>
+                                                            <th style={{ 'text-align': 'right' }}>Qty</th>
+                                                            <th style={{ 'width': '87px' }}>Order Date</th>
                                                             <th>Date/Month Receipt Expected</th>
-                                                            <th>Product Cost($)</th>
-                                                            <th>Freight Cost($)</th>
-                                                            <th>Total Cost($)</th>
-                                                            <th>Containers</th>
+                                                            <th style={{ 'text-align': 'right' }}>Product Cost (USD)</th>
+                                                            <th style={{ 'text-align': 'right' }}>Freight(%)</th>
+                                                            <th style={{ 'text-align': 'right' }}>Freight Cost (USD)</th>
+                                                            <th style={{ 'text-align': 'right' }}>Total Cost (USD)</th>
+                                                            <th style={{ 'text-align': 'right' }}>Containers</th>
                                                         </tr>
 
                                                     </thead>
 
                                                     <tbody>
                                                         <tr>
-                                                            <th colSpan="6">Feb 2020</th>
-                                                            <th colSpan="5">1</th>
+                                                            <th colSpan="14" style={{ 'text-align': 'left' }}>Feb 2020</th>
                                                         </tr>
                                                         <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
+                                                            <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>01</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Received</td>
                                                             <td></td>
-                                                            <td>04-25-2020</td>
-                                                            <td>17,000</td>
-                                                            <td>3,000</td>
-                                                            <td>20,000</td>
-                                                            <td>2</td>
+                                                            <td style={{ 'text-align': 'right' }}>2,000</td>
+                                                            <td>Feb-03-2020</td>
+                                                            <td>Apr-25-2020</td>
+                                                            <td style={{ 'text-align': 'right' }}>3,400,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            <td style={{ 'text-align': 'right' }}>340,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>3,740,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>1</td>
                                                         </tr>
                                                         <tr>
-                                                            <th colSpan="6">May 2020</th>
-                                                            <th colSpan="5">1</th>
+                                                            <th colSpan="14" style={{ 'text-align': 'left' }}>May 2020</th>
                                                         </tr>
                                                         <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
+                                                            <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
+                                                            <td>02</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Ordered</td>
                                                             <td></td>
-                                                            <td>09-25-2020</td>
-                                                            <td>15,000</td>
-                                                            <td>2,000</td>
-                                                            <td>17,000</td>
-                                                            <td>1.5</td>
+                                                            <td style={{ 'text-align': 'right' }}>3,000</td>
+                                                            <td>May-07-2020</td>
+                                                            <td>Sep-25-2020</td>
+                                                            <td style={{ 'text-align': 'right' }}>5,100,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            <td style={{ 'text-align': 'right' }}>510,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>5,610,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>1.5</td>
                                                         </tr>
                                                         <tr>
-                                                            <th colSpan="6">Jul 2020</th>
-                                                            <th colSpan="5">1</th>
+                                                            <th colSpan="14" style={{ 'text-align': 'left' }}>Jun 2020</th>
                                                         </tr>
                                                         <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
+                                                            <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
+                                                            <td>03</td>
                                                             <td>PEPFAR</td>
                                                             <td>GHSC-PSM</td>
-                                                            <td>Ordered</td>
+                                                            <td>Planned</td>
                                                             <td></td>
-                                                            <td>11-25-2020</td>
-                                                            <td>13,000</td>
-                                                            <td>2,000</td>
-                                                            <td>15,000</td>
-                                                            <td>1</td>
+                                                            <td style={{ 'text-align': 'right' }}>4,000</td>
+                                                            <td>Jun-03-2020</td>
+                                                            <td>Nov-25-2020</td>
+                                                            <td style={{ 'text-align': 'right' }}>6,800,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            <td style={{ 'text-align': 'right' }}>680,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>7,480,000</td>
+                                                            <td style={{ 'text-align': 'right' }}>2</td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>}

@@ -399,19 +399,24 @@ class SupplierLeadTimes extends Component {
 
                                             <thead>
                                                 <tr>
-                                                    <th className="text-center "> Country </th>
-                                                    <th className="text-center "> Program </th>
-                                                    <th className="text-center "> Planning Unit </th>
-                                                    <th className="text-center"> Plan to Draft LT (Months)</th>
-                                                    <th className="text-center"> Draft to Submitted LT (Months)</th>
-                                                    <th className="text-center"> Submitted to Approved LT (Months)</th>
-                                                    <th className="text-center"> Approved to Shipped LT (Months)</th>
-                                                    <th className="text-center"> Shipped to Arrived by Sea LT (Months)</th>
-                                                    <th className="text-center"> Shipped to Arrived by Air LT (Months)</th>
-                                                    <th className="text-center"> Arrived to Delivered LT (Months)</th>
-                                                    <th className="text-center"> Total LT By Sea (Months)</th>
-                                                    <th className="text-center"> Total LT By Air (Months)</th>
-                                                    <th className="text-center"> Local Procurement LT (Months)</th>
+                                                    <th colSpan="4" className="text-center "></th>
+                                                    <th colSpan="10" className="text-center ">Lead Time In Months</th>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-center " style={{ 'width': '2%' }}> Country </th>
+                                                    <th className="text-center "style={{ 'width': '2%' }}> Program </th>
+                                                    <th className="text-center " style={{ 'width': '2%' }}> Planning Unit </th>
+                                                    <th className="text-center" style={{ 'width': '2%' }}> Procurement Agent</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Plan to Draft</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Draft to Submitted</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Submitted to Approved</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Approved to Shipped</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Sea</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Air</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Arrived to Delivered</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Sea</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Air</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Local Procurement</th>
                                                 </tr>
                                             </thead>
 
@@ -422,6 +427,7 @@ class SupplierLeadTimes extends Component {
                                                     <td>Malawi</td>
                                                     <td>HIV/AIDS - Malawi - National</td>
                                                     <td>Abacavir 20 mg/mL Solution, 240 mL</td>
+                                                    <td>PEPFAR</td>
                                                     <td>0.5</td>
                                                     <td>0.5</td>
                                                     <td>1.25</td>
