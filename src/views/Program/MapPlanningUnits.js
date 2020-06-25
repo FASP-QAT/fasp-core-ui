@@ -29,6 +29,8 @@ export default class MapPlanningUnits extends Component {
 
     checkValidation() {
         var reg = /^[0-9\b]+$/;
+        var regDec =/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+        
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
@@ -86,6 +88,66 @@ export default class MapPlanningUnits extends Component {
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(4, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(5, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -159,6 +221,61 @@ export default class MapPlanningUnits extends Component {
         if (x == 3) {
             var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 4) {
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 5) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 6) {
+            // var reg = /^[0-9]+.[0-9]+$/;
+            var reg=/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -281,9 +398,17 @@ export default class MapPlanningUnits extends Component {
                                             type: 'number'
                                         },
                                         {
-                                            title: 'Batch Required',
-                                            type: 'checkbox'
-                                        }
+                                            title: 'Shelf Life',
+                                            type: 'number'
+                                        },
+                                        {
+                                            title: 'Catalog Price',
+                                            type: 'number'
+                                        },
+                                        // {
+                                        //     title: 'Batch Required',
+                                        //     type: 'checkbox'
+                                        // }
 
                                     ],
                                     pagination: false,
@@ -335,9 +460,11 @@ export default class MapPlanningUnits extends Component {
                 reorderFrequencyInMonths: map.get("2"),
                 minMonthsOfStock: map.get("3"),
                 localProcurementLeadTime:map.get("4"),
+                shelfLife:map.get("5"),
+                catalogPrice:map.get("6"),
                 active: true,
-                programPlanningUnitId: 0,
-                batchNoRequired:map.get("5")
+                programPlanningUnitId: 0
+               
             }
             planningUnitArray.push(planningUnitJson);
         }
