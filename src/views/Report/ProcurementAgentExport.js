@@ -780,7 +780,7 @@ class ProcurementAgentExport extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Shipment Status</Label>
+                                    <Label htmlFor="appendedInputButton">Include Planned Shipments</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
@@ -790,8 +790,8 @@ class ProcurementAgentExport extends Component {
                                                 bsSize="sm"
                                                 onChange={this.filterData}
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {realmCountries}
+                                                <option value="1">Yes</option>
+                                                <option value="2">No</option>
                                             </Input>
 
                                         </InputGroup>

@@ -746,6 +746,8 @@ class PlanningUnitCapacity extends Component {
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
     }
 
     hideSecondComponent() {
@@ -767,46 +769,77 @@ class PlanningUnitCapacity extends Component {
     }
 
     submitForm() {
-        console.log(JSON.stringify(this.state))
-        var planningUnitCapacity = this.state.rows
-        console.log("planningUnitCapacity------", planningUnitCapacity);
+        var validation = this.checkValidation();
+        console.log("validation************",validation);
+        if (validation) {
+            var tableJson = this.el.getJson();
+            let changedpapuList = [];
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                if (parseInt(map1.get("7")) === 1) {
+                    let json = {
+                        planningUnitCapacityId: parseInt(map1.get("6")),
+                        planningUnit: {
+                            id: this.props.match.params.planningUnitId
+                        }
+                        ,
+                        supplier: {
+                            id: parseInt(map1.get("1")),
+                            // label: {
+                            //     label_en: this.state.supplier.label.label_en
+                            // }
+                        }
+                        ,
+                        startDate: map1.get("2"),
 
+                        stopDate: map1.get("3"),
 
-        AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.editPlanningUnitCapacity(planningUnitCapacity)
-            .then(response => {
-                if (response.status == 200) {
-                    this.props.history.push(`/planningUnit/listPlanningUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
+                        capacity: map1.get("4"),
+                        active: map1.get("5"),
+                    }
+                    changedpapuList.push(json);
                 }
+            }
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+            AuthenticationService.setupAxiosInterceptors();
+            PlanningUnitService.editPlanningUnitCapacity(changedpapuList)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.props.history.push(`/planningUnit/listPlanningUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+
+        } else {
+            console.log("Something went wrong");
+        }
 
 
 
@@ -877,8 +910,8 @@ class PlanningUnitCapacity extends Component {
 
                                             // console.log("inventory Data Array-->", papuDataArr);
                                             if (papuDataArr.length == 0) {
-                                                data = [];
-                                                papuDataArr[0] = data;
+                                                // data = [];
+                                                // papuDataArr[0] = data;
                                             }
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');
                                             this.el.destroy();
@@ -904,12 +937,18 @@ class PlanningUnitCapacity extends Component {
                                                     },
                                                     {
                                                         title: "Start Date",
-                                                        type: 'text',
+                                                        type: 'calendar',
+                                                        options: {
+                                                            format: 'YYYY-MM-DD'
+                                                        }
 
                                                     },
                                                     {
                                                         title: "End Date",
-                                                        type: 'numeric',
+                                                        type: 'calendar',
+                                                        options: {
+                                                            format: 'YYYY-MM-DD'
+                                                        }
                                                     },
                                                     {
                                                         title: "Capacity",
@@ -1051,6 +1090,178 @@ class PlanningUnitCapacity extends Component {
 
     }
 
+    addRow = function () {
+
+        var data = [];
+        data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = true;
+        data[6] = 0;
+        data[7] = 1;
+        this.el.insertRow(
+            data, 0, 1
+        );
+    };
+
+    changed = function (instance, cell, x, y, value) {
+        //     $("#saveButtonDiv").show();
+        this.setState({
+            changedFlag: 1
+        })
+
+        //Supplier
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //start Date
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+
+        //End Date
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            var reg = /^[0-9\b]+$/;
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+        }
+
+        //Capacity
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+        }
+
+    }.bind(this);
+    // -----end of changed function
+
+    onedit = function (instance, cell, x, y, value) {
+        this.el.setValueFromCoords(7, y, 1, true);
+    }.bind(this);
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson();
+        for (var y = 0; y < json.length; y++) {
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (parseInt(value) == 1) {
+
+                //Supplier
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //StartDate
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "Invalid date" || value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //EndDate
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                if (value == "Invalid date" || value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Capacity
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
+
+
+
+
     render() {
         return (
 
@@ -1078,8 +1289,8 @@ class PlanningUnitCapacity extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addData')}</Button>
+                            <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
                             &nbsp;
                 </FormGroup>
                     </CardFooter>
