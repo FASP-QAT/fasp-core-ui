@@ -2026,7 +2026,8 @@ text-overflow: ellipsis;
 .css-1pcexqc-container {
   position: relative;
   box-sizing: border-box;
-  width: 244px;
+  // width: 244px;
+  width: 100%;
   background-color: white;
     border-radius: 4px;
     margin-top: 5px;
@@ -2050,21 +2051,38 @@ text-overflow: ellipsis;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
-  min-width: 183px!important;
+  // min-width: 183px!important;
 }
 .css-6y1x9t-control {
   min-height: 30px!important;
   border-color: #e4e7ea !important;
-  min-width: 183px!important;
+  // min-width: 183px!important;
 }
 .css-6y1x9t-control:hover {
 
   border-color:#e4e7ea !important;
 }
 .css-1vr111p-option{
-  min-width: 171px!important;
+  // min-width: 171px!important;
+  min-width: 100%;
 }
-
+@media (min-width: 1920px) {
+  .css-1pcexqc-container {
+    position: relative;
+    box-sizing: border-box;
+    width: 396px;
+    // width: 100%;
+    background-color: white;
+      border-radius: 4px;
+      margin-top: 5px;
+      position: absolute;
+      margin-left: -11px!important;
+      z-index: 2;
+  }
+  
+  
+  }
+  
 /////multi select checkbox css//
 .supplyplanformulas{
   color: #20a8d8 !important;
