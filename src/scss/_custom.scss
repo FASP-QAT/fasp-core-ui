@@ -776,8 +776,28 @@ label.arrow_label:after {
 .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
 .prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
-.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
+.prodCatlogAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: left !important;}
 
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(2){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(3){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(4){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(5){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(6){width: 150px !important;}
+.listRegionAlignThtd .react-bootstrap-table .table td:nth-child(7){width: 300px !important;}
+
+.listPrportFundingAlignThtd .react-bootstrap-table .table td{width: 150px !important;}
+
+.Region-box-icon {
+  position: absolute;
+  top: 33px;
+  left: 168px;
+  color: 697069 !important;
+  }
+
+  .Regioncalender .input-group .month-picker {
+    width: 220px;
+    }
 
 .prductCat-search-align{
   position: absolute;
@@ -786,6 +806,7 @@ label.arrow_label:after {
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
+
 
 
 
@@ -1933,43 +1954,11 @@ input::placeholder {
 .showdatabtn{
   margin-top:-1%;
 }
-///////Report react mutiselect checkbox Consumption globe
+///////Report react mutiselect checkbox 
 .css-1r4vtzz {
-padding: 1px 8px 5px 10px !important;
-background-color: #FFF;
- box-shadow: none !important;
-color: #515151;
-cursor: pointer;
-display: -webkit-inline-box;
-display: -webkit-inline-flex;
-display: -ms-inline-flexbox;
-text-align: left;
--webkit-text-decoration: none;
-text-decoration: none;
- max-width: none!important; 
-position: relative!important;
-display: flex!important;
-// flex-wrap: wrap!important;
-overflow: hidden;
-word-wrap: normal !important;
-white-space: normal;
-text-overflow: ellipsis;
-align-items: stretch!important;
-// width: 238%!important;
-min-width: 370px;
-width: 0 auto!important;
-height: calc(1.5em + 0.5rem + 2px)!important;
-background-clip: padding-box!important;
-border: 1px solid #e4e7ea!important;
-font-size: 0.76562rem!important;
-line-height: 1.5!important;
-border-radius: 0.2rem!important;
-
-}
-.css-48ayfv
-{
-  padding: 1px 8px 5px 10px !important;
-  background-color: #FFF;
+  padding: 0px 8px 5px 10px !important;
+  margin: -4px 0px 0px -8px!important;
+  background-color: transparent!important;
    box-shadow: none !important;
   color: #515151;
   cursor: pointer;
@@ -1982,71 +1971,27 @@ border-radius: 0.2rem!important;
    max-width: none!important; 
   position: relative!important;
   display: flex!important;
-  // flex-wrap: wrap!important;
-  align-items: stretch!important;
-  min-width: 370px;
-  width: 0 auto!important;
   overflow: hidden;
-word-wrap: normal !important;
-white-space: normal;
-text-overflow: ellipsis;
-  // width: 238%!important;
-  height: calc(1.5em + 0.5rem + 2px)!important;
+  word-wrap: normal !important;
+  white-space: normal;
+  text-overflow: ellipsis;
+  align-items: stretch!important;
+  width: 100%!important;
+  min-width: 233px!important;
+  width: 0 auto!important;
+  height: calc(0.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
-  border: 1px solid #e4e7ea!important;
   font-size: 0.76562rem!important;
   line-height: 1.5!important;
   border-radius: 0.2rem!important;
   
-}
-.css-1gpjby2 {
-
-  margin: 0px -12px!important;
-}
-.css-1pcexqc-container {
-  position: relative;
-  box-sizing: border-box;
-  width: 244px!important;
-}
-
-
-@media screen and (max-width: 992px){
-
-  .css-1r4vtzz {
-    padding: 1px 8px 5px 10px !important;
-    background-color: #FFF;
-     box-shadow: none !important;
-    color: #515151;
-    cursor: pointer;
-    display: -webkit-inline-box;
-    display: -webkit-inline-flex;
-    display: -ms-inline-flexbox;
-    text-align: left;
-    -webkit-text-decoration: none;
-    text-decoration: none;
-     max-width: none!important; 
-    position: relative!important;
-    display: flex!important;
-    // flex-wrap: wrap!important;
-    overflow: hidden;
-    word-wrap: normal !important;
-    white-space: normal;
-    text-overflow: ellipsis;
-    align-items: stretch!important;
-    // width: 238%!important;
-    min-width: 355px;
-    height: calc(1.5em + 0.5rem + 2px)!important;
-    background-clip: padding-box!important;
-    border: 1px solid #e4e7ea!important;
-    font-size: 0.76562rem!important;
-    line-height: 1.5!important;
-    border-radius: 0.2rem!important;
-    
-    }
+  }
+  
     .css-48ayfv
     {
-      padding: 1px 8px 5px 10px !important;
-      background-color: #FFF;
+      padding: 0px 8px 5px 10px !important;
+      margin: -4px 0px 0px -8px!important;
+      background-color: transparent!important;
        box-shadow: none !important;
       color: #515151;
       cursor: pointer;
@@ -2059,295 +2004,301 @@ text-overflow: ellipsis;
        max-width: none!important; 
       position: relative!important;
       display: flex!important;
-      // flex-wrap: wrap!important;
       align-items: stretch!important;
-      min-width: 355px;
+      width: 100%!important;
+      min-width: 233px!important;
+      width: 0 auto!important;
       overflow: hidden;
     word-wrap: normal !important;
     white-space: normal;
     text-overflow: ellipsis;
-      // width: 238%!important;
-      height: calc(1.5em + 0.5rem + 2px)!important;
+      height: calc(0.5em + 0.5rem + 2px)!important;
       background-clip: padding-box!important;
-      border: 1px solid #e4e7ea!important;
       font-size: 0.76562rem!important;
       line-height: 1.5!important;
       border-radius: 0.2rem!important;
       
     }
-}
-@media (max-width: 768px){
-.css-1r4vtzz
-{
-  min-width: 238px;
-}
-.css-48ayfv
-{
-  min-width: 238px;
-}
-.css-1jllj6i-control {
-  min-height: 30px!important;
-  min-width: 163px!important;
-}
-.css-6y1x9t-control {
-  min-height: 30px!important;
-  border-color:1px solid #e4e7ea !important;
-  min-width: 163px!important;
-}
-.css-1pcexqc-container {
-  position: relative;
-  width: 190px!important;
-  box-sizing: border-box;
-}
-
-}
-@media only screen and (max-width: 1024px) {
-  .css-1r4vtzz
-{
-  min-width: 157px
-}
-.css-48ayfv
-{
-  min-width: 157px
-}
-}
-
-@media screen and (min-width: 1920px) {
-  .css-48ayfv{
-    min-width: 380px;
-    overflow: hidden;
-  word-wrap: normal !important;
-  white-space: normal;
-  text-overflow: ellipsis;
+  
+  .css-1gpjby2 {
+  
+    margin: 0px -12px!important;
+    visibility: hidden;
   }
-  .css-1r4vtzz {
-   
-    overflow: hidden;
-    word-wrap: normal !important;
-    white-space: normal;
-    text-overflow: ellipsis;
-    align-items: stretch!important;
-    // width: 238%!important;
-    min-width: 465px
-
+  .css-1pcexqc-container {
+    position: relative;
+    box-sizing: border-box;
+    // width: 244px;
+    width: 100%;
+    background-color: white;
+      border-radius: 4px;
+      margin-top: 5px;
+      position: absolute;
+      margin-left: -11px!important;
+      z-index: 2;
+  }
+  
+  .reportdown-box-icon {
+    position: absolute;
+    top: 32px;
+    z-index: 2;
+    right: 23px;
+    color: 697069;
+  }
+  
+  
+  .css-1hwfws3
+  {
+    height: calc(1.5em + 0.5rem + -1px) !important;
+  }
+  .css-1jllj6i-control {
+    min-height: 30px!important;
+    // min-width: 183px!important;
+  }
+  .css-6y1x9t-control {
+    min-height: 30px!important;
+    border-color: #e4e7ea !important;
+    // min-width: 183px!important;
+  }
+  .css-6y1x9t-control:hover {
+  
+    border-color:#e4e7ea !important;
+  }
+  .css-1vr111p-option{
+    // min-width: 171px!important;
+    min-width: 100%;
+  }
+  @media (min-width: 1920px) {
+    .css-1pcexqc-container {
+      position: relative;
+      box-sizing: border-box;
+      width: 396px;
+      // width: 100%;
+      background-color: white;
+        border-radius: 4px;
+        margin-top: 5px;
+        position: absolute;
+        margin-left: -11px!important;
+        z-index: 2;
+    }
+    
     
     }
-  }
+    
+  /////multi select checkbox css//
   
-.css-1hwfws3
-{
-  height: calc(1.5em + 0.5rem + -1px) !important;
-}
-.css-1jllj6i-control {
-  min-height: 30px!important;
-  min-width: 183px!important;
-}
-.css-6y1x9t-control {
-  min-height: 30px!important;
-  border-color: #e4e7ea !important;
-  min-width: 183px!important;
-}
-.css-6y1x9t-control:hover {
-
-  border-color:#e4e7ea !important;
-}
-.css-1vr111p-option{
-  min-width: 171px!important;
-}
-// .css-1pcexqc-container {
-//   position: relative;
-//   box-sizing: border-box;
-//   width: 206px!important;
-// }
-/////multi select checkout css//
-.supplyplanformulas{
-  color: #20a8d8 !important;
-  font-size: 12px!important;
-  font-weight: bold!important;
-}
-.formulasheading{
-  font-size:14px!important;
-  font-weight: bold!important;
-  color: #20a8d8!important;
-}
-.formulastext{
-
-  color: #212721!important;
-}
-.grapg-margin{
-  margin-top:-2%;
-}
-.app-footer {
-  flex: 0 0 26px!important;
-}
-.uploadfilelable
-{
-  margin-left: -11px;
-}
-
-.custom-file-label::after {
-  color: #fff!important;
- background-color: #20a8d8!important;
- 
-}
-.custom-file-label {
-  color: #697069!important;
- 
-}
-.report-table{
-  max-height:300px;
-}
-
-// .table-fixed tbody {
-//   height: 300px;
-//   overflow-y: auto;
-//   width: 100%;
-// }
-
-// .table-fixed thead,
-// .table-fixed tbody,
-// .table-fixed tr,
-// .table-fixed td,
-// .table-fixed th {
-//   display: block;
-// }
-
-.formula-img-mr{
-  margin: 10px 0px 20px 0px;
-  border: 1px solid #20a8d8;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.formulastext-p{
-
-  color: #20a8d8!important;
-}
-
-.ml-field{
-  margin-left: -15px;
-}
-.mt-reporttable{
-  margin-top: -4%;
-}
-
-h6{
-  margin-top:5px;
-}
-
-.custom-file-input {
-  cursor: pointer;
-}
-//////supply plan table responsive css
-
-.overflowhide{
-  overflow-x: hidden!important;
-}
-
-.annualshipmrgin
-{
-  margin-top:5px !important;
-}
-
-.card-header
-{
-  padding: 10px 20px 10px 20px!important;
-} 
+  .supplyplanformulas{
+    color: #20a8d8 !important;
+    font-size: 12px!important;
+    font-weight: bold!important;
+  }
+  .formulasheading{
+    font-size:14px!important;
+    font-weight: bold!important;
+    color: #20a8d8!important;
+  }
+  .formulastext{
   
-.costinventryinput{
-  width:234px!important;
-}
-.table-mt{
-  margin-top: -1%;
-}
-.table-accesscnl-mt{
-  margin-top: -3%;
-}
-/* commit version legend */
-.legendcommitversion { list-style: none;display: inline-flex; }
-.legendcommitversion li { float: left; margin-right: 10px; }
-.legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
-
-/* your colors */
-.legendcommitversion .lightpinklegend {
-  background-color: yellow;
-  border-color: 1px solid yellow;
-}
-.legendcommitversion .greenlegend {
-  background-color:#86cd99;
-  border-color: 1px solid #86cd99;
-}
-.legendcommitversion .redlegend {
-  background-color: red;
-  border-color: 1px solid red;
-}
-
-.legendcommitversion .orangelegend {
-  background-color: orange;
-  border-color: 1px solid orange;
-}
-
-.legendcommitversion .orangeredlegend{
-  background-color: orangered;
-  border-color: 1px solid orangered;
-}
-
-.legendcommitversion .skipedShipmentslegend{
-  background-color: #696969;
-  border-color: 1px solid #696969;
-}
-
-.legendcommitversion .skipedShipmentsEmegencylegend{
-  background-color: #FA8072;
-  border-color: 1px solid #FA8072;
-}
-.legendcommitversion .purplelegend {
-  background-color: rgb(170, 85, 161);
-  border-color: 1px solid rgb(170, 85, 161);
-}
-.legendcommitversion .blacklegend {
-  background-color: #000;
-  border-color: 1px solid #000;
-}
-
-.legendcommitversion .notawesome {
-  background-color: #e5edf5;
-  border-color: 1px solid #e5edf5;
-}
-
-///supply plan
-.skipedShipmentslegend {
-  background-color: #696969;
-  border-color: 1px solid #696969;
-}
-.redlegend {
-  background-color: red;
-  border-color: 1px solid red;
-}
-.skipedShipmentsEmegencylegend{
-  background-color: #FA8072;
-  border-color: 1px solid #FA8072;
-}
-///Consumption model color
-.purplelegend {
-  background-color: rgb(170, 85, 161);
-  border-color: 1px solid rgb(170, 85, 161);
-}
-.blacklegend {
-  background-color: #000;
-  border-color: 1px solid #000;
-}
-
-.legendcommitversionText{
-  text-align: left;
-  display: table;
-  padding: 0px 0px 0px 11px;
-  }
-  .ForgotmarginTop
-  {
-    margin-top: -3%!important;
-  }
-  .date-color{
     color: #212721!important;
   }
+  .grapg-margin{
+    margin-top:-2%;
+  }
+  .app-footer {
+    flex: 0 0 26px!important;
+  }
+  .uploadfilelable
+  {
+    margin-left: -11px;
+  }
   
+  .custom-file-label::after {
+    color: #fff!important;
+   background-color: #20a8d8!important;
+   
+  }
+  .custom-file-label {
+    color: #697069!important;
+   
+  }
+  .report-table{
+    max-height:300px;
+  }
+  
+  // .table-fixed tbody {
+  //   height: 300px;
+  //   overflow-y: auto;
+  //   width: 100%;
+  // }
+  
+  // .table-fixed thead,
+  // .table-fixed tbody,
+  // .table-fixed tr,
+  // .table-fixed td,
+  // .table-fixed th {
+  //   display: block;
+  // }
+  
+  .formula-img-mr{
+    margin: 10px 0px 20px 0px;
+    border: 1px solid #20a8d8;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .formulastext-p{
+  
+    color: #20a8d8!important;
+  }
+  
+  .ml-field{
+    margin-left: -15px;
+  }
+  .mt-reporttable{
+    margin-top: -4%;
+  }
+  
+  h6{
+    margin-top:5px;
+  }
+  
+  .custom-file-input {
+    cursor: pointer;
+  }
+  //////supply plan table responsive css
+  
+  .overflowhide{
+    overflow-x: hidden!important;
+  }
+  
+  .annualshipmrgin
+  {
+    margin-top:5px !important;
+  }
+  
+  .card-header
+  {
+    padding: 10px 20px 10px 20px!important;
+  } 
+    
+  .costinventryinput{
+    width:234px!important;
+  }
+  .table-mt{
+    margin-top: -1%;
+  }
+  .table-accesscnl-mt{
+    margin-top: -3%;
+  }
+  /* commit version legend */
+  .legendcommitversion { list-style: none;display: inline-flex; }
+  .legendcommitversion li { float: left; margin-right: 10px; }
+  .legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
+  
+  /* your colors */
+  .legendcommitversion .lightpinklegend {
+    background-color: yellow;
+    border-color: 1px solid yellow;
+  }
+  .legendcommitversion .greenlegend {
+    background-color:#86cd99;
+    border-color: 1px solid #86cd99;
+  }
+  .legendcommitversion .redlegend {
+    background-color: red;
+    border-color: 1px solid red;
+  }
+  
+  .legendcommitversion .orangelegend {
+    background-color: orange;
+    border-color: 1px solid orange;
+  }
+  
+  .legendcommitversion .orangeredlegend{
+    background-color: orangered;
+    border-color: 1px solid orangered;
+  }
+  
+  .legendcommitversion .skipedShipmentslegend{
+    background-color: #696969;
+    border-color: 1px solid #696969;
+  }
+  
+  .legendcommitversion .skipedShipmentsEmegencylegend{
+    background-color: #FA8072;
+    border-color: 1px solid #FA8072;
+  }
+  .legendcommitversion .purplelegend {
+    background-color: rgb(170, 85, 161);
+    border-color: 1px solid rgb(170, 85, 161);
+  }
+  .legendcommitversion .blacklegend {
+    background-color: #000;
+    border-color: 1px solid #000;
+  }
+  
+  .legendcommitversion .notawesome {
+    background-color: #e5edf5;
+    border-color: 1px solid #e5edf5;
+  }
+  
+  ///supply plan
+  .skipedShipmentslegend {
+    background-color: #696969;
+    border-color: 1px solid #696969;
+  }
+  .redlegend {
+    background-color: red;
+    border-color: 1px solid red;
+  }
+  .skipedShipmentsEmegencylegend{
+    background-color: #FA8072;
+    border-color: 1px solid #FA8072;
+  }
+  ///Consumption model color
+  .purplelegend {
+    background-color: rgb(170, 85, 161);
+    border-color: 1px solid rgb(170, 85, 161);
+  }
+  .blacklegend {
+    background-color: #000;
+    border-color: 1px solid #000;
+  }
+  
+  .legendcommitversionText{
+    text-align: left;
+    display: table;
+    padding: 0px 0px 0px 11px;
+    }
+    .ForgotmarginTop
+    {
+      margin-top: -3%!important;
+    }
+    .date-color{
+      color: #212721!important;
+    }
+    .grid-divider {
+      position: relative;
+      padding: 0;
+      }
+      .grid-divider>[class*='col-'] {
+      position: static;
+      }
+      .grid-divider>[class*='col-']:nth-child(n+2):before {
+      content: "";
+      border-left: 1px solid #DDD;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      }
+      .col-padding {
+      padding: 0 15px;
+      }
+  /////////product catlog table css
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){width:2% !important;}
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(2){width:2% !important;}
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(3){width:2% !important;}
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(7){ width:20px !important; }
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(12){ width:4% !important; }
+  .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(14){ width:7% !important; word-break: break-all;}
+ 

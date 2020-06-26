@@ -216,7 +216,7 @@
 
 //         const marginLeft = 10;
 //         const doc = new jsPDF(orientation, unit, size,true);
-    
+
 //         doc.setFontSize(15);
 
 //         const title = "Product Catalog";
@@ -428,7 +428,7 @@
 //                         {  this.state.data.length > 0 && <div className="card-header-actions">
 //                         <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
 //                         <img style={{ height: '25px', width: '25px', cursor:'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />                  
-                                        
+
 //                         </div>}
 //                     </CardHeader>
 //                     <CardBody className="pb-lg-0">
@@ -567,7 +567,8 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 const entityname = i18n.t('static.dashboard.productcatalog');
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
-const data = [{ "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "ProcurementUnit": "(Campaign Bulk) LLIN 190x180x150 cm (LxWxH) Single Pyrethroid Rectangular (White)", "Supplier": "A To Z TEXTTILE LIMITED", "Weight": "1.115", "Height": "", "Length": "", "Width": "", "gtin": "", "Labeling": "Olyset 150 Denier Polyethylene" }];
+const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456870" }];
+const data1 = [{ "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "paskuCode": "100000DGA04S", "PlanningUnitMOQ": "3000", "PlanningUnitsperPallet": "1", "PlanningUnitsperContainer": "0.5", "PlanningUnitVolumem3": "4090", "PlanningUnitWeightkg": "500", "ProcurementUnit": "(Campaign Bulk) LLIN 190x180x150 cm (LxWxH) Single Pyrethroid Rectangular (White)", "Supplier": "A To Z TEXTTILE LIMITED", "Weight": "1.115", "Height": "", "Length": "", "Width": "", "gtin": "12345678912345", "Labeling": "Olyset 150 Denier Polyethylene", "UnitsperCase": "10,000", "UnitsperPallet": "5,000", "UnitsperContainer": "3,000", "ESTPrice": "2,456" }];
 export default class ProductCatalog extends React.Component {
     constructor(props) {
         super(props);
@@ -942,11 +943,18 @@ export default class ProductCatalog extends React.Component {
         // ];
         const columns = [
             {
+                dataField: 'program',
+                text: "Program",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
                 dataField: 'pc',
                 text: i18n.t('static.dashboard.productcategory'),
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             },
             {
                 dataField: 'tc',
@@ -959,8 +967,8 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'fc',
                 text: i18n.t('static.forecastingunit.forecastingunit'),
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             },
             {
                 dataField: 'UOMCode',
@@ -977,12 +985,27 @@ export default class ProductCatalog extends React.Component {
                 headerAlign: 'center'
             },
             {
+                dataField: 'MultiplierForecastingUnitToPlanningUnit',
+                text: "Forecasting Unit To Planning Unit Multiplier",
+                sort: true,
+                align: 'right',
+                headerAlign: 'right'
+            },
+            {
                 dataField: 'PlanningUnit',
                 text: "Planning Unit",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'left',
+                headerAlign: 'left'
             },
+            {
+                dataField: 'NoOfItems',
+                text: "No. Of Items",
+                sort: true,
+                align: 'right',
+                headerAlign: 'right'
+            },
+
             {
                 dataField: 'UOMCodeP',
                 text: "Unit",
@@ -994,72 +1017,39 @@ export default class ProductCatalog extends React.Component {
                 dataField: 'MultipliertoForecastingUnit',
                 text: "Multiplier",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
-                dataField: 'ProcurementUnit',
-                text: "Procurement Unit",
+                dataField: 'Min',
+                text: "Min",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-            ,
-            {
-                dataField: 'Supplier',
-                text: "Supplier",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-            ,
-            {
-                dataField: 'Weight',
-                text: "Weight",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             },
             {
-                dataField: 'Height',
-                text: "Height",
+                dataField: 'ReorderFrequecy',
+                text: "Reorder Frequecy",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-            ,
+                align: 'right',
+                headerAlign: 'right'
+            },
             {
-                dataField: 'Length',
-                text: "Length",
+                dataField: 'ShelfLife',
+                text: "Shelf Life(Months)",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-            ,
+                align: 'right',
+                headerAlign: 'right'
+            },
             {
-                dataField: 'Width',
-                text: "Width",
+                dataField: 'CatalogPrice',
+                text: "Catalog Price",
                 sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                align: 'right',
+                headerAlign: 'right'
             }
-            ,
-            {
-                dataField: 'gtin',
-                text: "GTIN",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-            ,
-            {
-                dataField: 'Labeling',
-                text: "Labeling",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-            
+
+
 
 
             //  {
@@ -1122,6 +1112,197 @@ export default class ProductCatalog extends React.Component {
             //     }
             // }
         ];
+        const columns1 = [
+            {
+                dataField: 'pc',
+                text: i18n.t('static.dashboard.productcategory'),
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
+                dataField: 'tc',
+                text: i18n.t('static.dashboard.tracercategory'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'fc',
+                text: i18n.t('static.forecastingunit.forecastingunit'),
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
+                dataField: 'UOMCode',
+                text: "Unit",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'genericName',
+                text: "Generic Name",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnit',
+                text: "Planning Unit",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            },
+            {
+                dataField: 'UOMCodeP',
+                text: "Unit",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'MultipliertoForecastingUnit',
+                text: "Multiplier",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'paskuCode',
+                text: "Procurement Agent SKU Code",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitMOQ',
+                text: "MOQ",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitsperPallet',
+                text: "Planning Units Per Pallet",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitsperContainer',
+                text: "Planning Units Per Container",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitVolumem3',
+                text: "Planning Unit Volume (m3)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'PlanningUnitWeightkg',
+                text: "Planning Unit Weight (Kg)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+
+            {
+                dataField: 'ProcurementUnit',
+                text: "Procurement Unit",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            }
+            ,
+            {
+                dataField: 'Supplier',
+                text: "Supplier",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            }
+            ,
+            {
+                dataField: 'Weight',
+                text: "Weight(Kg)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'Height',
+                text: "Height(m)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+            ,
+            {
+                dataField: 'Length',
+                text: "Length(m)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+            ,
+            {
+                dataField: 'Width',
+                text: "Width(m)",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+            ,
+            {
+                dataField: 'gtin',
+                text: "GTIN",
+                sort: true,
+                align: 'left',
+                headerAlign: 'left'
+            }
+            ,
+            {
+                dataField: 'Labeling',
+                text: "Labeling",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'UnitsperCase',
+                text: "Units Per Case",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'UnitsperPallet',
+                text: "Units Per Pallet",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'UnitsperContainer',
+                text: "Units Per Container",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'ESTPrice',
+                text: "EST Price",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -1166,7 +1347,7 @@ export default class ProductCatalog extends React.Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '}
                         {this.state.data.length > 0 && <div className="card-header-actions">
                             {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} /> */}
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
@@ -1175,7 +1356,7 @@ export default class ProductCatalog extends React.Component {
                     </CardHeader>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <Form >
-                            <Col md="9 pl-0">
+                            <Col md="12 pl-0">
                                 <div className="d-md-flex prodCatselect">
                                     {/* <FormGroup>
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
@@ -1214,8 +1395,10 @@ export default class ProductCatalog extends React.Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup> */}
+
+
                                     <FormGroup className="">
-                                        <Label htmlFor="appendedInputButton">Product Category</Label>
+                                        <Label htmlFor="appendedInputButton">Program</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
@@ -1251,7 +1434,7 @@ export default class ProductCatalog extends React.Component {
                                         </div>
                                     </FormGroup> */}
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                        <Label htmlFor="appendedInputButton">Product Category</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
@@ -1269,7 +1452,7 @@ export default class ProductCatalog extends React.Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Procurement Agent</Label>
+                                        <Label htmlFor="appendedInputButton">Tracer Category</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input

@@ -268,6 +268,7 @@
     "static.common.addEntity": "Add {{entityname}}",
     "static.common.editEntity": "Update {{entityname}}",
     "static.common.listEntity": "{{entityname}}s",
+    "static.common.listEntitypc": "{{entityname}}",
     "static.procurementagent.onlynumberText": "Only numbers allowed",
     "static.procurementagent.submitToApproveLeadTime": "Please enter submitted to approved lead time In Months",
     "static.businessFunction.businessFunctionName": "Business Function Name",
@@ -540,7 +541,7 @@
     "static.program.errorSelectProgramIfYouSelectVersion": "Please select program if you are selecting version.",
     "static.common.download": "Download",
     "static.dashboard.report": "Reports",
-    "static.dashboard.productcatalog": "Product Catalog",
+    "static.dashboard.productcatalog": "Program Product Catalog",
     "static.common.issync": "Sync online coversion rate",
     "static.message.oldPassword": "Please enter old password",
     "static.message.newPasswordMinLength": "Password has to be at least 6 characters",
@@ -803,8 +804,8 @@
     "static.report.amc": "AMC",
     "static.report.mos": "MOS",
     "static.report.comment": " Version Comments",
-    "static.report.mospast": "MOS Past(In Months)",
-    "static.report.mosfuture": "MOS Future(In Months)",
+    "static.report.mospast": "AMC Past(In Months)",
+    "static.report.mosfuture": "AMC Future(In Months)",
     "static.program.validstatus": "Please select Status",
     "static.accessDenied": "Access Denied",
     "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed.",
@@ -867,5 +868,8 @@
     "static.supplyPlan.shipped":"Shipped",
     "static.supplyPlan.ordered":"Ordered",
     "static.supplyPlan.planned":"Planned",
-    "static.supplyPlan.erpShipments":"Shipments from ERP"
+    "static.supplyPlan.erpShipments":"Shipments from ERP",
+    "static.report.warehouseCapacity": "Warehouse Capacity",
+    "static.report.stockAdjustment": "Stock Adjustment"
+
 }

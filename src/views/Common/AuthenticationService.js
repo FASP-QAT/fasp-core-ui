@@ -416,7 +416,7 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/user/accessControl":
+                case "/user/accessControl/:userId":
                     if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
@@ -918,6 +918,16 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/shipmentGlobalView":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/warehouseCapacity":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockAdjustment":
                     if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
                         return true;
                     }

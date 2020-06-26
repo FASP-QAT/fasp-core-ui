@@ -1061,6 +1061,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
+import 'chartjs-plugin-annotation';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1075,18 +1076,18 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-
+let dendoLabels = [{ label:"Today",pointStyle:"triangle"}]
 const options = {
   title: {
     display: true,
-    text: i18n.t('static.dashboard.globalconsumption'),
+    // text: i18n.t('static.dashboard.globalconsumption'),
     fontColor: 'black'
   },
   scales: {
     yAxes: [{
       scaleLabel: {
         display: true,
-        labelString: i18n.t('static.dashboard.consumption'),
+        labelString: 'Consumption Qty ( Million )',
         fontColor: 'black'
       },
       stacked: true,
@@ -1097,10 +1098,23 @@ const options = {
     }],
     xAxes: [{
       ticks: {
-        fontColor: 'black'
+        fontColor: 'black',
+       
       }
     }]
   },
+  annotation: {
+    annotations: [{
+      type:'triangle',
+    //  mode: 'vertical',
+      drawTime: 'beforeDatasetsDraw',
+      scaleID: 'x-axis-0',
+      value: 'Mar-2020',
+     
+      backgroundColor: 'rgba(0, 255, 0, 0.1)'
+   }],
+   
+},
   tooltips: {
     enabled: false,
     custom: CustomTooltips
@@ -1177,6 +1191,7 @@ class GlobalConsumption extends Component {
     this.getRandomColor = this.getRandomColor.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
+    this.hideDiv = this.hideDiv.bind(this)
   }
 
   makeText = m => {
@@ -1393,6 +1408,16 @@ class GlobalConsumption extends Component {
     })
   }
 
+  hideDiv() {
+    setTimeout(function () {
+      var theSelect = document.getElementById('planningUnitId').length;
+
+      console.log("INHIDEDIV------------------------------------------------------", theSelect);
+
+    }, 9000);
+
+  }
+
 
   filterData(rangeValue) {
     /*this.setState({
@@ -1419,9 +1444,991 @@ class GlobalConsumption extends Component {
 
       ReportService.getGlobalConsumptiondata(inputjson)
         .then(response => {
-          console.log(JSON.stringify(response.data));
+          console.log("RESP---", response.data);
           this.setState({
-            consumptions: response.data,
+            consumptions: [
+              {
+                "realmCountry": {
+                  "id": 1,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 2,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Feb 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 3,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Mar 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 4,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Apr 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 5,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "May 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 6,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jun 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 7,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jul 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 8,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-08-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Aug 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 9,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-09-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Sep 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 10,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-10-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Oct 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 11,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-11-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Nov 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 12,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-12-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Dec 2019"
+              },
+
+              {
+                "realmCountry": {
+                  "id": 13,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 14,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 1,
+                "consumptionDateString": "Feb 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 15,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 1.5,
+                "consumptionDateString": "Mar 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 16,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Apr 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 17,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 0.5,
+                "forecastingUnitQty": 0.5,
+                "consumptionDateString": "May 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 18,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 0.5,
+                "forecastingUnitQty": 0.5,
+                "consumptionDateString": "Jun 2020"
+              },
+
+
+
+
+//malawi
+              {
+                "realmCountry": {
+                  "id": 20,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 21,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Feb 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 22,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Mar 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 23,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Apr 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 24,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "May 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 25,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jun 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 26,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jul 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 27,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-08-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Aug 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 28,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-09-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Sep 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 29,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-10-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Oct 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 30,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-11-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Nov 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 31,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-12-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Dec 2019"
+              },
+
+              {
+                "realmCountry": {
+                  "id": 32,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jan 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 33,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Feb 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 34,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 1.5,
+                "consumptionDateString": "Mar 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 35,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Apr 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 36,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 0.5,
+                "forecastingUnitQty": 1,
+                "consumptionDateString": "May 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 37,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jun 2020"
+              },
+//zimbabwe
+              {
+                "realmCountry": {
+                  "id": 38,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 39,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Feb 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 40,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Mar 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 41,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Apr 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 42,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "May 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 43,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Jun 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 44,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Jul 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 45,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-08-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Aug 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 46,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-09-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Sep 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 47,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-10-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Oct 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 48,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-11-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Nov 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 49,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-12-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Dec 2019"
+              },
+
+              {
+                "realmCountry": {
+                  "id": 50,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Jan 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 51,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Feb 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 52,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Mar 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 53,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Apr 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 54,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 1.5,
+                "consumptionDateString": "May 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 55,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jun 2020"
+              },
+            ],
             message: ''
           })
         }).catch(
@@ -1748,7 +2755,7 @@ class GlobalConsumption extends Component {
     const { countrys } = this.state;
     // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      console.log(JSON.stringify(item))
+      // console.log(JSON.stringify(item))
       return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
     }, this);
     const { productCategories } = this.state;
@@ -1762,11 +2769,11 @@ class GlobalConsumption extends Component {
       }, this);
 
     const backgroundColor = [
-      '#4dbd74',
-      '#c8ced3',
-      '#000',
-      '#ffc107',
-      '#f86c6b',
+      '#002f6c',
+      '#118b70',
+      '#EDB944',
+      '#20a8d8',
+      '#d1e3f5',
     ]
     let country = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))]
     let consumptiondata = [];
@@ -1780,35 +2787,36 @@ class GlobalConsumption extends Component {
     const bar = {
 
       labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
-      // datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
-      datasets: [
-        {
-          label: 'Actual Consumption',
-          backgroundColor: '#86CD99',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.consumptions.map((item, index) => (item.Actual)),
-        }, {
-          type: "line",
-          linetension: 0,
-          label: i18n.t('static.report.forecastConsumption'),
-          backgroundColor: 'transparent',
-          borderColor: '#000',
-          borderDash: [10, 10],
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          showInLegend: true,
-          pointStyle: 'line',
-          pointBorderWidth: 5,
-          yValueFormatString: "$#,##0",
-          data: this.state.consumptions.map((item, index) => (item.forcast))
-        }
-      ],
+      datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
+
+      // datasets: [
+      //   {
+      //     label: 'Actual Consumption',
+      //     backgroundColor: '#86CD99',
+      //     borderColor: 'rgba(179,181,198,1)',
+      //     pointBackgroundColor: 'rgba(179,181,198,1)',
+      //     pointBorderColor: '#fff',
+      //     pointHoverBackgroundColor: '#fff',
+      //     pointHoverBorderColor: 'rgba(179,181,198,1)',
+      //     data: this.state.consumptions.map((item, index) => (item.planningUnitQty)),
+      //   }, {
+      //     type: "line",
+      //     lineTension: 0,
+      //     label: i18n.t('static.report.forecastConsumption'),
+      //     backgroundColor: 'transparent',
+      //     borderColor: '#000',
+      //     borderDash: [10, 10],
+      //     ticks: {
+      //       fontSize: 2,
+      //       fontColor: 'transparent',
+      //     },
+      //     showInLegend: true,
+      //     pointStyle: 'line',
+      //     pointBorderWidth: 5,
+      //     yValueFormatString: "$#,##0",
+      //     data: this.state.consumptions.map((item, index) => (item.forecastingUnitQty))
+      //   }
+      // ],
 
     };
     const pickerLang = {
@@ -1864,8 +2872,9 @@ class GlobalConsumption extends Component {
                     </FormGroup>
 
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                      <InputGroup>
+                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
                         <div className="controls edit">
                           <ReactMultiSelectCheckboxes
 
@@ -1883,8 +2892,9 @@ class GlobalConsumption extends Component {
                       </InputGroup>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                      <InputGroup>
+                      <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
                         <ReactMultiSelectCheckboxes
 
                           bsSize="sm"
@@ -1901,7 +2911,7 @@ class GlobalConsumption extends Component {
                     </FormGroup>
 
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                       <div className="controls ">
                         <InputGroup>
                           <Input
@@ -1925,10 +2935,11 @@ class GlobalConsumption extends Component {
                       </div>
 
                     </FormGroup>
-                    <FormGroup className="col-sm-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                    <FormGroup className="col-sm-3" id="hideDiv">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <InputGroup>
+                        <InputGroup className="box">
                           <ReactMultiSelectCheckboxes
 
                             name="planningUnitId"
@@ -1940,6 +2951,23 @@ class GlobalConsumption extends Component {
                         </InputGroup>
                       </div>
                     </FormGroup>
+                    {/* <FormGroup className="col-sm-3">
+                      <Label htmlFor="appendedInputButton">Report View</Label>
+                      <div className="controls">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="planningUnitId"
+                            id="planningUnitId"
+                            bsSize="sm"
+                          >
+                            <option value="0">Please select</option>
+                            <option value="1">Planning Unit</option>
+                            <option value="2">Forecasting Unit</option>
+                          </Input>
+                        </InputGroup>
+                      </div>
+                    </FormGroup> */}
 
                   </div>
                 </Col>
@@ -1952,15 +2980,12 @@ class GlobalConsumption extends Component {
                       this.state.consumptions.length > 0
                       &&
                       <div className="col-md-12 p-0 grapg-margin " >
-                        <div className="col-md-12">
+                        <div className="offset-md-1 col-md-11">
                           <div className="chart-wrapper chart-graph-report">
                             <Bar id="cool-canvas" data={bar} options={options} />
                           </div>
                         </div>
                         <div className="col-md-12">
-                          <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                            Product view
-                        </button>
                           <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                             {this.state.show ? 'Hide Data' : 'Show Data'}
                           </button>
@@ -1973,78 +2998,6 @@ class GlobalConsumption extends Component {
                     <div className="col-md-12">
                       {this.state.show && this.state.consumptions.length > 0 &&
                         <div className="table-responsive ">
-                          {/* <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
-
-                        <thead>
-                          <tr>
-                            <th>Country</th>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                              <td>Kenya</td>
-                          </tr>
-                        </thead>
-                       
-                          <tbody>
-                            <tr>
-                              <th>Month</th>
-                              <td>Jan-2019</td>
-                              <td>Feb-2019</td>
-                              <td>Mar-2019</td>
-                              <td>Apr-2019</td>
-                              <td>May-2019</td>
-                              <td>Jun-2019</td>
-                              <td>Jul-2019</td>
-                              <td>Aug-2019</td>
-                              <td>Sep-2019</td>
-                              <td>Oct-2019</td>
-                              <td>Nov-2019</td>
-                              <td>Dec-2019</td>
-                              <td>Jan-2019</td>
-                              <td>Feb-2019</td>
-                              <td>Mar-2019</td>
-                              <td>Apr-2019</td>
-                              <td>May-2019</td>
-                              <td>Jun-2019</td>
-                              
-                            </tr>
-                            <tr>
-                              <th>Consumption Quantity</th>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                              <td>0</td>
-                            </tr>
-                          </tbody>
-                 </Table> */}
 
                           <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
@@ -2052,7 +3005,7 @@ class GlobalConsumption extends Component {
                               <tr>
                                 <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.country')} </th>
                                 <th className="text-center " style={{ width: '34%' }}> {i18n.t('static.report.month')} </th>
-                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.consumption.consumptionqty')}</th>
+                                <th className="text-center" style={{ width: '34%' }}>Consumption Qty ( Million )</th>
                               </tr>
                             </thead>
 
@@ -2077,6 +3030,52 @@ class GlobalConsumption extends Component {
                               }
                             </tbody>
                           </Table>
+
+
+                          {/* <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                            <tbody>
+                              <>
+                                <tr>
+                                  <th style={{ width: '154px' }}>{i18n.t('static.dashboard.country')}</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {getLabelText(this.state.consumptions[idx].realmCountry.label, this.state.lang)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.month')}</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.state.consumptions[idx].consumptionDateString}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+
+                                <tr>
+                                  <th style={{ width: '153px' }}>Consumption QTY(Million)</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.consumptions[idx].planningUnitQty)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+                              </>
+                            </tbody>
+                          </Table> */}
                         </div>
                       }
 

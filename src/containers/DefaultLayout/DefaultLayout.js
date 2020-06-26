@@ -480,6 +480,18 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
+                            name: i18n.t('static.report.warehouseCapacity'),
+                            url: '/report/warehouseCapacity',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.report.stockAdjustment'),
+                            url: '/report/stockAdjustment',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.dashboard.costOfInventory'),
                             url: '/report/costOfInventory',
                             icon: 'fa fa-exchange',

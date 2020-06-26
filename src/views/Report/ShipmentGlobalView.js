@@ -96,6 +96,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
+            labelString: "Amount (USD)",
         }],
     },
     tooltips: {
@@ -106,7 +107,7 @@ const options = {
     ,
     legend: {
         display: true,
-        position: 'top',
+        position: 'bottom',
         labels: {
             usePointStyle: true,
             fontColor: 'black'
@@ -130,6 +131,7 @@ const options1 = {
         }],
         yAxes: [{
             stacked: true,
+            labelString: "Amount (USD)",
         }],
     },
     tooltips: {
@@ -140,7 +142,7 @@ const options1 = {
     ,
     legend: {
         display: true,
-        position: 'top',
+        position: 'bottom',
         labels: {
             usePointStyle: true,
             fontColor: 'black'
@@ -151,40 +153,46 @@ const options1 = {
 const chartData = {
     labels: ["Malawi", "Kenya", "Zimbabwe"],
     datasets: [{
-        label: 'Ship Actual',
+        label: 'Ordered Shipments',
         data: [20000, 10000, 2000],
-        backgroundColor: '#000050',
+        backgroundColor: '#6a82a8',
         borderWidth: 0
     },
     {
-        label: 'Ship Forecast',
+        label: 'Planned Shipments',
         data: [20000, 20000, 2000],
-        backgroundColor: '#52CAFF',
+        backgroundColor: '#dee7f8',
         borderWidth: 0,
     }
     ]
 };
 
 const chartData1 = {
-    labels: ["May 19", "Jun 19", "Jul 19"],
-    datasets: [{
-        label: 'GF',
-        data: [30000, 10000, 0],
-        backgroundColor: '#000050',
-        borderWidth: 0
-    },
-    {
-        label: 'Govt',
-        data: [10000, 10000, 1000],
-        backgroundColor: '#52CAFF',
-        borderWidth: 0,
-    },
-    {
-        label: 'PSM',
-        data: [1000, 1000, 2000],
-        backgroundColor: '#AAAAFA',
-        borderWidth: 0,
-    }
+    labels: ["Jan 2019", "Feb 2019", "Mar 2019", "Apr 2019", "May 19", "Jun 19", "Jul 19", "Aug 2019", "Sep 2019", "Oct 2019", "Nov 2019", "Dec 2019"],
+    datasets: [
+        {
+            label: 'PSM',
+            data: [0, 40000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#4dbd74',
+            borderWidth: 0,
+        }, {
+            label: 'GF',
+            data: [0, 0, 4000, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#f86c6b',
+            borderWidth: 0
+        },
+        {
+            label: 'Local',
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#8aa9e6',
+            borderWidth: 0,
+        },
+        {
+            label: 'Govt',
+            data: [0, 0, 0, 30000, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#EDB944',
+            borderWidth: 0,
+        }
     ]
 };
 
@@ -222,7 +230,7 @@ class ShipmentGlobalView extends Component {
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
         this.state = {
-            labels: ['GF', 'Govt', 'Other', 'PSM'],
+            labels: ['GF', 'Govt', 'Local', 'PSM'],
             datasets: [{
                 data: [13824000, 26849952, 0, 5615266],
                 backgroundColor: ['#F48521', '#118b70', '#002f6c', '#EDB944']
@@ -945,7 +953,8 @@ class ShipmentGlobalView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">Country</Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
 
                                                     bsSize="sm"
@@ -963,7 +972,8 @@ class ShipmentGlobalView extends Component {
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
 
                                                     bsSize="sm"
@@ -1006,8 +1016,9 @@ class ShipmentGlobalView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                <InputGroup>
+                                                <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
 
                                                         name="planningUnitId"
@@ -1038,7 +1049,8 @@ class ShipmentGlobalView extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="countrysId">Procurement Agent</Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <div className="controls edit">
                                                     <ReactMultiSelectCheckboxes
 
@@ -1060,22 +1072,22 @@ class ShipmentGlobalView extends Component {
                                 </Col>
                             </Form>
                             <Col md="12 pl-0">
-                                <div className="row">
+                                <div className="row grid-divider">
                                     {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                        <div className="col-md-6">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas" data={chartData} options={options} />
-                                            </div>
+                                    <div className="col-md-6">
+                                        <div className="chart-wrapper chart-graph-report">
+                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                            <Bar id="cool-canvas" data={chartData} options={options} />
                                         </div>
+                                    </div>
                                     {/* </div> */}
                                     {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                        <div className="col-md-6">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas" data={chartData1} options={options1} />
-                                            </div>
+                                    <div className="col-md-6">
+                                        <div className="chart-wrapper chart-graph-report">
+                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                            <Bar id="cool-canvas" data={chartData1} options={options1} />
                                         </div>
+                                    </div>
                                     {/* </div> */}
                                     {/* <Col md="12 pl-0"> */}
                                     {/* <div className="chart-wrapper">
@@ -1121,10 +1133,10 @@ class ShipmentGlobalView extends Component {
                                                     <thead>
                                                         <tr>
                                                             <th className="text-center" style={{ width: '350px' }}> Country </th>
-                                                            <th className="text-center " style={{ width: '350px' }}> GF </th>
-                                                            <th className="text-center" style={{ width: '350px' }}>Gov't</th>
-                                                            <th className="text-center" style={{ width: '350px' }}>Other</th>
-                                                            <th className="text-center" style={{ width: '350px' }}>PSM</th>
+                                                            <th className="text-right " style={{ width: '350px' }}> GF (USD) </th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Govt (USD)</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Local (USD)</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>PSM (USD)</th>
                                                         </tr>
                                                     </thead>
 
@@ -1132,13 +1144,13 @@ class ShipmentGlobalView extends Component {
                                                         <tr id="addr0" key={1} >
                                                             <td>Kenya</td>
                                                             <td></td>
-                                                            <td>30,000</td>
+                                                            <td className="text-right">30,000</td>
                                                             <td></td>
                                                             <td></td>
                                                         </tr>
                                                         <tr id="addr0" key={2} >
                                                             <td>Malawi</td>
-                                                            <td>40,000</td>
+                                                            <td className="text-right">4,000</td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
@@ -1147,8 +1159,46 @@ class ShipmentGlobalView extends Component {
                                                             <td>Zimbabwe</td>
                                                             <td></td>
                                                             <td></td>
-                                                            <td>4000</td>
                                                             <td></td>
+                                                            <td className="text-right">40,000</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </Table>
+                                            </div>
+                                            <div className="table-responsive ">
+                                                <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="text-center" style={{ width: '350px' }}> Month </th>
+                                                            <th className="text-center " style={{ width: '350px' }}> Country </th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Amount (USD)</th>
+                                                            <th className="text-center" style={{ width: '350px' }}>Funder</th>
+                                                            <th className="text-center" style={{ width: '350px' }}>Status</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr id="addr0" key={1} >
+                                                            <td>Feb 2019</td>
+                                                            <td>Malawi</td>
+                                                            <td className="text-right">4,000</td>
+                                                            <td>GF</td>
+                                                            <td>Ordered</td>
+                                                        </tr>
+                                                        <tr id="addr0" key={2} >
+                                                            <td>Mar 2019</td>
+                                                            <td>Kenya</td>
+                                                            <td className="text-right">30,000</td>
+                                                            <td>Govt</td>
+                                                            <td>Planned</td>
+                                                        </tr>
+                                                        <tr id="addr0" key={3} >
+                                                            <td>Apr 2019</td>
+                                                            <td>Zimbabwe</td>
+                                                            <td className="text-right">40,000</td>
+                                                            <td>PSM</td>
+                                                            <td>Received</td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>
