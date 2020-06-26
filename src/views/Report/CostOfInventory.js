@@ -20,6 +20,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import moment from 'moment'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import { Link } from "react-router-dom";
 
 
 const entityname = i18n.t('static.dashboard.costOfInventory');
@@ -373,45 +374,21 @@ handleClickMonthBox2 = (e) => {
                 formatter:this.formatter
             }, {
                 dataField: 'rate',
-                text: 'Rate',
+                text: 'Rate (USD)',
                 sort: true,
                 align: 'center',
                 style: { align: 'center' },
                 headerAlign: 'center',
-                formatter: (cell, row) => {
-
-                    var cell1 = cell
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return getLabelText(row.currency.label,this.state.lang)+" "+x1 + x2;
-                  }
+                formatter: this.formatter
             },
             {
                 dataField: 'cost',
-                text: 'Cost',
+                text: 'Cost (USD)',
                 sort: true,
                 align: 'center',
                 style: { align: 'center' },
                 headerAlign: 'center',
-                formatter: (cell, row) => {
-
-                    var cell1 = cell
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return getLabelText(row.currency.label,this.state.lang)+" "+x1 + x2;
-                  }
+                formatter: this.formatter
             }
         ];
         const options = {
@@ -450,6 +427,9 @@ handleClickMonthBox2 = (e) => {
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong>
                 
                         <div className="card-header-actions">
+                        <a className="card-header-action">
+                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                            </a>
                       <a className="card-header-action">
                       {this.state.costOfInventory.length > 0 && <div className="card-header-actions">
                 <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />

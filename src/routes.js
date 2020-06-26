@@ -351,7 +351,7 @@ const routes = [
   { path: '/user/listUser', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.user') }), component: ListUser },
   { path: '/user/addUser', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.user') }), component: AddUser },
   { path: '/user/editUser/:userId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.user') }), component: EditUser },
-  { path: '/user/accessControl', exact: true, name: i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
+  { path: '/user/accessControl/:userId', exact: true, name: i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
   { path: '/accessDenied', exact: true, component: AccessDenied },
 
   // { path: '/dashboard/:message', component: Dashboard },

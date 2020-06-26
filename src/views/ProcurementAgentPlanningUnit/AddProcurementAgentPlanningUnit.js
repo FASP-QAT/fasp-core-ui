@@ -905,6 +905,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     // console.log("inventory Data Array-->", papuDataArr);
                                                     if (papuDataArr.length == 0) {
                                                         data = [];
+                                                        data[0] = this.props.match.params.procurementAgentId;
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
@@ -1099,7 +1100,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     addRow = function () {
         var json = this.el.getJson();
         var data = [];
-        data[0] = "1";
+        data[0] = this.props.match.params.procurementAgentId;
         data[1] = "";
         data[2] = "";
         data[3] = "";
