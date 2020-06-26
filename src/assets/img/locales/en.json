@@ -476,7 +476,7 @@
     "static.message.tokenError": "Token Error",
     "static.programPlanningUnit.validReorderFrequencyText": "Please enter reorder frequency in months",
     "static.dataSource.program": "Program",
-    "static.procurementAgentProcurementUnit.mapProcurementUnit": "Map procurement unit",
+    "static.procurementAgentProcurementUnit.mapProcurementUnit": "Map Procurement Unit",
     "static.procurementAgentProcurementUnit.skuCode": "SKU code",
     "static.procurementAgentProcurementUnit.skuCodeText": "Enter SKU code",
     "static.procurementAgentProcurementUnit.vendorPrice": "Vendor price (USD)",
