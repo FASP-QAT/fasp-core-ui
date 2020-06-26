@@ -1061,6 +1061,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
+import 'chartjs-plugin-annotation';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1075,7 +1076,7 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-
+let dendoLabels = [{ label:"Today",pointStyle:"triangle"}]
 const options = {
   title: {
     display: true,
@@ -1097,10 +1098,23 @@ const options = {
     }],
     xAxes: [{
       ticks: {
-        fontColor: 'black'
+        fontColor: 'black',
+       
       }
     }]
   },
+  annotation: {
+    annotations: [{
+      type:'triangle',
+    //  mode: 'vertical',
+      drawTime: 'beforeDatasetsDraw',
+      scaleID: 'x-axis-0',
+      value: 'Mar-2020',
+     
+      backgroundColor: 'rgba(0, 255, 0, 0.1)'
+   }],
+   
+},
   tooltips: {
     enabled: false,
     custom: CustomTooltips
