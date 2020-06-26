@@ -1,7 +1,7 @@
-// my report 
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+import { Bar, Pie, HorizontalBar } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
+import { Online, Offline } from "react-detect-offline";
 import {
     Badge,
     Button,
@@ -27,7 +27,9 @@ import {
     CardColumns,
     Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
+import Select from 'react-select';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import paginationFactory from 'react-bootstrap-table2-paginator'
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
@@ -39,19 +41,20 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import ProgramService from '../../api/ProgramService';
+import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
-import { Online, Offline } from "react-detect-offline";
 import csvicon from '../../assets/img/csv.png'
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-//import fs from 'fs'
+import ReportService from '../../api/ReportService';
+import ProgramService from '../../api/ProgramService';
+// const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
@@ -61,7 +64,6 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
-
 const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
 const options = {
     title: {
@@ -77,7 +79,7 @@ const options = {
                 display: false
             },
 
-        fontColor: 'black'
+            fontColor: 'black'
         }],
         yAxes: [{
             scaleLabel: {
@@ -161,12 +163,15 @@ class Consumption extends Component {
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
         this.state = {
+            planningUnitValues: [],
+            planningUnitLabels: [],
             sortType: 'asc',
             dropdownOpen: false,
             radioSelected: 2,
             realms: [],
             programs: [],
             offlinePrograms: [],
+            versions: [],
             planningUnits: [],
             consumptions: [],
             offlineConsumptionList: [],
@@ -185,9 +190,6 @@ class Consumption extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.getPlanningUnit = this.getPlanningUnit.bind(this);
-        this.getProductCategories = this.getProductCategories.bind(this)
-        //this.pickRange = React.createRef()
 
     }
 
@@ -567,43 +569,11 @@ class Consumption extends Component {
 
 
     }
-    getPlanningUnit() {
-        if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
-            let programId = document.getElementById("programId").value;
-            let productCategoryId = document.getElementById("productCategoryId").value;
-            ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
-                console.log('**' + JSON.stringify(response.data))
-                this.setState({
-                    planningUnits: response.data,
-                }, () => {
-                    this.filterData();
-                })
-            })
-                .catch(
-                    error => {
-                        this.setState({
-                            planningUnits: [],
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+
+        if (versionId.includes('Local')) {
             const lan = 'en';
             var db1;
             var storeOS;
@@ -623,41 +593,37 @@ class Consumption extends Component {
                     myResult = planningunitRequest.result;
                     var programId = (document.getElementById("programId").value).split("_")[0];
                     var proList = []
+                    console.log(myResult)
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].program.id == programId) {
-                            var productJson = {
-                                name: getLabelText(myResult[i].planningUnit.label, lan),
-                                id: myResult[i].planningUnit.id
-                            }
-                            proList[i] = productJson
+
+                            proList[i] = myResult[i]
                         }
                     }
                     this.setState({
-                        offlinePlanningUnitList: proList
+                        planningUnits: proList, message: ''
                     })
                 }.bind(this);
             }.bind(this)
 
-        }
 
-    }
-    getProductCategories() {
-        let programId = document.getElementById("programId").value;
-        let realmId = AuthenticationService.getRealmId();
-        if (navigator.onLine) {
+        }
+        else {
             AuthenticationService.setupAxiosInterceptors();
-            ProductService.getProductCategoryListByProgram(realmId, programId)
-                .then(response => {
-                    console.log(JSON.stringify(response.data))
-                    this.setState({
-                        productCategories: response.data
-                    }, () => {
-                        this.filterData();
-                    })
-                }).catch(
+
+            //let productCategoryId = document.getElementById("productCategoryId").value;
+            ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                console.log('**' + JSON.stringify(response.data))
+                this.setState({
+                    planningUnits: response.data, message: ''
+                }, () => {
+                    this.fetchData();
+                })
+            })
+                .catch(
                     error => {
                         this.setState({
-                            productCategories: []
+                            planningUnits: [],
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -668,7 +634,7 @@ class Consumption extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
                                     break;
                                 default:
                                     this.setState({ message: 'static.unkownError' });
@@ -677,52 +643,89 @@ class Consumption extends Component {
                         }
                     }
                 );
-        } else {
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var offlineConsumptionList = (programJson.consumptionList);
-
-                    let offlineProductCategoryList = [];
-                    var json;
-
-                    for (let i = 0; i <= offlineConsumptionList.length; i++) {
-                        let count = 0;
-                        if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
-                            for (let j = 0; j <= offlineProductCategoryList.length; j++) {
-                                if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
-                                    count++;
-                                }
-                            }
-                            if (count == 0 || i == 0) {
-                                offlineProductCategoryList.push({
-                                    id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
-                                    name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
-                                });
-                            }
-                        }
-                    }
-                    this.setState({
-                        offlineProductCategoryList
-                    });
-
-                }.bind(this)
-
-            }.bind(this)
-
         }
-        this.getPlanningUnit();
+
+
+    }
+
+    filterVersion = () => {
+        let programId = document.getElementById("programId").value;
+        if (programId != 0) {
+            if (navigator.onLine) {
+                const program = this.state.programs.filter(c => c.programId == programId)
+                console.log(program)
+                if (program.length == 1) {
+                    this.setState({
+                        versions: []
+                    }, () => {
+                        this.setState({
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
+                    });
+                }
+                else {
+                    this.consolidatedVersionList(programId)
+                }
+            } else {
+                this.setState({
+                    versions: []
+                });
+            }
+        }
+    }
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+
+                    }
+
+
+                }
+
+                console.log(verList)
+                this.setState({
+                    versions: verList.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })
+                })
+
+            }.bind(this);
+
+
+
+        }.bind(this)
+
 
     }
     componentDidMount() {
@@ -771,6 +774,29 @@ class Consumption extends Component {
         }
     }
 
+    fetchData = () => {
+        let versionId = document.getElementById("versionId").value;
+        let programId = document.getElementById("programId").value;
+
+        let planningUnitIds = this.state.planningUnitValues;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+        } else if (versionId == 0) {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+        }
+    }
+
+
     toggle() {
         this.setState({
             dropdownOpen: !this.state.dropdownOpen,
@@ -805,8 +831,22 @@ class Consumption extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     render() {
-        const { planningUnits } = this.state;
         const { offlinePlanningUnitList } = this.state;
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
+                return (
+                    <option key={i} value={item.versionId}>
+                        {item.versionId}
+                    </option>
+                )
+            }, this);
+        const { planningUnits } = this.state
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
 
         const { programs } = this.state;
         const { offlinePrograms } = this.state;
@@ -898,9 +938,9 @@ class Consumption extends Component {
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
-                }} />
+                }} /> */}
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
 
@@ -983,7 +1023,7 @@ class Consumption extends Component {
                                                                 name="programId"
                                                                 id="programId"
                                                                 bsSize="sm"
-                                                                onChange={this.getProductCategories}
+                                                                onChange={this.filterVersion}
 
                                                             >
                                                                 <option value="-1">{i18n.t('static.common.select')}</option>
@@ -1029,152 +1069,59 @@ class Consumption extends Component {
                                                     </div>
                                                 </FormGroup>
                                             </Offline>
-                                            <Online>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                                    <div className="controls ">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="productCategoryId"
-                                                                id="productCategoryId"
-                                                                bsSize="sm"
-                                                                onChange={this.getPlanningUnit}
-                                                            >
-                                                                <option value="0">Please select</option>
-                                                                {productCategories.length > 0
-                                                                    && productCategories.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                                {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                        </InputGroup></div>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Version</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionId"
+                                                            id="versionId"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            {versionList}
+                                                        </Input>
 
-                                                </FormGroup>
-                                            </Online>
-                                            <Offline>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                                    <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="productCategoryId"
-                                                                id="productCategoryId"
-                                                                bsSize="sm"
-                                                                onChange={this.getPlanningUnit}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                                {offlineProductCategoryList.length > 0
-                                                                    && offlineProductCategoryList.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.id}>
-                                                                                {item.name}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                        </InputGroup></div>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
 
-                                                </FormGroup>
-                                            </Offline>
                                             <Online>
-                                                <FormGroup className="col-md-3">
+                                                <FormGroup className="col-sm-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                    <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                                     <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
+                                                        <InputGroup className="box">
+                                                            <ReactMultiSelectCheckboxes
                                                                 name="planningUnitId"
                                                                 id="planningUnitId"
                                                                 bsSize="sm"
-                                                                onChange={this.filterData}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {planningUnits.length > 0
-                                                                    && planningUnits.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.planningUnit.id}>
-                                                                                {getLabelText(item.planningUnit.label, this.state.lang)}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                            {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
+                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                            />
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
                                             </Online>
                                             <Offline>
-                                                <FormGroup className="col-md-3">
+                                                <FormGroup className="col-sm-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                    <div className="controls ">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
+                                                    <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                                    <div className="controls">
+                                                        <InputGroup className="box">
+                                                            <ReactMultiSelectCheckboxes
+
                                                                 name="planningUnitId"
                                                                 id="planningUnitId"
                                                                 bsSize="sm"
-                                                                onChange={this.filterData}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {offlinePlanningUnitList.length > 0
-                                                                    && offlinePlanningUnitList.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.id}>{item.name}</option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                            {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
+                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                            />
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
-                                            </Offline>
-                                            {/* <Online>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">Shipment Status</Label>
-                                                    <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="shipmentStatusId"
-                                                                id="shipmentStatusId"
-                                                                bsSize="sm"
-                                                            // onChange={this.filterData}
-                                                            >
-                                                                <option value="0">All</option>
-
-                                                            </Input>
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                            </Online> */}
-                                            <Offline>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">Shipment Status</Label>
-                                                    <div className="controls ">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="shipmentStatusId"
-                                                                id="shipmentStatusId"
-                                                                bsSize="sm"
-                                                            // onChange={this.filterData}
-                                                            >
-                                                                <option value="0">All</option>
-
-                                                            </Input>
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-
                                             </Offline>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Report View</Label>
