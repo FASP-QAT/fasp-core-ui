@@ -416,7 +416,7 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/user/accessControl":
+                case "/user/accessControl/:userId":
                     if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
                         return true;
                     }
