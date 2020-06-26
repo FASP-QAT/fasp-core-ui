@@ -870,6 +870,9 @@
     "static.supplyPlan.planned":"Planned",
     "static.supplyPlan.erpShipments":"Shipments from ERP",
     "static.report.warehouseCapacity": "Warehouse Capacity",
-    "static.report.stockAdjustment": "Stock Adjustment"
+    "static.report.stockAdjustment": "Stock Adjustment",
+    "static.report.lastmodifiedby": "Last Modified By",
+    "static.report.lastmodifieddate": "Last Modified Date"
+    
 
 }
