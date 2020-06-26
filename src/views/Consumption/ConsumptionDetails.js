@@ -296,7 +296,7 @@ export default class ConsumptionDetails extends React.Component {
                                     name: regionResult[k].label.label_en,
                                     id: regionResult[k].regionId
                                 }
-                                regionList[k] = regionJson
+                                regionList.push(regionJson);
                             }
                         }
 
@@ -910,7 +910,8 @@ export default class ConsumptionDetails extends React.Component {
                                         id: this.state.productCategoryId
                                     }
                                 }
-                            }
+                            },
+                            batchInfoList: []
                         }
                         // consumptionDataList.push(json);
                         consumptionDataListNotFiltered.push(json);
