@@ -25,7 +25,10 @@ const validationSchema = function (values) {
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
     healthAreaName: Yup.string()
-      .required(i18n.t('static.healtharea.healthareatext'))
+      .required(i18n.t('static.healtharea.healthareatext')),
+    healthAreaCode: Yup.string()
+      .max(3, 'Technical Area Code Is 3 Digit')
+      .required(i18n.t('static.country.countrycodetext')),
   })
 }
 
@@ -65,7 +68,8 @@ export default class AddHealthAreaComponent extends Component {
         realm: {
           id: ''
         },
-        realmCountryArray: []
+        realmCountryArray: [],
+        healthAreaCode: '',
 
       },
       lang: localStorage.getItem('lang'),
@@ -95,6 +99,8 @@ export default class AddHealthAreaComponent extends Component {
       healthArea.label.label_en = event.target.value
     } else if (event.target.name === "realmId") {
       healthArea.realm.id = event.target.value
+    } else if (event.target.name === "healthAreaCode") {
+      healthArea.healthAreaCode = event.target.value.toUpperCase();
     }
     this.setState({
       healthArea
@@ -107,7 +113,8 @@ export default class AddHealthAreaComponent extends Component {
   touchAll(setTouched, errors) {
     setTouched({
       realmId: true,
-      healthAreaName: true
+      healthAreaName: true,
+      healthAreaCode: true,
     }
     )
     this.validateForm(errors)
@@ -325,6 +332,19 @@ export default class AddHealthAreaComponent extends Component {
                               value={this.state.healthArea.label.label_en}
                               id="healthAreaName" />
                             <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                          </FormGroup>
+
+                          <FormGroup>
+                            <Label htmlFor="company">Technical Area Code<span class="red Reqasterisk">*</span> </Label>
+                            <Input
+                              bsSize="sm"
+                              type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
+                              invalid={touched.healthAreaCode && !!errors.healthAreaCode}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                              onBlur={handleBlur}
+                              value={this.state.healthArea.healthAreaCode}
+                              id="healthAreaCode" />
+                            <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
                           </FormGroup>
 
                         </CardBody>

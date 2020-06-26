@@ -165,14 +165,23 @@ export default class HealthAreaListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        }, {
+        }, 
+        {
             dataField: 'label',
             text: i18n.t('static.healthArea.healthAreaName'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        }, {
+        }, 
+        {
+            dataField: 'healthAreaCode',
+            text: 'TechnicalArea Code',
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+        }, 
+        {
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,

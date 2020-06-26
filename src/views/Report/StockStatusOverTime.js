@@ -57,9 +57,14 @@ const options = {
     legend: {
         display: true,
         position: 'bottom',
+       
         labels: {
             usePointStyle: true,
-            fontColor: 'black'
+            fontColor: 'black',
+            fontSize: 12,
+            boxWidth: 9,
+            boxHeight: 2
+           
         }
     }
 }
@@ -749,7 +754,8 @@ class StockStatusOverTime extends Component {
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                            <InputGroup>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
 
                                                     bsSize="sm"
@@ -783,8 +789,10 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                <InputGroup>   <ReactMultiSelectCheckboxes
+                                                <InputGroup className="box">   
+                                                <ReactMultiSelectCheckboxes
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"

@@ -61,13 +61,16 @@ class ListUserComponent extends Component {
     addAccessControls(event, row) {
         event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER')) {
-            this.props.history.push({
-                pathname: "/user/accessControl",
-                state: {
-                    user: row
-                }
+            // this.props.history.push({
+            //     pathname: "/user/accessControl",
+            //     state: {
+            //         user: row
+            //     }
 
-            })
+            // })
+            this.props.history.push({
+                pathname: `/user/accessControl/${row.userId}`,
+            });
         }
     }
     addNewUser() {
@@ -278,7 +281,7 @@ class ListUserComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" title="Add Access Control" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                return (<Button type="button" size="sm" color="success" title="Add Access Control" onClick={(event) =>  this.addAccessControls(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                 )
             }
         }

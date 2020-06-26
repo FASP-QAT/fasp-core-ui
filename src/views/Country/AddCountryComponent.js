@@ -16,6 +16,7 @@ const entityname = i18n.t('static.country.countryMaster');
 const initialValues = {
     label: '',
     countryCode: '',
+    countryCode2: '',
     // languageId: '',
     currencyId: '',
     languageList: [],
@@ -26,6 +27,9 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
             .required(i18n.t('static.country.countrytext')),
+        countryCode2: Yup.string()
+            .max(2, 'Country code 2 is 2 digit number')
+            .required(i18n.t('static.country.countrycodetext')),
         countryCode: Yup.string()
             .max(3, i18n.t('static.country.countrycodemax3digittext'))
             .required(i18n.t('static.country.countrycodetext')),
@@ -66,6 +70,7 @@ export default class AddCountryComponent extends Component {
         this.state = {
             country: {
                 countryCode: '',
+                countryCode2: '',
                 label: {
                     label_en: '',
                     label_fr: '',
@@ -100,6 +105,9 @@ export default class AddCountryComponent extends Component {
         if (event.target.name === "countryCode") {
             country.countryCode = event.target.value.toUpperCase();
         }
+        if (event.target.name === "countryCode2") {
+            country.countryCode2 = event.target.value.toUpperCase();
+        }
         else if (event.target.name === "currencyId") {
             country.currency.id = event.target.value
         }
@@ -120,6 +128,7 @@ export default class AddCountryComponent extends Component {
         setTouched({
             label: true,
             countryCode: true,
+            countryCode2: true,
             // languageId: true,
             currencyId: true
         }
@@ -239,7 +248,7 @@ export default class AddCountryComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -340,6 +349,23 @@ export default class AddCountryComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="countryCode">Country Code2<span class="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            name="countryCode2"
+                                                            id="countryCode2"
+                                                            bsSize="sm"
+                                                            valid={!errors.countryCode2 && this.state.country.countryCode2 != ''}
+                                                            invalid={touched.countryCode2 && !!errors.countryCode2}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.country.countryCode2}
+                                                            required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
+                                                    </FormGroup>
                                                     {/* <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label> */}
                                                     {/* <InputGroupAddon addonType="prepend"> */}
@@ -408,7 +434,7 @@ export default class AddCountryComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/country/listCountry/`+'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/country/listCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

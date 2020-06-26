@@ -19,6 +19,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import moment from 'moment'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import { Link } from "react-router-dom";
 
 
 const entityname = i18n.t('static.dashboard.inventoryTurns');
@@ -417,6 +418,9 @@ handleClickMonthBox2 = (e) => {
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.inventoryTurns')}</strong>
                 
                         <div className="card-header-actions">
+                        <a className="card-header-action">
+                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                            </a>
                       <a className="card-header-action">
                       {this.state.costOfInventory.length > 0 && <div className="card-header-actions">
                 <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />

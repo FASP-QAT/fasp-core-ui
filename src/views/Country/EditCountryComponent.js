@@ -16,6 +16,7 @@ const entityname = i18n.t('static.country.countryMaster');
 let initialValues = {
     label: '',
     countryCode: '',
+    countryCode2: '',
     // languageId: '',
     currencyId: '',
     // languageList: [],
@@ -28,6 +29,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.country.countrytext')),
         countryCode: Yup.string()
             .max(3, i18n.t('static.country.countrycodemax3digittext'))
+            .required(i18n.t('static.country.countrycodetext')),
+        countryCode2: Yup.string()
+            .max(2, 'Country code 2 is 2 digit number')
             .required(i18n.t('static.country.countrycodetext')),
         // languageId: Yup.string()
         //     .required(i18n.t('static.country.languagetext')),
@@ -66,6 +70,7 @@ export default class UpdateCountryComponent extends Component {
             // country: this.props.location.state.country,
             country: {
                 countryCode: '',
+                countryCode2: '',
                 label: {
                     label_en: '',
                     label_fr: '',
@@ -110,6 +115,9 @@ export default class UpdateCountryComponent extends Component {
         if (event.target.name === "countryCode") {
             country.countryCode = event.target.value.toUpperCase();
         }
+        if (event.target.name === "countryCode2") {
+            country.countryCode2 = event.target.value.toUpperCase();
+        }
         if (event.target.name === "currencyId") {
             country.currency.id = event.target.value
         }
@@ -133,6 +141,7 @@ export default class UpdateCountryComponent extends Component {
         setTouched({
             label: true,
             countryCode: true,
+            countryCode2: true,
             // languageId: true,
             currencyId: true
         }
@@ -162,7 +171,7 @@ export default class UpdateCountryComponent extends Component {
                     country: response.data
                 });
             }
-            else{
+            else {
                 this.setState({
                     message: response.data.messageCode
                 },
@@ -170,7 +179,7 @@ export default class UpdateCountryComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-           
+
             // initialValues = {
             //     label: getLabelText(this.state.country.label, this.state.lang),
             //     countryCode: this.state.country.countryCode,
@@ -311,7 +320,7 @@ export default class UpdateCountryComponent extends Component {
                                     CountryService.editCountry(this.state.country)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/country/listCountry/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/country/listCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -371,6 +380,23 @@ export default class UpdateCountryComponent extends Component {
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="countryCode">Country Code2<span class="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            name="countryCode2"
+                                                            id="countryCode2"
+                                                            bsSize="sm"
+                                                            valid={!errors.countryCode2}
+                                                            invalid={touched.countryCode2 && !!errors.countryCode2}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.country.countryCode2}
+                                                            required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
                                                     </FormGroup>
                                                     {/* <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label> */}
@@ -471,7 +497,7 @@ export default class UpdateCountryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/country/listCountry/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/country/listCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

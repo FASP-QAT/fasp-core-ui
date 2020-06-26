@@ -1,75 +1,23 @@
 import React, { Component } from "react";
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
     CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
 
 } from 'reactstrap';
-import DeleteSpecificRow from './TableFeatureTwo';
+
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from "../../api/PlanningUnitService";
-import StatusUpdateButtonFeature from '../../CommonComponent/StatusUpdateButtonFeature';
-import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import i18n from '../../i18n';
-import * as Yup from 'yup';
-import { Formik } from "formik";
-import getLabelText from '../../CommonComponent/getLabelText'
-
+import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
-let initialValues = {
-    planningUnitId: '',
-    reorderFrequencyInMonths: '',
-    minMonthsOfStock: '',
-    localProcurementLeadTime: ''
-}
 
-const validationSchema = function (values, t) {
-    // console.log("made by us schema--->", values)
-    return Yup.object().shape({
-        planningUnitId: Yup.string()
-            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        reorderFrequencyInMonths: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        minMonthsOfStock: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText')),
-        localProcurementLeadTime: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required('Please enter local procurement lead time').min(0, i18n.t('static.procurementUnit.validValueText'))
-    })
-}
-
-
-const validate = (getValidationSchema) => {
-
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 
 class AddprogramPlanningUnit extends Component {
-
     constructor(props) {
         super(props);
         let rows = [];
@@ -93,154 +41,261 @@ class AddprogramPlanningUnit extends Component {
             updateRowStatus: 0,
             lang: localStorage.getItem('lang'),
             batchNoRequired: false,
-            localProcurementLeadTime: ''
+            localProcurementLeadTime: '',
+            isValidData: true
 
         }
-        this.addRow = this.addRow.bind(this);
-        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
+        // this.addRow = this.addRow.bind(this);
+        // this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
-        this.setTextAndValue = this.setTextAndValue.bind(this);
+        // this.setTextAndValue = this.setTextAndValue.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.enableRow = this.enableRow.bind(this);
-        this.disableRow = this.disableRow.bind(this);
-        this.updateRow = this.updateRow.bind(this);
+        // this.enableRow = this.enableRow.bind(this);
+        // this.disableRow = this.disableRow.bind(this);
+        // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.addRowInJexcel = this.addRowInJexcel.bind(this);
+        this.changed = this.changed.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-    addRow() {
-        let addRow = true;
-        if (addRow) {
-            this.state.rows.map(item => {
-                if (item.planningUnit.id == this.state.planningUnitId) {
-                    addRow = false;
+
+    addRowInJexcel = function () {
+        var json = this.el.getJson();
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = 0;
+        data[7] = "";
+        data[8] = 1;
+        data[9] = 1;
+        data[10] = this.props.match.params.programId;
+        this.el.insertRow(
+            data
+        );
+    }
+
+    changed = function (instance, cell, x, y, value) {
+        var valid = true;
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = true;
+            }
+            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            instance.jexcel.setValue(columnName, '');
+        }
+
+
+        if (x == 1) {
+            var json = this.el.getJson();
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, "Planning Unit aready exist");
+                        i = json.length;
+                        this.el.setValueFromCoords(9, y, 1, true);
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(9, y, 1, true);
+                        valid = true;
+                    }
                 }
             }
-            )
+            // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
+            // instance.jexcel.setValue(columnName, '');
         }
-        if (addRow == true) {
-            var programName = document.getElementById("programId");
-            var value = programName.selectedIndex;
-            var selectedProgramName = programName.options[value].text;
-            this.state.rows.push(
-                {
-                    planningUnit: {
-                        id: this.state.planningUnitId,
-                        label: {
-                            label_en: this.state.planningUnitName
-                        }
-                    },
-                    program: {
-                        id: this.state.programId,
-                        label: {
-                            label_en: selectedProgramName
-                        }
-                    },
-                    reorderFrequencyInMonths: this.state.reorderFrequencyInMonths,
-                    minMonthsOfStock: this.state.minMonthsOfStock,
-                    localProcurementLeadTime: this.state.localProcurementLeadTime,
-                    batchNoRequired: this.state.batchNoRequired,
-                    active: true,
-                    isNew: this.state.isNew,
-                    programPlanningUnitId: this.state.programPlanningUnitId
 
-                })
-
-            this.setState({ rows: this.state.rows, rowErrorMessage: '' });
-
-        } else {
-            this.setState({ rowErrorMessage: 'Planning Unit Already Exist In List.' });
+        if (x == 2) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = true;
+                }
+            }
         }
-        this.setState({
-            planningUnitId: '',
-            reorderFrequencyInMonths: '',
-            minMonthsOfStock: '',
-            planningUnitName: '',
-            programPlanningUnitId: 0,
-            isNew: true,
-            updateRowStatus: 0,
-            localProcurementLeadTime: '',
-            batchNoRequired: false
-        });
-        document.getElementById('select').disabled = false;
+        if (x == 3) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        if (x == 4) {
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        if (x == 5) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        if (x == 6) {
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(9, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(9, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        this.setState({ isValidData: valid });
     }
 
-    updateRow(idx) {
-        if (this.state.updateRowStatus == 1) {
-            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
-        } else {
+    submitForm() {
 
-            document.getElementById('select').disabled = true;
-            initialValues = {
-                planningUnitId: this.state.rows[idx].planningUnit.id,
-                reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
-                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
-                localProcurementLeadTime: this.state.rows[idx].localProcurementLeadTime,
-                batchNoRequired: this.state.rows[idx].batchNoRequired
+        var json = this.el.getJson();
+        console.log("Rows on submit", json)
+        var planningUnitArray = []
+        for (var i = 0; i < json.length; i++) {
+            var map = new Map(Object.entries(json[i]));
+            if (map.get("9") == 1) {
+                if (map.get("7") == "") {
+                    var pId = 0;
+                } else {
+                    var pId = map.get("7");
+                }
+                var planningUnitJson = {
+                    programPlanningUnitId: pId,
+                    program: {
+                        id: map.get("10")
+                    },
+                    planningUnit: {
+                        id: map.get("1"),
+                    },
+                    reorderFrequencyInMonths: map.get("2"),
+                    minMonthsOfStock: map.get("3"),
+                    localProcurementLeadTime: map.get("4"),
+                    shelfLife: map.get("5"),
+                    catalogPrice:map.get("6"),
+                    active:map.get("8")
+                }
+                planningUnitArray.push(planningUnitJson);
             }
 
-            const rows = [...this.state.rows]
-            this.setState({
-                planningUnitId: this.state.rows[idx].planningUnit.id,
-                planningUnitName: this.state.rows[idx].planningUnit.label.label_en,
-                reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
-                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
-                programPlanningUnitId: this.state.rows[idx].programPlanningUnitId,
-                isNew: false,
-                updateRowStatus: 1,
-                localProcurementLeadTime: this.state.rows[idx].localProcurementLeadTime,
-                batchNoRequired: this.state.rows[idx].batchNoRequired
-            })
-            rows.splice(idx, 1);
-            this.setState({ rows });
         }
-    }
-
-    enableRow(idx) {
-        this.state.rows[idx].active = true;
-        this.setState({ rows: this.state.rows })
-    }
-
-    disableRow(idx) {
-        this.state.rows[idx].active = false;
-        this.setState({ rows: this.state.rows })
-    }
-
-    handleRemoveSpecificRow(idx) {
-        const rows = [...this.state.rows]
-        rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-
-    setTextAndValue = (event) => {
-        if (event.target.name === 'reorderFrequencyInMonths') {
-            this.setState({ reorderFrequencyInMonths: event.target.value });
-        }
-        if (event.target.name === 'minMonthsOfStock') {
-            this.setState({ minMonthsOfStock: event.target.value });
-        }
-        else if (event.target.name === 'planningUnitId') {
-            this.setState({ planningUnitName: event.target[event.target.selectedIndex].text });
-            this.setState({ planningUnitId: event.target.value })
-        }
-        if (event.target.name === 'localProcurementLeadTime') {
-            this.setState({ localProcurementLeadTime: event.target.value });
-        }
-        if (event.target.name === 'batchNoRequired') {
-            // this.setState({ batchNoRequired: event.target.value });
-            this.setState({ batchNoRequired: event.target.id === "batchNoRequired2" ? false : true })
-        }
-    };
-    submitForm() {
         AuthenticationService.setupAxiosInterceptors();
-        console.log("SUBMIT----", this.state.rows);
-        ProgramService.addprogramPlanningUnitMapping(this.state.rows)
+        console.log("SUBMIT----",planningUnitArray);
+        ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
             .then(response => {
                 if (response.status == "200") {
-                    this.props.history.push(`/program/listProgram/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -271,151 +326,207 @@ class AddprogramPlanningUnit extends Component {
                     }
                 }
             );
-
-
-
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        var list = [];
+        var productCategoryList = [];
+        // var realmId = document.getElementById("realmId").value;
 
-        ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
+        AuthenticationService.setupAxiosInterceptors();
+        ProductCategoryServcie.getProductCategoryListByRealmId(1)
             .then(response => {
+
                 if (response.status == 200) {
-                    let myReasponse = response.data;
-                    if (myReasponse.length > 0) {
-                        // console.log("myReasponse ---", myReasponse);
-                        this.setState({ rows: myReasponse });
+                    console.log("productCategory response----->", response.data);
+                    for (var k = 0; k < (response.data).length; k++) {
+                        var spaceCount = response.data[k].sortOrder.split(".").length;
+                        console.log("spaceCOunt--->", spaceCount);
+                        var indendent = "";
+                        for (var p = 1; p <= spaceCount - 1; p++) {
+                            if (p == 1) {
+                                indendent = indendent.concat("|_");
+                            } else {
+                                indendent = indendent.concat("_");
+                            }
+                        }
+                        console.log("ind", indendent);
+                        console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+                        var productCategoryJson = {
+                            name: (response.data[k].payload.label.label_en),
+                            id: response.data[k].payload.productCategoryId
+                        }
+                        productCategoryList.push(productCategoryJson);
+
                     }
+
+                    PlanningUnitService.getActivePlanningUnitList()
+                        .then(response => {
+                            if (response.status == 200) {
+                                this.setState({
+                                    planningUnitList: response.data
+                                });
+                                for (var k = 0; k < (response.data).length; k++) {
+                                    var planningUnitJson = {
+                                        name: response.data[k].label.label_en,
+                                        id: response.data[k].planningUnitId
+                                    }
+                                    list.push(planningUnitJson);
+                                }
+
+
+                                AuthenticationService.setupAxiosInterceptors();
+                                ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
+                                    .then(response => {
+                                        if (response.status == 200) {
+                                            let myReasponse = response.data;
+                                            if (myReasponse.length > 0) {
+                                                this.setState({ rows: myReasponse });
+
+                                                var data = [];
+                                                var productDataArr = []
+
+                                                if (myReasponse.length != 0) {
+                                                    for (var j = 0; j < myReasponse.length; j++) {
+                                                        data = [];
+                                                        data[0] = 0;
+                                                        data[1] = myReasponse[j].planningUnit.id;
+                                                        data[2] = myReasponse[j].reorderFrequencyInMonths;
+                                                        data[3] = myReasponse[j].minMonthsOfStock;
+                                                        data[4] = myReasponse[j].localProcurementLeadTime;
+                                                        data[5] = myReasponse[j].shelfLife;
+                                                        data[6] = myReasponse[j].catalogPrice;
+                                                        data[7] = myReasponse[j].programPlanningUnitId;
+                                                        data[8] = myReasponse[j].active;
+                                                        data[9] = 0;
+                                                        data[10] = myReasponse[j].program.id;
+                                                        productDataArr.push(data);
+                                                    }
+                                                } else {
+                                                    console.log("list length is 0.");
+                                                }
+
+                                                this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                                this.el.destroy();
+                                                var json = [];
+                                                var data1 = productDataArr;
+                                                var options = {
+                                                    data: data1,
+                                                    columnDrag: true,
+                                                    colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100],
+                                                    columns: [
+                                                        {
+                                                            title: 'Product Category',
+                                                            type: 'dropdown',
+                                                            source: productCategoryList
+                                                        },
+                                                        {
+                                                            title: 'Planning Unit',
+                                                            type: 'autocomplete',
+                                                            source: list,
+                                                            filter: this.dropdownFilter
+                                                        },
+                                                        {
+                                                            title: 'Reorder frequency in months',
+                                                            type: 'number',
+
+                                                        },
+                                                        {
+                                                            title: 'Min month of stock',
+                                                            type: 'number'
+                                                        },
+                                                        {
+                                                            title: 'Local Procurment Lead Time',
+                                                            type: 'number'
+                                                        },
+                                                        {
+                                                            title: 'Shelf Life',
+                                                            type: 'number'
+                                                        },
+                                                        {
+                                                            title: 'Catalog Price',
+                                                            type: 'number'
+                                                        },
+                                                        {
+                                                            title: 'Id',
+                                                            type: 'hidden'
+                                                        },
+                                                        {
+                                                            title: 'Active',
+                                                            type: 'hidden'
+                                                        },
+                                                        {
+                                                            title: 'Changed Flag',
+                                                            type: 'hidden'
+                                                        },
+                                                        {
+                                                            title: 'ProgramId',
+                                                            type: 'hidden'
+                                                        }
+
+
+                                                    ],
+                                                    pagination: 10,
+                                                    search: true,
+                                                    columnSorting: true,
+                                                    tableOverflow: true,
+                                                    wordWrap: true,
+                                                    paginationOptions: [10, 25, 50, 100],
+                                                    position: 'top',
+                                                    allowInsertColumn: false,
+                                                    allowManualInsertColumn: false,
+                                                    allowDeleteRow: false,
+                                                    onchange: this.changed,
+                                                    oneditionend: this.onedit,
+                                                    copyCompatibility: true
+
+                                                };
+                                                var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                                this.el = elVar;
+                                                this.setState({ mapPlanningUnitEl: elVar });
+                                            }
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            })
+                                        }
+                                    }).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({ message: error.message });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                                                    case 500:
+                                                    case 401:
+                                                    case 404:
+                                                    case 406:
+                                                    case 412:
+                                                        this.setState({ message: error.response.data.messageCode });
+                                                        break;
+                                                    default:
+                                                        this.setState({ message: 'static.unkownError' });
+                                                        console.log("Error code unkown");
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
+
+                            } else {
+                                list = [];
+                            }
+                        });
                 } else {
+                    productCategoryList = []
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            });
 
-
-        ProgramService.getProgramList().then(response => {
-            if (response.status == "200") {
-                this.setState({
-                    programList: response.data
-                });
-            } else {
-                this.setState({
-                    message: response.data.message
-                })
-            }
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
-        PlanningUnitService.getActivePlanningUnitList().then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    planningUnitList: response.data
-                });
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                })
-            }
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
-
-
-    }
-    touchAll(errors) {
-        this.validateForm(errors);
-    }
-    validateForm(errors) {
-        this.findFirstError('programPlanningUnitForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
     }
 
     render() {
-        const { programList } = this.state;
-        const { planningUnitList } = this.state;
-        let programs = programList.length > 0 && programList.map((item, i) => {
-            return (
-                <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
-        let products = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
-            return (
-                <option key={i} value={item.planningUnitId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
+
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
@@ -426,213 +537,18 @@ class AddprogramPlanningUnit extends Component {
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <Formik
-                                    enableReinitialize={true}
-                                    initialValues={initialValues}
-                                    validate={validate(validationSchema)}
-                                    onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                                        this.addRow();
-                                        resetForm({ planningUnitId: "", reorderFrequencyInMonths: "", minMonthsOfStock: "", localProcurementLeadTime: "", batchNoRequired: false });
-                                    }}
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched
-                                        }) => (
-                                                <Form onSubmit={handleSubmit} noValidate name='programPlanningUnitForm'>
-                                                    <Row>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="select"
-                                                                value={this.state.programId}
-                                                                name="programId"
-                                                                id="programId"
-                                                                disabled>
-                                                                {programs}
-                                                            </Input>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="planningUnitId"
-                                                                id="select"
-                                                                bsSize="sm"
-                                                                valid={!errors.planningUnitId && this.state.planningUnitId != ''}
-                                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                                value={this.state.planningUnitId}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                                required
-                                                            >
-                                                                <option value="">Please select</option>
-                                                                {products}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="number"
-                                                                min='0'
-                                                                name="reorderFrequencyInMonths"
-                                                                id="reorderFrequencyInMonths"
-                                                                bsSize="sm"
-                                                                valid={!errors.reorderFrequencyInMonths && this.state.reorderFrequencyInMonths != ''}
-                                                                invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
-                                                                value={this.state.reorderFrequencyInMonths}
-                                                                placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            />
-                                                            <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Minimum Month Of Stock<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="number"
-                                                                min='0'
-                                                                name="minMonthsOfStock"
-                                                                id="minMonthsOfStock"
-                                                                bsSize="sm"
-                                                                valid={!errors.minMonthsOfStock && this.state.minMonthsOfStock != ''}
-                                                                invalid={touched.minMonthsOfStock && !!errors.minMonthsOfStock}
-                                                                value={this.state.minMonthsOfStock}
-                                                                placeholder='Minimum month of stock'
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            />
-                                                            <FormFeedback className="red">{errors.minMonthsOfStock}</FormFeedback>
-                                                        </FormGroup>
-
-
-
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Local Procurement Lead Time<span className="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="number"
-                                                                min='0'
-                                                                name="localProcurementLeadTime"
-                                                                id="localProcurementLeadTime"
-                                                                bsSize="sm"
-                                                                valid={!errors.localProcurementLeadTime && this.state.localProcurementLeadTime != ''}
-                                                                invalid={touched.localProcurementLeadTime && !!errors.localProcurementLeadTime}
-                                                                value={this.state.localProcurementLeadTime}
-                                                                placeholder='Local procurement lead time'
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            />
-                                                            <FormFeedback className="red">{errors.localProcurementLeadTime}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Batch Number Required</Label>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="batchNoRequired1"
-                                                                    name="batchNoRequired"
-                                                                    value={true}
-                                                                    checked={this.state.batchNoRequired === true}
-                                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio1">
-                                                                    {i18n.t('static.program.yes')}
-                                                                </Label>
-                                                            </FormGroup>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="batchNoRequired2"
-                                                                    name="batchNoRequired"
-                                                                    value={false}
-                                                                    checked={this.state.batchNoRequired === false}
-                                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2">
-                                                                    {i18n.t('static.program.no')}
-                                                                </Label>
-                                                            </FormGroup>
-
-
-
-                                                        </FormGroup>
-
-
-                                                        <FormGroup className="col-md-12 mt-md-0">
-                                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                            &nbsp;
-
-                                     </FormGroup></Row>
-                                                </Form>
-                                            )} />
-                                <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive className="table-striped table-hover table-bordered text-center mt-0">
-                                    <thead>
-                                        <tr>
-                                            <th className="text-left"> {i18n.t('static.program.program')} </th>
-                                            <th> {i18n.t('static.planningunit.planningunit')}</th>
-                                            <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
-                                            <th>Minimum Month of Stock</th>
-                                            <th>Local Procurement Lead Time</th>
-                                            <th>Batch Number Required</th>
-                                            <th>{i18n.t('static.common.status')}</th>
-                                            <th>{i18n.t('static.common.update')}</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.rows.map((item, idx) => (
-                                                <tr id="addr0" key={idx}>
-                                                    <td className="text-left">
-                                                        {this.state.rows[idx].program.label.label_en}
-                                                    </td>
-                                                    <td>
-                                                        {this.state.rows[idx].planningUnit.label.label_en}
-                                                    </td>
-                                                    <td className="text-right">
-                                                        {this.state.rows[idx].reorderFrequencyInMonths}
-                                                    </td>
-                                                    <td className="text-right">
-                                                        {this.state.rows[idx].minMonthsOfStock}
-                                                    </td>
-                                                    <td>
-                                                        {this.state.rows[idx].localProcurementLeadTime}
-                                                    </td>
-                                                    <td>
-                                                        {this.state.rows[idx].batchNoRequired ? 'Yes' : 'No'}
-                                                    </td>
-                                                    <td>
-                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-                                                    </td>
-                                                    <td className="whitebtnColor">
-                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-                                    </tbody>
-                                </Table>
+                                <h4 className="red">{this.props.message}</h4>
+                                <div className="table-responsive" >
+                                    <div id="mapPlanningUnit">
+                                    </div>
+                                </div>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
                                     &nbsp;
                                 </FormGroup>
                             </CardFooter>
