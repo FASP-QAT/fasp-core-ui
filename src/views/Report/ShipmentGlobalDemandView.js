@@ -97,7 +97,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            
+            labelString: "Planning Unit"
         }],
     },
     tooltips: {
@@ -1008,7 +1008,7 @@ class ShipmentGlobalDemandView extends Component {
                                     </div>
                                 </Col>
                             </Form>
-                            <Col md="12 pl-0">
+                            <Col md="12 pl-0  mt-4">
                                 <div className="row grid-divider">
                                     <Col md="8 pl-0">
                                         <div className="chart-wrapper" style={{ marginTop: '-5%' }}>

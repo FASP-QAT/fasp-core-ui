@@ -399,24 +399,24 @@ class SupplierLeadTimes extends Component {
 
                                             <thead>
                                                 <tr>
-                                                <th colSpan="4" className="text-center "></th>
-                                                <th colSpan="10" className="text-center ">Lead Time In Months</th>
+                                                    <th colSpan="4" className="text-center "></th>
+                                                    <th colSpan="10" className="text-center ">Lead Time In Months</th>
                                                 </tr>
                                                 <tr>
-                                                    <th className="text-center "> Country </th>
-                                                    <th className="text-center "> Program </th>
-                                                    <th className="text-center "> Planning Unit </th>
-                                                    <th className="text-center"> Procurement Agent</th>
-                                                    <th className="text-center"> Plan to Draft</th>
-                                                    <th className="text-center"> Draft to Submitted</th>
-                                                    <th className="text-center"> Submitted to Approved</th>
-                                                    <th className="text-center"> Approved to Shipped</th>
-                                                    <th className="text-center"> Shipped to Arrived by Sea</th>
-                                                    <th className="text-center"> Shipped to Arrived by Air</th>
-                                                    <th className="text-center"> Arrived to Delivered</th>
-                                                    <th className="text-center"> Total LT By Sea</th>
-                                                    <th className="text-center"> Total LT By Air</th>
-                                                    <th className="text-center"> Local Procurement</th>
+                                                    <th className="text-center " style={{ 'width': '2%' }}> Country </th>
+                                                    <th className="text-center "style={{ 'width': '2%' }}> Program </th>
+                                                    <th className="text-center " style={{ 'width': '2%' }}> Planning Unit </th>
+                                                    <th className="text-center" style={{ 'width': '2%' }}> Procurement Agent</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Plan to Draft</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Draft to Submitted</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Submitted to Approved</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Approved to Shipped</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Sea</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Air</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Arrived to Delivered</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Sea</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Air</th>
+                                                    <th className="text-center" style={{ 'width': '6%' }}> Local Procurement</th>
                                                 </tr>
                                             </thead>
 
