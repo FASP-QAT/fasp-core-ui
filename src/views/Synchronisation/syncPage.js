@@ -2077,9 +2077,10 @@ export default class syncPage extends Component {
             programJson.consumptionList = this.state.mergedConsumptionList;
             programJson.inventoryList = this.state.mergedInventoryList;
             programJson.shipmentList = this.state.mergedShipmentList;
+            console.log("Program Json",programJson)
             ProgramService.saveProgramData(programJson).then(response => {
               if (response.status == 200) {
-                this.props.history.push(`/dashboard/` + i18n.t('static.message.commitSuccess', { entityname }))
+                this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t('static.message.commitSuccess', { entityname }))
               } else {
                 this.setState({
                   message: response.data.messageCode
@@ -2125,6 +2126,6 @@ export default class syncPage extends Component {
 
   cancelClicked() {
     console.log("inside cancel")
-    this.props.history.push(`/dashboard/`+ 'red/' + i18n.t('static.message.cancelled'))
+    this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 }

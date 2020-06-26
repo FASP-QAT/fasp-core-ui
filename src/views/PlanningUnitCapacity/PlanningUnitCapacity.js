@@ -910,8 +910,9 @@ class PlanningUnitCapacity extends Component {
 
                                             // console.log("inventory Data Array-->", papuDataArr);
                                             if (papuDataArr.length == 0) {
-                                                // data = [];
-                                                // papuDataArr[0] = data;
+                                                data = [];
+                                                data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+                                                papuDataArr[0] = data;
                                             }
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');
                                             this.el.destroy();
@@ -1092,6 +1093,7 @@ class PlanningUnitCapacity extends Component {
 
     addRow = function () {
 
+        console.log("IN addRow");
         var data = [];
         data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
         data[1] = "";

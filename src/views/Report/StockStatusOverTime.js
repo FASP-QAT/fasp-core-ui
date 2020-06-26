@@ -57,9 +57,14 @@ const options = {
     legend: {
         display: true,
         position: 'bottom',
+       
         labels: {
             usePointStyle: true,
-            fontColor: 'black'
+            fontColor: 'black',
+            fontSize: 12,
+            boxWidth: 9,
+            boxHeight: 2
+           
         }
     }
 }
