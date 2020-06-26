@@ -97,11 +97,7 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-<<<<<<< HEAD
-            labelString: "Planning Unit"
-=======
             
->>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
         }],
     },
     tooltips: {
@@ -1012,11 +1008,7 @@ class ShipmentGlobalDemandView extends Component {
                                     </div>
                                 </Col>
                             </Form>
-<<<<<<< HEAD
-                            <Col md="12 pl-0  mt-4">
-=======
                             <Col md="12 pl-0">
->>>>>>> 502fc5feacfbe1c67d905a43cddb1e11f63650d5
                                 <div className="row grid-divider">
                                     <Col md="8 pl-0">
                                         <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
