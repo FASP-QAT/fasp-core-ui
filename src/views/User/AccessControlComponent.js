@@ -1363,8 +1363,9 @@ class AccessControlComponent extends Component {
 
         // console.log("inventory Data Array-->", papuDataArr);
         if (papuDataArr.length == 0) {
-            // data = [];
-            // papuDataArr[0] = data;
+            data = [];
+            data[0] = this.state.user.username;
+            papuDataArr[0] = data;
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         this.el.destroy();
