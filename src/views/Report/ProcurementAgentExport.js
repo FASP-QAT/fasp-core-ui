@@ -629,7 +629,7 @@ class ProcurementAgentExport extends Component {
             },
             {
                 dataField: 'totalProductCost',
-                text: 'Product Cost ($)',
+                text: 'Product Cost (USD)',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -643,14 +643,14 @@ class ProcurementAgentExport extends Component {
             },
             {
                 dataField: 'freightCost',
-                text: 'Freight Cost ($)',
+                text: 'Freight Cost (USD)',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'totalCost',
-                text: 'Total Cost ($)',
+                text: 'Total Cost (USD)',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -773,6 +773,25 @@ class ProcurementAgentExport extends Component {
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {realmCountries}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Include Planned Shipments</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="shipmentStatusID"
+                                                id="shipmentStatusID"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="1">Yes</option>
+                                                <option value="2">No</option>
                                             </Input>
 
                                         </InputGroup>

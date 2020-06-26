@@ -1177,6 +1177,7 @@ class GlobalConsumption extends Component {
     this.getRandomColor = this.getRandomColor.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
+    this.hideDiv = this.hideDiv.bind(this)
   }
 
   makeText = m => {
@@ -1393,6 +1394,16 @@ class GlobalConsumption extends Component {
     })
   }
 
+  hideDiv() {
+    setTimeout(function () {
+      var theSelect = document.getElementById('planningUnitId').length;
+
+      console.log("INHIDEDIV------------------------------------------------------", theSelect);
+
+    }, 9000);
+
+  }
+
 
   filterData(rangeValue) {
     /*this.setState({
@@ -1438,11 +1449,228 @@ class GlobalConsumption extends Component {
                 "consumptionDate": "2019-01-01",
                 "planningUnitQty": 1.5,
                 "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
+                "consumptionDateString": "Jan 2019"
               },
               {
                 "realmCountry": {
                   "id": 2,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Feb 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 3,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Mar 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 4,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Apr 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 5,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "May 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 6,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jun 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 7,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jul 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 8,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-08-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Aug 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 9,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-09-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Sep 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 10,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-10-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Oct 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 11,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-11-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Nov 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 12,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-12-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Dec 2019"
+              },
+
+              {
+                "realmCountry": {
+                  "id": 13,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Kenya",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "KEN"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 14,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1460,7 +1688,7 @@ class GlobalConsumption extends Component {
               },
               {
                 "realmCountry": {
-                  "id": 3,
+                  "id": 15,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1478,7 +1706,7 @@ class GlobalConsumption extends Component {
               },
               {
                 "realmCountry": {
-                  "id": 4,
+                  "id": 16,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1496,7 +1724,7 @@ class GlobalConsumption extends Component {
               },
               {
                 "realmCountry": {
-                  "id": 5,
+                  "id": 17,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1514,7 +1742,7 @@ class GlobalConsumption extends Component {
               },
               {
                 "realmCountry": {
-                  "id": 6,
+                  "id": 18,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1530,28 +1758,14 @@ class GlobalConsumption extends Component {
                 "forecastingUnitQty": 0.5,
                 "consumptionDateString": "Jun 2020"
               },
-              //  {
-              //   "realmCountry": {
-              //     "id": 7,
-              //     "label": {
-              //       "active": false,
-              //       "labelId": 307,
-              //       "label_en": "Kenya",
-              //       "label_sp": "",
-              //       "label_fr": "",
-              //       "label_pr": ""
-              //     },
-              //     "code": "KEN"
-              //   },
-              //   "consumptionDate": "2019-07-01",
-              //   "planningUnitQty": 0.5,
-              //   "forecastingUnitQty": 3,
-              //   "consumptionDateString": "Jul 2020"
-              // },
+
+
+
+
 //malawi
               {
                 "realmCountry": {
-                  "id": 8,
+                  "id": 20,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1564,12 +1778,12 @@ class GlobalConsumption extends Component {
                 },
                 "consumptionDate": "2019-01-01",
                 "planningUnitQty": 1,
-                "forecastingUnitQty": 2,
-                "consumptionDateString": "Jan 2020"
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2019"
               },
               {
                 "realmCountry": {
-                  "id": 9,
+                  "id": 21,
                   "label": {
                     "active": false,
                     "labelId": 306,
@@ -1579,6 +1793,531 @@ class GlobalConsumption extends Component {
                     "label_pr": ""
                   },
                   "code": "MAL"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Feb 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 22,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Mar 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 23,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Apr 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 24,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "May 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 25,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jun 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 26,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jul 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 27,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-08-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Aug 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 28,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-09-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Sep 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 29,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-10-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Oct 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 30,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-11-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Nov 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 31,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-12-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Dec 2019"
+              },
+
+              {
+                "realmCountry": {
+                  "id": 32,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jan 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 33,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Feb 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 34,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 1.5,
+                "consumptionDateString": "Mar 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 35,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Apr 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 36,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 0.5,
+                "forecastingUnitQty": 1,
+                "consumptionDateString": "May 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 37,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Malawi",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "MAL"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Jun 2020"
+              },
+//zimbabwe
+              {
+                "realmCountry": {
+                  "id": 38,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-01-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Jan 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 39,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-02-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Feb 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 40,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Mar 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 41,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-04-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Apr 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 42,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-05-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "May 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 43,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Jun 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 44,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Jul 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 45,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-08-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2.5,
+                "consumptionDateString": "Aug 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 46,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-09-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Sep 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 47,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-10-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Oct 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 48,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-11-01",
+                "planningUnitQty": 2.5,
+                "forecastingUnitQty": 3.5,
+                "consumptionDateString": "Nov 2019"
+              },
+              {
+                "realmCountry": {
+                  "id": 49,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-12-01",
+                "planningUnitQty": 2,
+                "forecastingUnitQty": 3,
+                "consumptionDateString": "Dec 2019"
+              },
+
+              {
+                "realmCountry": {
+                  "id": 50,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
                 },
                 "consumptionDate": "2019-01-01",
                 "planningUnitQty": 1.5,
@@ -1587,220 +2326,93 @@ class GlobalConsumption extends Component {
               },
               {
                 "realmCountry": {
-                  "id": 10,
+                  "id": 51,
                   "label": {
                     "active": false,
                     "labelId": 306,
-                    "label_en": "Malawi",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "MAL"
-                },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1,
-                "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 11,
-                  "label": {
-                    "active": false,
-                    "labelId": 306,
-                    "label_en": "Malawi",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "MAL"
-                },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 2.5,
-                "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 12,
-                  "label": {
-                    "active": false,
-                    "labelId": 306,
-                    "label_en": "Malawi",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "MAL"
-                },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 2,
-                "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 13,
-                  "label": {
-                    "active": false,
-                    "labelId": 306,
-                    "label_en": "Malawi",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "MAL"
-                },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1.5,
-                "forecastingUnitQty": 3,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 14,
-                  "label": {
-                    "active": false,
-                    "labelId": 306,
-                    "label_en": "Malawi",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "MAL"
-                },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1,
-                "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
-              },
-//zimbabwe
-              {
-                "realmCountry": {
-                  "id": 15,
-                  "label": {
-                    "active": false,
-                    "labelId": 308,
                     "label_en": "Zimbabwe",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
                   },
-                  "code": "ZIM"
+                  "code": "ZWE"
                 },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1.5,
-                "forecastingUnitQty": 2,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 16,
-                  "label": {
-                    "active": false,
-                    "labelId": 308,
-                    "label_en": "Zimbabwe",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "ZIM"
-                },
-                "consumptionDate": "2019-01-01",
+                "consumptionDate": "2019-02-01",
                 "planningUnitQty": 1,
                 "forecastingUnitQty": 2,
-                "consumptionDateString": "Jan 2020"
+                "consumptionDateString": "Feb 2020"
               },
               {
                 "realmCountry": {
-                  "id": 17,
+                  "id": 52,
                   "label": {
                     "active": false,
-                    "labelId": 308,
+                    "labelId": 306,
                     "label_en": "Zimbabwe",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
                   },
-                  "code": "ZIM"
+                  "code": "ZWE"
                 },
-                "consumptionDate": "2019-01-01",
+                "consumptionDate": "2019-03-01",
+                "planningUnitQty": 1.5,
+                "forecastingUnitQty": 2,
+                "consumptionDateString": "Mar 2020"
+              },
+              {
+                "realmCountry": {
+                  "id": 53,
+                  "label": {
+                    "active": false,
+                    "labelId": 306,
+                    "label_en": "Zimbabwe",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  },
+                  "code": "ZWE"
+                },
+                "consumptionDate": "2019-04-01",
                 "planningUnitQty": 2,
                 "forecastingUnitQty": 3,
-                "consumptionDateString": "Jan 2020"
+                "consumptionDateString": "Apr 2020"
               },
               {
                 "realmCountry": {
-                  "id": 18,
+                  "id": 54,
                   "label": {
                     "active": false,
-                    "labelId": 308,
+                    "labelId": 306,
                     "label_en": "Zimbabwe",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
                   },
-                  "code": "ZIM"
+                  "code": "ZWE"
                 },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1.5,
-                "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 19,
-                  "label": {
-                    "active": false,
-                    "labelId": 308,
-                    "label_en": "Zimbabwe",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "ZIM"
-                },
-                "consumptionDate": "2019-01-01",
+                "consumptionDate": "2019-05-01",
                 "planningUnitQty": 1,
-                "forecastingUnitQty": 2.5,
-                "consumptionDateString": "Jan 2020"
+                "forecastingUnitQty": 1.5,
+                "consumptionDateString": "May 2020"
               },
               {
                 "realmCountry": {
-                  "id": 20,
+                  "id": 55,
                   "label": {
                     "active": false,
-                    "labelId": 308,
+                    "labelId": 306,
                     "label_en": "Zimbabwe",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
                   },
-                  "code": "ZIM"
+                  "code": "ZWE"
                 },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1.5,
+                "consumptionDate": "2019-06-01",
+                "planningUnitQty": 2,
                 "forecastingUnitQty": 3,
-                "consumptionDateString": "Jan 2020"
-              },
-              {
-                "realmCountry": {
-                  "id": 21,
-                  "label": {
-                    "active": false,
-                    "labelId": 308,
-                    "label_en": "Zimbabwe",
-                    "label_sp": "",
-                    "label_fr": "",
-                    "label_pr": ""
-                  },
-                  "code": "ZIM"
-                },
-                "consumptionDate": "2019-01-01",
-                "planningUnitQty": 1,
-                "forecastingUnitQty": 2,
-                "consumptionDateString": "Jan 2020"
+                "consumptionDateString": "Jun 2020"
               },
             ],
             message: ''
@@ -2309,7 +2921,7 @@ class GlobalConsumption extends Component {
                       </div>
 
                     </FormGroup>
-                    <FormGroup className="col-sm-3">
+                    <FormGroup className="col-sm-3" id="hideDiv">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -2355,7 +2967,7 @@ class GlobalConsumption extends Component {
                       &&
                       <div className="col-md-12 p-0 grapg-margin " >
                         <div className="offset-md-1 col-md-11">
-                        <div className="chart-wrapper chart-graph-report">
+                          <div className="chart-wrapper chart-graph-report">
                             <Bar id="cool-canvas" data={bar} options={options} />
                           </div>
                         </div>

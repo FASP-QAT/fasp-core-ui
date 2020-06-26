@@ -161,6 +161,13 @@ export default class CountryListComponent extends Component {
                 headerAlign: 'center'
             },
             {
+                dataField: 'countryCode2',
+                text: 'Country Code2',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'active',
                 text: i18n.t('static.common.status'),
                 sort: true,

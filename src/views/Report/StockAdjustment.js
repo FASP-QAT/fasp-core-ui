@@ -278,7 +278,7 @@ class StockAdjustmentComponent extends Component {
                 dataField: 'notes',
                 text: 'Notes',
                 sort: true,
-                align: 'center',
+                align: 'left',
                 headerAlign: 'center'
             }
 
