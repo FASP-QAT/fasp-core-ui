@@ -651,10 +651,11 @@ class Consumption extends Component {
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
-            if (navigator.onLine) {
-                const program = this.state.programs.filter(c => c.programId == programId)
-                console.log(program)
-                if (program.length == 1) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (navigator.onLine) {
                     this.setState({
                         versions: []
                     }, () => {
@@ -664,15 +665,24 @@ class Consumption extends Component {
                             })
                         }, () => { this.consolidatedVersionList(programId) });
                     });
-                }
-                else {
-                    this.consolidatedVersionList(programId)
+
+
+                } else {
+                    this.setState({
+                        versions: []
+                    }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
+
                 this.setState({
                     versions: []
-                });
+                })
+
             }
+        } else {
+            this.setState({
+                versions: []
+            })
         }
     }
     consolidatedVersionList = (programId) => {
@@ -728,6 +738,100 @@ class Consumption extends Component {
 
 
     }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: []
+        }, () => {
+            if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList[i] = myResult[i]
+                            }
+                        }
+                        this.setState({
+                            planningUnits: proList, message: ''
+                        }, () => {
+                            this.fetchData();
+                        })
+                    }.bind(this);
+                }.bind(this)
+
+
+            }
+            else {
+                AuthenticationService.setupAxiosInterceptors();
+
+                //let productCategoryId = document.getElementById("productCategoryId").value;
+                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    console.log('**' + JSON.stringify(response.data))
+                    this.setState({
+                        planningUnits: response.data, message: ''
+                    }, () => {
+                        this.fetchData();
+                    })
+                })
+                    .catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        });
+
+    }
+
+    handlePlanningUnitChange = (planningUnitIds) => {
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+
+            // this.fetchData()
+        })
+    }
+
     componentDidMount() {
         if (navigator.onLine) {
             this.getPrograms();
@@ -831,7 +935,6 @@ class Consumption extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     render() {
-        const { offlinePlanningUnitList } = this.state;
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -996,80 +1099,54 @@ class Consumption extends Component {
                                 <Form >
                                     <Col md="12 pl-0">
                                         <div className="row">
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
+                                            <FormGroup  className="tab-ml-1">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
+                                                <div className="controls SelectGo Regioncalender">
+                                                    <InputGroup>
+                                                        <Picker
+                                                            ref="pickRange"
+                                                            years={{ min: 2013 }}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
 
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: 2013 }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
+                                                    </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <Online>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                    <div className="controls ">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="programId"
-                                                                id="programId"
-                                                                bsSize="sm"
-                                                                onChange={this.filterVersion}
 
-                                                            >
-                                                                <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                {programs.length > 0
-                                                                    && programs.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.programId}>
-                                                                                {getLabelText(item.label, this.state.lang)}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
 
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                            </Online>
-                                            <Offline>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                    <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="programId"
-                                                                id="programId"
-                                                                bsSize="sm"
-                                                                onChange={this.getProductCategories}
+                                            <FormGroup className="tab-ml-1">
+                                                <Label htmlFor="appendedInputButton">Program</Label>
+                                                <div className="controls SelectGo">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="programId"
+                                                            id="programId"
+                                                            bsSize="sm"
+                                                            onChange={this.filterVersion}
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {programs.length > 0
+                                                                && programs.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.programId}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
 
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {offlinePrograms.length > 0
-                                                                    && offlinePrograms.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.id}>
-                                                                                {item.name}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
+                                                        </Input>
 
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                            </Offline>
-                                            <FormGroup className="col-md-3">
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="tab-ml-1">
                                                 <Label htmlFor="appendedInputButton">Version</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1088,42 +1165,22 @@ class Consumption extends Component {
                                                 </div>
                                             </FormGroup>
 
-                                            <Online>
-                                                <FormGroup className="col-sm-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                    <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                                    <div className="controls">
-                                                        <InputGroup className="box">
-                                                            <ReactMultiSelectCheckboxes
-                                                                name="planningUnitId"
-                                                                id="planningUnitId"
-                                                                bsSize="sm"
-                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                            />
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                            </Online>
-                                            <Offline>
-                                                <FormGroup className="col-sm-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                    <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                                    <div className="controls">
-                                                        <InputGroup className="box">
-                                                            <ReactMultiSelectCheckboxes
+                                            <FormGroup className="tab-ml-1">
+                                                <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                <div className="controls">
+                                                    <InputGroup className="box">
+                                                        <ReactMultiSelectCheckboxes
+                                                            name="planningUnitId"
+                                                            id="planningUnitId"
+                                                            bsSize="md"
+                                                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                        />
 
-                                                                name="planningUnitId"
-                                                                id="planningUnitId"
-                                                                bsSize="sm"
-                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                            />
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                            </Offline>
-                                            <FormGroup className="col-md-3">
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="tab-ml-1">
                                                 <Label htmlFor="appendedInputButton">Report View</Label>
                                                 <div className="controls ">
                                                     <InputGroup>

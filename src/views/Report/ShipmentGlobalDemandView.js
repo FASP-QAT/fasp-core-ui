@@ -414,7 +414,7 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
-            this.filterData(this.state.rangeValue)
+            // this.filterData(this.state.rangeValue)
         })
     }
 
@@ -679,10 +679,11 @@ class ShipmentGlobalDemandView extends Component {
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
-            if (navigator.onLine) {
-                const program = this.state.programs.filter(c => c.programId == programId)
-                console.log(program)
-                if (program.length == 1) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (navigator.onLine) {
                     this.setState({
                         versions: []
                     }, () => {
@@ -692,15 +693,24 @@ class ShipmentGlobalDemandView extends Component {
                             })
                         }, () => { this.consolidatedVersionList(programId) });
                     });
-                }
-                else {
-                    this.consolidatedVersionList(programId)
+
+
+                } else {
+                    this.setState({
+                        versions: []
+                    }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
+
                 this.setState({
                     versions: []
-                });
+                })
+
             }
+        } else {
+            this.setState({
+                versions: []
+            })
         }
     }
     consolidatedVersionList = (programId) => {
@@ -756,6 +766,226 @@ class ShipmentGlobalDemandView extends Component {
 
 
     }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: []
+        }, () => {
+            if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList[i] = myResult[i]
+                            }
+                        }
+                        this.setState({
+                            planningUnits: proList, message: ''
+                        }, () => {
+                            this.fetchData();
+                        })
+                    }.bind(this);
+                }.bind(this)
+
+
+            }
+            else {
+                AuthenticationService.setupAxiosInterceptors();
+
+                //let productCategoryId = document.getElementById("productCategoryId").value;
+                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    console.log('**' + JSON.stringify(response.data))
+                    this.setState({
+                        planningUnits: response.data, message: ''
+                    }, () => {
+                        this.fetchData();
+                    })
+                })
+                    .catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        });
+
+    }
+    fetchData = () => {
+        let versionId = document.getElementById("versionId").value;
+        let programId = document.getElementById("programId").value;
+
+        let planningUnitIds = this.state.planningUnitValues;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (versionId.includes('Local')) {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var regionList = [];
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext')
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var version = (versionId.split('(')[0]).trim()
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var program = `${programId}_v${version}_uId_${userId}`
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    console.log(program)
+                    var programRequest = programDataOs.get(program);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    programRequest.onsuccess = function (e) {
+                        console.log(programRequest)
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var inventoryList = []
+                        planningUnitIds.map(planningUnitId =>
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)')))]);
+                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
+                        var data = []
+                        planningUnitIds.map(planningUnitId => {
+                            dates.map(dt => {
+
+                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
+                                console.log(list)
+                                if (list.length > 0) {
+                                    var adjustment = 0;
+                                    list.map(ele => adjustment = adjustment + ele.adjustmentQty);
+
+                                    var json = {
+                                        program: programJson,
+                                        inventoryDate: new moment(dt).format('MMM YYYY'),
+                                        planningUnit: list[0].planningUnit,
+                                        stockAdjustemntQty: adjustment,
+                                        lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+                                        lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                        notes: list[0].notes
+                                    }
+                                    data.push(json)
+                                } else {
+
+                                }
+                            })
+                        })
+                        console.log(data)
+                        this.setState({
+                            data: data
+                            , message: ''
+                        })
+                    }.bind(this)
+                }.bind(this)
+            } else {
+                var inputjson = {
+                    programId: programId,
+                    versionId: versionId,
+                    startDate: new moment(startDate),
+                    stopDate: new moment(endDate),
+                    planningUnitIds: planningUnitIds
+                }
+                AuthenticationService.setupAxiosInterceptors();
+                ReportService.stockAdjustmentList(inputjson)
+                    .then(response => {
+                        console.log(JSON.stringify(response.data))
+                        this.setState({
+                            data: response.data
+                        }, () => { this.consolidatedProgramList() })
+                    }).catch(
+                        error => {
+                            this.setState({
+                                data: []
+                            }, () => { this.consolidatedProgramList() })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+
+            }
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+        } else if (versionId == 0) {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+        }
+    }
+    handlePlanningUnitChange = (planningUnitIds) => {
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+
+            // this.fetchData()
+        })
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
@@ -797,8 +1027,7 @@ class ShipmentGlobalDemandView extends Component {
         return color;
     }
     render() {
-        const { planningUnits } = this.state;
-        console.log("planningUnits---", planningUnits);
+        
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -808,15 +1037,13 @@ class ShipmentGlobalDemandView extends Component {
                     </option>
                 )
             }, this);
-        let planningUnitList = [];
-        planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.planningUnitId}>
-                        {item.planningUnit.label.label_en}
-                    </option>
-                )
-            }, this);
+            const { planningUnits } = this.state
+            let planningUnitList = planningUnits.length > 0
+                && planningUnits.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+    
+                }, this);
+                console.log("planningUnits---", planningUnits);
         const { programs } = this.state;
         let programList = [];
         programList = programs.length > 0
@@ -925,27 +1152,30 @@ class ShipmentGlobalDemandView extends Component {
                             <Form >
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                            <div className="controls edit">
+                                        <FormGroup  className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
+                                            <div className="controls SelectGo Regioncalender">
+                                                <InputGroup>
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: 2013 }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
 
-                                                <Picker
-                                                    ref="pickRange"
-                                                    years={{ min: 2013 }}
-                                                    value={rangeValue}
-                                                    lang={pickerLang}
-                                                    //theme="light"
-                                                    onChange={this.handleRangeChange}
-                                                    onDismiss={this.handleRangeDissmis}
-                                                >
-                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                </Picker>
+                                                </InputGroup>
                                             </div>
-
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                            <div className="controls ">
+
+
+                                        <FormGroup className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                            <div className="controls SelectGo">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
@@ -953,9 +1183,8 @@ class ShipmentGlobalDemandView extends Component {
                                                         id="programId"
                                                         bsSize="sm"
                                                         onChange={this.filterVersion}
-
                                                     >
-                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                         {programs.length > 0
                                                             && programs.map((item, i) => {
                                                                 return (
@@ -964,12 +1193,13 @@ class ShipmentGlobalDemandView extends Component {
                                                                     </option>
                                                                 )
                                                             }, this)}
+
                                                     </Input>
 
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup  className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">Version</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -987,62 +1217,22 @@ class ShipmentGlobalDemandView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-sm-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+
+                                        <FormGroup  className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
                                             <div className="controls">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
-
                                                         name="planningUnitId"
                                                         id="planningUnitId"
-                                                        bsSize="sm"
+                                                        bsSize="md"
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     />
+
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">Funder</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <div className="controls edit">
-                                                    <ReactMultiSelectCheckboxes
-
-                                                        bsSize="sm"
-                                                        name="countrysId"
-                                                        id="countrysId"
-                                                        onChange={(e) => { this.handleChange(e) }}
-                                                        options={countryList && countryList.length > 0 ? countryList : []}
-                                                    />
-                                                    {!!this.props.error &&
-                                                        this.props.touched && (
-                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                        )}
-                                                </div>
-                                            </InputGroup>
-                                        </FormGroup>
-                                        {/* <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">Shipment Status</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <div className="controls edit">
-                                                    <ReactMultiSelectCheckboxes
-
-                                                        bsSize="sm"
-                                                        name="countrysId"
-                                                        id="countrysId"
-                                                        onChange={(e) => { this.handleChange(e) }}
-                                                        options={countryList && countryList.length > 0 ? countryList : []}
-                                                    />
-                                                    {!!this.props.error &&
-                                                        this.props.touched && (
-                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                        )}
-                                                </div>
-                                            </InputGroup>
-                                        </FormGroup> */}
                                     </div>
                                 </Col>
                             </Form>
