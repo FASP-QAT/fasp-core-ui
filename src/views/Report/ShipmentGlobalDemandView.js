@@ -2,28 +2,10 @@ import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Pie, HorizontalBar } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import {
-    Badge,
-    Button,
-    ButtonDropdown,
-    ButtonGroup,
-    ButtonToolbar,
     Card,
     CardBody,
-    // CardFooter,
     CardHeader,
-    CardTitle,
     Col,
-    Widgets,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Progress,
-    Pagination,
-    PaginationItem,
-    PaginationLink,
-    Row,
-    CardColumns,
     Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
 import Select from 'react-select';
@@ -83,14 +65,14 @@ const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
 const options = {
     title: {
         display: true,
-        text: "Global Demand(Orders over selected time period)",
+        text: "Global Demand (Units)",
         fontColor: 'black'
     },
     scales: {
         xAxes: [{
-            
+
             stacked: true,
-            labelString: "Amount",
+            labelString: "Units",
             gridLines: {
                 display: false
             },
@@ -118,25 +100,25 @@ const options = {
 const optionsPie = {
     title: {
         display: true,
-        text: "Funder Split",
+        text: "Funding Source (USD)",
         fontColor: 'black'
     },
     legend: {
-      position: 'bottom'
-    //   labels: {
-    //     boxWidth: 10
-    //   }
+        position: 'bottom'
+        //   labels: {
+        //     boxWidth: 10
+        //   }
     }
-  }
+}
 
 const chartData = {
-    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each','Female Condom (Nitrile) Lubricated, 17 cm, 20 Each' ],
+    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each', 'Female Condom (Nitrile) Lubricated, 17 cm, 20 Each'],
     datasets: [{
         label: 'Ordered Shipments',
         data: [20000, 10000, 2000],
         backgroundColor: '#6a82a8',
         borderWidth: 0
-        
+
     },
     {
         label: 'Planned Shipments',
@@ -193,6 +175,7 @@ class ShipmentGlobalDemandView extends Component {
             radioSelected: 2,
             lang: localStorage.getItem('lang'),
             countrys: [],
+            versions: [],
             planningUnits: [],
             consumptions: [],
             productCategories: [],
@@ -214,8 +197,6 @@ class ShipmentGlobalDemandView extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.getPlanningUnit = this.getPlanningUnit.bind(this);
-        this.getProductCategories = this.getProductCategories.bind(this)
         this.getPrograms = this.getPrograms.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.getRandomColor = this.getRandomColor.bind(this)
@@ -433,7 +414,7 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
-            this.filterData(this.state.rangeValue)
+            // this.filterData(this.state.rangeValue)
         })
     }
 
@@ -582,42 +563,12 @@ class ShipmentGlobalDemandView extends Component {
 
 
     }
-    getPlanningUnit() {
-        if (navigator.onLine) {
-            console.log('changed')
-            let productCategoryId = document.getElementById("productCategoryId").value;
-            AuthenticationService.setupAxiosInterceptors();
-            if (productCategoryId != -1) {
-                PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                    this.setState({
-                        planningUnits: response.data,
-                    })
-                })
-                    .catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        //  this.setState({ message: error.response.data.messageCode });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
-                                }
-                            }
-                        }
-                    );
-            }
-        } else {
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+
+        if (versionId.includes('Local')) {
             const lan = 'en';
             var db1;
             var storeOS;
@@ -625,8 +576,8 @@ class ShipmentGlobalDemandView extends Component {
             var openRequest = indexedDB.open('fasp', 1);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var planningunitTransaction = db1.transaction(['CountryPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('CountryPlanningUnit');
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
                 var planningList = []
                 planningunitRequest.onerror = function (event) {
@@ -635,27 +586,62 @@ class ShipmentGlobalDemandView extends Component {
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    var CountryId = (document.getElementById("CountryId").value).split("_")[0];
+                    var programId = (document.getElementById("programId").value).split("_")[0];
                     var proList = []
+                    console.log(myResult)
                     for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].Country.id == CountryId) {
-                            var productJson = {
-                                name: getLabelText(myResult[i].planningUnit.label, lan),
-                                id: myResult[i].planningUnit.id
-                            }
-                            proList[i] = productJson
+                        if (myResult[i].program.id == programId) {
+
+                            proList[i] = myResult[i]
                         }
                     }
                     this.setState({
-                        planningUnitList: proList
+                        planningUnits: proList, message: ''
                     })
                 }.bind(this);
             }.bind(this)
 
+
+        }
+        else {
+            AuthenticationService.setupAxiosInterceptors();
+            console.log("programid----------------" + programId);
+            //let productCategoryId = document.getElementById("productCategoryId").value;
+            ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                console.log('**' + JSON.stringify(response.data))
+                this.setState({
+                    planningUnits: response.data, message: ''
+                }, () => {
+                    // this.fetchData();
+                })
+            })
+                .catch(
+                    error => {
+                        this.setState({
+                            planningUnits: [],
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
         }
 
-    }
 
+    }
     getPrograms() {
         AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
@@ -690,47 +676,319 @@ class ShipmentGlobalDemandView extends Component {
             );
     }
 
-    getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                console.log(response.data)
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        productCategories: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-        this.getPlanningUnit();
+    filterVersion = () => {
+        let programId = document.getElementById("programId").value;
+        if (programId != 0) {
 
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (navigator.onLine) {
+                    this.setState({
+                        versions: []
+                    }, () => {
+                        this.setState({
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
+                    });
+
+
+                } else {
+                    this.setState({
+                        versions: []
+                    }, () => { this.consolidatedVersionList(programId) })
+                }
+            } else {
+
+                this.setState({
+                    versions: []
+                })
+
+            }
+        } else {
+            this.setState({
+                versions: []
+            })
+        }
+    }
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+
+                    }
+
+
+                }
+
+                console.log(verList)
+                this.setState({
+                    versions: verList.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })
+                })
+
+            }.bind(this);
+
+
+
+        }.bind(this)
+
+
+    }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: []
+        }, () => {
+            if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList[i] = myResult[i]
+                            }
+                        }
+                        this.setState({
+                            planningUnits: proList, message: ''
+                        }, () => {
+                            this.fetchData();
+                        })
+                    }.bind(this);
+                }.bind(this)
+
+
+            }
+            else {
+                AuthenticationService.setupAxiosInterceptors();
+
+                //let productCategoryId = document.getElementById("productCategoryId").value;
+                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    console.log('**' + JSON.stringify(response.data))
+                    this.setState({
+                        planningUnits: response.data, message: ''
+                    }, () => {
+                        this.fetchData();
+                    })
+                })
+                    .catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        });
+
+    }
+    fetchData = () => {
+        let versionId = document.getElementById("versionId").value;
+        let programId = document.getElementById("programId").value;
+
+        let planningUnitIds = this.state.planningUnitValues;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (versionId.includes('Local')) {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var regionList = [];
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext')
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var version = (versionId.split('(')[0]).trim()
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var program = `${programId}_v${version}_uId_${userId}`
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    console.log(program)
+                    var programRequest = programDataOs.get(program);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    programRequest.onsuccess = function (e) {
+                        console.log(programRequest)
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var inventoryList = []
+                        planningUnitIds.map(planningUnitId =>
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)')))]);
+                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
+                        var data = []
+                        planningUnitIds.map(planningUnitId => {
+                            dates.map(dt => {
+
+                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
+                                console.log(list)
+                                if (list.length > 0) {
+                                    var adjustment = 0;
+                                    list.map(ele => adjustment = adjustment + ele.adjustmentQty);
+
+                                    var json = {
+                                        program: programJson,
+                                        inventoryDate: new moment(dt).format('MMM YYYY'),
+                                        planningUnit: list[0].planningUnit,
+                                        stockAdjustemntQty: adjustment,
+                                        lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+                                        lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                        notes: list[0].notes
+                                    }
+                                    data.push(json)
+                                } else {
+
+                                }
+                            })
+                        })
+                        console.log(data)
+                        this.setState({
+                            data: data
+                            , message: ''
+                        })
+                    }.bind(this)
+                }.bind(this)
+            } else {
+                var inputjson = {
+                    programId: programId,
+                    versionId: versionId,
+                    startDate: new moment(startDate),
+                    stopDate: new moment(endDate),
+                    planningUnitIds: planningUnitIds
+                }
+                AuthenticationService.setupAxiosInterceptors();
+                ReportService.stockAdjustmentList(inputjson)
+                    .then(response => {
+                        console.log(JSON.stringify(response.data))
+                        this.setState({
+                            data: response.data
+                        }, () => { this.consolidatedProgramList() })
+                    }).catch(
+                        error => {
+                            this.setState({
+                                data: []
+                            }, () => { this.consolidatedProgramList() })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+
+            }
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+        } else if (versionId == 0) {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+        }
+    }
+    handlePlanningUnitChange = (planningUnitIds) => {
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+
+            // this.fetchData()
+        })
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        this.getPrograms()
-        this.getCountrys();
-        this.getProductCategories()
-
+        this.getPrograms();
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -769,16 +1027,23 @@ class ShipmentGlobalDemandView extends Component {
         return color;
     }
     render() {
-        const { planningUnits } = this.state;
-        let planningUnitList = [];
-        planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
+        
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
                 return (
-
-                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
-
+                    <option key={i} value={item.versionId}>
+                        {item.versionId}
+                    </option>
                 )
             }, this);
+            const { planningUnits } = this.state
+            let planningUnitList = planningUnits.length > 0
+                && planningUnits.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+    
+                }, this);
+                console.log("planningUnits---", planningUnits);
         const { programs } = this.state;
         let programList = [];
         programList = programs.length > 0
@@ -887,124 +1152,87 @@ class ShipmentGlobalDemandView extends Component {
                             <Form >
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                            <div className="controls edit">
+                                        <FormGroup  className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
+                                            <div className="controls SelectGo Regioncalender">
+                                                <InputGroup>
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: 2013 }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
 
-                                                <Picker
-                                                    ref="pickRange"
-                                                    years={{ min: 2013 }}
-                                                    value={rangeValue}
-                                                    lang={pickerLang}
-                                                    //theme="light"
-                                                    onChange={this.handleRangeChange}
-                                                    onDismiss={this.handleRangeDissmis}
-                                                >
-                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                </Picker>
+                                                </InputGroup>
                                             </div>
-
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <ReactMultiSelectCheckboxes
-
-                                                    bsSize="sm"
-                                                    name="programIds"
-                                                    id="programIds"
-                                                    onChange={(e) => { this.handleChangeProgram(e) }}
-                                                    options={programList && programList.length > 0 ? programList : []}
-                                                />
-                                                {!!this.props.error &&
-                                                    this.props.touched && (
-                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                    )}
-                                            </InputGroup>
                                         </FormGroup>
 
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+
+                                        <FormGroup className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                            <div className="controls SelectGo">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="programId"
+                                                        id="programId"
+                                                        bsSize="sm"
+                                                        onChange={this.filterVersion}
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {programs.length > 0
+                                                            && programs.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.programId}>
+                                                                        {getLabelText(item.label, this.state.lang)}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup  className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">Version</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="productCategoryId"
-                                                        id="productCategoryId"
+                                                        name="versionId"
+                                                        id="versionId"
                                                         bsSize="sm"
-                                                        onChange={this.getPlanningUnit}
+                                                        onChange={(e) => { this.getPlanningUnit(); }}
                                                     >
                                                         <option value="-1">{i18n.t('static.common.select')}</option>
-                                                        {productCategories.length > 0
-                                                            && productCategories.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
+                                                        {versionList}
                                                     </Input>
+
                                                 </InputGroup>
                                             </div>
-
                                         </FormGroup>
-                                        <FormGroup className="col-sm-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+
+                                        <FormGroup  className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
                                             <div className="controls">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
-
                                                         name="planningUnitId"
                                                         id="planningUnitId"
-                                                        bsSize="sm"
+                                                        bsSize="md"
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     />
+
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">Funder</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <div className="controls edit">
-                                                    <ReactMultiSelectCheckboxes
-
-                                                        bsSize="sm"
-                                                        name="countrysId"
-                                                        id="countrysId"
-                                                        onChange={(e) => { this.handleChange(e) }}
-                                                        options={countryList && countryList.length > 0 ? countryList : []}
-                                                    />
-                                                    {!!this.props.error &&
-                                                        this.props.touched && (
-                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                        )}
-                                                </div>
-                                            </InputGroup>
-                                        </FormGroup>
-                                        {/* <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">Shipment Status</Label>
-                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <div className="controls edit">
-                                                    <ReactMultiSelectCheckboxes
-
-                                                        bsSize="sm"
-                                                        name="countrysId"
-                                                        id="countrysId"
-                                                        onChange={(e) => { this.handleChange(e) }}
-                                                        options={countryList && countryList.length > 0 ? countryList : []}
-                                                    />
-                                                    {!!this.props.error &&
-                                                        this.props.touched && (
-                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                        )}
-                                                </div>
-                                            </InputGroup>
-                                        </FormGroup> */}
                                     </div>
                                 </Col>
                             </Form>
@@ -1062,12 +1290,29 @@ class ShipmentGlobalDemandView extends Component {
 
                                                     <thead>
                                                         <tr>
-                                                            <th className="text-left" style={{ width: '600px' }}> Planning Unit </th>
-                                                            <th className="text-right " style={{ width: '350px' }}> GF (USD) </th>
-                                                            <th className="text-right" style={{ width: '350px' }}>Gov't (USD)</th>
-                                                            <th className="text-right" style={{ width: '350px' }}>Local (USD)</th>
-                                                            <th className="text-right" style={{ width: '350px' }}>PSM (USD)</th>
-                                                            <th className="text-right" style={{ width: '350px' }}>Total (USD)</th>
+                                                            <th className="text-left" style={{ width: '300px' }} rowSpan="2"> Planning Unit </th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">GF</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">Govt</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">Local</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">PSM</th>
+                                                            <th className="text-center" style={{ width: '200px' }} colSpan="2">Total</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Total Units </th>
+                                                            <th className="text-right" style={{ width: '100px' }}> Total Amount (USD) </th>
+                                                            {/* <th className="text-right " style={{ width: '350px' }}> GF</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Gov't</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Local</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>PSM</th>
+                                                            <th className="text-right" style={{ width: '350px' }}>Total</th> */}
                                                         </tr>
                                                     </thead>
 
@@ -1075,13 +1320,46 @@ class ShipmentGlobalDemandView extends Component {
                                                         <tr id="addr0" key={1} >
 
                                                             <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td className="text-right">2,826</td>
-                                                            <td className="text-right">2,826</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>3,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}>7,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
                                                         </tr>
                                                         <tr id="addr0" key={2} >
+
+                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Each</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>3,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}>7,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
+                                                        </tr>
+                                                        <tr id="addr0" key={3} >
+
+                                                            <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>3,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}></td>
+                                                            <td className="text-right" style={{ width: '100px' }}>7,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
+                                                        </tr>
+                                                        {/* <tr id="addr0" key={2} >
 
                                                             <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Each </td>
                                                             <td></td>
@@ -1098,7 +1376,7 @@ class ShipmentGlobalDemandView extends Component {
                                                             <td></td>
                                                             <td></td>
                                                             <td className="text-right">40,673,952</td>
-                                                        </tr>
+                                                        </tr> */}
                                                     </tbody>
                                                 </Table>
                                             </div>
