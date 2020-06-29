@@ -115,6 +115,7 @@ class FundingSourceListComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
+                    console.log("RESP----",response.data);
                     this.setState({
                         fundingSourceList: response.data,
                         selSource: response.data
@@ -187,7 +188,13 @@ class FundingSourceListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        }, {
+        },{
+            dataField: 'fundingSourceCode',
+            text: i18n.t('static.fundingsource.fundingsourceCode'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+        },{
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,

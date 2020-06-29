@@ -872,7 +872,17 @@
     "static.report.warehouseCapacity": "Warehouse Capacity",
     "static.report.stockAdjustment": "Stock Adjustment",
     "static.report.lastmodifiedby": "Last Modified By",
-    "static.report.lastmodifieddate": "Last Modified Date"
+    "static.report.lastmodifieddate": "Last Modified Date",
+    "static.common.max6digittext": "Maximum 6 characters only",
+    "static.fundingsource.fundingsourceCodeText": "Please enter funding source code",
+    "static.fundingsource.fundingsourceCode": "Funding Source Code",
+    "static.common.max10digittext": "Maximum 6 characters only",
+    "static.budget.budgetCodeText": "Please enter budget code",
+    "static.budget.budgetCode": "Budget Code",
+    "static.program.programCode": "Program Code",
+    "static.procurementAgent.procurementAgentHTMLCode": "Please enter color code",
+    "static.procurementagent.procurementAgentColorCode": "Color Code"
+    
     
 
 }

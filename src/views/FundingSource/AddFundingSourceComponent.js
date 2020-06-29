@@ -12,7 +12,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import i18n from '../../i18n'
 const initialValues = {
   fundingSourceId: [],
-  subFundingSource: ""
+  subFundingSource: "",
+  fundingSourceCode: "",
 }
 const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
@@ -20,7 +21,10 @@ const validationSchema = function (values) {
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
     fundingSource: Yup.string()
-      .required(i18n.t('static.fundingsource.fundingsourcetext'))
+      .required(i18n.t('static.fundingsource.fundingsourcetext')),
+    fundingSourceCode: Yup.string()
+      .max(6, i18n.t('static.common.max6digittext'))
+      .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
   })
 }
 
@@ -56,7 +60,8 @@ class AddFundingSourceComponent extends Component {
         },
         label: {
           label_en: ''
-        }
+        },
+        fundingSourceCode:''
       },
       message: '',
       lang: localStorage.getItem('lang')
@@ -76,6 +81,9 @@ class AddFundingSourceComponent extends Component {
     if (event.target.name == "fundingSource") {
       fundingSource.label.label_en = event.target.value;
     }
+    if (event.target.name == "fundingSourceCode") {
+      fundingSource.fundingSourceCode = event.target.value.toUpperCase();;
+    }
     this.setState({
       fundingSource
     },
@@ -85,7 +93,8 @@ class AddFundingSourceComponent extends Component {
   touchAll(setTouched, errors) {
     setTouched({
       realmId: true,
-      fundingSource: true
+      fundingSource: true,
+      fundingSourceCode:true,
     }
     );
     this.validateForm(errors);
@@ -124,9 +133,9 @@ class AddFundingSourceComponent extends Component {
   }
   hideSecondComponent() {
     setTimeout(function () {
-        document.getElementById('div2').style.display = 'none';
+      document.getElementById('div2').style.display = 'none';
     }, 8000);
-}
+  }
 
   render() {
     const { realms } = this.state;
@@ -143,7 +152,7 @@ class AddFundingSourceComponent extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -159,14 +168,14 @@ class AddFundingSourceComponent extends Component {
                     .then(response => {
                       console.log("Response->", response);
                       if (response.status == 200) {
-                        this.props.history.push(`/fundingSource/listFundingSource/`  + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/fundingSource/listFundingSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
-                            message: response.data.messageCode
+                          message: response.data.messageCode
                         },
-                            () => {
-                                this.hideSecondComponent();
-                            })
+                          () => {
+                            this.hideSecondComponent();
+                          })
                       }
                     })
                 }}
@@ -217,6 +226,20 @@ class AddFundingSourceComponent extends Component {
                               required />
                             <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                           </FormGroup>
+                          <FormGroup>
+                            <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsourceCode')}<span className="red Reqasterisk">*</span> </Label>
+                            <Input type="text"
+                              name="fundingSourceCode"
+                              id="fundingSourceCode"
+                              bsSize="sm"
+                              valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
+                              invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
+                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                              onBlur={handleBlur}
+                              value={this.Capitalize(this.state.fundingSource.fundingSourceCode)}
+                              required />
+                            <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
+                          </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
@@ -244,13 +267,14 @@ class AddFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/fundingSource/listFundingSource/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/fundingSource/listFundingSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
   resetClicked() {
     let { fundingSource } = this.state;
 
     fundingSource.realm.id = ''
     fundingSource.label.label_en = ''
+    fundingSource.fundingSourceCode = ''
 
     this.setState({
       fundingSource

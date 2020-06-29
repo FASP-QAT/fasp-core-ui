@@ -420,7 +420,7 @@ export default class EditProgram extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProgramService.editProgram(this.state.program).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/program/listProgram/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -468,6 +468,21 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
+                                                        <Label htmlFor="company">{i18n.t('static.program.programCode')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            type="text" name="programCode" valid={!errors.programCode}
+                                                            bsSize="sm"
+                                                            invalid={touched.programCode && !!errors.programCode}
+                                                            readOnly
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.programCode}
+                                                            id="programCode" />
+                                                        <FormFeedback>{errors.programCode}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+
                                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
 
                                                         <Input
@@ -500,7 +515,7 @@ export default class EditProgram extends Component {
 
                                                         </Input>
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
- 
+
                                                     </FormGroup>
                                                     <FormGroup >
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
@@ -810,7 +825,7 @@ export default class EditProgram extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

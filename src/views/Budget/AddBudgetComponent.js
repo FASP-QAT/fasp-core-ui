@@ -26,6 +26,7 @@ const initialValues = {
     // startDate: '',
     // stopDate: '',
     programList: [],
+    budgetCode: '',
     fundingSourceList: [],
 
     currencyId: ''
@@ -42,13 +43,16 @@ const validationSchema = function (values, t) {
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9]+([,\.][0-9]+)?/,i18n.t('static.program.validBudgetAmount')),
+            .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
         // stopDate: Yup.string()
         //     .required(i18n.t('static.budget.stopdatetext'))
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
+        budgetCode: Yup.string()
+            .max(10, i18n.t('static.common.max10digittext'))
+            .required(i18n.t('static.budget.budgetCodeText')),
     })
 }
 const validate = (getValidationSchema) => {
@@ -121,7 +125,8 @@ class AddBudgetComponent extends Component {
                 startDate: '',
                 stopDate: '',
                 budgetAmt: '',
-                notes: ''
+                notes: '',
+                budgetCode: '',
 
             },
 
@@ -205,6 +210,9 @@ class AddBudgetComponent extends Component {
             var chnageValue = this.CommaFormatted(event.target.value);
             budget.budgetAmt = chnageValue;
         }
+        if (event.target.name === "budgetCode") {
+            budget.budgetCode = event.target.value.toUpperCase();
+        }
         if (event.target.name === "currencyId") {
             var currencyAndrate = event.target.value;
             var values = currencyAndrate.split("~");
@@ -233,7 +241,8 @@ class AddBudgetComponent extends Component {
             programId: true,
             fundingSourceId: true,
             budgetAmt: true,
-            currencyId: true
+            currencyId: true,
+            budgetCode: true,
             // startDate: true,
             // stopDate: true
         }
@@ -477,6 +486,21 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.budget}</FormFeedback>
                                                     </FormGroup>
 
+                                                    <FormGroup>
+                                                        <Label for="budget">{i18n.t('static.budget.budgetCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="budgetCode"
+                                                            id="budgetCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
+                                                            invalid={touched.budgetCode && !!errors.budgetCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.budget.budgetCode}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
+                                                    </FormGroup>
+
 
                                                     <FormGroup>
                                                         <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
@@ -530,7 +554,7 @@ class AddBudgetComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.budgetAmt && this.state.budget.budgetAmt != ''}
                                                             invalid={touched.budgetAmt && !!errors.budgetAmt}
-                                                            onChange={(e) => { handleChange(e);this.dataChange(e); }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             type="text"
                                                             value={this.state.budget.budgetAmt}
@@ -672,12 +696,13 @@ class AddBudgetComponent extends Component {
         budget.startDate = ''
         budget.stopDate = ''
         budget.currency.currencyId = ''
+        budget.budgetCode = ''
 
 
-        this.setState({
-            budget
-        },
-            () => { });
+            this.setState({
+                budget
+            },
+                () => { });
     }
 }
 

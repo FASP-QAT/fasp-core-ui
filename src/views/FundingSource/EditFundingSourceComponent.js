@@ -10,13 +10,17 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 let initialValues = {
-    fundingSource: ""
+    fundingSource: "",
+    fundingSourceCode: "",
 }
 const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
-            .required(i18n.t('static.fundingsource.fundingsourcetext'))
+            .required(i18n.t('static.fundingsource.fundingsourcetext')),
+        fundingSourceCode: Yup.string()
+            .max(6, i18n.t('static.common.max6digittext'))
+            .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
 
@@ -61,7 +65,8 @@ class EditFundingSourceComponent extends Component {
                     label_sp: '',
                     label_pr: '',
                     label_fr: '',
-                }
+                },
+                fundingSourceCode: '',
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -80,20 +85,21 @@ class EditFundingSourceComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
-            if (response.status == 200) {     
-                     this.setState({
-                fundingSource: response.data
-            });
-        }
-        else{
+            if (response.status == 200) {
+                console.log("RESP----",response.data);
+                this.setState({
+                    fundingSource: response.data
+                });
+            }
+            else {
 
-            this.setState({
-                message: response.data.messageCode
-            },
-                () => {
-                    this.hideSecondComponent();
-                })
-        }
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
 
         })
     }
@@ -111,6 +117,9 @@ class EditFundingSourceComponent extends Component {
         if (event.target.name == "active") {
             fundingSource.active = event.target.id === "active2" ? false : true;
         }
+        if (event.target.name == "fundingSourceCode") {
+            fundingSource.fundingSourceCode = event.target.value.toUpperCase();;
+        }
         this.setState({
             fundingSource
         },
@@ -119,7 +128,8 @@ class EditFundingSourceComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            fundingSource: true
+            fundingSource: true,
+            fundingSourceCode: true,
         }
         )
         this.validateForm(errors)
@@ -159,23 +169,25 @@ class EditFundingSourceComponent extends Component {
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
-                                    fundingSource: this.state.fundingSource.label.label_en
+                                    fundingSource: this.state.fundingSource.label.label_en,
+                                    fundingSourceCode:this.state.fundingSource.fundingSourceCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
+                                    console.log("FUNDING_SOURCE----",this.state.fundingSource);
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/fundingSource/listFundingSource/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/fundingSource/listFundingSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
-                                                
-                                            this.setState({
-                                                message: response.data.messageCode
-                                            },
-                                                () => {
-                                                    this.hideSecondComponent();
-                                                })
+
+                                                this.setState({
+                                                    message: response.data.messageCode
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                 }}
@@ -219,6 +231,22 @@ class EditFundingSourceComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsourceCode')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Input type="text"
+                                                            name="fundingSourceCode"
+                                                            id="fundingSourceCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
+                                                            invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.fundingSource.fundingSourceCode}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
+                                                    </FormGroup>
+
+
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
@@ -278,7 +306,7 @@ class EditFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` + 'red/'+ i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/fundingSource/listFundingSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
