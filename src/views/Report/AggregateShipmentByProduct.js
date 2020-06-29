@@ -40,6 +40,7 @@ import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
+import ReportService from '../../api/ReportService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
@@ -47,6 +48,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import { Online, Offline } from "react-detect-offline";
 import csvicon from '../../assets/img/csv.png'
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -169,6 +171,9 @@ class AggregateShipmentByProduct extends Component {
             offlinePlanningUnitList: [],
             productCategories: [],
             offlineProductCategoryList: [],
+            versions: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
@@ -181,8 +186,6 @@ class AggregateShipmentByProduct extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.getPlanningUnit = this.getPlanningUnit.bind(this);
-        this.getProductCategories = this.getProductCategories.bind(this)
         //this.pickRange = React.createRef()
 
     }
@@ -563,163 +566,316 @@ class AggregateShipmentByProduct extends Component {
 
 
     }
-    getPlanningUnit() {
-        if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
-            let programId = document.getElementById("programId").value;
-            let productCategoryId = document.getElementById("productCategoryId").value;
-            ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
-                console.log('**' + JSON.stringify(response.data))
-                this.setState({
-                    planningUnits: response.data,
-                }, () => {
-                    this.filterData();
-                })
-            })
-                .catch(
-                    error => {
-                        this.setState({
-                            planningUnits: [],
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            const lan = 'en';
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    var programId = (document.getElementById("programId").value).split("_")[0];
-                    var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId) {
-                            var productJson = {
-                                name: getLabelText(myResult[i].planningUnit.label, lan),
-                                id: myResult[i].planningUnit.id
-                            }
-                            proList[i] = productJson
-                        }
-                    }
-                    this.setState({
-                        offlinePlanningUnitList: proList
-                    })
-                }.bind(this);
-            }.bind(this)
 
-        }
-
-    }
-    getProductCategories() {
+    filterVersion = () => {
         let programId = document.getElementById("programId").value;
-        let realmId = AuthenticationService.getRealmId();
-        if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
-            ProductService.getProductCategoryListByProgram(realmId, programId)
-                .then(response => {
-                    console.log(JSON.stringify(response.data))
+        if (programId != 0) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (navigator.onLine) {
                     this.setState({
-                        productCategories: response.data
+                        versions: []
                     }, () => {
-                        this.filterData();
-                    })
-                }).catch(
-                    error => {
                         this.setState({
-                            productCategories: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var offlineConsumptionList = (programJson.consumptionList);
-
-                    let offlineProductCategoryList = [];
-                    var json;
-
-                    for (let i = 0; i <= offlineConsumptionList.length; i++) {
-                        let count = 0;
-                        if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
-                            for (let j = 0; j <= offlineProductCategoryList.length; j++) {
-                                if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
-                                    count++;
-                                }
-                            }
-                            if (count == 0 || i == 0) {
-                                offlineProductCategoryList.push({
-                                    id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
-                                    name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
-                                });
-                            }
-                        }
-                    }
-                    this.setState({
-                        offlineProductCategoryList
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
                     });
 
+
+                } else {
+                    this.setState({
+                        versions: []
+                    }, () => { this.consolidatedVersionList(programId) })
+                }
+            } else {
+
+                this.setState({
+                    versions: []
+                })
+
+            }
+        } else {
+            this.setState({
+                versions: []
+            })
+        }
+    }
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+
+                    }
+
+
+                }
+
+                console.log(verList)
+                this.setState({
+                    versions: verList.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })
+                })
+
+            }.bind(this);
+
+
+
+        }.bind(this)
+
+
+    }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: []
+        }, () => {
+            if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList[i] = myResult[i]
+                            }
+                        }
+                        this.setState({
+                            planningUnits: proList, message: ''
+                        }, () => {
+                            this.fetchData();
+                        })
+                    }.bind(this);
                 }.bind(this)
 
-            }.bind(this)
+
+            }
+            else {
+                AuthenticationService.setupAxiosInterceptors();
+
+                //let productCategoryId = document.getElementById("productCategoryId").value;
+                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    console.log('**' + JSON.stringify(response.data))
+                    this.setState({
+                        planningUnits: response.data, message: ''
+                    }, () => {
+                        this.fetchData();
+                    })
+                })
+                    .catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        });
+
+    }
+    fetchData = () => {
+        let versionId = document.getElementById("versionId").value;
+        let programId = document.getElementById("programId").value;
+
+        let planningUnitIds = this.state.planningUnitValues;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (versionId.includes('Local')) {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var regionList = [];
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext')
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var version = (versionId.split('(')[0]).trim()
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var program = `${programId}_v${version}_uId_${userId}`
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    console.log(program)
+                    var programRequest = programDataOs.get(program);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    programRequest.onsuccess = function (e) {
+                        console.log(programRequest)
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var inventoryList = []
+                        planningUnitIds.map(planningUnitId =>
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)')))]);
+                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
+                        var data = []
+                        planningUnitIds.map(planningUnitId => {
+                            dates.map(dt => {
+
+                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
+                                console.log(list)
+                                if (list.length > 0) {
+                                    var adjustment = 0;
+                                    list.map(ele => adjustment = adjustment + ele.adjustmentQty);
+
+                                    var json = {
+                                        program: programJson,
+                                        inventoryDate: new moment(dt).format('MMM YYYY'),
+                                        planningUnit: list[0].planningUnit,
+                                        stockAdjustemntQty: adjustment,
+                                        lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+                                        lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                        notes: list[0].notes
+                                    }
+                                    data.push(json)
+                                } else {
+
+                                }
+                            })
+                        })
+                        console.log(data)
+                        this.setState({
+                            data: data
+                            , message: ''
+                        })
+                    }.bind(this)
+                }.bind(this)
+            } else {
+                var inputjson = {
+                    programId: programId,
+                    versionId: versionId,
+                    startDate: new moment(startDate),
+                    stopDate: new moment(endDate),
+                    planningUnitIds: planningUnitIds
+                }
+                AuthenticationService.setupAxiosInterceptors();
+                ReportService.stockAdjustmentList(inputjson)
+                    .then(response => {
+                        console.log(JSON.stringify(response.data))
+                        this.setState({
+                            data: response.data
+                        }, () => { this.consolidatedProgramList() })
+                    }).catch(
+                        error => {
+                            this.setState({
+                                data: []
+                            }, () => { this.consolidatedProgramList() })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+
+            }
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+        } else if (versionId == 0) {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
         }
-        this.getPlanningUnit();
+    }
+    handlePlanningUnitChange = (planningUnitIds) => {
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
 
+            // this.fetchData()
+        })
     }
     componentDidMount() {
         if (navigator.onLine) {
@@ -801,14 +957,26 @@ class AggregateShipmentByProduct extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     render() {
-        const { planningUnits } = this.state;
-        const { offlinePlanningUnitList } = this.state;
-
+        
         const { programs } = this.state;
         const { offlinePrograms } = this.state;
 
-        const { productCategories } = this.state;
-        const { offlineProductCategoryList } = this.state;
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
+                return (
+                    <option key={i} value={item.versionId}>
+                        {item.versionId}
+                    </option>
+                )
+            }, this);
+            const { planningUnits } = this.state
+            let planningUnitList = planningUnits.length > 0
+                && planningUnits.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+    
+                }, this);
+                console.log("planningUnits---", planningUnits);
 
         let bar = "";
         if (navigator.onLine) {
@@ -907,12 +1075,12 @@ class AggregateShipmentByProduct extends Component {
                         <Online>
                             {/* {
                                 this.state.consumptions.length > 0 && */}
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
 
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
-                                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
 
  
  {({ toPdf }) =>
@@ -920,9 +1088,9 @@ class AggregateShipmentByProduct extends Component {
 
  }
  </Pdf>*/}
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                                </div>
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
                             {/* } */}
                         </Online>
                         <Offline>
@@ -979,7 +1147,7 @@ class AggregateShipmentByProduct extends Component {
                                                                 name="programId"
                                                                 id="programId"
                                                                 bsSize="sm"
-                                                                onChange={this.getProductCategories}
+                                                                onChange={this.filterVersion}
 
                                                             >
                                                                 <option value="-1">{i18n.t('static.common.select')}</option>
@@ -1027,112 +1195,42 @@ class AggregateShipmentByProduct extends Component {
                                             </Offline>
                                             <Online>
                                                 <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                                    <Label htmlFor="appendedInputButton">Version</Label>
                                                     <div className="controls ">
                                                         <InputGroup>
                                                             <Input
                                                                 type="select"
-                                                                name="productCategoryId"
-                                                                id="productCategoryId"
+                                                                name="versionId"
+                                                                id="versionId"
                                                                 bsSize="sm"
-                                                                onChange={this.getPlanningUnit}
+                                                                onChange={(e) => { this.getPlanningUnit(); }}
                                                             >
-                                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                                {productCategories.length > 0
-                                                                    && productCategories.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                                {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
+                                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                {versionList}
                                                             </Input>
                                                         </InputGroup></div>
 
                                                 </FormGroup>
                                             </Online>
-                                            <Offline>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                                    <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="productCategoryId"
-                                                                id="productCategoryId"
-                                                                bsSize="sm"
-                                                                onChange={this.getPlanningUnit}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                                {offlineProductCategoryList.length > 0
-                                                                    && offlineProductCategoryList.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.id}>
-                                                                                {item.name}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                        </InputGroup></div>
-
-                                                </FormGroup>
-                                            </Offline>
                                             <Online>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+
+                                                <FormGroup className="tab-ml-1">
+                                                    <Label htmlFor="appendedInputButton">Planning Unit</Label>
                                                     <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
+                                                        <InputGroup className="box">
+                                                            <ReactMultiSelectCheckboxes
                                                                 name="planningUnitId"
                                                                 id="planningUnitId"
-                                                                bsSize="sm"
-                                                                onChange={this.filterData}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {planningUnits.length > 0
-                                                                    && planningUnits.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.planningUnit.id}>
-                                                                                {getLabelText(item.planningUnit.label, this.state.lang)}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                            {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
+                                                                bsSize="md"
+                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                            />
+
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
                                             </Online>
-                                            <Offline>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                    <div className="controls ">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="planningUnitId"
-                                                                id="planningUnitId"
-                                                                bsSize="sm"
-                                                                onChange={this.filterData}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {offlinePlanningUnitList.length > 0
-                                                                    && offlinePlanningUnitList.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.id}>{item.name}</option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input>
-                                                            {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                            </Offline>
+                                         
                                             <Online>
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">Include Planned Shipments</Label>
@@ -1185,8 +1283,8 @@ class AggregateShipmentByProduct extends Component {
                                             {/* <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
                                                     <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}> */}
-                                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                        {/* <Bar id="cool-canvas" data={chartData} options={options} />
+                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                            {/* <Bar id="cool-canvas" data={chartData} options={options} />
                                                         <div>
 
                                                         </div>
@@ -1213,14 +1311,14 @@ class AggregateShipmentByProduct extends Component {
                                                         <div className="chart-wrapper chart-graph-report">
                                                             {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
 
-                                                        {/* </div> */}
-                                                    {/* </div> */}
-                                                    {/* <div className="col-md-12"> */}
-                                                        {/* <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}> */}
-                                                            {/* {this.state.show ? 'Hide Data' : 'Show Data'} */}
-                                                        {/* </button> */}
-                                                    {/* </div> */}
-                                                {/* </div>} */}
+                                            {/* </div> */}
+                                            {/* </div> */}
+                                            {/* <div className="col-md-12"> */}
+                                            {/* <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}> */}
+                                            {/* {this.state.show ? 'Hide Data' : 'Show Data'} */}
+                                            {/* </button> */}
+                                            {/* </div> */}
+                                            {/* </div>} */}
 
                                         </Offline>
                                     </div>
@@ -1230,38 +1328,38 @@ class AggregateShipmentByProduct extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {/* {this.state.show && */}
-                                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style={{width: '700px', cursor: 'pointer' }}>Planning Unit</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Quantity</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Product Cost(USD)</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Freight(%)</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Freight Cost(USD)</th>
-                                                            <th style={{width: '325px', cursor: 'pointer' }}>Total Cost(USD)</th>
-                                                        </tr>
-                                                    </thead>
+                                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ width: '700px', cursor: 'pointer' }}>Planning Unit</th>
+                                                        <th style={{ width: '325px', cursor: 'pointer' }}>Quantity</th>
+                                                        <th style={{ width: '325px', cursor: 'pointer' }}>Product Cost(USD)</th>
+                                                        <th style={{ width: '325px', cursor: 'pointer' }}>Freight(%)</th>
+                                                        <th style={{ width: '325px', cursor: 'pointer' }}>Freight Cost(USD)</th>
+                                                        <th style={{ width: '325px', cursor: 'pointer' }}>Total Cost(USD)</th>
+                                                    </tr>
+                                                </thead>
 
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>3000</td>
-                                                            <td>5,100,000</td>
-                                                            <td>10</td>
-                                                            <td>510,000</td>
-                                                            <td>5,610,000</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Ceftriaxone 1 gm Powder Vial, 50 Vials</td>
-                                                            <td>5000</td>
-                                                            <td>8,500,000</td>
-                                                            <td>10</td>
-                                                            <td>850,000</td>
-                                                            <td>9,350,000</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </Table>
-                                                {/* } */}
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
+                                                        <td>3000</td>
+                                                        <td>5,100,000</td>
+                                                        <td>10</td>
+                                                        <td>510,000</td>
+                                                        <td>5,610,000</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Ceftriaxone 1 gm Powder Vial, 50 Vials</td>
+                                                        <td>5000</td>
+                                                        <td>8,500,000</td>
+                                                        <td>10</td>
+                                                        <td>850,000</td>
+                                                        <td>9,350,000</td>
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
+                                            {/* } */}
                                         </div>
                                     </div>
 
