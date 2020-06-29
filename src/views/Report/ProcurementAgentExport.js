@@ -415,6 +415,10 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+import ProgramService from '../../api/ProgramService';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -432,6 +436,9 @@ class ProcurementAgentExport extends Component {
             message: '',
             selRegion: [],
             realmCountryList: [],
+            procurementAgentList: [],
+            programList: [],
+            planningUnitList: [],
             lang: localStorage.getItem('lang'),
             loading: true,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
@@ -443,6 +450,7 @@ class ProcurementAgentExport extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.getPlanningUnit = this.getPlanningUnit.bind(this);
     }
 
     makeText = m => {
@@ -489,66 +497,116 @@ class ProcurementAgentExport extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProcurementAgentService.getProcurementAgentListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("RESP----",response.data)
+                    this.setState({
+                        procurementAgentList: response.data,
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            })
+
+
+        let realmId = AuthenticationService.getRealmId();
+        ProgramService.getProgramByRealmId(realmId)
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    programList: response.data
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                        programs: []
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
         RegionService.getRegionList()
             .then(response => {
                 console.log("RESP---", response.data);
-
                 if (response.status == 200) {
                     this.setState({
                         regionList: response.data,
                         selRegion: [
                             {
-                            "active": true,
-                            "regionId": 1,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "procuremntAgent": "PSM",
-                            "planningUnit": "Ceftriaxone 1 gm Vial,50 Vials",
-                            "qty": "50,000",
-                            "productCost": "7.00",
-                            "totalProductCost": "350,000",
-                            "freightPer": "10",
-                            "freightCost": "35,000",
-                            "totalCost": "385,000",
-                        },
-                        {
-                            "active": true,
-                            "regionId": 2,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "procuremntAgent": "GF",
-                            "planningUnit": "Ceftriaxone 1 gm Vial,10 Vials",
-                            "qty": "60,000",
-                            "productCost": "8.00",
-                            "totalProductCost": "480,000",
-                            "freightPer": "12",
-                            "freightCost": "57,600",
-                            "totalCost": "537,600",
-                        },
-                        {
-                            "active": true,
-                            "regionId": 3,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "procuremntAgent": "PEPFAR",
-                            "planningUnit": "Ceftriaxone 250 gm Powder Vial,10 Vials",
-                            "qty": "40,000",
-                            "productCost": "9.00",
-                            "totalProductCost": "360,000",
-                            "freightPer": "10",
-                            "freightCost": "36,000",
-                            "totalCost": "396,000",
-                        },
-                        {
-                            "active": true,
-                            "regionId": 4,
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
-                            "procuremntAgent": "Local Procurement Agent",
-                            "planningUnit": "Ceftriaxone 250 gm Powder Vial,1 Vial",
-                            "qty": "50,000",
-                            "productCost": "10.00",
-                            "totalProductCost": "500,000",
-                            "freightPer": "15",
-                            "freightCost": "75,000",
-                            "totalCost": "575,000",
-                        }
+                                "active": true,
+                                "regionId": 1,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "procuremntAgent": "PSM",
+                                "planningUnit": "Ceftriaxone 1 gm Vial,50 Vials",
+                                "qty": "50,000",
+                                "productCost": "7.00",
+                                "totalProductCost": "350,000",
+                                "freightPer": "10",
+                                "freightCost": "35,000",
+                                "totalCost": "385,000",
+                            },
+                            {
+                                "active": true,
+                                "regionId": 2,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "procuremntAgent": "GF",
+                                "planningUnit": "Ceftriaxone 1 gm Vial,10 Vials",
+                                "qty": "60,000",
+                                "productCost": "8.00",
+                                "totalProductCost": "480,000",
+                                "freightPer": "12",
+                                "freightCost": "57,600",
+                                "totalCost": "537,600",
+                            },
+                            {
+                                "active": true,
+                                "regionId": 3,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "procuremntAgent": "PEPFAR",
+                                "planningUnit": "Ceftriaxone 250 gm Powder Vial,10 Vials",
+                                "qty": "40,000",
+                                "productCost": "9.00",
+                                "totalProductCost": "360,000",
+                                "freightPer": "10",
+                                "freightCost": "36,000",
+                                "totalCost": "396,000",
+                            },
+                            {
+                                "active": true,
+                                "regionId": 4,
+                                "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                                "procuremntAgent": "Local Procurement Agent",
+                                "planningUnit": "Ceftriaxone 250 gm Powder Vial,1 Vial",
+                                "qty": "50,000",
+                                "productCost": "10.00",
+                                "totalProductCost": "500,000",
+                                "freightPer": "15",
+                                "freightCost": "75,000",
+                                "totalCost": "575,000",
+                            }
                         ],
                         loading: false
                     })
@@ -575,6 +633,83 @@ class ProcurementAgentExport extends Component {
         return getLabelText(cell, this.state.lang);
     }
 
+    getPlanningUnit() {
+        if (navigator.onLine) {
+            console.log('changed')
+            AuthenticationService.setupAxiosInterceptors();
+            let programId = document.getElementById("programId").value;
+            ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                console.log('**' + JSON.stringify(response.data))
+                this.setState({
+                    planningUnitList: response.data,
+                })
+            })
+                .catch(
+                    error => {
+                        this.setState({
+                            planningUnitList: [],
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            const lan = 'en';
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    console.log("myResult", myResult);
+                    var programId = (document.getElementById("programId").value).split("_")[0];
+                    console.log('programId----->>>', programId)
+                    console.log(myResult);
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].program.id == programId) {
+                            var productJson = {
+                                name: getLabelText(myResult[i].planningUnit.label, lan),
+                                id: myResult[i].planningUnit.id
+                            }
+                            proList[i] = productJson
+                        }
+                    }
+                    console.log("proList---" + proList);
+                    this.setState({
+                        planningUnitList: proList
+                    })
+                }.bind(this);
+            }.bind(this)
+
+        }
+
+    }
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -590,6 +725,36 @@ class ProcurementAgentExport extends Component {
                 return (
                     <option key={i} value={item.realmCountryId}>
                         {getLabelText(item.country.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { programList } = this.state;
+        let programLists = programList.length > 0
+            && programList.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { planningUnitList } = this.state;
+        let planningUnitLists = planningUnitList.length > 0
+            && planningUnitList.map((item, i) => {
+                return (
+                    <option key={i} value={item.planningUnit.id}>
+                        {getLabelText(item.planningUnit.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { procurementAgentList } = this.state;
+        let procurementAgentLists = procurementAgentList.length > 0
+            && procurementAgentList.map((item, i) => {
+                return (
+                    <option key={i} value={item.procurementAgentId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -703,7 +868,7 @@ class ProcurementAgentExport extends Component {
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
                                     <div className="controls SelectGo Regioncalender">
                                         <InputGroup>
                                             <Picker
@@ -728,13 +893,13 @@ class ProcurementAgentExport extends Component {
                                         <InputGroup>
                                             <Input
                                                 type="select"
-                                                name="realmCountryId"
-                                                id="realmCountryId"
+                                                name="procurementAgentId"
+                                                id="procurementAgentId"
                                                 bsSize="sm"
                                                 onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
-                                                {realmCountries}
+                                                {procurementAgentLists}
                                             </Input>
 
                                         </InputGroup>
@@ -747,13 +912,13 @@ class ProcurementAgentExport extends Component {
                                         <InputGroup>
                                             <Input
                                                 type="select"
-                                                name="realmCountryId"
-                                                id="realmCountryId"
+                                                name="programId"
+                                                id="programId"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                                onChange={this.getPlanningUnit}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
-                                                {realmCountries}
+                                                {programLists}
                                             </Input>
 
                                         </InputGroup>
@@ -766,13 +931,13 @@ class ProcurementAgentExport extends Component {
                                         <InputGroup>
                                             <Input
                                                 type="select"
-                                                name="realmCountryId"
-                                                id="realmCountryId"
+                                                name="planningUnitId"
+                                                id="planningUnitId"
                                                 bsSize="sm"
                                                 onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
-                                                {realmCountries}
+                                                {planningUnitLists}
                                             </Input>
 
                                         </InputGroup>

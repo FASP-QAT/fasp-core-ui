@@ -378,13 +378,12 @@ class AddprogramPlanningUnit extends Component {
                                 ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
                                     .then(response => {
                                         if (response.status == 200) {
+                                            // alert("hi");
                                             let myReasponse = response.data;
-                                            if (myReasponse.length > 0) {
+                                            var productDataArr = []
+                                            // if (myReasponse.length > 0) {
                                                 this.setState({ rows: myReasponse });
-
                                                 var data = [];
-                                                var productDataArr = []
-
                                                 if (myReasponse.length != 0) {
                                                     for (var j = 0; j < myReasponse.length; j++) {
                                                         data = [];
@@ -408,9 +407,9 @@ class AddprogramPlanningUnit extends Component {
                                                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                                 this.el.destroy();
                                                 var json = [];
-                                                var data1 = productDataArr;
+                                                var data = productDataArr;
                                                 var options = {
-                                                    data: data1,
+                                                    data: data,
                                                     columnDrag: true,
                                                     colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100],
                                                     columns: [
@@ -483,7 +482,7 @@ class AddprogramPlanningUnit extends Component {
                                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                                 this.el = elVar;
                                                 this.setState({ mapPlanningUnitEl: elVar });
-                                            }
+                                            // }
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode

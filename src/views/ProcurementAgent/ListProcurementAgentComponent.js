@@ -231,7 +231,7 @@ class ListProcurementAgentComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-               
+
             })
         // .catch(
         //     error => {
@@ -298,6 +298,13 @@ class ListProcurementAgentComponent extends Component {
             {
                 dataField: 'procurementAgentCode',
                 text: i18n.t('static.procurementagent.procurementagentcode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'colorHtmlCode',
+                text: i18n.t('static.procurementagent.procurementAgentColorCode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -381,7 +388,7 @@ class ListProcurementAgentComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-               <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardHeader className="mb-md-3 pb-lg-1">

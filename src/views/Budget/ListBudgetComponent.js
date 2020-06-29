@@ -268,6 +268,13 @@ class ListBudgetComponent extends Component {
         formatter: this.formatLabel
       },
       {
+        dataField: 'budgetCode',
+        text: i18n.t('static.budget.budgetCode'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+      },
+      {
         dataField: 'fundingSource.label',
         text: i18n.t('static.budget.fundingsource'),
         sort: true,

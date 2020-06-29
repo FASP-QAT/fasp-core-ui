@@ -670,6 +670,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') ? false : true) }
                           },
+                          {
+                            name: i18n.t('static.report.stockAdjustment'),
+                            url: '/report/stockAdjustment',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                          }
                           /* {
                              name: i18n.t('static.dashboard.stockstatus'),
                              url: '/report/stockStatus',
