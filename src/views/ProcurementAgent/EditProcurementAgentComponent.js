@@ -13,7 +13,8 @@ const entityname = i18n.t('static.procurementagent.procurementagent');
 
 const initialValues = {
     procurementAgentName: "",
-    submittedToApprovedLeadTime: ""
+    submittedToApprovedLeadTime: "",
+    colorHtmlCode: "",
 }
 
 const validationSchema = function (values) {
@@ -28,7 +29,10 @@ const validationSchema = function (values) {
         // submittedToApprovedLeadTime: Yup.number()
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-        //     .min(0, i18n.t('static.program.validvaluetext'))
+        //     .min(0, i18n.t('static.program.validvaluetext')),
+        colorHtmlCode: Yup.string()
+            .max(6, i18n.t('static.common.max6digittext'))
+            .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
     })
 }
 
@@ -75,7 +79,8 @@ class EditProcurementAgentComponent extends Component {
                     label_pr: '',
                     label_fr: '',
                 },
-                procurementAgentCode: ''
+                procurementAgentCode: '',
+                colorHtmlCode: '',
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -115,6 +120,9 @@ class EditProcurementAgentComponent extends Component {
         if (event.target.name == "procurementAgentCode") {
             procurementAgent.procurementAgentCode = event.target.value;
         }
+        if (event.target.name == "colorHtmlCode") {
+            procurementAgent.colorHtmlCode = event.target.value.toUpperCase();
+        }
         if (event.target.name == "procurementAgentName") {
             procurementAgent.label.label_en = event.target.value;
         }
@@ -135,7 +143,8 @@ class EditProcurementAgentComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             procurementAgentName: true,
-            submittedToApprovedLeadTime: true
+            submittedToApprovedLeadTime: true,
+            colorHtmlCode:true,
         }
         )
         this.validateForm(errors)
@@ -162,7 +171,7 @@ class EditProcurementAgentComponent extends Component {
                 this.setState({
                     procurementAgent: response.data
                 });
-            }else{
+            } else {
                 this.setState({
                     message: response.data.messageCode
                 },
@@ -170,7 +179,7 @@ class EditProcurementAgentComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-            
+
 
         })
     }
@@ -192,7 +201,8 @@ class EditProcurementAgentComponent extends Component {
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
                                         procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime
+                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
+                                        colorHtmlCode:this.state.procurementAgent.colorHtmlCode,
                                     }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -253,6 +263,22 @@ class EditProcurementAgentComponent extends Component {
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            bsSize="sm"
+                                                            name="colorHtmlCode"
+                                                            id="colorHtmlCode"
+                                                            valid={!errors.colorHtmlCode && this.state.procurementAgent.colorHtmlCode != ''}
+                                                            invalid={touched.colorHtmlCode && !!errors.colorHtmlCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            maxLength={6}
+                                                            value={this.state.procurementAgent.colorHtmlCode}
+                                                        />
+                                                        <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
@@ -346,7 +372,7 @@ class EditProcurementAgentComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/`  + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

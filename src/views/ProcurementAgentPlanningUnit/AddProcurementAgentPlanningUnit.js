@@ -34,7 +34,7 @@ let initialValues = {
     unitsPerPallet: 0,
     unitsPerContainer: 0,
     volume: 0,
-    weight: 0
+    weight: 0,
 }
 
 // const validationSchema = function (values, t) {
@@ -774,7 +774,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             isNew: true,
             procurementAgentId: this.props.match.params.procurementAgentId,
             updateRowStatus: 0,
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.options = props.options;
         this.addRow = this.addRow.bind(this);
@@ -782,6 +783,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.changed = this.changed.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
 
@@ -794,7 +801,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     console.log("getProcurementAgentPlaningUnitList--", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse });
+                        this.setState({ rows: myResponse});
                     }
 
                     ProcurementAgentService.getProcurementAgentListAll()
@@ -1000,6 +1007,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     };
 
                                                     this.el = jexcel(document.getElementById("paputableDiv"), options);
+                                                    this.setState({
+                                                        loading: false
+                                                    })
 
                                                 });
                                         } else {
@@ -1114,7 +1124,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         data[11] = 1;
 
         this.el.insertRow(
-            data,0,1
+            data, 0, 1
         );
     };
 
@@ -1562,30 +1572,44 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Card>
 
-                <Card>
+                        <CardHeader>
+                            <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
+                        </CardHeader>
+                        <CardBody>
 
-                    <CardHeader>
-                        <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                    </CardHeader>
-                    <CardBody>
-
-                        <Col xs="12" sm="12">
-                            <div className="table-responsive">
-                                <div id="paputableDiv" >
+                            <Col xs="12" sm="12">
+                                <div className="table-responsive">
+                                    <div id="paputableDiv" >
+                                    </div>
                                 </div>
+                            </Col>
+                        </CardBody>
+                        <CardFooter>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
+        &nbsp;
+    </FormGroup>
+                        </CardFooter>
+                    </Card>
+                </Row>
+
+
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
                             </div>
-                        </Col>
-                    </CardBody>
-                    <CardFooter>
-                        <FormGroup>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
-                            &nbsp;
-                        </FormGroup>
-                    </CardFooter>
-                </Card>
+                        </div>
+                    </div>
+                </Row>
 
 
             </div >

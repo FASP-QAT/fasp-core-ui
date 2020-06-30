@@ -45,6 +45,12 @@ export default class ConsumptionDetails extends React.Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount = function () {
@@ -954,16 +960,20 @@ export default class ConsumptionDetails extends React.Component {
                             // $("#saveButtonDiv").hide();
                             this.setState({
                                 message: 'static.message.consumptionSaved',
-                                changedFlag: 0
+                                changedFlag: 0,
+                                color: 'green'
                             })
+                            this.hideFirstComponent();
                             // this.props.history.push(`/consumptionDetails/${document.getElementById('programId').value}/${document.getElementById("planningUnitId").value}/` + i18n.t('static.message.consumptionSuccess'))
                             this.props.history.push(`/consumptionDetails/` + i18n.t('static.message.consumptionSuccess'));
                         }.bind(this)
                     } else {
                         this.setState({
                             message: 'Duplicate Consumption Details Found',
-                            changedFlag: 0
+                            changedFlag: 0,
+                            color: 'red'
                         })
+                        this.hideFirstComponent();
                     }
 
 
@@ -1126,7 +1136,7 @@ export default class ConsumptionDetails extends React.Component {
                     this.setState({ message: message })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Card>
 
