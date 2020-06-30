@@ -1000,8 +1000,8 @@ class ForecastMetrics extends Component {
                   </div>
                 </Col>
               </Form>
-              <br/><br/>
-              <Col md="12 pl-0">
+              
+              <Col md="12 pl-0 mt-2">
 
                 <div className="row">
                   <div className="col-md-12">
