@@ -882,8 +882,8 @@
     "static.budget.budgetCode": "Budget Code",
     "static.program.programCode": "Program Code",
     "static.procurementAgent.procurementAgentHTMLCode": "Please enter color code",
-    "static.procurementagent.procurementAgentColorCode": "Color Code"
-    
+    "static.procurementagent.procurementAgentColorCode": "Color Code",
+    "static.inventoryType.adjustment":"Adjustment"
     
 
 }
