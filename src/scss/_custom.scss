@@ -2246,6 +2246,10 @@ input::placeholder {
     background-color: #e5edf5;
     border-color: 1px solid #e5edf5;
   }
+  .legendcommitversion .lightgreenlegend {
+    background-color: #d9ead3;
+    border-color: 1px solid #d9ead3;
+  }
   
   ///supply plan
   .skipedShipmentslegend {
@@ -2307,3 +2311,26 @@ input::placeholder {
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(12){ width:4% !important; }
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(14){ width:7% !important; word-break: break-all;}
  
+  .expand-button {
+    position: relative;
+  }
+  
+  .accordion-toggle .expand-button:after
+  {
+    position: absolute;
+    left:.75rem;
+    top: 50%;
+    transform: translate(0, -50%);
+    content: '-';
+  }
+  .accordion-toggle.collapsed .expand-button:after
+  {
+    content: '+';
+  }
+
+  .supplyplanTdWidth{
+    overflow: hidden!important;
+    min-width: 195px!important;
+    word-wrap: break-word!important;
+  }
+  

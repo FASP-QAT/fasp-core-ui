@@ -617,7 +617,7 @@ export default class ProgramOnboarding extends Component {
                                     <ul>
                                         <li className="progressbartext1">Realm</li>
                                         <li className="progressbartext2">Country</li>
-                                        <li className="progressbartext3">Health Area</li>
+                                        <li className="progressbartext3">Technical Area</li>
                                         <li className="progressbartext4">Organization</li>
                                         <li className="progressbartext5">Region</li>
                                         <li className="progressbartext6">Program Data</li>

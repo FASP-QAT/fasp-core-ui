@@ -3,7 +3,7 @@ import React from "react";
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
-    Input, InputGroup, Label, FormGroup, Form, Row, Nav, NavItem, NavLink, TabPane, TabContent
+    Input, InputGroup, Label, FormGroup, Form, Row, Nav, NavItem, NavLink,Collapse, TabPane, TabContent
 } from 'reactstrap';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -522,7 +522,7 @@ export default class SupplyPlanComponent extends React.Component {
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
                                 <tr>
-                                    <th ></th>
+                                    <th className="supplyplanTdWidth"></th>
                                     {
                                         this.state.monthsArray.map(item => (
                                             <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
@@ -531,6 +531,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                             </thead>
                             <tbody>
+
                                 <tr bgcolor='#d9d9d9'>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                     {
@@ -576,7 +577,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
+                            
                                 <tr>
+                               
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                     {
                                         this.state.manualShipmentsTotalData.map(item1 => (
@@ -584,8 +587,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         ))
                                     }
                                 </tr>
+                                
                                 <tr>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+                                   
                                     {
                                         this.state.deliveredShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
@@ -595,10 +600,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         })
                                     }
+                                   
                                 </tr>
-
-                                <tr>
-                                    <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
+                               
+                               <tr>
+                                    <td  align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                     {
                                         this.state.shippedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
@@ -611,7 +617,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
 
                                 <tr>
-                                    <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                    <td  align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                     {
                                         this.state.orderedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
@@ -622,8 +628,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
+                               
                                 <tr>
-                                    <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                    <td  align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                     {
                                         this.state.plannedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
@@ -634,6 +641,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
+                                
+                               
                                 <tr>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
                                     {
