@@ -175,6 +175,13 @@ hideSecondComponent() {
         formatter: this.formatLabel
       },
       {
+        dataField: 'programCode',
+        text: i18n.t('static.program.programCode'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+      },
+      {
         dataField: 'realmCountry.realm.label',
         text: i18n.t('static.program.realm'),
         sort: true,

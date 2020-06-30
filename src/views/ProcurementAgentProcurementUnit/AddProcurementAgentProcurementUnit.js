@@ -132,6 +132,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             .then(response => {
                 if (response.status == "200") {
                     this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                   
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -331,7 +332,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     // console.log("first---->", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse, loading: false });
+                        this.setState({ rows: myResponse });
                     }
                     AuthenticationService.setupAxiosInterceptors();
                     ProcurementAgentService.getProcurementAgentListAll().then(response => {
@@ -458,7 +459,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     };
                                     var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                     this.el = elVar;
-                                    this.setState({ mapPlanningUnitEl: elVar });
+                                    this.setState({ mapPlanningUnitEl: elVar,loading: false });
+                                  
 
                                 } else {
                                     this.setState({
@@ -555,8 +557,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <Row>
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+               <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Col xs="12" sm="12">
                         <Card  >
 
                             <CardHeader>
@@ -582,6 +584,17 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             </CardFooter>
                         </Card>
                     </Col>
+                </Row>
+                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
                 </Row>
             </div>
 
