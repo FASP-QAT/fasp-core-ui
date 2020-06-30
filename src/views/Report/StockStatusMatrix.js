@@ -1408,9 +1408,9 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>}
                 {this.state.view == 2 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                  <div className="controls ">
-
-                    <InputGroup>   <ReactMultiSelectCheckboxes
+                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                  <InputGroup className="box">   
+                    <ReactMultiSelectCheckboxes
                       name="productCategoryId"
                       id="productCategoryId"
                       bsSize="md"
@@ -1418,7 +1418,7 @@ export default class StockStatusMatrix extends React.Component {
                       options={productCategoryListcheck && productCategoryListcheck.length > 0 ? productCategoryListcheck : []}
                     /> </InputGroup>
 
-                  </div>
+                 
                 </FormGroup>}
                 {this.state.view == 1 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>

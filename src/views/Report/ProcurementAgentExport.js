@@ -979,7 +979,7 @@ class ProcurementAgentExport extends Component {
                                 props => (
 
                                     <div className="TableCust listPrportFundingAlignThtd">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left mt-5">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
