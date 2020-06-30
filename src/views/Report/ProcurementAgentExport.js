@@ -417,6 +417,9 @@ import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import ProgramService from '../../api/ProgramService';
+
+import CryptoJS from 'crypto-js'
+import { SECRET_KEY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 const pickerLang = {
@@ -501,7 +504,7 @@ class ProcurementAgentExport extends Component {
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("RESP----",response.data)
+                    console.log("RESP----", response.data)
                     this.setState({
                         procurementAgentList: response.data,
                     })
@@ -517,36 +520,7 @@ class ProcurementAgentExport extends Component {
             })
 
 
-        let realmId = AuthenticationService.getRealmId();
-        ProgramService.getProgramByRealmId(realmId)
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    programList: response.data
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        programs: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        this.getPrograms();
 
         RegionService.getRegionList()
             .then(response => {
@@ -614,19 +588,102 @@ class ProcurementAgentExport extends Component {
                     this.setState({ message: response.data.messageCode })
                 }
             })
+    }
 
-        RealmCountryService.getRealmCountryListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountryList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { programs } = this.state
+        var proList = programs;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
+
+                        var f = 0
+                        for (var k = 0; k < this.state.programs.length; k++) {
+                            if (this.state.programs[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
+                        }
+                        if (f == 0) {
+                            proList.push(programData)
+                        }
+                    }
+
+
                 }
-            })
+
+                this.setState({
+                    programs: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+
+    }
+
+    getPrograms = () => {
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors();
+            let realmId = AuthenticationService.getRealmId();
+            ProgramService.getProgramByRealmId(realmId)
+                .then(response => {
+                    // console.log(JSON.stringify(response.data))
+                    this.setState({
+                        programs: response.data
+                    }, () => { this.consolidatedProgramList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            programs: []
+                        }, () => { this.consolidatedProgramList() })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log('offline')
+            this.consolidatedProgramList()
+        }
+
     }
 
     formatLabel(cell, row) {
@@ -718,16 +775,6 @@ class ProcurementAgentExport extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
-        const { realmCountryList } = this.state;
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
 
         const { programList } = this.state;
         let programLists = programList.length > 0
@@ -964,7 +1011,6 @@ class ProcurementAgentExport extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-
 
 
                         <ToolkitProvider
