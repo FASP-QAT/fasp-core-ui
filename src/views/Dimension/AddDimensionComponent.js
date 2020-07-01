@@ -228,7 +228,7 @@ export default class AddDimensionComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + "Action Canceled")
+        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
