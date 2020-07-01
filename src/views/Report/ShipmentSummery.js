@@ -1094,7 +1094,7 @@ class Consumption extends Component {
                         </Offline>
                     </CardHeader>
                     <CardBody>
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
                                 <Form >
                                     <Col md="12 pl-0">

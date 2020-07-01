@@ -2919,7 +2919,7 @@ export default class SupplyPlanComponent extends React.Component {
                     <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                         <thead>
                             <tr>
-                                <th ></th>
+                                <th className="supplyplanTdWidth"></th>
                                 {
                                     this.state.monthsArray.map(item => (
                                         <th style={{ padding: '10px 0 !important' }}>{item.month}</th>

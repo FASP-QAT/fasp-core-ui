@@ -456,7 +456,7 @@
     "static.program.mapPlanningUnit": "Map Planning Unit",
     "static.program.reorderFrequencyInMonths": "Reorder Frequency In Months",
     "static.program.programPlanningUnit.reorderFrequencyText": "Enter reorder frequency in months",
-    "static.dashboard.procurementAgentPlanningUnit": "Procurement agent planning unit",
+    "static.dashboard.procurementAgentPlanningUnit": "Procurement Agent Planning Unit",
     "static.procurementAgentPlanningUnit.catalogPrice": "Catalog price (USD)",
     "static.procurementAgentPlanningUnit.catalogPriceText": "Enter catalog price (USD)",
     "static.procurementAgentPlanningUnit.moq": "Minimum Order Quantity (MOQ)",
@@ -476,7 +476,7 @@
     "static.message.tokenError": "Token Error",
     "static.programPlanningUnit.validReorderFrequencyText": "Please enter reorder frequency in months",
     "static.dataSource.program": "Program",
-    "static.procurementAgentProcurementUnit.mapProcurementUnit": "Map procurement unit",
+    "static.procurementAgentProcurementUnit.mapProcurementUnit": "Map Procurement Unit",
     "static.procurementAgentProcurementUnit.skuCode": "SKU code",
     "static.procurementAgentProcurementUnit.skuCodeText": "Enter SKU code",
     "static.procurementAgentProcurementUnit.vendorPrice": "Vendor price (USD)",
@@ -485,7 +485,7 @@
     "static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText": "Enter approved to shipped lead time In Months",
     "static.procurementAgentProcurementUnit.gtin": "GTIN",
     "static.procurementAgentProcurementUnit.gtinText": "Enter GTIN",
-    "static.dashboard.procurementAgentProcurementUnit": "Procurement agent procurement unit",
+    "static.dashboard.procurementAgentProcurementUnit": "Procurement Agent Procurement Unit",
     "static.dashboad.planningunitcapacity": "Planning Unit Capacities",
     "static.planningunit.capacity": "Capacity",
     "static.planningunit.capacitytext": "Please entre capacity",
@@ -882,8 +882,10 @@
     "static.budget.budgetCode": "Budget Code",
     "static.program.programCode": "Program Code",
     "static.procurementAgent.procurementAgentHTMLCode": "Please enter color code",
-    "static.procurementagent.procurementAgentColorCode": "Color Code"
-    
+    "static.procurementagent.procurementAgentColorCode": "Color Code",
+    "static.inventoryType.adjustment":"Adjustment",
+    "static.supplyPlan.tbd":"TBD",
+    "static.supplyPlan.multipleShipments":"Multiple Shipments"
     
 
 }

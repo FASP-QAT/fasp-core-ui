@@ -285,7 +285,7 @@ class ForecastMetrics extends Component {
           doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 140, {
             align: 'left'
           })
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
           doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 160, planningText)
         }
@@ -1000,8 +1000,8 @@ class ForecastMetrics extends Component {
                   </div>
                 </Col>
               </Form>
-              <br/><br/>
-              <Col md="12 pl-0">
+              
+              <Col md="12 pl-0 mt-2">
 
                 <div className="row">
                   <div className="col-md-12">
