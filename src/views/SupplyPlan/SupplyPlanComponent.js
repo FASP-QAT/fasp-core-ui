@@ -197,7 +197,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
         })
-        console.log("!this.state.showTotalShipment",!this.state.showTotalShipment);
+        console.log("!this.state.showTotalShipment", !this.state.showTotalShipment);
         var fields = document.getElementsByClassName("totalShipments");
         for (var i = 0; i < fields.length; i++) {
             if (!this.state.showTotalShipment == true) {
@@ -209,7 +209,7 @@ export default class SupplyPlanComponent extends React.Component {
 
         fields = document.getElementsByClassName("manualShipments");
         for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalShipment==true && this.state.showManualShipment == true) {
+            if (!this.state.showTotalShipment == true && this.state.showManualShipment == true) {
                 fields[i].style.display = "";
             } else {
                 fields[i].style.display = "none";
@@ -218,7 +218,7 @@ export default class SupplyPlanComponent extends React.Component {
 
         fields = document.getElementsByClassName("erpShipments");
         for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalShipment==true && this.state.showErpShipment == true) {
+            if (!this.state.showTotalShipment == true && this.state.showErpShipment == true) {
                 fields[i].style.display = "";
             } else {
                 fields[i].style.display = "none";
@@ -591,6 +591,7 @@ export default class SupplyPlanComponent extends React.Component {
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th className="supplyplanTdWidth"></th>
                                     {
                                         this.state.monthsArray.map(item => (
@@ -602,6 +603,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <tbody>
 
                                 <tr bgcolor='#d9d9d9'>
+                                    <td></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                     {
                                         this.state.openingBalanceArray.map(item1 => (
@@ -610,6 +612,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                    <td></td>
                                     <td align="left"><b>- {i18n.t('static.dashboard.consumption')}</b></td>
                                     {
                                         this.state.consumptionTotalData.map(item1 => (
@@ -617,7 +620,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         ))
                                     }
                                 </tr>
-                                <tr onClick={() => this.toggleAccordionTotalShipments()}>
+                                <tr>
+                                    <td onClick={() => this.toggleAccordionTotalShipments()}>
+                                        {this.state.showTotalShipment ? "-" : "+"}
+                                    </td>
                                     <td align="left"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
                                     {
                                         this.state.shipmentsTotalData.map(item1 => (
@@ -627,6 +633,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
 
                                 <tr class="totalShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                     {
                                         this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -648,7 +655,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
 
-                                <tr class="totalShipments" onClick={() => this.toggleAccordionManualShipments()}>
+                                <tr class="totalShipments">
+                                    <td onClick={() => this.toggleAccordionManualShipments()}>
+                                        {this.state.showManualShipment ? "-" : "+"}
+                                    </td>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                     {
                                         this.state.manualShipmentsTotalData.map(item1 => (
@@ -658,6 +668,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
 
                                 <tr class="manualShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                     {
@@ -673,6 +684,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
 
                                 <tr class="manualShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                     {
                                         this.state.shippedShipmentsTotalData.map(item1 => {
@@ -686,6 +698,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
 
                                 <tr class="manualShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                     {
                                         this.state.orderedShipmentsTotalData.map(item1 => {
@@ -698,6 +711,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr class="manualShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                     {
                                         this.state.plannedShipmentsTotalData.map(item1 => {
@@ -709,7 +723,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-                                <tr class="totalShipments" onClick={() => this.toggleAccordionErpShipments()}>
+                                <tr class="totalShipments">
+                                    <td onClick={() => this.toggleAccordionErpShipments()}>
+                                        {this.state.showErpShipment ? "-" : "+"}
+                                    </td>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
                                     {
                                         this.state.erpShipmentsTotalData.map(item1 => (
@@ -718,6 +735,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr class="erpShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                     {
                                         this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -731,6 +749,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
 
                                 <tr class="erpShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                     {
                                         this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -743,6 +762,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr class="erpShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                     {
                                         this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -755,6 +775,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr class="erpShipments">
+                                    <td></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                     {
                                         this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -767,6 +788,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                    <td></td>
                                     <td align="left"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                     {
                                         this.state.inventoryTotalData.map(item1 => (
@@ -775,6 +797,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr bgcolor='#d9d9d9'>
+                                    <td></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                     {
                                         this.state.closingBalanceArray.map(item1 => (
@@ -783,6 +806,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                     {
                                         this.state.monthsOfStockArray.map(item1 => (
@@ -791,6 +815,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td></td>
                                     <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
                                     {
                                         this.state.amcTotalData.map(item1 => (
@@ -799,6 +824,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td></td>
                                     <td align="left">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                     {
                                         this.state.minStockMoS.map(item1 => (
@@ -807,6 +833,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td></td>
                                     <td align="left">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                     {
                                         this.state.maxStockMoS.map(item1 => (
@@ -815,6 +842,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td></td>
                                     <td align="left">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                     {
                                         this.state.unmetDemand.map(item1 => (
@@ -1143,7 +1171,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
-                        name:programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, this.state.lang),
+                        name: programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
