@@ -236,7 +236,7 @@ console.log('programJson',programJson)
                     var amcAfterArray = [];
 
 
-                    for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+                    for (var c = 0; c < 12; c++) {
 
                       var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                       var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -267,7 +267,7 @@ console.log('programJson',programJson)
                         }
                       }
                     }
-                    for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                    for (var c = 0; c < 12; c++) {
                       var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                       var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                       if (consumptionListForAMC.length > 0) {

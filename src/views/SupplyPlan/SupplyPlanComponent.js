@@ -1341,9 +1341,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                 var lastActualConsumptionDateArr = [];
                 for (var i = 0; i < regionListFiltered.length; i++) {
-                    console.log("consumption list", consumptionList);
                     var consumptionListForlastActualConsumptionDate = consumptionList.filter(c => (c.actualFlag == true || c.actualFlag == "true") && c.region.id == regionListFiltered[i].id);
-                    console.log("ConsumptiponListForLastActualConsumption", consumptionListForlastActualConsumptionDate);
                     var lastActualConsumptionDate = "";
                     for (var lcd = 0; lcd < consumptionListForlastActualConsumptionDate.length; lcd++) {
                         if (lcd == 0) {
@@ -1355,7 +1353,6 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     lastActualConsumptionDateArr.push({ lastActualConsumptionDate: lastActualConsumptionDate, region: regionListFiltered[i].id })
                 }
-                console.log("lastActualConsumptionDateArr", lastActualConsumptionDateArr);
                 // if (regionId != -1) {
                 //     consumptionList = consumptionList.filter(c => c.region.id == regionId)
                 // }
@@ -1477,7 +1474,6 @@ export default class SupplyPlanComponent extends React.Component {
 
                     }
                     var amcArray = amcBeforeArray.concat(amcAfterArray);
-                    console.log("amcArray", amcArray);
                     var amcArrayFilteredForMonth = amcArray.filter(c => m[i].month == c.month);
                     console.log("amcArray filtered", amcArrayFilteredForMonth, "Month", m[i].month);
                     var countAMC = amcArrayFilteredForMonth.length;
@@ -6038,7 +6034,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var colArr = ['A', 'F'];
                                                 var data = [];
                                                 var shipmentsArr = [];
-                                                console.log("Shipment List", shipmentList);
                                                 for (var i = 0; i < shipmentList.length; i++) {
                                                     var moq = 0;
                                                     var pricePerUnit = 0;
@@ -6300,8 +6295,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     // var elInstance=this.state.plannedPsmShipmentsEl;
                                                                     var rowData = obj.getRowData(y)
                                                                     var batchInfo = rowData[40];
-                                                                    console.log("AbtchInfo", batchInfo);
-                                                                    console.log("batchInfo.length", batchInfo.length)
                                                                     var cell = obj.getCell(`A${parseInt(y) + 1}`)
                                                                     cell.classList.add('readonly');
                                                                     for (var sb = 0; sb < batchInfo.length; sb++) {
