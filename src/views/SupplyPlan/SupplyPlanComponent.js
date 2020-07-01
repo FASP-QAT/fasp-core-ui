@@ -1061,7 +1061,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
-                        name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                        name:programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
