@@ -557,20 +557,21 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-               <Row style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Col xs="12" sm="12">
+               <div style={{ display: this.state.loading ? "none" : "block" }}>
+                   
                         <Card  >
 
                             <CardHeader>
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
                             </CardHeader>
-                            <CardBody>
-
+                            <CardBody className="p-0">
+                            <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
+                                </Col>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -583,8 +584,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                             </CardFooter>
                         </Card>
-                    </Col>
-                </Row>
+                  
+                </div>
                  <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">

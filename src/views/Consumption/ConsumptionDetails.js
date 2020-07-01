@@ -1143,7 +1143,7 @@ export default class ConsumptionDetails extends React.Component {
                     <CardHeader>
                         <strong>{i18n.t('static.consumption.consumptionadd')}</strong>
                     </CardHeader>
-                    <CardBody className="">
+                    <CardBody >
                         <Formik
                             render={
                                 ({
@@ -1194,7 +1194,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12">
+                        <Col xs="12" sm="12" className="p-0">
                             <div className="table-responsive">
                                 <div id="consumptiontableDiv">
                                 </div>
