@@ -1822,7 +1822,7 @@ class AccessControlComponent extends Component {
                     <CardHeader>
                         <i className="icon-note"></i><strong>{i18n.t('static.user.accessControl')}</strong>{' '}
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
                             <div className="table-responsive">

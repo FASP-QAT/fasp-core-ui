@@ -860,7 +860,7 @@ export default class AddInventory extends Component {
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12">
+                        <Col xs="12" sm="12" className="p-0">
                             <div className="table-responsive">
                                 <div id="inventorytableDiv" >
                                 </div>
