@@ -1152,9 +1152,9 @@ class ShipmentGlobalDemandView extends Component {
                             <Form >
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <FormGroup  className="tab-ml-1">
+                                        <FormGroup  className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
-                                            <div className="controls SelectGo Regioncalender">
+                                            <div className="controls  Regioncalender">
                                                 <InputGroup>
                                                     <Picker
                                                         ref="pickRange"
@@ -1173,9 +1173,9 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup>
 
 
-                                        <FormGroup className="tab-ml-1">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">Program</Label>
-                                            <div className="controls SelectGo">
+                                            <div className="controls">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
@@ -1199,7 +1199,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup  className="tab-ml-1">
+                                        <FormGroup  className="col-md-3">
                                             <Label htmlFor="appendedInputButton">Version</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -1218,8 +1218,9 @@ class ShipmentGlobalDemandView extends Component {
                                             </div>
                                         </FormGroup>
 
-                                        <FormGroup  className="tab-ml-1">
+                                        <FormGroup  className="col-md-3">
                                             <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
