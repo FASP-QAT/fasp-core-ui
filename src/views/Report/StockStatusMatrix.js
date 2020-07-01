@@ -136,8 +136,8 @@ export default class StockStatusMatrix extends React.Component {
 
   filterData() {
     console.log('In filter data---' + this.state.rangeValue.from.year)
-    let startDate = this.state.rangeValue.from.year + '-' +String(  this.state.rangeValue.from.month).padStart(2, '0') + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + +String(  this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    let startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
+    let endDate = this.state.rangeValue.to.year + '-' + +String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
     let programId = document.getElementById("programId").value;
     let planningUnitIds = this.state.planningUnitValues;
     let view = document.getElementById("view").value;
@@ -178,10 +178,10 @@ export default class StockStatusMatrix extends React.Component {
                 var totalConsumption = 0;
                 var totalAdjustments = 0;
                 var totalShipments = 0;
-console.log('startDate',startDate)
-console.log('programJson',programJson)
+                console.log('startDate', startDate)
+                console.log('programJson', programJson)
                 var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
-                console.log('consumptionRemainingList',consumptionRemainingList)
+                console.log('consumptionRemainingList', consumptionRemainingList)
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                   var count = 0;
                   for (var k = 0; k < consumptionRemainingList.length; k++) {
@@ -210,7 +210,7 @@ console.log('programJson',programJson)
                   totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
                 }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
-               
+
                 for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                   var monthlydata = [];
                   for (var month = 1; month <= 12; month++) {
@@ -220,7 +220,7 @@ console.log('programJson',programJson)
                     console.log(openingBalance)
                     var invlist = inventoryList.filter(c => c.inventoryDate === dt)
                     var adjustment = 0;
-                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty*ele.multiplier));
+                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
                     var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                     var consumption = 0;
                     conlist.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption);
@@ -231,7 +231,7 @@ console.log('programJson',programJson)
 
                     var endingBalance = openingBalance + adjustment + shipment - consumption
                     console.log('endingBalance', endingBalance)
-                    openingBalance=endingBalance
+                    openingBalance = endingBalance
                     var amcBeforeArray = [];
                     var amcAfterArray = [];
 
@@ -309,7 +309,7 @@ console.log('programJson',programJson)
 
 
                     var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
-                    console.log('amcCalcualted',amcCalcualted)
+                    console.log('amcCalcualted', amcCalcualted)
                     var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
 
                     monthlydata.push(this.roundN(mos))
@@ -354,8 +354,10 @@ console.log('programJson',programJson)
                 var totalConsumption = 0;
                 var totalAdjustments = 0;
                 var totalShipments = 0;
-
+                console.log('startDate', startDate)
+                console.log('programJson', programJson)
                 var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+                console.log('consumptionRemainingList', consumptionRemainingList)
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                   var count = 0;
                   for (var k = 0; k < consumptionRemainingList.length; k++) {
@@ -384,17 +386,17 @@ console.log('programJson',programJson)
                   totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
                 }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
+
                 for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                  console.log(from)
                   var monthlydata = [];
                   for (var month = 1; month <= 12; month++) {
                     var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                     console.log(dtstr)
                     var dt = dtstr
-
+                    console.log(openingBalance)
                     var invlist = inventoryList.filter(c => c.inventoryDate === dt)
                     var adjustment = 0;
-                    invlist.map(ele => adjustment = adjustment + ele.adjustmentQty);
+                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
                     var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                     var consumption = 0;
                     conlist.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption);
@@ -405,6 +407,7 @@ console.log('programJson',programJson)
 
                     var endingBalance = openingBalance + adjustment + shipment - consumption
                     console.log('endingBalance', endingBalance)
+                    openingBalance = endingBalance
                     var amcBeforeArray = [];
                     var amcAfterArray = [];
 
@@ -435,13 +438,12 @@ console.log('programJson',programJson)
                         }
                         amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
                         var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                        if (amcArrayForMonth.length != programJson.monthsInPastForAmc) {
+                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
                           c = 12;
                         }
                       }
                     }
-                    console.log('amcBeforeArray', amcBeforeArray)
-                    for (var c = 0; c < programJson.monthsInFutureForAMC; c++) {
+                    for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
                       var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                       var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                       if (consumptionListForAMC.length > 0) {
@@ -463,10 +465,10 @@ console.log('programJson',programJson)
                               consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
                             }
                           }
-                          amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
                         }
                         amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                        if (amcArrayForMonth.length == programJson.monthsInFutureForAMC) {
+                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
+                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
                           c = 12;
                         }
                       }
@@ -481,16 +483,15 @@ console.log('programJson',programJson)
                       sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
                     }
 
-                    console.log('sumOfConsumptions', sumOfConsumptions)
+
                     var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
                     console.log('amcCalcualted', amcCalcualted)
-
                     var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
 
                     monthlydata.push(this.roundN(mos))
 
                   }
-                  var minmonthofstock = Math.min.apply(Math, monthlydata.map(a => a));
+                var minmonthofstock = Math.min.apply(Math, monthlydata.map(a => a));
                   var min = 3
                   var json = {
                     name: inventoryList[0].planningUnit.forecastingUnit.productCategory,
@@ -1581,7 +1582,7 @@ console.log('programJson',programJson)
                 {this.state.view == 2 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                  <InputGroup className="box">   
+                  <InputGroup className="box">
                     <ReactMultiSelectCheckboxes
                       name="productCategoryId"
                       id="productCategoryId"
@@ -1590,7 +1591,7 @@ console.log('programJson',programJson)
                       options={productCategoryListcheck && productCategoryListcheck.length > 0 ? productCategoryListcheck : []}
                     /> </InputGroup>
 
-                 
+
                 </FormGroup>}
                 {this.state.view == 1 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
