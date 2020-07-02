@@ -526,7 +526,7 @@ class StockAdjustmentComponent extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log(program)
+                    console.log("1----",program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -534,20 +534,21 @@ class StockAdjustmentComponent extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        console.log(programRequest)
+                        console.log("2----",programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var inventoryList = []
+                        // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
                         planningUnitIds.map(planningUnitId =>
-                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)')))]);
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate>=startDate&& c.inventoryDate<=endDate)))]);
                         var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
                         var data = []
                         planningUnitIds.map(planningUnitId => {
                             dates.map(dt => {
 
                                 var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
-                                console.log(list)
+                                console.log("3--->",list)
                                 if (list.length > 0) {
                                     var adjustment = 0;
                                     list.map(ele => adjustment = adjustment + ele.adjustmentQty);
@@ -583,17 +584,20 @@ class StockAdjustmentComponent extends Component {
                     planningUnitIds: planningUnitIds
                 }
                 AuthenticationService.setupAxiosInterceptors();
+                console.log("inputJson---->",inputjson);
                 ReportService.stockAdjustmentList(inputjson)
                     .then(response => {
+                        console.log("-------->");
                         console.log(JSON.stringify(response.data))
                         this.setState({
                             data: response.data
-                        }, () => { this.consolidatedProgramList() })
+                        }
+                        )
                     }).catch(
                         error => {
                             this.setState({
                                 data: []
-                            }, () => { this.consolidatedProgramList() })
+                            })
                             if (error.message === "Network Error") {
                                 this.setState({ message: error.message });
                             } else {
