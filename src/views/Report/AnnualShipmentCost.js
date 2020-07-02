@@ -1216,7 +1216,7 @@ class AnnualShipmentCost extends Component {
 
                             <a className="card-header-action">
 
-                                {this.state.matricsList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
+                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
                             </a>
                         </div>
                     </CardHeader>
