@@ -436,8 +436,9 @@ export default class CostOfInventory extends Component {
         var versionId = this.state.CostOfInventoryInput.versionId
         if (programId != 0 && versionId != -1) {
             if (versionId.includes('Local')) {
-                var startDate = new moment(this.state.CostOfInventoryInput.dt).subtract(1, 'months').format('MM-YYYY');
-                var endDate = new moment(this.state.CostOfInventoryInput.dt).format('MM-YYYY');
+                let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
+                let endDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-' + new Date(this.state.singleValue2.year, this.state.singleValue2.month + 1, 0).getDate();
+        
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -463,21 +464,136 @@ export default class CostOfInventory extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        console.log(programRequest)
+                       
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
+                        console.log(programJson)
+                        var proList = []
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        planningunitRequest.onerror = function (event) {
+                          // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                          var myResult = [];
+                          myResult = planningunitRequest.result;
+                      
+                          for (var i = 0,j=0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+                              proList[j++]=myResult[i]
+                            }
+                          }
+                          var data = []
+                          
+                          proList.map(planningUnit=>{
+                            console.log('planningunit',planningUnit.planningUnit.id)
                         var inventoryList = []
-                       
-                            inventoryList = ((programJson.inventoryList).filter(c => c.active == true && moment(new moment(c.inventoryDate).format('MM-YYYY')).isBetween(startDate, endDate, null, '[)')));
-                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
-                        var data = []
+                        var batchNos = programJson.batchInfoList.filter(c =>c.planningUnitId== planningUnit.planningUnit.id )
+                        console.log('batchNos',batchNos)
+                        batchNos.map(batch=>{    
+                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true  && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
+                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id  && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
+                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
 
+                // calculate openingBalance
+
+                var openingBalance = 0;
+                var totalConsumption = 0;
+                var totalAdjustments = 0;
+                var totalShipments = 0;
+                console.log('startDate', startDate)
+                console.log('programJson', programJson)
+                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+                console.log('consumptionRemainingList', consumptionRemainingList)
+                for (var j = 0; j < consumptionRemainingList.length; j++) {
+                  var count = 0;
+                  for (var k = 0; k < consumptionRemainingList.length; k++) {
+                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                      count++;
+                    } else {
+
+                    }
+                  }
+                  if (count == 0) {
+                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                  } else {
+                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                      totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                    }
+                  }
+                }
+
+                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                  totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+                }
+
+                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+                for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                    console.log(shipmentsRemainingList[j].batchInfoList)
+                    for (var k = 0; k < (shipmentsRemainingList[j].batchInfoList).length; k++) {
+                    if(shipmentsRemainingList[j].batchInfoList[k].batch.batchId==batch.batchId)
+                  totalShipments += parseInt((shipmentsRemainingList[j].batchInfoList[k].shipmentQty));}
+                }
+                openingBalance = totalAdjustments - totalConsumption + totalShipments;
+                var endingBalance
+              
+                    var dtstr = startDate
+                    var enddtStr = endDate
+                    console.log(dtstr, ' ', enddtStr)
+                    var dt = dtstr
+                    console.log(openingBalance)
+                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                    var adjustment = 0;
+                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                    var consumption = 0;
+                    console.log(programJson.regionList)
+
+
+                    for (var i = 0; i < programJson.regionList.length; i++) {
+
+                      var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                      console.log(list)
+                      if (list.length > 1) {
+                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                      } else {
+                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                      }
+                    }
+
+
+
+                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                    var shipment = 0;
+                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                    console.log(shiplist.length ,'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                   endingBalance = openingBalance + adjustment + shipment - consumption
+                    console.log('endingBalance', endingBalance)
+
+                    //endingBalance = endingBalance < 0 ? 0 : endingBalance
+                   
+               var json={
+                   planningUnit:planningUnit.planningUnit,
+                   batchNo:batch.batchNo,
+                   expiryDate:batch.expiryDate,
+                   stock:endingBalance,
+                   rate:planningUnit.catalogPrice,
+                   cost:(endingBalance*planningUnit.catalogPrice)
+               }
+                  data.push(json)  
+                })
+
+                          })
                         console.log(data)
                         this.setState({
-                            data: data
+                            costOfInventory: data
                             , message: ''
                         })
+                    }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
