@@ -26,6 +26,9 @@ import { Online, Offline } from "react-detect-offline";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import { DatePicker } from 'antd';
+import 'antd/dist/antd.css';
+const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -50,7 +53,8 @@ export default class StockStatusMatrix extends React.Component {
       planningUnitValues: [],
       planningUnitLabels: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+startYear:new Date().getFullYear() - 1,
+endYear:new Date().getFullYear()
 
     }
     this.filterData = this.filterData.bind(this);
@@ -83,7 +87,11 @@ export default class StockStatusMatrix extends React.Component {
     })
 
   }
-
+  onYearChange=(value)=>{
+   this.setState({ startYear:value[0].format('YYYY'),
+endYear:value[1].format('YYYY')},()=>{console.log(this.state.startYear,' ',this.state.endYear )
+this.filterData()})
+  }
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
@@ -135,9 +143,9 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   filterData() {
-    console.log('In filter data---' + this.state.rangeValue.from.year)
-    let startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + +String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    //console.log('In filter data---' + this.state.rangeValue.from.year)
+    let startDate = this.state.startYear + '-01-01';
+    let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
     let programId = document.getElementById("programId").value;
     let planningUnitIds = this.state.planningUnitValues;
     let view = document.getElementById("view").value;
@@ -168,10 +176,18 @@ export default class StockStatusMatrix extends React.Component {
             var programJson = JSON.parse(programData);
             if (this.state.view == 1) {
               planningUnitIds.map(planningUnitId => {
+
+                var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                 var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
-                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-
+                var shipmentList =[]
+                if(document.getElementById("includePlanningShipments").selectedOptions[0].value.toString()=='true'){
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+            }else{
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
+         
+            }
                 // calculate openingBalance
 
                 var openingBalance = 0;
@@ -211,26 +227,44 @@ export default class StockStatusMatrix extends React.Component {
                 }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
 
-                for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
                   var monthlydata = [];
                   for (var month = 1; month <= 12; month++) {
                     var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                    console.log(dtstr)
+                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                    console.log(dtstr, ' ', enddtStr)
                     var dt = dtstr
                     console.log(openingBalance)
-                    var invlist = inventoryList.filter(c => c.inventoryDate === dt)
+                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
                     var adjustment = 0;
                     invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
                     var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                     var consumption = 0;
-                    conlist.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption);
-                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate === dt)
+                    console.log(programJson.regionList)
+
+
+                    for (var i = 0; i < programJson.regionList.length; i++) {
+
+                      var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                      console.log(list)
+                      if (list.length > 1) {
+                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                      } else {
+                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                      }
+                    }
+
+
+
+                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
                     var shipment = 0;
                     shiplist.map(ele => shipment = shipment + ele.shipmentQty);
 
-
+                    console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
                     var endingBalance = openingBalance + adjustment + shipment - consumption
                     console.log('endingBalance', endingBalance)
+
+                    endingBalance = endingBalance < 0 ? 0 : endingBalance
                     openingBalance = endingBalance
                     var amcBeforeArray = [];
                     var amcAfterArray = [];
@@ -315,14 +349,12 @@ export default class StockStatusMatrix extends React.Component {
                     monthlydata.push(this.roundN(mos))
 
                   }
-                  var minmonthofstock = Math.min.apply(Math, monthlydata.map(a => a));
-                  var min = 3
                   var json = {
-                    name: inventoryList[0].planningUnit,
+                    name: pu.planningUnit,
                     units: inventoryList[0].unit,
-                    reorderFrequency: 0,
+                    reorderFrequency: pu.reorderFrequencyInMonths,
                     year: from,
-                    min: min,
+                    min: pu.minMonthsOfStock,
                     Jan: monthlydata[0],
                     Feb: monthlydata[1],
                     Mar: monthlydata[2],
@@ -339,7 +371,8 @@ export default class StockStatusMatrix extends React.Component {
                   data.push(json)
                 }
                 this.setState({
-                  data
+                  data: data,
+                  message: ''
                 })
               })
             } else {
@@ -347,6 +380,33 @@ export default class StockStatusMatrix extends React.Component {
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.active == true);
                 var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId);
                 var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+                var shipmentList =[]
+                if(document.getElementById("includePlanningShipments").selectedOptions[0].value.toString()=='true'){
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true &&  c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+            }else{
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId  && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
+         
+            }
+                var proList = []
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                planningunitRequest.onerror = function (event) {
+                  // Handle errors!
+                };
+                planningunitRequest.onsuccess = function (e) {
+                  var myResult = [];
+                  myResult = planningunitRequest.result;
+              
+                  for (var i = 0,j=0; i < myResult.length; i++) {
+                    if (myResult[i].program.id == programId) {
+                      console.log('equal')
+                      proList[j++]=myResult[i]
+                    }
+                  }
+
+                
+
 
                 // calculate openingBalance
 
@@ -354,10 +414,7 @@ export default class StockStatusMatrix extends React.Component {
                 var totalConsumption = 0;
                 var totalAdjustments = 0;
                 var totalShipments = 0;
-                console.log('startDate', startDate)
-                console.log('programJson', programJson)
                 var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
-                console.log('consumptionRemainingList', consumptionRemainingList)
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                   var count = 0;
                   for (var k = 0; k < consumptionRemainingList.length; k++) {
@@ -387,52 +444,59 @@ export default class StockStatusMatrix extends React.Component {
                 }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
 
-                for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
                   var monthlydata = [];
                   for (var month = 1; month <= 12; month++) {
                     var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                    console.log(dtstr)
+                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                    console.log(dtstr, ' ', enddtStr)
                     var dt = dtstr
                     console.log(openingBalance)
-                    var invlist = inventoryList.filter(c => c.inventoryDate === dt)
+                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
                     var adjustment = 0;
                     invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
                     var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                     var consumption = 0;
-                    conlist.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption);
-                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate === dt)
+                    for (var j = 0; j < proList.length; j++) {
+                      for (var i = 0; i < programJson.regionList.length; i++) {
+                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
+                        if (list.length > 1) {
+                          list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                        } else {
+                          consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                        }
+                      }
+                    }
+
+
+                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
                     var shipment = 0;
                     shiplist.map(ele => shipment = shipment + ele.shipmentQty);
 
-
+                    console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
                     var endingBalance = openingBalance + adjustment + shipment - consumption
                     console.log('endingBalance', endingBalance)
+
+                    endingBalance = endingBalance < 0 ? 0 : endingBalance
                     openingBalance = endingBalance
                     var amcBeforeArray = [];
                     var amcAfterArray = [];
 
 
-                    for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+                    for (var c = 0; c < 12; c++) {
 
                       var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                       var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
                       if (consumptionListForAMC.length > 0) {
                         var consumptionQty = 0;
-                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                          var count = 0;
-                          for (var k = 0; k < consumptionListForAMC.length; k++) {
-                            if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                              count++;
+
+                        for (var j = 0; j < proList.length; j++) {
+                          for (var i = 0; i < programJson.regionList.length; i++) {
+                            var list = consumptionListForAMC.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
+                            if (list.length > 1) {
+                              list.map(ele => ele.actualFlag.toString() == 'true' ? consumptionQty = consumptionQty + ele.consumptionQty : consumptionQty)
                             } else {
-
-                            }
-                          }
-
-                          if (count == 0) {
-                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                          } else {
-                            if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                              consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                              consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
                             }
                           }
                         }
@@ -443,30 +507,23 @@ export default class StockStatusMatrix extends React.Component {
                         }
                       }
                     }
-                    for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                    for (var c = 0; c < 12; c++) {
                       var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                       var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                       if (consumptionListForAMC.length > 0) {
                         var consumptionQty = 0;
-                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                          var count = 0;
-                          for (var k = 0; k < consumptionListForAMC.length; k++) {
-                            if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                              count++;
+
+                        for (var j = 0; j < proList.length; j++) {
+                          for (var i = 0; i < programJson.regionList.length; i++) {
+                            var list = consumptionListForAMC.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
+                            if (list.length > 1) {
+                              list.map(ele => ele.actualFlag.toString() == 'true' ? consumptionQty = consumptionQty + ele.consumptionQty : consumptionQty)
                             } else {
-
-                            }
-                          }
-
-                          if (count == 0) {
-                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                          } else {
-                            if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                              consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                              consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
                             }
                           }
                         }
-                        amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                       amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
                         amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
                         if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
                           c = 12;
@@ -491,14 +548,9 @@ export default class StockStatusMatrix extends React.Component {
                     monthlydata.push(this.roundN(mos))
 
                   }
-                var minmonthofstock = Math.min.apply(Math, monthlydata.map(a => a));
-                  var min = 3
                   var json = {
                     name: inventoryList[0].planningUnit.forecastingUnit.productCategory,
-                    units: inventoryList[0].unit,
-                    reorderFrequency: 0,
                     year: from,
-                    min: min,
                     Jan: monthlydata[0],
                     Feb: monthlydata[1],
                     Mar: monthlydata[2],
@@ -515,9 +567,11 @@ export default class StockStatusMatrix extends React.Component {
                   data.push(json)
                 }
                 this.setState({
-                  data
+                  data: data,
+                  message: ''
                 })
-              })
+              }.bind(this);}
+              )
             }
           }.bind(this)
 
@@ -1027,7 +1081,7 @@ export default class StockStatusMatrix extends React.Component {
   exportCSV(columns) {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + (this.state.startYear + ' ~ ' + this.state.endYear)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     if (this.state.view == 1) {
       this.state.planningUnitLabels.map(ele =>
@@ -1049,8 +1103,14 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
     var A = [headers]
     var re = this.state.data
-    this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.units.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.min, ele.reorderFrequency, ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
-      , ele.Dec]));
+    if (this.state.view == 1) {
+      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.units.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.min, ele.reorderFrequency, ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+        , ele.Dec]));
+    }
+    else {
+      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+        , ele.Dec]));
+    }
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -1062,7 +1122,7 @@ export default class StockStatusMatrix extends React.Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.startYear+'~'+this.state.endYear + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -1106,7 +1166,7 @@ export default class StockStatusMatrix extends React.Component {
         if (i == 1) {
           doc.setFontSize(8)
           doc.setFont('helvetica', 'normal')
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.startYear + ' ~ ' + this.state.endYear, doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -1144,34 +1204,55 @@ export default class StockStatusMatrix extends React.Component {
 
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     let header = []
+    if (this.state.view == 1) {
 
-
-    let header1 = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
-    { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
-      , [
-      { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
-      { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
-    ]
-
-    header = header1;
+      header = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
+        , [
+        { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
+      ]
+    } else {
+      header = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
+        , [
+        { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
+      ]
+    }
     let data;
-
-    data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), getLabelText(ele.units.label, this.state.lang), ele.min, ele.reorderFrequency, ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
-      .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
+    if (this.state.view == 1) {
+      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), getLabelText(ele.units.label, this.state.lang), ele.min, ele.reorderFrequency, ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
+    } else {
+      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
+    }
     let content = {
       margin: { top: 40 },
       startY: 200,
@@ -1277,7 +1358,7 @@ export default class StockStatusMatrix extends React.Component {
     let columns = [
       {
         dataField: 'name.label',
-        text: this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory'),
+        text: i18n.t('static.planningunit.planningunit'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -1403,45 +1484,110 @@ export default class StockStatusMatrix extends React.Component {
 
     let columns1 = [
       {
-        dataField: 'PLANNING_UNIT_LABEL_EN',
-        text: i18n.t('static.procurementUnit.planningUnit'),
+        dataField: 'name.label',
+        text: i18n.t('static.productcategory.productcategory'),
         sort: true,
-        align: 'left',
-        headerAlign: 'left',
-        width: '180'
-      }, {
-        dataField: 'YEAR',
+        align: 'center',
+        headerAlign: 'center',
+        style: { width: '350px' },
+        formatter: this.formatLabel
+      },
+
+      {
+        dataField: 'year',
         text: i18n.t('static.common.year'),
         sort: true,
         align: 'center',
         headerAlign: 'center'
       },
       {
-        dataField: 'Q1',
-        text: i18n.t('static.common.quarter1'),
+        dataField: 'Jan',
+        text: i18n.t('static.month.jan'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
       }, {
-        dataField: 'Q2',
-        text: i18n.t('static.common.quarter2'),
+        dataField: 'Feb',
+        text: i18n.t('static.month.feb'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
       }, {
-        dataField: 'Q3',
-        text: i18n.t('static.common.quarter3'),
+        dataField: 'Mar',
+        text: i18n.t('static.month.mar'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
       }, {
-        dataField: 'Q4',
-        text: i18n.t('static.common.quarter4'),
+        dataField: 'Apr',
+        text: i18n.t('static.month.apr'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
-      }]
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'May',
+        text: i18n.t('static.month.may'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Jun',
+        text: i18n.t('static.month.jun'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Jul',
+        text: i18n.t('static.month.jul'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Aug',
+        text: i18n.t('static.month.aug'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Sep',
+        text: i18n.t('static.month.sep'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Oct',
+        text: i18n.t('static.month.oct'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Nov',
+        text: i18n.t('static.month.nov'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Dec',
+        text: i18n.t('static.month.dec'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }
 
+
+    ];
     const options = {
       hidePageListOnlyOnePage: true,
       firstPageText: i18n.t('static.common.first'),
@@ -1494,14 +1640,14 @@ export default class StockStatusMatrix extends React.Component {
           <CardHeader className="pb-1">
             <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
             {this.state.data.length > 0 && <div className="card-header-actions">
-              <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-              <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+              <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(this.state.view == 1 ? columns : columns1)} />
+              <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(this.state.view == 1 ? columns : columns1)} />
             </div>}
           </CardHeader>
           <CardBody className="pb-md-3">
             <Col md="12 pl-0">
               <div className="row">
-                <FormGroup className="col-md-3" title="click here to select period">
+                {/*<FormGroup className="col-md-3" title="click here to select period">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                   <div className="controls">
 
@@ -1512,14 +1658,24 @@ export default class StockStatusMatrix extends React.Component {
                       lang={pickerLang}
                       //theme="light"
                       onChange={this.handleRangeChange}
-                      onDismiss={this.handleRangeDissmis}
+                      onDismiss={this.handleRangeDi ssmis}
                     >
                       <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                     </Picker>
                   </div>
 
+                </FormGroup>*/}
+ <FormGroup className="col-md-3">
+                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                <div className="controls">
+                  <RangePicker picker="year"   allowClear={false}
+                                id="date" name= "date"
+                                style={{ width: '450px', marginLeft:'20px'}} 
+                                onChange={this.onYearChange} 
+                                value={[moment(this.state.startYear.toString()),moment(this.state.endYear.toString())]}  />
+ 
+                </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                   <div className="controls ">
@@ -1614,7 +1770,7 @@ export default class StockStatusMatrix extends React.Component {
                         name="includePlanningShipments"
                         id="includePlanningShipments"
                         bsSize="sm"
-                        onChange={(e) => { this.viewChange(); this.formSubmit() }}
+                        onChange={(e) => { this.filterData() }}
                       >
                         <option value="true">{i18n.t('static.program.yes')}</option>
                         <option value="false">{i18n.t('static.program.no')}</option>
@@ -1623,36 +1779,11 @@ export default class StockStatusMatrix extends React.Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
+               
               </div>
             </Col>
-            {this.state.view == 0 && this.state.data.length > 0 &&
-              <Table striped bordered hover responsive="md">
-                <thead>
-                  <tr>
-                    <th rowSpan="2" style={{ "width": "20%", "text-align": "center" }}> {i18n.t('static.planningunit.planningunit')}</th>
-                    {this.state.years.map((item, i) => {
-                      return (
-                        <th colSpan="4" style={{ "text-align": "center" }}>{item}</th>
-                      )
-                    })}
-                  </tr>
-                  <tr>
-                    {this.state.years.map(ele => { return (<><th style={{ "width": "3%", "text-align": "center" }} >Q1</th><th align="center" style={{ "width": "3%", "text-align": "center" }}>Q2</th ><th style={{ "width": "3%", "text-align": "center" }}>Q3</th><th style={{ "width": "3%", "text-align": "center" }}>Q4</th></>) })}
-
-                  </tr>
-                </thead>
-                <tbody>
-
-                  {this.state.data.map(ele => {
-                    return (<tr> {ele.map((item, index) => { return (index == 0 ? <td style={{ "text-align": "left" }}>{item}</td> : <td style={{ "text-align": "right" }}>{formatter(item)}</td>) }
-                    )}</tr>)
-                  })}
-
-                </tbody>
-              </Table>
-            }
             <div class="TableCust">
-              {this.state.data.length > 0 &&
+              {this.state.data.length > 0 && this.state.view == 1 &&
                 <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
                   <thead>
                     <tr>
@@ -1685,6 +1816,53 @@ export default class StockStatusMatrix extends React.Component {
                         <td className="text-center"> {getLabelText(ele.units.label, this.state.lang)}</td>
                         <td className="text-center">{ele.min}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
+                        <td className="text-center">{ele.year}</td>
+                        <td className="text-center">{ele.Jan}</td>
+                        <td className="text-center">{ele.Feb}</td>
+                        <td className="text-center">{ele.Mar}</td>
+                        <td className="text-center">{ele.Apr}</td>
+                        <td className="text-center">{ele.May}</td>
+                        <td className="text-center">{ele.Jun}</td>
+                        <td className="text-center">{ele.Jul}</td>
+                        <td className="text-center">{ele.Aug}</td>
+                        <td className="text-center">{ele.Sep}</td>
+                        <td className="text-center">{ele.Oct}</td>
+                        <td className="text-center">{ele.Nov}</td>
+                        <td className="text-center">{ele.Dec}</td></tr>)
+                    })}
+
+                  </tbody>
+                </Table>
+              }
+
+
+              {this.state.data.length > 0 && this.state.view == 2 &&
+                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
+                  <thead>
+                    <tr>
+                      <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.productcategory.productcategory')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
+                      <th colSpan="12" className="text-center">{i18n.t('static.report.monthsOfStock')}</th>
+
+                    </tr>
+                    <tr> <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.mar')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.apr')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.may')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jun')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jul')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.aug')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.sep')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.oct')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.nov')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.dec')}</th></tr>
+                  </thead>
+                  <tbody>
+
+                    {this.state.data.map(ele => {
+                      return (<tr>
+                        <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
                         <td className="text-center">{ele.year}</td>
                         <td className="text-center">{ele.Jan}</td>
                         <td className="text-center">{ele.Feb}</td>
