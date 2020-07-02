@@ -541,7 +541,7 @@ class StockAdjustmentComponent extends Component {
                         var inventoryList = []
                         // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
                         planningUnitIds.map(planningUnitId =>
-                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate>=startDate&& c.inventoryDate<=endDate)))]);
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId &&( c.inventoryDate>=startDate && c.inventoryDate<=endDate)))]);
                         var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
                         var data = []
                         planningUnitIds.map(planningUnitId => {
@@ -847,9 +847,9 @@ class StockAdjustmentComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">Version</Label>
-                                    <div className="controls ">
+                                    <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -868,7 +868,8 @@ class StockAdjustmentComponent extends Component {
 
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                    <div className="controls">
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls SelectGo">
                                         <InputGroup className="box">
                                             <ReactMultiSelectCheckboxes
                                                 name="planningUnitId"
@@ -879,7 +880,7 @@ class StockAdjustmentComponent extends Component {
                                             />
 
                                         </InputGroup>
-                                    </div>
+                                        </div> 
                                 </FormGroup>
                             </div>
                         </Col>

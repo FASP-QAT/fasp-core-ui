@@ -1572,13 +1572,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
 
                         <CardHeader>
                             <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                         </CardHeader>
-                        <CardBody>
+                        <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
                                 <div className="table-responsive">
@@ -1596,7 +1596,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     </FormGroup>
                         </CardFooter>
                     </Card>
-                </Row>
+                </div>
 
 
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>

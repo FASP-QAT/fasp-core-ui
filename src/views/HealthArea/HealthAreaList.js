@@ -176,7 +176,7 @@ export default class HealthAreaListComponent extends Component {
         }, 
         {
             dataField: 'healthAreaCode',
-            text: 'TechnicalArea Code',
+            text: 'Technical Area Code',
             sort: true,
             align: 'center',
             headerAlign: 'center',

@@ -1115,7 +1115,7 @@ class AggregateShipmentByProduct extends Component {
                         </Offline>
                     </CardHeader>
                     <CardBody>
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
                                 <Form >
                                     <Col md="12 pl-0">
@@ -1214,8 +1214,9 @@ class AggregateShipmentByProduct extends Component {
                                             </Online>
                                             <Online>
 
-                                                <FormGroup className="tab-ml-1">
+                                                <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                     <div className="controls">
                                                         <InputGroup className="box">
                                                             <ReactMultiSelectCheckboxes

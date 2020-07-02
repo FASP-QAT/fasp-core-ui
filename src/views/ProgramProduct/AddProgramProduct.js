@@ -529,18 +529,20 @@ class AddprogramPlanningUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <Row>
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+               
+                    <div style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader>
-                            <CardBody>
+                            <CardBody className="p-0">
+                            <Col sm={12} md={12}>
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
+                                </Col>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -552,8 +554,8 @@ class AddprogramPlanningUnit extends Component {
                                 </FormGroup>
                             </CardFooter>
                         </Card>
-                    </Col>
-                </Row>
+                    </div>
+                
             </div>
 
         );

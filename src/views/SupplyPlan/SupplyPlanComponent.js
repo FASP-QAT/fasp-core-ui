@@ -3,7 +3,7 @@ import React from "react";
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
-    Input, InputGroup, Label, FormGroup, Form, Row, Nav, NavItem, NavLink, TabPane, TabContent
+    Input, InputGroup, Label, FormGroup, Form, Row, Nav, NavItem, NavLink, Collapse, TabPane, TabContent
 } from 'reactstrap';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -144,8 +144,11 @@ export default class SupplyPlanComponent extends React.Component {
             lang: localStorage.getItem('lang'),
             unmetDemand: [],
             expiredStock: [],
-            versionId: ""
-
+            versionId: "",
+            accordion: [true],
+            showTotalShipment: false,
+            showManualShipment: false,
+            showErpShipment: false
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -184,6 +187,71 @@ export default class SupplyPlanComponent extends React.Component {
         this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
 
         this.budgetDropdownFilter = this.budgetDropdownFilter.bind(this);
+        this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
+        this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
+        this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
+    }
+
+    toggleAccordionTotalShipments() {
+        this.setState({
+            showTotalShipment: !this.state.showTotalShipment
+        })
+        console.log("!this.state.showTotalShipment", !this.state.showTotalShipment);
+        var fields = document.getElementsByClassName("totalShipments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalShipment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+
+        fields = document.getElementsByClassName("manualShipments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalShipment == true && this.state.showManualShipment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+
+        fields = document.getElementsByClassName("erpShipments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalShipment == true && this.state.showErpShipment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+
+    }
+
+    toggleAccordionManualShipments() {
+        this.setState({
+            showManualShipment: !this.state.showManualShipment
+        })
+        var fields = document.getElementsByClassName("manualShipments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showManualShipment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+
+    toggleAccordionErpShipments() {
+        this.setState({
+            showErpShipment: !this.state.showErpShipment
+        })
+        var fields = document.getElementsByClassName("erpShipments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showErpShipment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
     }
 
 
@@ -522,7 +590,8 @@ export default class SupplyPlanComponent extends React.Component {
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
                                 <tr>
-                                    <th ></th>
+                                    <th className="BorderNoneSupplyPlan"></th>
+                                    <th className="supplyplanTdWidth"></th>
                                     {
                                         this.state.monthsArray.map(item => (
                                             <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
@@ -531,7 +600,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                             </thead>
                             <tbody>
+
                                 <tr bgcolor='#d9d9d9'>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                     {
                                         this.state.openingBalanceArray.map(item1 => (
@@ -540,6 +611,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>- {i18n.t('static.dashboard.consumption')}</b></td>
                                     {
                                         this.state.consumptionTotalData.map(item1 => (
@@ -548,6 +620,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                        {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                    </td>
                                     <td align="left"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
                                     {
                                         this.state.shipmentsTotalData.map(item1 => (
@@ -555,7 +630,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         ))
                                     }
                                 </tr>
-                                <tr>
+
+                                <tr class="totalShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                     {
                                         this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -576,7 +653,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-                                <tr>
+
+                                <tr class="totalShipments">
+                                    <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                        {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                    </td>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                     {
                                         this.state.manualShipmentsTotalData.map(item1 => (
@@ -584,8 +665,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         ))
                                     }
                                 </tr>
-                                <tr>
+
+                                <tr class="manualShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+
                                     {
                                         this.state.deliveredShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
@@ -595,9 +679,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         })
                                     }
+
                                 </tr>
 
-                                <tr>
+                                <tr class="manualShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                     {
                                         this.state.shippedShipmentsTotalData.map(item1 => {
@@ -610,7 +696,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
 
-                                <tr>
+                                <tr class="manualShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                     {
                                         this.state.orderedShipmentsTotalData.map(item1 => {
@@ -622,7 +709,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-                                <tr>
+                                <tr class="manualShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                     {
                                         this.state.plannedShipmentsTotalData.map(item1 => {
@@ -634,7 +722,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-                                <tr>
+                                <tr class="totalShipments">
+                                    <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                        {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                    </td>
                                     <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
                                     {
                                         this.state.erpShipmentsTotalData.map(item1 => (
@@ -642,7 +733,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         ))
                                     }
                                 </tr>
-                                <tr>
+                                <tr class="erpShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                     {
                                         this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -655,7 +747,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
 
-                                <tr>
+                                <tr class="erpShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                     {
                                         this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -667,8 +760,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-
-                                <tr>
+                                <tr class="erpShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                     {
                                         this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -680,7 +773,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                     }
                                 </tr>
-                                <tr>
+                                <tr class="erpShipments">
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                     {
                                         this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -693,6 +787,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                     {
                                         this.state.inventoryTotalData.map(item1 => (
@@ -701,6 +796,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr bgcolor='#d9d9d9'>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                     {
                                         this.state.closingBalanceArray.map(item1 => (
@@ -709,6 +805,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                     {
                                         this.state.monthsOfStockArray.map(item1 => (
@@ -717,6 +814,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
                                     {
                                         this.state.amcTotalData.map(item1 => (
@@ -725,6 +823,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                     {
                                         this.state.minStockMoS.map(item1 => (
@@ -733,6 +832,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                     {
                                         this.state.maxStockMoS.map(item1 => (
@@ -741,6 +841,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 </tr>
                                 <tr>
+                                    <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                     {
                                         this.state.unmetDemand.map(item1 => (
@@ -880,7 +981,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         if (item1.adjustmentQty.toString() != '') {
                                                             return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
                                                         } else {
-                                                            var lastActualConsumptionDate = moment(this.state.lastActualConsumptionDate).format("YYYY-MM");
+                                                            var lastActualConsumptionDate = moment(((this.state.lastActualConsumptionDateArr.filter(c => item1.region.id == c.region))[0]).lastActualConsumptionDate).format("YYYY-MM");
                                                             var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
                                                             if (currentMonthDate > lastActualConsumptionDate) {
                                                                 return (<td align="right"></td>)
@@ -976,6 +1077,20 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
+        var fields = document.getElementsByClassName("totalShipments");
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].style.display = "none";
+        }
+
+        fields = document.getElementsByClassName("manualShipments");
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].style.display = "none";
+        }
+
+        fields = document.getElementsByClassName("erpShipments");
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].style.display = "none";
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
@@ -1004,6 +1119,9 @@ export default class SupplyPlanComponent extends React.Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+
+                        // var pjBytes = CryptoJS.AES.decrypt(myResult[i].programJson, SECRET_KEY);
+                        // var pj = pjBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
                             name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + "~v" + myResult[i].version,
                             id: myResult[i].id
@@ -1019,7 +1137,7 @@ export default class SupplyPlanComponent extends React.Component {
     };
 
     getPlanningUnitList(event) {
-        document.getElementById("planningUnitId").value = 0;
+
         this.setState({
             display: 'none'
         })
@@ -1052,6 +1170,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
+                        // name: // programJson.regionList[i].regionId,
                         name: getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
@@ -1148,7 +1267,14 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(monthCount) {
-        console.log("In form submit")
+        // this.setState({
+        //     showTotalShipment: false,
+        //     showManualShipment: false,
+        //     showErpShipment: false
+        // })
+        // this.toggleAccordionTotalShipments();
+        // this.toggleAccordionManualShipments();
+        // this.toggleAccordionErpShipments();
         if (document.getElementById("planningUnitId").value != 0) {
             this.setState({
                 planningUnitChange: true,
@@ -1248,23 +1374,24 @@ export default class SupplyPlanComponent extends React.Component {
                     shelfLife: shelfLife,
                     versionId: programJson.currentVersion.versionId
                 })
-                console.log("Program Json consumption List", programJson.consumptionList);
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
-                console.log("Consumption List------------->", consumptionList);
-                console.log("planningUnitId", planningUnitId);
-                var consumptionListForlastActualConsumptionDate = consumptionList.filter(c => c.actualFlag == true);
-                var lastActualConsumptionDate = "";
-                for (var lcd = 0; lcd < consumptionListForlastActualConsumptionDate.length; lcd++) {
-                    if (lcd == 0) {
-                        lastActualConsumptionDate = consumptionListForlastActualConsumptionDate[lcd].consumptionDate;
+                var lastActualConsumptionDateArr = [];
+                for (var i = 0; i < regionListFiltered.length; i++) {
+                    var consumptionListForlastActualConsumptionDate = consumptionList.filter(c => (c.actualFlag.toString() == "true") && c.region.id == regionListFiltered[i].id);
+                    var lastActualConsumptionDate = "";
+                    for (var lcd = 0; lcd < consumptionListForlastActualConsumptionDate.length; lcd++) {
+                        if (lcd == 0) {
+                            lastActualConsumptionDate = consumptionListForlastActualConsumptionDate[lcd].consumptionDate;
+                        }
+                        if (lastActualConsumptionDate < consumptionListForlastActualConsumptionDate[lcd].consumptionDate) {
+                            lastActualConsumptionDate = consumptionListForlastActualConsumptionDate[lcd].consumptionDate;
+                        }
                     }
-                    if (lastActualConsumptionDate < consumptionListForlastActualConsumptionDate[lcd].consumptionDate) {
-                        lastActualConsumptionDate = consumptionListForlastActualConsumptionDate[lcd].consumptionDate;
-                    }
+                    lastActualConsumptionDateArr.push({ lastActualConsumptionDate: lastActualConsumptionDate, region: regionListFiltered[i].id })
                 }
-                if (regionId != -1) {
-                    consumptionList = consumptionList.filter(c => c.region.id == regionId)
-                }
+                // if (regionId != -1) {
+                //     consumptionList = consumptionList.filter(c => c.region.id == regionId)
+                // }
 
                 for (var i = 0; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
                     var consumptionQty = 0;
@@ -1312,8 +1439,6 @@ export default class SupplyPlanComponent extends React.Component {
                         unallocatedConsumption.push(consumptionUnaccountedQty);
                     }
                 }
-
-                console.log("Consumption total data", consumptionTotalData);
 
                 // Calculations for AMC
                 var amcBeforeArray = [];
@@ -1386,6 +1511,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     var amcArray = amcBeforeArray.concat(amcAfterArray);
                     var amcArrayFilteredForMonth = amcArray.filter(c => m[i].month == c.month);
+                    console.log("amcArray filtered", amcArrayFilteredForMonth, "Month", m[i].month);
                     var countAMC = amcArrayFilteredForMonth.length;
                     var sumOfConsumptions = 0;
                     for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
@@ -1575,6 +1701,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var shippedErpShipmentsDetailsArr = [];
                             var orderedErpShipmentsDetailsArr = [];
                             var plannedErpShipmentsDetailsArr = [];
+                            var paColor = "";
 
                             for (var j = 0; j < shipmentArr.length; j++) {
                                 shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
@@ -1584,27 +1711,47 @@ export default class SupplyPlanComponent extends React.Component {
                             for (var j = 0; j < manualShipmentArr.length; j++) {
                                 manualTotalQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 if (manualShipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (manualShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     deliveredShipmentsDetailsArr.push(shipmentDetail);
                                     deliveredShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 } else if (manualShipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (manualShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     shippedShipmentsDetailsArr.push(shipmentDetail);
                                     shippedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 } else if (manualShipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (manualShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     orderedShipmentsDetailsArr.push(shipmentDetail);
                                     orderedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 } else if (manualShipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == DRAFT_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (manualShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     plannedShipmentsDetailsArr.push(shipmentDetail);
                                     plannedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 }
@@ -1613,7 +1760,7 @@ export default class SupplyPlanComponent extends React.Component {
                             manualShipmentsTotalData.push(manualTotalQty);
 
                             if ((manualShipmentArr.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (deliveredShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1623,7 +1770,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
 
                             if ((manualShipmentArr.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (shippedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1633,7 +1780,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
 
                             if ((manualShipmentArr.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (orderedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1643,7 +1790,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
 
                             if ((manualShipmentArr.filter(c => c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS || c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (plannedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1655,27 +1802,47 @@ export default class SupplyPlanComponent extends React.Component {
                             for (var j = 0; j < erpShipmentArr.length; j++) {
                                 erpTotalQty += parseInt((erpShipmentArr[j].shipmentQty));
                                 if (erpShipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (erpShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     deliveredErpShipmentsDetailsArr.push(shipmentDetail);
                                     deliveredErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
                                 } else if (erpShipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (erpShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     shippedErpShipmentsDetailsArr.push(shipmentDetail);
                                     shippedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
                                 } else if (erpShipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (erpShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     orderedErpShipmentsDetailsArr.push(shipmentDetail);
                                     orderedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
                                 } else if (erpShipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == DRAFT_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
-                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                    var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                    if (erpShipmentArr[j].procurementAgent.id != "") {
+                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
+                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        paColor = procurementAgent.colorHtmlCode;
+                                    } else {
+                                        paColor = "#efefef"
+                                    }
                                     plannedErpShipmentsDetailsArr.push(shipmentDetail);
                                     plannedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
                                 }
@@ -1684,7 +1851,7 @@ export default class SupplyPlanComponent extends React.Component {
                             erpShipmentsTotalData.push(erpTotalQty);
 
                             if ((erpShipmentArr.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (deliveredErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1694,7 +1861,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
 
                             if ((erpShipmentArr.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (shippedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1704,7 +1871,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
 
                             if ((erpShipmentArr.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (orderedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1714,7 +1881,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
 
                             if ((erpShipmentArr.filter(c => c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS || c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
-                                var colour = "";
+                                var colour = paColor;
                                 if (plannedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
@@ -1723,7 +1890,6 @@ export default class SupplyPlanComponent extends React.Component {
                                 plannedErpShipmentsTotalData.push("");
                             }
                         }
-                        console.log("PlannedShipmentSrr", plannedShipmentsTotalData);
                         // Calculation of opening and closing balance
                         var openingBalance = 0;
                         var totalConsumption = 0;
@@ -1759,6 +1925,9 @@ export default class SupplyPlanComponent extends React.Component {
                             totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
                         }
                         openingBalance = totalAdjustments - totalConsumption + totalShipments;
+                        if (openingBalance < 0) {
+                            openingBalance = 0;
+                        }
                         openingBalanceArray.push(openingBalance);
                         for (var i = 1; i <= TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
                             var consumptionQtyForCB = 0;
@@ -2025,6 +2194,7 @@ export default class SupplyPlanComponent extends React.Component {
                             planningUnitName: planningUnitName,
                             jsonArrForGraph: jsonArrForGraph,
                             lastActualConsumptionDate: lastActualConsumptionDate,
+                            lastActualConsumptionDateArr: lastActualConsumptionDateArr,
                             unmetDemand: unmetDemand
                         })
                     }.bind(this)
@@ -2327,8 +2497,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var elInstance = el.jexcel;
                             var rowData = elInstance.getRowData(y);
                             var batchInfo = rowData[10];
-                            console.log("BatchInfo-=----------------->", batchInfo);
-                            if (rowData[8] == true) {
+                            if (rowData[8].toString() == "true") {
                                 if (batchInfo != "") {
                                     var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
                                     cell.classList.add('readonly');
@@ -2342,8 +2511,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var items = [];
                             //Add consumption batch info
                             var rowData = obj.getRowData(y)
-                            console.log("RowData[8]", rowData[8]);
-                            if (rowData[8] == "true" || rowData[8] == true) {
+                            if (rowData[8].toString() == "true") {
                                 items.push({
                                     title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                     onclick: function () {
@@ -2355,31 +2523,33 @@ export default class SupplyPlanComponent extends React.Component {
                                         var rowData = obj.getRowData(y)
                                         var batchInfo = rowData[10];
                                         var consumptionQty = (rowData[3]).toString().replaceAll("\,", "");
-                                        console.log("Consumption QTy", consumptionQty);
                                         var consumptionBatchInfoQty = 0;
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
                                             data[0] = batchInfo[sb].batch.batchId;
-                                            data[1] = batchInfo[sb].consumptionQty;
-                                            data[2] = batchInfo[sb].consumptionTransBatchInfoId;
-                                            data[3] = y;
+                                            data[1] = batchInfo[sb].batch.expiryDate;
+                                            data[2] = batchInfo[sb].consumptionQty;
+                                            data[3] = batchInfo[sb].consumptionTransBatchInfoId;
+                                            data[4] = y;
                                             consumptionBatchInfoQty += parseInt(batchInfo[sb].consumptionQty);
                                             json.push(data);
                                         }
                                         if (parseInt(consumptionQty) > consumptionBatchInfoQty && batchInfo.length > 0) {
                                             var data = [];
                                             data[0] = -1;
-                                            data[1] = parseInt(consumptionQty) - parseInt(consumptionBatchInfoQty);
-                                            data[2] = 0;
-                                            data[3] = y;
+                                            data[1] = "";
+                                            data[2] = parseInt(consumptionQty) - parseInt(consumptionBatchInfoQty);
+                                            data[3] = 0;
+                                            data[4] = y;
                                             json.push(data);
                                         }
                                         if (batchInfo.length == 0) {
                                             var data = [];
                                             data[0] = "";
-                                            data[1] = "";
-                                            data[2] = 0;
-                                            data[3] = y;
+                                            data[1] = ""
+                                            data[2] = "";
+                                            data[3] = 0;
+                                            data[4] = y;
                                             json.push(data)
                                         }
                                         var options = {
@@ -2392,6 +2562,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                     type: 'dropdown',
                                                     source: this.state.batchInfoList,
                                                     filter: this.filterBatchInfoForExistingData
+                                                },
+                                                {
+                                                    title: i18n.t('static.supplyPlan.expiryDate'),
+                                                    type: 'calendar',
+                                                    options: {
+                                                        format: 'MM-DD-YYYY',
+                                                        validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                    },
+                                                    readOnly: true
                                                 },
                                                 {
                                                     title: i18n.t('static.report.consupmtionqty'),
@@ -2495,8 +2674,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 var data = [];
                                                                 data[0] = "";
                                                                 data[1] = "";
-                                                                data[2] = 0;
-                                                                data[3] = y;
+                                                                data[2] = "";
+                                                                data[3] = 0;
+                                                                data[4] = y;
                                                                 obj.insertRow(data);
                                                             }
                                                         });
@@ -2740,13 +2920,17 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
+                if (value != -1) {
+                    var expiryDate = this.state.batchInfoListAllForConsumption.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
+                    elInstance.setValueFromCoords(1, y, expiryDate, true);
+                }
             }
         }
-        if (x == 1) {
+        if (x == 2) {
             var reg = /^[0-9\b]+$/;
-            var col = ("B").concat(parseInt(y) + 1);
+            var col = ("C").concat(parseInt(y) + 1);
             value = value.toString().replaceAll("\,", "");
-            if (value == "" || x == 0) {
+            if (value == "" || value == 0) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -2811,11 +2995,11 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, "");
                 }
 
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(1, y);
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(2, y);
                 value = value.toString().replaceAll("\,", "");
                 var reg = /^[0-9\b]+$/;
-                if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
+                if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
                     valid = false;
@@ -2844,7 +3028,7 @@ export default class SupplyPlanComponent extends React.Component {
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
                 if (i == 0) {
-                    rowNumber = map.get("3");
+                    rowNumber = map.get("4");
                 }
                 var batchInfoJson;
                 if (map.get("0") != -1) {
@@ -2852,20 +3036,19 @@ export default class SupplyPlanComponent extends React.Component {
                     var filteredBatch = this.state.batchInfoListAllForConsumption.filter(c => c.batchNo == batchNo);
                     var expiryDate = filteredBatch[0].expiryDate;
                     batchInfoJson = {
-                        consumptionTransBatchInfoId: map.get("2"),
+                        consumptionTransBatchInfoId: map.get("3"),
                         batch: {
                             batchId: map.get("0"),
                             batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
                             expiryDate: expiryDate
                         },
-                        consumptionQty: map.get("1").toString().replaceAll("\,", "")
+                        consumptionQty: map.get("2").toString().replaceAll("\,", "")
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
-                totalConsumption += parseInt(map.get("1").toString().replaceAll("\,", ""));
+                totalConsumption += parseInt(map.get("2").toString().replaceAll("\,", ""));
             }
             var consumptionInstance = this.state.consumptionEl;
-            console.log("this.state.consumptionEl", this.state.consumptionEl);
             consumptionInstance.setValueFromCoords(3, parseInt(rowNumber), totalConsumption, true);
             consumptionInstance.setValueFromCoords(10, parseInt(rowNumber), batchInfoArray, true);
             // rowData[10] = batchInfoArray;
@@ -2968,7 +3151,7 @@ export default class SupplyPlanComponent extends React.Component {
             mapArray.push(map);
 
             var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("8") == map.get("8")
+                c.get("8").toString() == map.get("8").toString()
             )
             if (checkDuplicateInMap.length > 1) {
                 var colArr = ['I'];
@@ -3091,12 +3274,16 @@ export default class SupplyPlanComponent extends React.Component {
                     var consumptionDataList = (programJson.consumptionList);
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
+                        var actualFlag = false;
+                        if (map.get("8").toString() == "true") {
+                            actualFlag = true;
+                        }
                         if (map.get("6") != -1) {
                             consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
                             consumptionDataList[parseInt(map.get("6"))].consumptionQty = (map.get("3")).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = (map.get("4")).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
-                            consumptionDataList[parseInt(map.get("6"))].actualFlag = map.get("8");
+                            consumptionDataList[parseInt(map.get("6"))].actualFlag = actualFlag;
                             consumptionDataList[parseInt(map.get("6"))].active = map.get("9");
                             consumptionDataList[parseInt(map.get("6"))].batchInfoList = map.get("10")
                         } else {
@@ -3112,7 +3299,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     id: map.get("2")
                                 },
                                 notes: map.get("5"),
-                                actualFlag: map.get("8"),
+                                actualFlag: actualFlag,
                                 active: map.get("9"),
 
                                 // planningUnit: {
@@ -3277,9 +3464,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 expectedBal = parseInt(inventoryList[j].actualQty) - parseInt(inventoryList[j].adjustmentQty);
                             }
                             var readonlyCountrySKU = true;
-                            var adjustmentType = "Actual";
+                            var adjustmentType = "1";
                             if (inventoryList[j].actualQty == "" || inventoryList[j].actualQty == 0) {
-                                adjustmentType = "Adjustment"
+                                adjustmentType = "2"
                             }
                             var readonlyAdjustmentType = "";
                             if (inventoryList[j].batchInfoList.length != 0) {
@@ -3348,7 +3535,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList },
                                 { title: i18n.t('static.planningunit.countrysku'), type: 'dropdown', source: countrySKUList, readOnly: readonlyCountrySKU },
                                 { title: i18n.t('static.supplyPlan.conversionUnits'), type: 'hidden', readOnly: true },
-                                { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: ['Actual', 'Adjustment'], readOnly: readonlyAdjustmentType },
+                                { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: readonlyAdjustmentType },
                                 { title: i18n.t('static.supplyPlan.planningUnitQty'), type: 'hidden', readOnly: true },
                                 { title: i18n.t('static.inventory.manualAdjustment'), type: 'numeric', mask: '[-]#,##' },
                                 { title: i18n.t('static.supplyPlan.planningUnitQty'), type: 'hidden', readOnly: true },
@@ -3395,7 +3582,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     cell.classList.remove('readonly');
                                 }
                                 var adjustmentType = rowData[5];
-                                if (adjustmentType == "Actual") {
+                                if (adjustmentType == 1) {
                                     var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
                                     cell.classList.add('readonly');
                                     var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
@@ -3411,7 +3598,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 var items = [];
                                 //Add consumption batch info
                                 var rowData = obj.getRowData(y)
-                                if (rowData[5] == 'Actual' || rowData[5] == 'Adjustment') {
+                                if (rowData[5] == 1 || rowData[5] == 2) {
                                     items.push({
                                         title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                         onclick: function () {
@@ -3420,7 +3607,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             this.el.destroy();
                                             var json = [];
                                             // var elInstance=this.state.plannedPsmShipmentsEl;
-                                            console.log("Y----------", y);
                                             var cell = obj.getCell(`F${parseInt(y) + 1}`)
                                             cell.classList.add('readonly');
                                             var rowData = obj.getRowData(y);
@@ -3428,7 +3614,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             var adjustmentType = rowData[5];
                                             var columnTypeForActualStock = "";
                                             var columnTypeForAdjustedQty = "";
-                                            if (adjustmentType == "Actual") {
+                                            if (adjustmentType == 1) {
                                                 columnTypeForActualStock = "numeric";
                                                 columnTypeForAdjustedQty = "hidden";
                                             } else {
@@ -3436,7 +3622,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 columnTypeForAdjustedQty = "numeric";
                                             }
                                             var inventoryQty = 0;
-                                            if (adjustmentType == "Actual") {
+                                            if (adjustmentType == 1) {
                                                 inventoryQty = (rowData[9]).toString().replaceAll("\,", "");
                                             } else {
                                                 inventoryQty = (rowData[7]).toString().replaceAll("\,", "");
@@ -3450,7 +3636,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 data[3] = batchInfo[sb].actualQty; //D
                                                 data[4] = batchInfo[sb].inventoryTransBatchInfoId; //E
                                                 data[5] = y; //F
-                                                if (adjustmentType == "Actual") {
+                                                if (adjustmentType == 1) {
                                                     inventoryBatchInfoQty += parseInt(batchInfo[sb].actualQty);
                                                 } else {
                                                     inventoryBatchInfoQty += parseInt(batchInfo[sb].adjustmentQty);
@@ -3462,7 +3648,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var data = [];
                                                 data[0] = -1; //A
                                                 data[1] = adjustmentType; //B
-                                                if (adjustmentType == "Actual") {
+                                                if (adjustmentType == 1) {
                                                     data[2] = ""; //C
                                                     data[3] = qty; //D
                                                 } else {
@@ -3497,7 +3683,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     {
                                                         title: i18n.t('static.supplyPlan.adjustmentType'),
                                                         type: 'hidden',
-                                                        source: ['Actual', 'Adjustment'],
+                                                        source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }],
                                                         readOnly: true
                                                     },
                                                     {
@@ -3542,8 +3728,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
                                                     var adjustmentType = rowData[1];
-                                                    console.log("Adjustment Type", adjustmentType);
-                                                    if (adjustmentType == "Actual") {
+                                                    if (adjustmentType == 1) {
                                                         var cell = elInstance.getCell(`C${parseInt(y) + 1}`)
                                                         cell.classList.add('readonly');
                                                         var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
@@ -3619,9 +3804,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         // Insert new row
                                                         if (obj.options.allowInsertRow == true) {
                                                             var rowData = obj.getRowData(y);
-                                                            console.log("Row Data", rowData);
                                                             var adjustmentType = rowData[1];
-                                                            console.log("Adjustment Type", adjustmentType);
                                                             items.push({
                                                                 title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                                 onclick: function () {
@@ -3900,7 +4083,7 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-            } else if (elInstance.getValueFromCoords(1, y) == 'Adjustment') {
+            } else if (elInstance.getValueFromCoords(1, y) == 2) {
                 var col = ("C").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -3926,7 +4109,7 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-            } else if (elInstance.getValueFromCoords(1, y) == 'Actual') {
+            } else if (elInstance.getValueFromCoords(1, y) == 1) {
                 var col = ("D").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -3947,7 +4130,7 @@ export default class SupplyPlanComponent extends React.Component {
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
-                if (value == 'Actual') {
+                if (value == 1) {
                     var cell = elInstance.getCell(`C${parseInt(y) + 1}`)
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
@@ -4028,7 +4211,7 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(1, y) == 'Adjustment') {
+                } else if (elInstance.getValueFromCoords(1, y) == 2) {
                     var col = ("C").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4054,7 +4237,7 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(1, y) == 'Actual') {
+                } else if (elInstance.getValueFromCoords(1, y) == 1) {
                     var col = ("D").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4118,7 +4301,7 @@ export default class SupplyPlanComponent extends React.Component {
             var inventoryInstance = this.state.inventoryEl;
             var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
 
-            if (map.get(1) == "Actual") {
+            if (map.get(1) == 1) {
                 inventoryInstance.setValueFromCoords(7, rowNumber, "", true);
                 inventoryInstance.setValueFromCoords(9, rowNumber, totalActualStock, true);
             } else {
@@ -4213,7 +4396,7 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-            } else if (elInstance.getValueFromCoords(5, y) == 'Adjustment') {
+            } else if (elInstance.getValueFromCoords(5, y) == 2) {
                 var col = ("H").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -4239,7 +4422,7 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-            } else if (elInstance.getValueFromCoords(5, y) == 'Actual') {
+            } else if (elInstance.getValueFromCoords(5, y) == 1) {
                 var col = ("J").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -4260,7 +4443,7 @@ export default class SupplyPlanComponent extends React.Component {
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
-                if (value == 'Actual') {
+                if (value == 1) {
                     var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
@@ -4370,7 +4553,7 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(5, y) == 'Adjustment') {
+                } else if (elInstance.getValueFromCoords(5, y) == 2) {
                     var col = ("H").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4396,7 +4579,7 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(5, y) == 'Actual') {
+                } else if (elInstance.getValueFromCoords(5, y) == 1) {
                     var col = ("J").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4651,7 +4834,7 @@ export default class SupplyPlanComponent extends React.Component {
                             for (var k = 0; k < fsResult.length; k++) {
                                 if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
                                     var fsJson = {
-                                        name: getLabelText(fsResult[k].label, this.state.lang),
+                                        name: getLabelText(fsResult[k].label, this.state.lang) + " - " + fsResult[k].fundingSourceCode,
                                         id: fsResult[k].fundingSourceId
                                     }
                                     fundingSourceList.push(fsJson);
@@ -4695,7 +4878,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     data[6] = "";//Currency
                                     data[7] = "";//ConversionRateToUSD
                                     data[8] = "";//Funding Source
-                                    data[9] = suggestedShipmentList[j].shipmentMode;
+                                    data[9] = "";
                                     data[10] = "";
                                     data[11] = orderedDate;
                                     data[12] = "";
@@ -4735,7 +4918,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         { type: 'dropdown', source: currencyList, title: i18n.t('static.dashboard.currency') },
                                         { type: 'text', readOnly: true, title: i18n.t('static.currency.conversionrateusd') },
                                         { type: 'dropdown', source: fundingSourceList, title: i18n.t('static.subfundingsource.fundingsource') },
-                                        { type: 'dropdown', source: ['Sea', 'Air'], title: i18n.t('static.supplyPlan.shipmentMode') },
+                                        { type: 'dropdown', source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], title: i18n.t('static.supplyPlan.shipmentMode') },
                                         { type: 'text', title: i18n.t('static.program.notes') },
                                         { type: 'hidden', title: i18n.t('static.supplyPlan.orderDate') },
                                         { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), null] }, title: i18n.t('static.supplyPlan.expectedDeliveryDate') },
@@ -5034,10 +5217,14 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (papuResult.localProcurementAgent) {
                                     addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                 } else {
+                                    var submittedToApprovedLeadTime = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "") {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
                                     addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+                                        parseFloat(submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
-                                    if (valueOfG == "Sea") {
+                                    if (valueOfG == 1) {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                     } else {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
@@ -5114,11 +5301,14 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (papuResult.localProcurementAgent) {
                                     addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                 } else {
-
+                                    var submittedToApprovedLeadTime = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "") {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
                                     addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+                                        parseFloat(submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
-                                    if (value == "Sea") {
+                                    if (value == 1) {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                     } else {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
@@ -5317,10 +5507,14 @@ export default class SupplyPlanComponent extends React.Component {
                         if (papuResult.localProcurementAgent) {
                             addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                         } else {
+                            var submittedToApprovedLeadTime = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].submittedToApprovedLeadTime;
+                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "") {
+                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                            }
                             addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+                                parseFloat(submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
-                            if (map.get("9") == "Sea") {
+                            if (map.get("9") == 1) {
                                 addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                             } else {
                                 addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
@@ -5331,6 +5525,10 @@ export default class SupplyPlanComponent extends React.Component {
                         var isEmergencyOrder = 0;
                         if (moment(Date.parse(map.get("12"))).format("YYYY-MM") < moment(expectedDeliveryDate).format("YYYY-MM")) {
                             isEmergencyOrder = 1;
+                        }
+                        var shipmentMode = "Sea";
+                        if (map.get("9") == 2) {
+                            shipmentMode = "Air";
                         }
 
                         var shipmentJson = {
@@ -5358,7 +5556,7 @@ export default class SupplyPlanComponent extends React.Component {
                             rate: 0,
                             deliveredDate: "",
                             shipmentId: 0,
-                            shipmentMode: map.get("9"),
+                            shipmentMode: shipmentMode,
                             shipmentStatus: {
                                 id: PLANNED_SHIPMENT_STATUS
                             },
@@ -5424,7 +5622,6 @@ export default class SupplyPlanComponent extends React.Component {
     filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[2];
-        console.log("this.state.batchInfoList", this.state.batchInfoList);
         if (value != 0) {
             mylist = this.state.batchInfoList.filter(c => c.id != -1);
         } else {
@@ -5436,7 +5633,6 @@ export default class SupplyPlanComponent extends React.Component {
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[4];
-        console.log("this.state.batchInfoList", this.state.batchInfoList);
         if (value != 0) {
             mylist = this.state.batchInfoList.filter(c => c.id != -1);
         } else {
@@ -5577,7 +5773,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     <ul className="legendcommitversion">
-                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleProcurementAgent')}</span></li>
+                                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+
                                                         <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
                                                         {/* <li><span className=" lightGreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleProcurementAgent')} </span></li> */}
                                                     </ul>
@@ -5714,7 +5912,7 @@ export default class SupplyPlanComponent extends React.Component {
                         for (var k = 0; k < fsResult.length; k++) {
                             if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
                                 var fsJson = {
-                                    name: getLabelText(fsResult[k].label, this.state.lang),
+                                    name: getLabelText(fsResult[k].label, this.state.lang) + " - " + fsResult[k].fundingSourceCode,
                                     id: fsResult[k].fundingSourceId
                                 }
                                 fundingSourceList.push(fsJson);
@@ -5840,7 +6038,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 for (var k = 0; k < bResult.length; k++) {
                                                     if (bResult[k].program.id == programJson.programId && bResult[k].active == true) {
                                                         var bJson = {
-                                                            name: getLabelText(bResult[k].label, this.state.lang),
+                                                            name: getLabelText(bResult[k].label, this.state.lang) + " - " + bResult[k].budgetCode,
                                                             id: bResult[k].budgetId
                                                         }
                                                         budgetList.push(bJson);
@@ -5892,12 +6090,22 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var data = [];
                                                 var shipmentsArr = [];
                                                 for (var i = 0; i < shipmentList.length; i++) {
-                                                    var procurementAgentPlanningUnit = procurementAgentListAll.filter(p => p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
-                                                    var moq = procurementAgentPlanningUnit.moq;
-                                                    var pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
-                                                    if (shipmentList[i].procurementUnit.id != 0) {
-                                                        var procurementUnit = procurementUnitListAll.filter(p => p.procurementUnit.id == shipmentList[i].procurementUnit.id && p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
-                                                        pricePerUnit = procurementUnit.vendorPrice;
+                                                    var moq = 0;
+                                                    var pricePerUnit = 0;
+                                                    var userQty = "";
+                                                    var procurementAgentPlanningUnit = {}
+                                                    if (shipmentList[i].procurementAgent.id != "") {
+                                                        procurementAgentPlanningUnit = procurementAgentListAll.filter(p => p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
+                                                        moq = procurementAgentPlanningUnit.moq;
+                                                        pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
+                                                        if (shipmentList[i].procurementUnit.id != 0) {
+                                                            var procurementUnit = procurementUnitListAll.filter(p => p.procurementUnit.id == shipmentList[i].procurementUnit.id && p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
+                                                            pricePerUnit = procurementUnit.vendorPrice;
+                                                        }
+
+                                                        if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                            userQty = shipmentList[i].shipmentQty;
+                                                        }
                                                     }
                                                     var budgetAmount = 0;
                                                     var totalShipmentQty = 0;
@@ -5912,10 +6120,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     for (var sb = 0; sb < shipmentBatchInfoList.length; sb++) {
                                                         totalShipmentQty += parseInt(shipmentBatchInfoList[sb].shipmentQty);
                                                     }
-                                                    var userQty = "";
-                                                    if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
-                                                        userQty = shipmentList[i].shipmentQty;
-                                                    }
+
                                                     var orderNo = shipmentList[i].orderNo;
                                                     var primeLineNo = shipmentList[i].primeLineNo;
                                                     var orderNoAndPrimeLineNo = "";
@@ -5924,6 +6129,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                     if (primeLineNo != null && primeLineNo != "") {
                                                         orderNoAndPrimeLineNo = orderNoAndPrimeLineNo.concat("~").concat(primeLineNo);
+                                                    }
+
+                                                    var shipmentMode = 1;
+                                                    if (shipmentList[i].shipmentMode == "Air") {
+                                                        shipmentMode = 2;
                                                     }
                                                     // budgetAmount = budgetAmount.toFixed(2);
                                                     data[0] = shipmentList[i].expectedDeliveryDate; // A
@@ -5938,8 +6148,13 @@ export default class SupplyPlanComponent extends React.Component {
                                                     data[9] = this.state.planningUnitName; //J
                                                     data[10] = shipmentList[i].suggestedQty; //K
                                                     data[11] = moq; //L
-                                                    data[12] = procurementAgentPlanningUnit.unitsPerPallet;//M
-                                                    data[13] = procurementAgentPlanningUnit.unitsPerContainer;//N
+                                                    if (shipmentList[i].procurementAgent.id != "") {
+                                                        data[12] = procurementAgentPlanningUnit.unitsPerPallet;//M
+                                                        data[13] = procurementAgentPlanningUnit.unitsPerContainer;//N
+                                                    } else {
+                                                        data[12] = 0;//M
+                                                        data[13] = 0;//N
+                                                    }
                                                     data[14] = `=ROUND(IF(M${parseInt(i) + 1}!=0,IF(K${parseInt(i) + 1}>L${parseInt(i) + 1},K${parseInt(i) + 1}/M${parseInt(i) + 1},L${parseInt(i) + 1}/M${parseInt(i) + 1}),0),2)`;//O
                                                     data[15] = `=ROUND(IF(N${parseInt(i) + 1}!=0,IF(K${parseInt(i) + 1}>L${parseInt(i) + 1},K${parseInt(i) + 1}/N${parseInt(i) + 1},L${parseInt(i) + 1}/N${parseInt(i) + 1}),0),2)`;//P
                                                     data[16] = ""; // Order based on Q
@@ -5994,9 +6209,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     data[24] = shipmentList[i].supplier.id; //Y
                                                     data[25] = `=ROUND(${pricePerUnit}/G${parseInt(i) + 1},2)`; //Z
                                                     data[26] = `=ROUND(IF(AND(NOT(ISBLANK(W${parseInt(i) + 1})),(W${parseInt(i) + 1} != 0)),W${parseInt(i) + 1},Z${parseInt(i) + 1})*T${parseInt(i) + 1},2)`; //Amount AA
-                                                    data[27] = shipmentList[i].shipmentMode;//Shipment method AB
+                                                    data[27] = shipmentMode;//Shipment method AB
                                                     data[28] = shipmentList[i].freightCost;// Freight Cost AC
-                                                    data[29] = `=ROUND(IF(AB${parseInt(i) + 1}=="Sea",(AA${parseInt(i) + 1}*AH${parseInt(i) + 1})/100,(AA${parseInt(i) + 1}*AG${parseInt(i) + 1})/100),2)`;// Default frieght cost AD
+                                                    data[29] = `=ROUND(IF(AB${parseInt(i) + 1}==1,(AA${parseInt(i) + 1}*AH${parseInt(i) + 1})/100,(AA${parseInt(i) + 1}*AG${parseInt(i) + 1})/100),2)`;// Default frieght cost AD
                                                     data[30] = `=ROUND(AA${parseInt(i) + 1}+IF(AND(NOT(ISBLANK(AC${parseInt(i) + 1})),(AC${parseInt(i) + 1}!= 0)),AC${parseInt(i) + 1},AD${parseInt(i) + 1}),2)`; // Final Amount AE
                                                     data[31] = shipmentList[i].notes;//Notes AF
                                                     data[32] = airFreightPerc; //AG
@@ -6048,7 +6263,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         { type: 'dropdown', title: i18n.t('static.procurementUnit.supplier'), source: supplierList, width: 120, readOnly: true },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.amountInUSD'), width: 80, mask: '#,##.00', decimal: '.' },
-                                                        { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: ['Sea', 'Air'], width: 100 },
+                                                        { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                         { type: 'numeric', title: i18n.t('static.supplyPlan.userFreight'), width: 80, mask: '#,##.00', decimal: '.' },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.defaultFreight'), width: 80, mask: '#,##.00', decimal: '.' },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.totalAmount'), width: 80, mask: '#,##.00', decimal: '.' },
@@ -6124,12 +6339,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                         // Add shipment batch info
                                                         var rowData = obj.getRowData(y);
                                                         var expectedDeliveryDate = moment(rowData[0]).format("YYYY-MM-DD");
-                                                        console.log("ExpectedDeliveryDate", expectedDeliveryDate);
-                                                        console.log("Shelf Life", this.state.shelfLife);
                                                         var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').format("YYYY-MM-DD");
-                                                        console.log("ExpiryDate", expiryDate);
                                                         var readOnlyBatchInfo = false;
-                                                        if (rowData[1] != DELIVERED_SHIPMENT_STATUS) {
+                                                        if (rowData[35] != DELIVERED_SHIPMENT_STATUS) {
                                                             readOnlyBatchInfo = true
                                                         }
                                                         if ((rowData[1] == DELIVERED_SHIPMENT_STATUS || rowData[1] == SHIPPED_SHIPMENT_STATUS || rowData[1] == ARRIVED_SHIPMENT_STATUS)) {
@@ -6656,14 +6868,11 @@ export default class SupplyPlanComponent extends React.Component {
                 var shipmentInstance = this.state.shipmentsEl;
                 var rowData = shipmentInstance.getRowData(parseInt(rowNumber));
                 var batchNo = "";
-                console.log("rowData[34]", rowData[34]);
-                console.log("VersiionId", this.state.versionId);
                 if (map.get("0") != "") {
                     batchNo = map.get("0");
                 } else {
                     batchNo = "QAT".concat(rowData[34]).concat(this.state.versionId).concat(AuthenticationService.getLoggedInUserId());
                 }
-                console.log("BatchNo", batchNo);
                 var batchInfoJson = {
                     shipmentTransBatchInfoId: map.get("3"),
                     batch: {
@@ -6679,7 +6888,6 @@ export default class SupplyPlanComponent extends React.Component {
 
             rowData[40] = batchInfoArray;
             rowData[41] = totalShipmentQty;
-            console.log("TotalShipmentQty------>", totalShipmentQty);
             shipmentInstance.setValueFromCoords(40, rowNumber, batchInfoArray, true);
             shipmentInstance.setValueFromCoords(41, rowNumber, totalShipmentQty, true);
             this.setState({
@@ -6709,7 +6917,6 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentError: '',
             shipmentDuplicateError: '',
         })
-        console.log("In shipment Changed ", x, "Y------------->", y);
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -6801,7 +7008,6 @@ export default class SupplyPlanComponent extends React.Component {
         }
 
         if (x == 4) {
-            console.log("In procurement agent changed ")
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -6888,7 +7094,6 @@ export default class SupplyPlanComponent extends React.Component {
                 var valueOfF = elInstance.getRowData(y)[4];
                 if (valueOfF != "") {
                     var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == value && p.procurementAgent.id == valueOfF)[0];
-                    console.log("ProcurementUnit", procurementUnit)
                     pricePerUnit = procurementUnit.vendorPrice;
                     var pu = this.state.procurementListForSupplier.filter(c => c.procurementUnitId == value)[0];
                     var supplier = pu.supplier.id;
@@ -6919,7 +7124,6 @@ export default class SupplyPlanComponent extends React.Component {
 
         if (x == 24) {
             var shipmentStatus = elInstance.getRowData(y)[1];
-            console.log("SHipment status", shipmentStatus);
             var col1 = ("Y").concat(parseInt(y) + 1);
             if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
                 var supplier = value;
@@ -6970,8 +7174,6 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 41) {
             if (value != 0) {
                 var adjustedQty = ((elInstance.getCell(`T${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-                console.log("AdjustmentQTy", adjustedQty);
-                console.log("Value", value);
                 if (value != adjustedQty) {
                     var col = ("T").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -7004,195 +7206,226 @@ export default class SupplyPlanComponent extends React.Component {
         var mapArray = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(0, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                // if (isNaN(Date.parse(value))) {
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setStyle(col, "background-color", "yellow");
-                //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                //     valid = false;
-                // } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                // }
-            }
+            // console.log("Map", map);
+            // var budget = this.state.budgetListAll.filter(c => c.budgetId == map.get("8"))[0]
+            // var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
+            // var shipmentList = this.state.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("8"));
+            // var usedBudgetTotalAmount = 0;
+            // for (var s = 0; s < shipmentList.length; s++) {
+            //     usedBudgetTotalAmount += (shipmentList[s].productCost + shipmentList[s].freightCost) * shipmentList[s].currency.conversionRateToUsd;
+            // }
+            // console.log("Used budget amount", usedBudgetTotalAmount);
+            // var totalCost = ((elInstance.getCell(`AE${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+            // console.log("Toatlcost", totalCost);
+            // console.log("map.get(6)", map.get("6"))
+            // var enteredBudgetAmt = (totalCost * map.get("6"));
+            // console.log("Entered Budget amount", enteredBudgetAmt);
+            // usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
+            // enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
+            // var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
+            // if (enteredBudgetAmt > availableBudgetAmount) {
+            //     valid = false;
+            //     var col = ("I").concat(parseInt(y) + 1);
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+
+            //     var col = ("AE").concat(parseInt(y) + 1);
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+            //     this.setState({
+            //         noFundsBudgetError: i18n.t('static.label.noFundsAvailable')
+            //     })
+            // } else {
+
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(0, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    // if (isNaN(Date.parse(value))) {
+                    //     elInstance.setStyle(col, "background-color", "transparent");
+                    //     elInstance.setStyle(col, "background-color", "yellow");
+                    //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                    //     valid = false;
+                    // } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                    // }
+                }
 
 
-            var value = elInstance.getRowData(y)[1];
-            var col = ("B").concat(parseInt(y) + 1);
-            var col1 = ("X").concat(parseInt(y) + 1);
-            var col2 = ("Y").concat(parseInt(y) + 1);
-            var col3 = ("I").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (value == DELIVERED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS) {
-                    var procurementUnit = elInstance.getValueFromCoords(23, y);
-                    var supplier = elInstance.getValueFromCoords(24, y);
-                    if (procurementUnit == "") {
-                        elInstance.setStyle(col1, "background-color", "transparent");
-                        elInstance.setStyle(col1, "background-color", "yellow");
-                        elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                        valid = false;
+                var value = elInstance.getRowData(y)[1];
+                var col = ("B").concat(parseInt(y) + 1);
+                var col1 = ("X").concat(parseInt(y) + 1);
+                var col2 = ("Y").concat(parseInt(y) + 1);
+                var col3 = ("I").concat(parseInt(y) + 1);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (value == DELIVERED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS) {
+                        var procurementUnit = elInstance.getValueFromCoords(23, y);
+                        var supplier = elInstance.getValueFromCoords(24, y);
+                        if (procurementUnit == "") {
+                            elInstance.setStyle(col1, "background-color", "transparent");
+                            elInstance.setStyle(col1, "background-color", "yellow");
+                            elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col1, "background-color", "transparent");
+                            elInstance.setComments(col1, "");
+                        }
+
+                        if (supplier == "") {
+                            elInstance.setStyle(col2, "background-color", "transparent");
+                            elInstance.setStyle(col2, "background-color", "yellow");
+                            elInstance.setComments(col2, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col2, "background-color", "transparent");
+                            elInstance.setComments(col2, "");
+                        }
+                    } else if (value == SUBMITTED_SHIPMENT_STATUS) {
+                        var budget = elInstance.getValueFromCoords(8, y);
+                        if (budget == "") {
+                            elInstance.setStyle(col3, "background-color", "transparent");
+                            elInstance.setStyle(col3, "background-color", "yellow");
+                            elInstance.setComments(col3, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col3, "background-color", "transparent");
+                            elInstance.setComments(col3, "");
+                        }
                     } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
                         elInstance.setStyle(col1, "background-color", "transparent");
                         elInstance.setComments(col1, "");
-                    }
-
-                    if (supplier == "") {
-                        elInstance.setStyle(col2, "background-color", "transparent");
-                        elInstance.setStyle(col2, "background-color", "yellow");
-                        elInstance.setComments(col2, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
                         elInstance.setStyle(col2, "background-color", "transparent");
                         elInstance.setComments(col2, "");
-                    }
-                } else if (value == SUBMITTED_SHIPMENT_STATUS) {
-                    var budget = elInstance.getValueFromCoords(8, y);
-                    if (budget == "") {
-                        elInstance.setStyle(col3, "background-color", "transparent");
-                        elInstance.setStyle(col3, "background-color", "yellow");
-                        elInstance.setComments(col3, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
                         elInstance.setStyle(col3, "background-color", "transparent");
                         elInstance.setComments(col3, "");
                     }
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                    elInstance.setStyle(col2, "background-color", "transparent");
-                    elInstance.setComments(col2, "");
-                    elInstance.setStyle(col3, "background-color", "transparent");
-                    elInstance.setComments(col3, "");
                 }
-            }
 
-            var col = ("AB").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(27, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var col = ("S").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(18, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                var col = ("AB").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(27, y);
+                if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
 
-            }
-
-            var col = ("E").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(4, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(3, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var col = ("W").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(22, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
+                var col = ("S").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(18, y);
+                if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
-                }
-
-            }
-
-            var col = ("AC").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(28, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-            var shipmentStatus = elInstance.getRowData(y)[1];
-            if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
-                var shipmentStatus = elInstance.getRowData(y)[1];
-                console.log("elInstance.getValueFromCoords(40, y).length", elInstance.getValueFromCoords(40, y).length);
-                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
-                    var totalShipmentQty = (elInstance.getValueFromCoords(41, y));
-                    console.log("TotalShipmentQty", totalShipmentQty);
-                    var adjustedOrderQty = (elInstance.getCell(`T${parseInt(y) + 1}`)).innerHTML;
-                    adjustedOrderQty = adjustedOrderQty.toString().replaceAll("\,", "");
-                    console.log("adjusted Order qty", adjustedOrderQty)
-                    var col = ("T").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.batchNumberMissing'));
-                    if (totalShipmentQty != 0 && totalShipmentQty != adjustedOrderQty) {
-                        this.setState({
-                            shipmentBatchError: i18n.t('static.supplyPlan.batchNumberMissing')
-                        })
-                        valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
-                        var col = ("T").concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
+
                 }
-            }
-            // }
+
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(4, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(3, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("W").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(22, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                } else {
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                }
+
+                var col = ("AC").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(28, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                } else {
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                }
+                var shipmentStatus = elInstance.getRowData(y)[1];
+                if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
+                    var shipmentStatus = elInstance.getRowData(y)[1];
+                    if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                        var totalShipmentQty = (elInstance.getValueFromCoords(41, y));
+                        var adjustedOrderQty = (elInstance.getCell(`T${parseInt(y) + 1}`)).innerHTML;
+                        adjustedOrderQty = adjustedOrderQty.toString().replaceAll("\,", "");
+                        var col = ("T").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.supplyPlan.batchNumberMissing'));
+                        if (totalShipmentQty != 0 && totalShipmentQty != adjustedOrderQty) {
+                            this.setState({
+                                shipmentBatchError: i18n.t('static.supplyPlan.batchNumberMissing')
+                            })
+                            valid = false;
+                        } else {
+                            var col = ("T").concat(parseInt(y) + 1);
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    }
+                }
+                // }
+                // }
             // }
         }
         return valid;
@@ -7268,6 +7501,10 @@ export default class SupplyPlanComponent extends React.Component {
                         } else {
                             freightCost = (elInstance.getCell(`AD${j}`)).innerHTML;
                         }
+                        var shipmentMode = "Sea";
+                        if (map.get("27") == 2) {
+                            shipmentMode = "Air";
+                        }
                         shipmentDataList[parseInt(map.get("34"))].expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
                         shipmentDataList[parseInt(map.get("34"))].shipmentStatus.id = shipmentStatusId;
                         shipmentDataList[parseInt(map.get("34"))].dataSource.id = map.get("3");
@@ -7278,23 +7515,62 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("34"))].rate = rate.toString().replaceAll("\,", "");
                         shipmentDataList[parseInt(map.get("34"))].procurementUnit.id = map.get("23");
                         shipmentDataList[parseInt(map.get("34"))].supplier.id = map.get("24");
-                        shipmentDataList[parseInt(map.get("34"))].shipmentMode = map.get("27");
+                        shipmentDataList[parseInt(map.get("34"))].shipmentMode = shipmentMode;
                         shipmentDataList[parseInt(map.get("34"))].productCost = productCost.toString().replaceAll("\,", "");
                         shipmentDataList[parseInt(map.get("34"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
                         shipmentDataList[parseInt(map.get("34"))].notes = map.get("31");
                         shipmentDataList[parseInt(map.get("34"))].active = map.get("39");
                         shipmentDataList[parseInt(map.get("34"))].accountFlag = map.get("37");
                         shipmentDataList[parseInt(map.get("34"))].emergencyOrder = map.get("38");
-                        shipmentDataList[parseInt(map.get("34"))].batchInfoList = map.get("40");
+                        if (map.get("40").length != 0) {
+                            console.log("In if for length")
+                            shipmentDataList[parseInt(map.get("34"))].batchInfoList = map.get("40");
+                        }
                         if (shipmentStatusId == SHIPPED_SHIPMENT_STATUS) {
                             shipmentDataList[parseInt(map.get("34"))].shippedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
                         if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                             shipmentDataList[parseInt(map.get("34"))].deliveredDate = moment(Date.now()).format("YYYY-MM-DD");
                             var shipmentBatchInfoList = map.get("40");
+                            console.log("Shipment BatchInfo", shipmentBatchInfoList);
+                            console.log("Shipment BatchInfo length", shipmentBatchInfoList.length);
+                            if (shipmentBatchInfoList.length == 0) {
+                                var batchNo = "QAT".concat(map.get("34")).concat(this.state.versionId).concat(AuthenticationService.getLoggedInUserId());
+                                var expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
+                                var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').format("YYYY-MM-DD");
+                                var batchInfoJson = {
+                                    shipmentTransBatchInfoId: 0,
+                                    batch: {
+                                        batchNo: batchNo,
+                                        expiryDate: expiryDate,
+                                        batchId: 0
+                                    },
+                                    shipmentQty: shipmentQty,
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                }
+                                console.log("batchInfoJson", batchInfoJson);
+                                console.log("map.get(34)", map.get("34"));
+                                var batchArr = [];
+                                batchArr.push(batchInfoJson);
+                                shipmentDataList[parseInt(map.get("34"))].batchInfoList = batchArr;
+                                var batchDetails = {
+                                    batchId: 0,
+                                    batchNo: batchNo,
+                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    expiryDate: expiryDate,
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                }
+                                batchInfoList.push(batchDetails);
+                            }
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                shipmentBatchInfoList[bi].createdDate = moment(Date.now()).format("YYYY-MM-DD");
-                                batchInfoList.push(shipmentBatchInfoList[bi]);
+                                var batchDetails = {
+                                    batchId: shipmentBatchInfoList[bi].batch.batchId,
+                                    batchNo: shipmentBatchInfoList[bi].batch.batchNo,
+                                    planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                    expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
+                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                }
+                                batchInfoList.push(batchDetails);
                             }
                             programJson.batchInfoList = batchInfoList;
                         }
@@ -7302,7 +7578,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     programJson.shipmentList = shipmentDataList;
-                    console.log("Shipment DAta list", shipmentDataList);
+                    console.log("Program Json after shipment------------------>", programJson);
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
 
