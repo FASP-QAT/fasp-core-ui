@@ -833,7 +833,7 @@
     "static.dashboard.pipelineProgramImport": "Program Import",
     "static.message.incorrectPassword": "Old password is incorrect",
     "static.message.accessControlSuccess": "Access controls updated successfully",
-    "static.message.pipelineProgramImportSuccess": "Program Imported successfully",
+    "static.message.pipelineProgramImportSuccess": "Program Imported Successfully",
     "static.masterDataSync.masterDataSyncFailed": "Master data sync failed.",
     "static.message.duplicateOrg": "Duplicate organisation code",
     "static.message.updateFailedAcl": "Failed to update",
