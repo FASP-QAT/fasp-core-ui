@@ -885,7 +885,8 @@
     "static.procurementagent.procurementAgentColorCode": "Color Code",
     "static.inventoryType.adjustment":"Adjustment",
     "static.supplyPlan.tbd":"TBD",
-    "static.supplyPlan.multipleShipments":"Multiple Shipments"
-    
+    "static.supplyPlan.multipleShipments":"Multiple Shipments",
+    "static.supplyPlan.sea":"Sea",
+    "static.supplyPlan.air":"Air"
 
 }
