@@ -149,7 +149,6 @@ export default class SupplyPlanComponent extends React.Component {
             showTotalShipment: false,
             showManualShipment: false,
             showErpShipment: false
-
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -838,7 +837,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.maxStockMoS.map(item1 => (
                                             <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                         ))
+                                        ))
                                     }
                                 </tr>
                                 <tr>
@@ -1138,7 +1137,7 @@ export default class SupplyPlanComponent extends React.Component {
     };
 
     getPlanningUnitList(event) {
-        document.getElementById("planningUnitId").value = 0;
+
         this.setState({
             display: 'none'
         })
@@ -1171,7 +1170,8 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
-                        name: programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, this.state.lang),
+                        // name: // programJson.regionList[i].regionId,
+                        name: getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
@@ -1267,6 +1267,14 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(monthCount) {
+        // this.setState({
+        //     showTotalShipment: false,
+        //     showManualShipment: false,
+        //     showErpShipment: false
+        // })
+        // this.toggleAccordionTotalShipments();
+        // this.toggleAccordionManualShipments();
+        // this.toggleAccordionErpShipments();
         if (document.getElementById("planningUnitId").value != 0) {
             this.setState({
                 planningUnitChange: true,
@@ -1369,7 +1377,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                 var lastActualConsumptionDateArr = [];
                 for (var i = 0; i < regionListFiltered.length; i++) {
-                    var consumptionListForlastActualConsumptionDate = consumptionList.filter(c => (c.actualFlag == true || c.actualFlag == "true") && c.region.id == regionListFiltered[i].id);
+                    var consumptionListForlastActualConsumptionDate = consumptionList.filter(c => (c.actualFlag.toString() == "true") && c.region.id == regionListFiltered[i].id);
                     var lastActualConsumptionDate = "";
                     for (var lcd = 0; lcd < consumptionListForlastActualConsumptionDate.length; lcd++) {
                         if (lcd == 0) {
@@ -2489,7 +2497,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var elInstance = el.jexcel;
                             var rowData = elInstance.getRowData(y);
                             var batchInfo = rowData[10];
-                            if (rowData[8] == true) {
+                            if (rowData[8].toString() == "true") {
                                 if (batchInfo != "") {
                                     var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
                                     cell.classList.add('readonly');
@@ -2503,7 +2511,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var items = [];
                             //Add consumption batch info
                             var rowData = obj.getRowData(y)
-                            if (rowData[8] == "true" || rowData[8] == true) {
+                            if (rowData[8].toString() == "true") {
                                 items.push({
                                     title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                     onclick: function () {
@@ -3143,7 +3151,7 @@ export default class SupplyPlanComponent extends React.Component {
             mapArray.push(map);
 
             var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("8") == map.get("8")
+                c.get("8").toString() == map.get("8").toString()
             )
             if (checkDuplicateInMap.length > 1) {
                 var colArr = ['I'];
@@ -3266,12 +3274,16 @@ export default class SupplyPlanComponent extends React.Component {
                     var consumptionDataList = (programJson.consumptionList);
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
+                        var actualFlag = false;
+                        if (map.get("8").toString() == "true") {
+                            actualFlag = true;
+                        }
                         if (map.get("6") != -1) {
                             consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
                             consumptionDataList[parseInt(map.get("6"))].consumptionQty = (map.get("3")).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = (map.get("4")).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
-                            consumptionDataList[parseInt(map.get("6"))].actualFlag = map.get("8");
+                            consumptionDataList[parseInt(map.get("6"))].actualFlag = actualFlag;
                             consumptionDataList[parseInt(map.get("6"))].active = map.get("9");
                             consumptionDataList[parseInt(map.get("6"))].batchInfoList = map.get("10")
                         } else {
@@ -3287,7 +3299,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     id: map.get("2")
                                 },
                                 notes: map.get("5"),
-                                actualFlag: map.get("8"),
+                                actualFlag: actualFlag,
                                 active: map.get("9"),
 
                                 // planningUnit: {
@@ -4866,7 +4878,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     data[6] = "";//Currency
                                     data[7] = "";//ConversionRateToUSD
                                     data[8] = "";//Funding Source
-                                    data[9] = suggestedShipmentList[j].shipmentMode;
+                                    data[9] = "";
                                     data[10] = "";
                                     data[11] = orderedDate;
                                     data[12] = "";
@@ -4906,7 +4918,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         { type: 'dropdown', source: currencyList, title: i18n.t('static.dashboard.currency') },
                                         { type: 'text', readOnly: true, title: i18n.t('static.currency.conversionrateusd') },
                                         { type: 'dropdown', source: fundingSourceList, title: i18n.t('static.subfundingsource.fundingsource') },
-                                        { type: 'dropdown', source: ['Sea', 'Air'], title: i18n.t('static.supplyPlan.shipmentMode') },
+                                        { type: 'dropdown', source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], title: i18n.t('static.supplyPlan.shipmentMode') },
                                         { type: 'text', title: i18n.t('static.program.notes') },
                                         { type: 'hidden', title: i18n.t('static.supplyPlan.orderDate') },
                                         { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), null] }, title: i18n.t('static.supplyPlan.expectedDeliveryDate') },
@@ -5205,10 +5217,14 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (papuResult.localProcurementAgent) {
                                     addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                 } else {
+                                    var submittedToApprovedLeadTime = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "") {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
                                     addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+                                        parseFloat(submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
-                                    if (valueOfG == "Sea") {
+                                    if (valueOfG == 1) {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                     } else {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
@@ -5285,11 +5301,14 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (papuResult.localProcurementAgent) {
                                     addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                 } else {
-
+                                    var submittedToApprovedLeadTime = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "") {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
                                     addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+                                        parseFloat(submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
-                                    if (value == "Sea") {
+                                    if (value == 1) {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                     } else {
                                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
@@ -5488,10 +5507,14 @@ export default class SupplyPlanComponent extends React.Component {
                         if (papuResult.localProcurementAgent) {
                             addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                         } else {
+                            var submittedToApprovedLeadTime = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].submittedToApprovedLeadTime;
+                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "") {
+                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                            }
                             addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+                                parseFloat(submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
-                            if (map.get("9") == "Sea") {
+                            if (map.get("9") == 1) {
                                 addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                             } else {
                                 addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedByAirLeadTime);
@@ -5502,6 +5525,10 @@ export default class SupplyPlanComponent extends React.Component {
                         var isEmergencyOrder = 0;
                         if (moment(Date.parse(map.get("12"))).format("YYYY-MM") < moment(expectedDeliveryDate).format("YYYY-MM")) {
                             isEmergencyOrder = 1;
+                        }
+                        var shipmentMode = "Sea";
+                        if (map.get("9") == 2) {
+                            shipmentMode = "Air";
                         }
 
                         var shipmentJson = {
@@ -5529,7 +5556,7 @@ export default class SupplyPlanComponent extends React.Component {
                             rate: 0,
                             deliveredDate: "",
                             shipmentId: 0,
-                            shipmentMode: map.get("9"),
+                            shipmentMode: shipmentMode,
                             shipmentStatus: {
                                 id: PLANNED_SHIPMENT_STATUS
                             },
@@ -6103,6 +6130,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                     if (primeLineNo != null && primeLineNo != "") {
                                                         orderNoAndPrimeLineNo = orderNoAndPrimeLineNo.concat("~").concat(primeLineNo);
                                                     }
+
+                                                    var shipmentMode = 1;
+                                                    if (shipmentList[i].shipmentMode == "Air") {
+                                                        shipmentMode = 2;
+                                                    }
                                                     // budgetAmount = budgetAmount.toFixed(2);
                                                     data[0] = shipmentList[i].expectedDeliveryDate; // A
                                                     data[1] = shipmentList[i].shipmentStatus.id; //B
@@ -6177,9 +6209,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     data[24] = shipmentList[i].supplier.id; //Y
                                                     data[25] = `=ROUND(${pricePerUnit}/G${parseInt(i) + 1},2)`; //Z
                                                     data[26] = `=ROUND(IF(AND(NOT(ISBLANK(W${parseInt(i) + 1})),(W${parseInt(i) + 1} != 0)),W${parseInt(i) + 1},Z${parseInt(i) + 1})*T${parseInt(i) + 1},2)`; //Amount AA
-                                                    data[27] = shipmentList[i].shipmentMode;//Shipment method AB
+                                                    data[27] = shipmentMode;//Shipment method AB
                                                     data[28] = shipmentList[i].freightCost;// Freight Cost AC
-                                                    data[29] = `=ROUND(IF(AB${parseInt(i) + 1}=="Sea",(AA${parseInt(i) + 1}*AH${parseInt(i) + 1})/100,(AA${parseInt(i) + 1}*AG${parseInt(i) + 1})/100),2)`;// Default frieght cost AD
+                                                    data[29] = `=ROUND(IF(AB${parseInt(i) + 1}==1,(AA${parseInt(i) + 1}*AH${parseInt(i) + 1})/100,(AA${parseInt(i) + 1}*AG${parseInt(i) + 1})/100),2)`;// Default frieght cost AD
                                                     data[30] = `=ROUND(AA${parseInt(i) + 1}+IF(AND(NOT(ISBLANK(AC${parseInt(i) + 1})),(AC${parseInt(i) + 1}!= 0)),AC${parseInt(i) + 1},AD${parseInt(i) + 1}),2)`; // Final Amount AE
                                                     data[31] = shipmentList[i].notes;//Notes AF
                                                     data[32] = airFreightPerc; //AG
@@ -6231,7 +6263,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         { type: 'dropdown', title: i18n.t('static.procurementUnit.supplier'), source: supplierList, width: 120, readOnly: true },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.amountInUSD'), width: 80, mask: '#,##.00', decimal: '.' },
-                                                        { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: ['Sea', 'Air'], width: 100 },
+                                                        { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                         { type: 'numeric', title: i18n.t('static.supplyPlan.userFreight'), width: 80, mask: '#,##.00', decimal: '.' },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.defaultFreight'), width: 80, mask: '#,##.00', decimal: '.' },
                                                         { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.totalAmount'), width: 80, mask: '#,##.00', decimal: '.' },
@@ -7174,38 +7206,38 @@ export default class SupplyPlanComponent extends React.Component {
         var mapArray = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            console.log("Map", map);
-            var budget = this.state.budgetListAll.filter(c => c.budgetId == map.get("8"))[0]
-            var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
-            var shipmentList = this.state.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("8"));
-            var usedBudgetTotalAmount = 0;
-            for (var s = 0; s < shipmentList.length; s++) {
-                usedBudgetTotalAmount += (shipmentList[s].productCost + shipmentList[s].freightCost) * shipmentList[s].currency.conversionRateToUsd;
-            }
-            console.log("Used budget amount", usedBudgetTotalAmount);
-            var totalCost = ((elInstance.getCell(`AE${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-            console.log("Toatlcost", totalCost);
-            console.log("map.get(6)", map.get("6"))
-            var enteredBudgetAmt = (totalCost * map.get("6"));
-            console.log("Entered Budget amount", enteredBudgetAmt);
-            usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
-            enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
-            var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
-            if (enteredBudgetAmt > availableBudgetAmount) {
-                valid = false;
-                var col = ("I").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+            // console.log("Map", map);
+            // var budget = this.state.budgetListAll.filter(c => c.budgetId == map.get("8"))[0]
+            // var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
+            // var shipmentList = this.state.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("8"));
+            // var usedBudgetTotalAmount = 0;
+            // for (var s = 0; s < shipmentList.length; s++) {
+            //     usedBudgetTotalAmount += (shipmentList[s].productCost + shipmentList[s].freightCost) * shipmentList[s].currency.conversionRateToUsd;
+            // }
+            // console.log("Used budget amount", usedBudgetTotalAmount);
+            // var totalCost = ((elInstance.getCell(`AE${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+            // console.log("Toatlcost", totalCost);
+            // console.log("map.get(6)", map.get("6"))
+            // var enteredBudgetAmt = (totalCost * map.get("6"));
+            // console.log("Entered Budget amount", enteredBudgetAmt);
+            // usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
+            // enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
+            // var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
+            // if (enteredBudgetAmt > availableBudgetAmount) {
+            //     valid = false;
+            //     var col = ("I").concat(parseInt(y) + 1);
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
 
-                var col = ("AE").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
-                this.setState({
-                    noFundsBudgetError: i18n.t('static.label.noFundsAvailable')
-                })
-            } else {
+            //     var col = ("AE").concat(parseInt(y) + 1);
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+            //     this.setState({
+            //         noFundsBudgetError: i18n.t('static.label.noFundsAvailable')
+            //     })
+            // } else {
 
                 var col = ("A").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(0, y);
@@ -7394,7 +7426,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 // }
                 // }
-            }
+            // }
         }
         return valid;
     }
@@ -7469,6 +7501,10 @@ export default class SupplyPlanComponent extends React.Component {
                         } else {
                             freightCost = (elInstance.getCell(`AD${j}`)).innerHTML;
                         }
+                        var shipmentMode = "Sea";
+                        if (map.get("27") == 2) {
+                            shipmentMode = "Air";
+                        }
                         shipmentDataList[parseInt(map.get("34"))].expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
                         shipmentDataList[parseInt(map.get("34"))].shipmentStatus.id = shipmentStatusId;
                         shipmentDataList[parseInt(map.get("34"))].dataSource.id = map.get("3");
@@ -7479,7 +7515,7 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("34"))].rate = rate.toString().replaceAll("\,", "");
                         shipmentDataList[parseInt(map.get("34"))].procurementUnit.id = map.get("23");
                         shipmentDataList[parseInt(map.get("34"))].supplier.id = map.get("24");
-                        shipmentDataList[parseInt(map.get("34"))].shipmentMode = map.get("27");
+                        shipmentDataList[parseInt(map.get("34"))].shipmentMode = shipmentMode;
                         shipmentDataList[parseInt(map.get("34"))].productCost = productCost.toString().replaceAll("\,", "");
                         shipmentDataList[parseInt(map.get("34"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
                         shipmentDataList[parseInt(map.get("34"))].notes = map.get("31");
