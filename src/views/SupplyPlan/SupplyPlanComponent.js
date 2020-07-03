@@ -198,6 +198,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
         this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
         this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
+        this.calculationsForOpeningAndClosingBalanceAccordingToMonths = this.calculationsForOpeningAndClosingBalanceAccordingToMonths.bind(this);
     }
 
     toggleAccordionTotalShipments() {
@@ -591,7 +592,7 @@ export default class SupplyPlanComponent extends React.Component {
                         <Row>
                             <div className="col-md-12">
                                 <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToLeft')} <i className="cui-arrow-right icons" ></i> </span>
+                                <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                             </div>
                         </Row>
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
@@ -1921,43 +1922,73 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                         }
                         // Calculation of opening and closing balance
+                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                        var createdDate = moment('2018-12-01').format("YYYY-MM-DD");
+                        var curDate = moment(this.state.monthsArray[0].startDate).subtract(1, 'months').format("YYYY-MM-DD");
                         var openingBalance = 0;
-                        var totalConsumption = 0;
-                        var totalAdjustments = 0;
-                        var totalShipments = 0;
+                        for (var i = 0; createdDate < curDate; i++) {
+                            createdDate = moment(createdDate).add(1, 'months').format("YYYY-MM-DD");
+                            console.log("Created date", createdDate);
+                            console.log("i", i)
+                            var consumptionQty = 0;
+                            var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                            var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                            console.log("startDate", startDate);
+                            console.log("endDate", endDate);
+                            for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].id);
+                                console.log("c----------->", c)
+                                for (var j = 0; j < c.length; j++) {
+                                    var count = 0;
+                                    for (var k = 0; k < c.length; k++) {
+                                        if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                            count++;
+                                        } else {
 
-                        var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < m[0].startDate);
-                        for (var j = 0; j < consumptionRemainingList.length; j++) {
-                            var count = 0;
-                            for (var k = 0; k < consumptionRemainingList.length; k++) {
-                                if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                                    count++;
-                                } else {
-
+                                        }
+                                    }
+                                    if (count == 0) {
+                                        consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                    } else {
+                                        if (c[j].actualFlag.toString() == 'true') {
+                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                        }
+                                    }
                                 }
                             }
-                            if (count == 0) {
-                                totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                            } else {
-                                if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
-                                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                            console.log("Consumption Qty", consumptionQty, " Start date", startDate);
+
+                            // Inventory part
+                            var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                            var adjustmentQty = 0;
+                            for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].id);
+                                for (var j = 0; j < c.length; j++) {
+                                    adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
                                 }
                             }
-                        }
+                            var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                            for (var j = 0; j < c1.length; j++) {
+                                adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                            }
+                            console.log("Adjustment Qty", adjustmentQty, " Start date", startDate);
 
-                        var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < m[0].startDate);
-                        for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                            totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                        }
+                            // Shipments part
+                            var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                            var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                            var shipmentTotalQty = 0;
+                            for (var j = 0; j < shipmentArr.length; j++) {
+                                shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                            }
+                            console.log("Shipment Qty", shipmentTotalQty, " Start date", startDate);
 
-                        var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < m[0].startDate && c.accountFlag == true);
-                        for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                            totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                            var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty);
+                            if (closingBalance < 0) {
+                                closingBalance = 0;
+                            }
+                            openingBalance = closingBalance;
                         }
-                        openingBalance = totalAdjustments - totalConsumption + totalShipments;
-                        if (openingBalance < 0) {
-                            openingBalance = 0;
-                        }
+                        console.log("Opening balance", openingBalance);
                         openingBalanceArray.push(openingBalance);
                         for (var i = 1; i <= TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
                             var consumptionQtyForCB = 0;
@@ -2232,6 +2263,42 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
 
+    }
+
+    calculationsForOpeningAndClosingBalanceAccordingToMonths() {
+        // var db1;
+        // var storeOS;
+        // getDatabase();
+        // var regionList = this.state.regionList;
+        // var regionListFiltered = this.state.regionList;
+        // console.log("RegionListFiltered", regionListFiltered)
+        // var planningUnitId = document.getElementById("planningUnitId").value;
+        // var openRequest = indexedDB.open('fasp', 1);
+        // openRequest.onerror = function (event) {
+        //     this.setState({
+        //         supplyPlanError: i18n.t('static.program.errortext')
+        //     })
+        // }.bind(this);
+        // openRequest.onsuccess = function (e) {
+        //     db1 = e.target.result;
+        //     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+        //     var programDataOs = programDataTransaction.objectStore('programData');
+        //     var programRequest = programDataOs.get(document.getElementById("programId").value);
+        //     programRequest.onerror = function (event) {
+        //         this.setState({
+        //             supplyPlanError: i18n.t('static.program.errortext')
+        //         })
+        //     }.bind(this);
+        //     programRequest.onsuccess = function (e) {
+        //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        //         var programJson = JSON.parse(programData);
+        //         console.log("ProgramJson in closing balance function", programJson);
+
+        //         console.log("Opening balance inside function", openingBalance)
+        //         return openingBalance;
+        //     }.bind(this)
+        // }.bind(this)
     }
 
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType) {
@@ -3032,8 +3099,6 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
                 var totalStockForBatchNumber = stockForBatchNumber.qty;
-                console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
-
                 var consumptionList = programJson.consumptionList;
                 var consumptionBatchArray = [];
 
@@ -3055,7 +3120,6 @@ export default class SupplyPlanComponent extends React.Component {
                     consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
                 }
                 consumptionQty += parseInt(map.get("2").toString().replaceAll("\,", ""));
-                console.log("Total consumptions batch number", consumptionQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
                 var inventoryList = programJson.inventoryList;
                 var inventoryBatchArray = [];
                 for (var inv = 0; inv < inventoryList.length; inv++) {
@@ -3072,18 +3136,12 @@ export default class SupplyPlanComponent extends React.Component {
                     inventoryForBatchNumber = [];
                 }
                 var adjustmentQty = 0;
-                console.log("inventoryForBatchNumber", inventoryForBatchNumber);
                 for (var b = 0; b < inventoryForBatchNumber.length; b++) {
                     adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
                 }
 
-                console.log("Total adjustments batch number", adjustmentQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
                 var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-                console.log("RemainingBtach Qty", remainingBatchQty, " For batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
                 if (remainingBatchQty < 0) {
-                    console.log("remaining qty is less than total for batch No", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
-
-
                     var col = ("C").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4333,7 +4391,6 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
                 var totalStockForBatchNumber = stockForBatchNumber.qty;
-                console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
 
                 var consumptionList = programJson.consumptionList;
                 var consumptionBatchArray = [];
@@ -4353,7 +4410,6 @@ export default class SupplyPlanComponent extends React.Component {
                     consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
                 }
                 consumptionQty += parseInt(map.get("2").toString().replaceAll("\,", ""));
-                console.log("Total consumptions batch number", consumptionQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
                 var inventoryList = programJson.inventoryList;
                 var inventoryBatchArray = [];
                 for (var inv = 0; inv < inventoryList.length; inv++) {
@@ -4374,18 +4430,12 @@ export default class SupplyPlanComponent extends React.Component {
                     inventoryForBatchNumber = [];
                 }
                 var adjustmentQty = 0;
-                console.log("inventoryForBatchNumber", inventoryForBatchNumber);
                 for (var b = 0; b < inventoryForBatchNumber.length; b++) {
                     adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
                 }
                 adjustmentQty += parseInt(map.get("3").toString().replaceAll("\,", ""));
-                console.log("Total adjustments batch number", adjustmentQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
                 var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-                console.log("RemainingBtach Qty", remainingBatchQty, " For batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
                 if (remainingBatchQty < 0) {
-                    console.log("remaining qty is less than total for batch No", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
-
-
                     var col = ("D").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4930,10 +4980,8 @@ export default class SupplyPlanComponent extends React.Component {
                             var index = this.state.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
                             var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]);
                             var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
-                            console.log("National Adjustment", nationalAdjustment);
                             if (nationalAdjustment != 0) {
                                 var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
-                                console.log("NationalAdjustment index", nationAdjustmentIndex);
                                 if (nationAdjustmentIndex == -1) {
                                     var inventoryJson = {
                                         inventoryId: 0,
