@@ -77,7 +77,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.mos<ele.min?i18n.t('static.report.low'):(ele.mos>ele.max?i18n.t('static.report.excess'):i18n.t('static.report.ok'))).replaceAll(' ', '%20'),ele.mos, ele.min, ele.max, ele.stock,ele.amc, (ele.transDate).replaceAll(' ','%20')]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.min ? i18n.t('static.report.low') : (ele.mos > ele.max ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), ele.mos, ele.min, ele.max, ele.stock, ele.amc, (ele.transDate).replaceAll(' ', '%20')]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -153,7 +153,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.mos<ele.min?i18n.t('static.report.low'):(ele.mos>ele.max?i18n.t('static.report.excess'):i18n.t('static.report.ok'))).replaceAll(' ', '%20'),this.formatterDouble(ele.mos), this.formatterDouble(ele.min), this.formatterDouble(ele.max), this.formatter(ele.stock),this.formatter(ele.amc), ele.transDate]);
+        const data = this.state.costOfInventory.map(ele => [(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.min ? i18n.t('static.report.low') : (ele.mos > ele.max ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.formatterDouble(ele.mos), this.formatterDouble(ele.min), this.formatterDouble(ele.max), this.formatter(ele.stock), this.formatter(ele.amc), ele.transDate]);
 
         let content = {
             margin: { top: 80 },
@@ -482,14 +482,19 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 // }
                                 // calculate openingBalance
                                 let moments = inventoryList.map(d => moment(d.inventoryDate))
+                                let invmin=moment.min(moments)
+                                let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+                                let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
                                 var maxDate = moment.max(moments)
+                                var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
+
                                 var openingBalance = 0;
                                 var totalConsumption = 0;
                                 var totalAdjustments = 0;
                                 var totalShipments = 0;
                                 console.log('startDate', startDate)
                                 console.log('programJson', programJson)
-                                var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore(startDate));
+                                var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore(minDate));
                                 console.log('consumptionRemainingList', consumptionRemainingList)
                                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                                     var count = 0;
@@ -509,60 +514,68 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     }
                                 }
 
-                                var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore(startDate));
+                                var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore(minDate));
                                 for (var j = 0; j < adjustmentsRemainingList.length; j++) {
                                     totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
                                 }
 
-                                var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate).isBefore(startDate) && c.accountFlag == true);
+                                var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate).isBefore(minDate) && c.accountFlag == true);
                                 console.log('shipmentsRemainingList', shipmentsRemainingList)
                                 for (var j = 0; j < shipmentsRemainingList.length; j++) {
                                     totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
                                 }
                                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
+                                var endingBalance = 0
+                                for (i = 1; ; i++) {
+                                    var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
+                                    var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
+                                    console.log(dtstr, ' ', enddtStr)
+                                    var dt = dtstr
+                                    console.log(openingBalance)
+                                    console.log(inventoryList)
+                                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                                    var adjustment = 0;
+                                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                                    console.log(consumptionList)
+                                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                    var consumption = 0;
+                                    console.log(programJson.regionList)
 
-                                var dtstr = startDate.format('YYYY-MM-DD')
-                                var enddtStr = endDate.format('YYYY-MM-DD')
-                                console.log(dtstr, ' ', enddtStr)
-                                var dt = dtstr
-                                console.log(openingBalance)
-                                console.log(inventoryList)
-                                var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                                var adjustment = 0;
-                                invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                                console.log(consumptionList)
-                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                var consumption = 0;
-                                console.log(programJson.regionList)
+                                    var actualFlag = false
+                                    for (var i = 0; i < programJson.regionList.length; i++) {
 
-                                var actualFlag = false
-                                for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                    console.log(list)
-                                    if (list.length > 1) {
-                                        for (var l = 0; l < list.length; l++) {
-                                            if (list[l].actualFlag.toString() == 'true') {
-                                                actualFlag = true;
-                                                consumption = consumption + list[l].consumptionQty
+                                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                                        console.log(list)
+                                        if (list.length > 1) {
+                                            for (var l = 0; l < list.length; l++) {
+                                                if (list[l].actualFlag.toString() == 'true') {
+                                                    actualFlag = true;
+                                                    consumption = consumption + list[l].consumptionQty
+                                                }
                                             }
+                                        } else {
+                                            consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
                                         }
-                                    } else {
-                                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
                                     }
+
+
+                                    console.log(shipmentList)
+                                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                                    var shipment = 0;
+                                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                                    console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                                    var endingBalance = openingBalance + adjustment + shipment - consumption
+                                    console.log('endingBalance', endingBalance)
+
+                                    endingBalance = endingBalance < 0 ? 0 : endingBalance
+                                    openingBalance = endingBalance
+                                    minDate=minDate.add(1,'month')
+                                    
+                                   if(minDate.startOf('month').isAfter(startDate)){
+                                       break;
+                                   }
                                 }
-
-
-                                console.log(shipmentList)
-                                var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                                var shipment = 0;
-                                shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                                console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                                var endingBalance = openingBalance + adjustment + shipment - consumption
-                                console.log('endingBalance', endingBalance)
-
-                                endingBalance = endingBalance < 0 ? 0 : endingBalance
                                 var amcBeforeArray = [];
                                 var amcAfterArray = [];
 
@@ -703,13 +716,17 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                 }
                 this.setState({
-                    data: [ {
-                        planningUnit: {id:157,label:{active: false,
-                            labelId: 9117,
-                            label_en: "Abacavir 60 mg Tablet, 60 Tablets",
-                            label_sp: null,
-                            label_fr: null,
-                            label_pr: null}},
+                    data: [{
+                        planningUnit: {
+                            id: 157, label: {
+                                active: false,
+                                labelId: 9117,
+                                label_en: "Abacavir 60 mg Tablet, 60 Tablets",
+                                label_sp: null,
+                                label_fr: null,
+                                label_pr: null
+                            }
+                        },
                         transDate: moment(new Date()).format('YYYY-MM-DD'),
                         mos: this.roundN(2),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
                         min: 3,
@@ -823,9 +840,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                 ,
                 style: function callback(cell, row, rowIndex, colIndex) {
                     if (cell < row.min) {
-                        return { backgroundColor: '#f48282',  align: 'center', width: '100px' };
+                        return { backgroundColor: '#f48282', align: 'center', width: '100px' };
                     } else if (cell > row.max) {
-                        return { backgroundColor: '#f3d679',  align: 'center', width: '100px' };
+                        return { backgroundColor: '#f3d679', align: 'center', width: '100px' };
                     } else {
                         return { backgroundColor: '#00c596', align: 'center', width: '100px' };
                     }
@@ -840,11 +857,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                 formatter: this.formatter,
                 style: function callback(cell, row, rowIndex, colIndex) {
                     if (cell < row.min) {
-                        return { backgroundColor: '#f48282',  align: 'center', width: '100px' };
+                        return { backgroundColor: '#f48282', align: 'center', width: '100px' };
                     } else if (cell > row.max) {
-                        return { backgroundColor: '#f3d679',  align: 'center', width: '100px' };
+                        return { backgroundColor: '#f3d679', align: 'center', width: '100px' };
                     } else {
-                        return { backgroundColor: '#00c596',  align: 'center', width: '100px' };
+                        return { backgroundColor: '#00c596', align: 'center', width: '100px' };
                     }
                 }
             },
