@@ -1849,7 +1849,7 @@ class ProcurementAgentExport extends Component {
                         <br /><br /><br /><br />
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
