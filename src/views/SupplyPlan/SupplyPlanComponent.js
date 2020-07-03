@@ -47,7 +47,10 @@ const chartOptions = {
             stacked: false,
             ticks: {
                 beginAtZero: true,
-                fontColor: 'black'
+                fontColor: 'black',
+                callback: function (value) {
+                    return value.toLocaleString();
+                }
             },
             position: 'left',
         },
@@ -73,6 +76,11 @@ const chartOptions = {
         }]
     },
     tooltips: {
+        callbacks: {
+            label: function (tooltipItems, data) {
+                return (tooltipItems.yLabel.toLocaleString());
+            }
+        },
         enabled: false,
         custom: CustomTooltips
     },
@@ -934,7 +942,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="table-responsive">
                                 <div id="consumptionDetailsTable" />
                             </div>
-                            <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchError}</h6>
+                            <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                             <div className="table-responsive">
                                 <div id="consumptionBatchInfoTable"></div>
                             </div>
@@ -1022,7 +1030,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="table-responsive">
                                 <div id="adjustmentsTable" className="table-responsive" />
                             </div>
-                            <h6 className="red">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchError}</h6>
+                            <h6 className="red">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                             <div className="table-responsive">
                                 <div id="inventoryBatchInfoTable"></div>
                             </div>
@@ -2244,7 +2252,9 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionDuplicateError: '',
             inventoryDuplicateError: '',
             consumptionBatchInfoDuplicateError: '',
+            consumptionBatchInfoNoStockError: '',
             inventoryBatchInfoDuplicateError: '',
+            inventoryBatchInfoNoStockError: '',
             shipmentBatchInfoDuplicateError: '',
             inventoryNoStockError: '',
             consumptionNoStockError: '',
@@ -2306,7 +2316,9 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryNoStockError: '',
             consumptionNoStockError: '',
             consumptionBatchInfoDuplicateError: '',
+            consumptionBatchInfoNoStockError: '',
             inventoryBatchInfoDuplicateError: '',
+            inventoryBatchInfoNoStockError: '',
             shipmentBatchInfoDuplicateError: '',
             noFundsBudgetError: ''
 
@@ -2411,6 +2423,9 @@ export default class SupplyPlanComponent extends React.Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    this.setState({
+                        programJsonAfterConsumptionClicked: programJson
+                    })
                     var batchList = []
                     var batchInfoList = programJson.batchInfoList;
                     // batchInfoList.push({
@@ -2964,6 +2979,9 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
+                    this.setState({
+                        consumptionBatchInfoNoStockError: ''
+                    })
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
@@ -2981,6 +2999,8 @@ export default class SupplyPlanComponent extends React.Component {
         var json = elInstance.getJson();
         var mapArray = [];
         for (var y = 0; y < json.length; y++) {
+
+
             var map = new Map(Object.entries(json[y]));
             mapArray.push(map);
 
@@ -2999,42 +3019,116 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     consumptionBatchInfoDuplicateError: i18n.t('static.supplyPlan.duplicateBatchNumber')
                 })
-            } else {
-
-                var colArr = ['A'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                var col = ("A").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(0, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y);
-                value = value.toString().replaceAll("\,", "");
-                var reg = /^[0-9\b]+$/;
-                if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    valid = false;
-                    if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+            else {
+                var programJson = this.state.programJsonAfterConsumptionClicked;
+                var shipmentList = programJson.shipmentList;
+                var shipmentBatchArray = [];
+                for (var ship = 0; ship < shipmentList.length; ship++) {
+                    var batchInfoList = shipmentList[ship].batchInfoList;
+                    for (var bi = 0; bi < batchInfoList.length; bi++) {
+                        shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
                     }
-                } else {
+                }
+                var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
+                var totalStockForBatchNumber = stockForBatchNumber.qty;
+                console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+
+                var consumptionList = programJson.consumptionList;
+                var consumptionBatchArray = [];
+
+                for (var con = 0; con < consumptionList.length; con++) {
+                    var consumptionIndex = (this.state.consumptionEl).getRowData(parseInt(map.get("4")))[6];
+                    if (con != consumptionIndex) {
+                        var batchInfoList = consumptionList[con].batchInfoList;
+                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                        }
+                    }
+                }
+                var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                if (consumptionForBatchNumber == undefined) {
+                    consumptionForBatchNumber = [];
+                }
+                var consumptionQty = 0;
+                for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                    consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                }
+                consumptionQty += parseInt(map.get("2").toString().replaceAll("\,", ""));
+                console.log("Total consumptions batch number", consumptionQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                var inventoryList = programJson.inventoryList;
+                var inventoryBatchArray = [];
+                for (var inv = 0; inv < inventoryList.length; inv++) {
+                    var batchInfoList = inventoryList[inv].batchInfoList;
+                    for (var bi = 0; bi < batchInfoList.length; bi++) {
+                        inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                    }
+                }
+                var inventoryForBatchNumber = [];
+                if (inventoryBatchArray.length > 0) {
+                    inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
+                }
+                if (inventoryForBatchNumber == undefined) {
+                    inventoryForBatchNumber = [];
+                }
+                var adjustmentQty = 0;
+                console.log("inventoryForBatchNumber", inventoryForBatchNumber);
+                for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                    adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                }
+
+                console.log("Total adjustments batch number", adjustmentQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                console.log("RemainingBtach Qty", remainingBatchQty, " For batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                if (remainingBatchQty < 0) {
+                    console.log("remaining qty is less than total for batch No", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+
+
+                    var col = ("C").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
+
+                    valid = false;
+                    this.setState({
+                        consumptionBatchInfoNoStockError: i18n.t('static.supplyPlan.noStockAvailable')
+                    })
+                } else {
+                    var colArr = ['A'];
+                    for (var c = 0; c < colArr.length; c++) {
+                        var col = (colArr[c]).concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    var col = ("A").concat(parseInt(y) + 1);
+                    var value = elInstance.getValueFromCoords(0, y);
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var col = ("C").concat(parseInt(y) + 1);
+                    var value = elInstance.getValueFromCoords(2, y);
+                    value = value.toString().replaceAll("\,", "");
+                    var reg = /^[0-9\b]+$/;
+                    if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        valid = false;
+                        if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
+                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                        } else {
+                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        }
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
                 }
             }
         }
@@ -3415,6 +3509,9 @@ export default class SupplyPlanComponent extends React.Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    this.setState({
+                        programJsonAfterAdjustmentClicked: programJson
+                    })
                     var batchList = []
                     var batchInfoList = programJson.batchInfoList;
                     batchList.push({
@@ -3466,6 +3563,7 @@ export default class SupplyPlanComponent extends React.Component {
                         })
                         var inventoryList = (programJson.inventoryList).filter(c =>
                             c.planningUnit.id == planningUnitId &&
+                            c.region != null &&
                             c.region.id == region &&
                             moment(c.inventoryDate).format("MMM YY") == month);
                         this.el = jexcel(document.getElementById("adjustmentsTable"), '');
@@ -4122,6 +4220,9 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
+                    this.setState({
+                        inventoryBatchInfoNoStockError: ''
+                    })
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
@@ -4132,6 +4233,9 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 var col = ("D").concat(parseInt(y) + 1);
+                this.setState({
+                    inventoryBatchInfoNoStockError: ''
+                })
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
@@ -4218,91 +4322,165 @@ export default class SupplyPlanComponent extends React.Component {
                     inventoryBatchInfoDuplicateError: i18n.t('static.supplyPlan.duplicateBatchNumber')
                 })
             } else {
-                var colArr = ['A'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
+                var programJson = this.state.programJsonAfterAdjustmentClicked;
+                var shipmentList = programJson.shipmentList;
+                var shipmentBatchArray = [];
+                for (var ship = 0; ship < shipmentList.length; ship++) {
+                    var batchInfoList = shipmentList[ship].batchInfoList;
+                    for (var bi = 0; bi < batchInfoList.length; bi++) {
+                        shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                    }
                 }
-                var col = ("A").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(0, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
+                var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
+                var totalStockForBatchNumber = stockForBatchNumber.qty;
+                console.log("Total stock batch number", totalStockForBatchNumber, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+
+                var consumptionList = programJson.consumptionList;
+                var consumptionBatchArray = [];
+
+                for (var con = 0; con < consumptionList.length; con++) {
+                    var batchInfoList = consumptionList[con].batchInfoList;
+                    for (var bi = 0; bi < batchInfoList.length; bi++) {
+                        consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                    }
+                }
+                var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                if (consumptionForBatchNumber == undefined) {
+                    consumptionForBatchNumber = [];
+                }
+                var consumptionQty = 0;
+                for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                    consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                }
+                consumptionQty += parseInt(map.get("2").toString().replaceAll("\,", ""));
+                console.log("Total consumptions batch number", consumptionQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                var inventoryList = programJson.inventoryList;
+                var inventoryBatchArray = [];
+                for (var inv = 0; inv < inventoryList.length; inv++) {
+                    var invIndex = (this.state.inventoryEl).getRowData(parseInt(map.get("6")))[12];
+                    if (inv != invIndex) {
+                        var batchInfoList = inventoryList[inv].batchInfoList;
+                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                        }
+                    }
                 }
 
-                var col = ("D").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "");
-                var reg = /-?\d+/;
-                // var reg = /^[0-9\b]+$/;
-                if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
-                    var reg = /-?\d+/
+                var inventoryForBatchNumber = [];
+                if (inventoryBatchArray.length > 0) {
+                    inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
+                }
+                if (inventoryForBatchNumber == undefined) {
+                    inventoryForBatchNumber = [];
+                }
+                var adjustmentQty = 0;
+                console.log("inventoryForBatchNumber", inventoryForBatchNumber);
+                for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                    adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                }
+                adjustmentQty += parseInt(map.get("3").toString().replaceAll("\,", ""));
+                console.log("Total adjustments batch number", adjustmentQty, "Batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                console.log("RemainingBtach Qty", remainingBatchQty, " For batch number", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                if (remainingBatchQty < 0) {
+                    console.log("remaining qty is less than total for batch No", elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+
+
+                    var col = ("D").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
+
+                    valid = false;
+                    this.setState({
+                        inventoryBatchInfoNoStockError: i18n.t('static.supplyPlan.noStockAvailable')
+                    })
+                } else {
+                    var colArr = ['A'];
+                    for (var c = 0; c < colArr.length; c++) {
+                        var col = (colArr[c]).concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    var col = ("A").concat(parseInt(y) + 1);
+                    var value = elInstance.getValueFromCoords(0, y);
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var col = ("D").concat(parseInt(y) + 1);
+                    var value = elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "");
+                    var reg = /-?\d+/;
                     // var reg = /^[0-9\b]+$/;
-                    var col = ("D").concat(parseInt(y) + 1);
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
+                        var reg = /-?\d+/
+                        // var reg = /^[0-9\b]+$/;
+                        var col = ("D").concat(parseInt(y) + 1);
+                        if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else if (elInstance.getValueFromCoords(2, y) == 2) {
+                        var col = ("D").concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ("D").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var value = elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "");
+                    if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
+                        // var reg = /-?\d+/
+                        var reg = /^[0-9\b]+$/;
+                        var col = ("E").concat(parseInt(y) + 1);
+                        if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else if (elInstance.getValueFromCoords(2, y) == 1) {
+                        var col = ("E").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ("E").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var value = elInstance.getValueFromCoords(2, y);
+                    var col = ("C").concat(parseInt(y) + 1);
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
                     } else {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(2, y) == 2) {
-                    var col = ("D").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    var col = ("D").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
                 }
-
-                var value = elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "");
-                if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
-                    // var reg = /-?\d+/
-                    var reg = /^[0-9\b]+$/;
-                    var col = ("E").concat(parseInt(y) + 1);
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                } else if (elInstance.getValueFromCoords(2, y) == 1) {
-                    var col = ("E").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    var col = ("E").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var value = elInstance.getValueFromCoords(2, y);
-                var col = ("C").concat(parseInt(y) + 1);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
             }
         }
         return valid;
@@ -4747,13 +4925,15 @@ export default class SupplyPlanComponent extends React.Component {
                                 adjustmentQty += parseFloat(invList[i].adjustmentQty);
                             }
                         }
-                        if (actualQty > 0 && actualQtyCount > 1 && regionWiseInventoryCount == this.state.regionListFiltered.length) {
+                        if (actualQty > 0 && adjustmentQty == 0 && regionWiseInventoryCount == this.state.regionListFiltered.length) {
                             var endDate = map.get("14");
                             var index = this.state.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
-                            var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]) + adjustmentQty;
+                            var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]);
                             var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
+                            console.log("National Adjustment", nationalAdjustment);
                             if (nationalAdjustment != 0) {
                                 var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
+                                console.log("NationalAdjustment index", nationAdjustmentIndex);
                                 if (nationAdjustmentIndex == -1) {
                                     var inventoryJson = {
                                         inventoryId: 0,
@@ -4777,7 +4957,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     inventoryDataList.push(inventoryJson);
                                 } else {
-                                    inventoryDataList[parseInt(index)].adjustmentQty = nationalAdjustment;
+                                    inventoryDataList[parseInt(nationAdjustmentIndex)].adjustmentQty = nationalAdjustment;
                                 }
                             }
 
