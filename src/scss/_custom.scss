@@ -2251,6 +2251,11 @@ input::placeholder {
     background-color: #d9ead3;
     border-color: 1px solid #d9ead3;
   }
+
+  .legendcommitversion .lightgreylegend{
+    background-color: #efefee;
+    border-color: 1px solid #efefef;
+  }
   
   ///supply plan
   .skipedShipmentslegend {
@@ -2333,6 +2338,14 @@ input::placeholder {
     overflow: hidden!important;
     min-width: 195px!important;
     word-wrap: break-word!important;
-    // border:none!important;
+    border:none!important;
+  }
+  .BorderNoneSupplyPlan{
+    border:none!important;
+    background: #fff!important;
+  }
+  .supplyPlanIcon{
+    color: #20a8d8;
+    font-size: 14px;
   }
   

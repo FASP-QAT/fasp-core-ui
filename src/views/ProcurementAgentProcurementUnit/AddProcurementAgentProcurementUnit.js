@@ -293,6 +293,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
 
+        if (x == 3) {
+            // var json = this.el.getJson();
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = false;
+            } else {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = true;
+            }
+        }
+
         if (x == 4) {
             var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
@@ -315,6 +332,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     this.el.setValueFromCoords(7, y, 1, true);
                     valid = true;
                 }
+            }
+        }
+
+        if (x == 5) {
+            // var json = this.el.getJson();
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = false;
+            } else {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = true;
             }
         }
 
@@ -557,20 +591,21 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-               <Row style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Col xs="12" sm="12">
+               <div style={{ display: this.state.loading ? "none" : "block" }}>
+                   
                         <Card  >
 
                             <CardHeader>
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
                             </CardHeader>
-                            <CardBody>
-
+                            <CardBody className="p-0">
+                            <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
+                                </Col>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -583,8 +618,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                             </CardFooter>
                         </Card>
-                    </Col>
-                </Row>
+                  
+                </div>
                  <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">

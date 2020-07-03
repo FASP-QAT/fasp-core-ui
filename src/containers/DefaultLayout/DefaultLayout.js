@@ -681,6 +681,12 @@ class DefaultLayout extends Component {
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.report.annualshipmentcost'),
+                            url: '/report/annualShipmentCost',
+                            icon: 'fa fa-file-text',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
                           }
                           /* {
                              name: i18n.t('static.dashboard.stockstatus'),

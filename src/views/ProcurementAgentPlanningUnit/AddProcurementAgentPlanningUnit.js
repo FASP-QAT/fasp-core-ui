@@ -784,6 +784,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.changed = this.changed.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -1218,7 +1219,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         if (hasDuplicate) {
             this.setState({
                 message: 'Duplicate Planning Unit Details Found',
-                changedFlag: 0
+                changedFlag: 0,
+
+            },
+            () => {
+                this.hideSecondComponent();
             })
             return false;
         } else {
@@ -1571,14 +1576,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     this.setState({ message: message })
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
 
                         <CardHeader>
                             <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                         </CardHeader>
-                        <CardBody>
+                        <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
                                 <div className="table-responsive">
@@ -1596,7 +1601,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     </FormGroup>
                         </CardFooter>
                     </Card>
-                </Row>
+                </div>
 
 
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
