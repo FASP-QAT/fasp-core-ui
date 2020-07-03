@@ -196,7 +196,7 @@ class ApplicationDashboard extends Component {
       <div className="animated fadeIn">
         <h5  className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
        
-        {/* <Row>
+     {/* <Row>
         <Col md="8">
             <Card>
               <CardHeader>
@@ -317,8 +317,8 @@ class ApplicationDashboard extends Component {
                 </Card>
                 </Col>
                 
-        </Row> */}
-
+        </Row> 
+ */}
 
       </div>
     );
