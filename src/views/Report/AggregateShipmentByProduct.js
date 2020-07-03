@@ -393,136 +393,136 @@ class AggregateShipmentByProduct extends Component {
 
 
     filterData() {
-        let versionId = document.getElementById("versionId").value;
-        let programId = document.getElementById("programId").value;
-        // let productCategoryId = document.getElementById("productCategoryId").value;
-        let planningUnitId = document.getElementById("planningUnitId").value;
-        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-        if (planningUnitId > 0 && programId > 0 && versionId != 0) {
+        // let versionId = document.getElementById("versionId").value;
+        // let programId = document.getElementById("programId").value;
+        // // let productCategoryId = document.getElementById("productCategoryId").value;
+        // let planningUnitId = document.getElementById("planningUnitId").value;
+        // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        // if (planningUnitId > 0 && programId > 0 && versionId != 0) {
 
-            if (navigator.onLine) {
-                let realmId = AuthenticationService.getRealmId();
-                AuthenticationService.setupAxiosInterceptors();
-                ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
-                    .then(response => {
-                        console.log(JSON.stringify(response.data));
-                        this.setState({
-                            consumptions: response.data,
-                            message: ''
-                        })
-                    }).catch(
-                        error => {
-                            this.setState({
-                                consumptions: []
-                            })
+        //     if (navigator.onLine) {
+        //         let realmId = AuthenticationService.getRealmId();
+        //         AuthenticationService.setupAxiosInterceptors();
+        //         ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+        //             .then(response => {
+        //                 console.log(JSON.stringify(response.data));
+        //                 this.setState({
+        //                     consumptions: response.data,
+        //                     message: ''
+        //                 })
+        //             }).catch(
+        //                 error => {
+        //                     this.setState({
+        //                         consumptions: []
+        //                     })
 
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
-                                }
-                            }
-                        }
-                    );
-            } else {
-                // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
-                var db1;
-                getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
+        //                     if (error.message === "Network Error") {
+        //                         this.setState({ message: error.message });
+        //                     } else {
+        //                         switch (error.response ? error.response.status : "") {
+        //                             case 500:
+        //                             case 401:
+        //                             case 404:
+        //                             case 406:
+        //                             case 412:
+        //                                 this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+        //                                 break;
+        //                             default:
+        //                                 this.setState({ message: 'static.unkownError' });
+        //                                 break;
+        //                         }
+        //                     }
+        //                 }
+        //             );
+        //     } else {
+        //         // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+        //         var db1;
+        //         getDatabase();
+        //         var openRequest = indexedDB.open('fasp', 1);
+        //         openRequest.onsuccess = function (e) {
+        //             db1 = e.target.result;
 
-                    var transaction = db1.transaction(['programData'], 'readwrite');
-                    var programTransaction = transaction.objectStore('programData');
-                    var programRequest = programTransaction.get(programId);
+        //             var transaction = db1.transaction(['programData'], 'readwrite');
+        //             var programTransaction = transaction.objectStore('programData');
+        //             var programRequest = programTransaction.get(programId);
 
-                    programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        var offlineConsumptionList = (programJson.consumptionList);
+        //             programRequest.onsuccess = function (event) {
+        //                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        //                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        //                 var programJson = JSON.parse(programData);
+        //                 var offlineConsumptionList = (programJson.consumptionList);
 
-                        const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
+        //                 const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
 
-                        const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-                        const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
+        //                 const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+        //                 const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
 
-                        // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-                        const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
+        //                 // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+        //                 const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
-                        const sorted = dateFilter.sort((a, b) => {
-                            var dateA = new Date(a.consumptionDate).getTime();
-                            var dateB = new Date(b.consumptionDate).getTime();
-                            return dateA > dateB ? 1 : -1;
-                        });
-                        let previousDate = "";
-                        let finalOfflineConsumption = [];
-                        var json;
+        //                 const sorted = dateFilter.sort((a, b) => {
+        //                     var dateA = new Date(a.consumptionDate).getTime();
+        //                     var dateB = new Date(b.consumptionDate).getTime();
+        //                     return dateA > dateB ? 1 : -1;
+        //                 });
+        //                 let previousDate = "";
+        //                 let finalOfflineConsumption = [];
+        //                 var json;
 
-                        for (let i = 0; i <= sorted.length; i++) {
-                            let forcast = 0;
-                            let actual = 0;
-                            if (sorted[i] != null && sorted[i] != "") {
-                                previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
-                                for (let j = 0; j <= sorted.length; j++) {
-                                    if (sorted[j] != null && sorted[j] != "") {
-                                        if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
-                                            if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
-                                                forcast = forcast + parseFloat(sorted[j].consumptionQty);
-                                            }
-                                            if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
-                                                actual = actual + parseFloat(sorted[j].consumptionQty);
-                                            }
-                                        }
-                                    }
-                                }
+        //                 for (let i = 0; i <= sorted.length; i++) {
+        //                     let forcast = 0;
+        //                     let actual = 0;
+        //                     if (sorted[i] != null && sorted[i] != "") {
+        //                         previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+        //                         for (let j = 0; j <= sorted.length; j++) {
+        //                             if (sorted[j] != null && sorted[j] != "") {
+        //                                 if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+        //                                     if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
+        //                                         forcast = forcast + parseFloat(sorted[j].consumptionQty);
+        //                                     }
+        //                                     if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
+        //                                         actual = actual + parseFloat(sorted[j].consumptionQty);
+        //                                     }
+        //                                 }
+        //                             }
+        //                         }
 
-                                let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
-                                json = {
-                                    consumption_date: date,
-                                    Actual: actual,
-                                    forcast: forcast
-                                }
+        //                         let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+        //                         json = {
+        //                             consumption_date: date,
+        //                             Actual: actual,
+        //                             forcast: forcast
+        //                         }
 
-                                if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
-                                    finalOfflineConsumption.push(json);
-                                }
+        //                         if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+        //                             finalOfflineConsumption.push(json);
+        //                         }
 
-                                // console.log("finalOfflineConsumption---", finalOfflineConsumption);
+        //                         // console.log("finalOfflineConsumption---", finalOfflineConsumption);
 
-                            }
-                        }
-                        console.log("final consumption---", finalOfflineConsumption);
-                        this.setState({
-                            offlineConsumptionList: finalOfflineConsumption
-                        });
+        //                     }
+        //                 }
+        //                 console.log("final consumption---", finalOfflineConsumption);
+        //                 this.setState({
+        //                     offlineConsumptionList: finalOfflineConsumption
+        //                 });
 
-                    }.bind(this)
+        //             }.bind(this)
 
-                }.bind(this)
-                // }
-            }
-        } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+        //         }.bind(this)
+        //         // }
+        //     }
+        // } else if (programId == 0) {
+        //     this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-        } else if (productCategoryId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
+        // } else if (productCategoryId == -1) {
+        //     this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
 
-        } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+        // } else {
+        //     this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
-        }
+        // }
     }
 
     getPrograms() {
