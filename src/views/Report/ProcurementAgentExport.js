@@ -708,7 +708,7 @@ class ProcurementAgentExport extends Component {
             message: '',
             selRegion: [],
             realmCountryList: [],
-            procuremntAgents: [],
+            procurementAgents: [],
             programs: [],
             versions: [],
             planningUnits: [],
@@ -833,12 +833,12 @@ class ProcurementAgentExport extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        procuremntAgents: response.data
+                        procurementAgents: response.data
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
                         this.setState({
-                            procuremntAgents: []
+                            procurementAgents: []
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -868,8 +868,8 @@ class ProcurementAgentExport extends Component {
 
     consolidatedProcurementAgentList = () => {
         const lan = 'en';
-        const { procuremntAgents } = this.state
-        var proList = procuremntAgents;
+        const { procurementAgents } = this.state
+        var proList = procurementAgents;
 
         var db1;
         getDatabase();
@@ -888,34 +888,33 @@ class ProcurementAgentExport extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // console.log("ProcurementAgentMyResult------>>>>", myResult);
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        // console.log(programNameLabel);
 
-                        // var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                    // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                    // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                    // console.log(programNameLabel);
+
+                    // var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                    // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
 
 
-                        var f = 0
-                        for (var k = 0; k < this.state.procuremntAgents.length; k++) {
-                            if (this.state.procuremntAgents[k].procurementAgentId == myResult[i].procurementAgentId) {
-                                f = 1;
-                                console.log('already exist')
-                            }
-                        }
-                        var programData = myResult[i];
-                        if (f == 0) {
-                            proList.push(programData)
+                    var f = 0
+                    for (var k = 0; k < this.state.procurementAgents.length; k++) {
+                        if (this.state.procurementAgents[k].procurementAgentId == myResult[i].procurementAgentId) {
+                            f = 1;
+                            console.log('already exist')
                         }
                     }
-
+                    var programData = myResult[i];
+                    if (f == 0) {
+                        proList.push(programData)
+                    }
 
                 }
-
+                
                 this.setState({
-                    procuremntAgents: proList
+                    procurementAgents: proList
                 })
 
             }.bind(this);
@@ -925,6 +924,7 @@ class ProcurementAgentExport extends Component {
 
 
     filterVersion = () => {
+        // document.getElementById("planningUnitId").checked = false;
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
 
@@ -1144,6 +1144,7 @@ class ProcurementAgentExport extends Component {
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         this.state.planningUnitLabels.map(ele =>
             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push(i18n.t('static.program.isincludeplannedshipment') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
@@ -1156,7 +1157,7 @@ class ProcurementAgentExport extends Component {
 
         var A = [headers]
         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
-        this.state.data.map(ele => A.push([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]));
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
         for (var i = 0; i < A.length; i++) {
             console.log(A[i])
@@ -1224,8 +1225,13 @@ class ProcurementAgentExport extends Component {
                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 200, {
+                        align: 'left'
+                    })
 
                 }
 
@@ -1245,17 +1251,17 @@ class ProcurementAgentExport extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
+        let data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
         let content = {
             margin: { top: 40 },
-            startY: 200,
+            startY: 220,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 170 },
-                1: { cellWidth: 171.89 },
-                6: { cellWidth: 100 }
+                0: { cellWidth: 100 },
+                1: { cellWidth: 100 },
+                2: { cellWidth: 170 },
             }
         };
 
@@ -1272,12 +1278,13 @@ class ProcurementAgentExport extends Component {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let procurementAgentId = document.getElementById("procurementAgentId").value;
+        let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
 
         let planningUnitIds = this.state.planningUnitValues;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0) {
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0 && isPlannedShipmentId > 0) {
             if (versionId.includes('Local')) {
                 var db1;
                 var storeOS;
@@ -1363,16 +1370,24 @@ class ProcurementAgentExport extends Component {
                             // })
 
                             var shipmentList = (programJson.shipmentList);
+                            console.log("shipmentList---->>>", shipmentList);
 
                             const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
                             // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
-                            const procurementAgentFilter = activeFilter.filter(c => c.procurementAgent.id == procurementAgentId);
+                            let isPlannedShipment = [];
+                            if (isPlannedShipmentId == 1) {//yes
+                                isPlannedShipment = activeFilter;
+                            } else {//no
+                                isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                            }
+
+                            const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
 
                             const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
 
-                            console.log("DB LIST---", dateFilter);
-                            console.log("SELECTED LIST---", planningUnitIds);
+                            // console.log("DB LIST---", dateFilter);
+                            // console.log("SELECTED LIST---", planningUnitIds);
 
                             let data = [];
                             let planningUnitFilter = [];
@@ -1398,8 +1413,8 @@ class ProcurementAgentExport extends Component {
                                     "procurementAgent": planningUnitFilter[j].procurementAgent,
                                     "planningUnit": planningUnitFilter[j].planningUnit,
                                     "qty": planningUnitFilter[j].shipmentQty,
-                                    "totalProductCost": planningUnitFilter[j].productCost,
-                                    "freightPer": parseFloat(freight),
+                                    "productCost": planningUnitFilter[j].productCost,
+                                    "freightPerc": parseFloat(freight),
                                     "freightCost": planningUnitFilter[j].freightCost,
                                     "totalCost": planningUnitFilter[j].productCost + planningUnitFilter[j].freightCost,
                                 }
@@ -1488,7 +1503,7 @@ class ProcurementAgentExport extends Component {
                             //         data.push(json);
                             //     }
                             // }
-                            console.log("end offline data----", data);
+                            // console.log("end offline data----", data);
                             this.setState({
                                 data: data
                                 , message: ''
@@ -1497,18 +1512,28 @@ class ProcurementAgentExport extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
+                this.setState({
+                    message: ''
+                })
+                let includePlannedShipments = true;
+                if(isPlannedShipmentId == 1){
+                    includePlannedShipments = true;
+                }else{
+                    includePlannedShipments = false;
+                }
                 var inputjson = {
                     procurementAgentId: procurementAgentId,
                     programId: programId,
                     versionId: versionId,
                     startDate: new moment(startDate),
                     stopDate: new moment(endDate),
-                    planningUnitIds: planningUnitIds
+                    planningUnitIds: planningUnitIds,
+                    includePlannedShipments: includePlannedShipments,
                 }
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.stockAdjustmentList(inputjson)
+                ReportService.procurementAgentExporttList(inputjson)
                     .then(response => {
-                        // console.log(JSON.stringify(response.data))
+                        console.log("Online Data------",response.data);
                         this.setState({
                             data: response.data
                         }, () => {
@@ -1544,18 +1569,20 @@ class ProcurementAgentExport extends Component {
 
 
             }
-        } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
-
-        } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
-
         } else if (procurementAgentId == 0) {
             this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
 
-        } else {
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+        } else if (versionId == -1) {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
+        } else if (isPlannedShipmentId == 0) {
+            this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
         }
     }
 
@@ -1569,6 +1596,21 @@ class ProcurementAgentExport extends Component {
         return getLabelText(cell, this.state.lang);
     }
 
+    addCommas(cell, row) {
+        // console.log("row---------->", row);
+        
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        // return "(" + currencyCode + ")" + "  " + x1 + x2;
+        return x1 + x2;
+      }
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -1578,7 +1620,7 @@ class ProcurementAgentExport extends Component {
             </span>
         );
 
-        const { procuremntAgents } = this.state;
+        const { procurementAgents } = this.state;
 
         const { programs } = this.state;
 
@@ -1636,34 +1678,41 @@ class ProcurementAgentExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                formatter: this.addCommas
             },
             {
-                dataField: 'totalProductCost',
+                dataField: 'productCost',
                 text: i18n.t('static.report.productCost'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.addCommas
             },
             {
-                dataField: 'freightPer',
+                dataField: 'freightPerc',
                 text: i18n.t('static.report.freightPer'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    return cell.toFixed(2);
+                }
             },
             {
                 dataField: 'freightCost',
                 text: i18n.t('static.report.freightCost'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.addCommas
             },
             {
                 dataField: 'totalCost',
                 text: i18n.t('static.report.totalCost'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.addCommas
             },
 
         ];
@@ -1766,8 +1815,8 @@ class ProcurementAgentExport extends Component {
                                                 onChange={this.fetchData}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
-                                                {procuremntAgents.length > 0
-                                                    && procuremntAgents.map((item, i) => {
+                                                {procurementAgents.length > 0
+                                                    && procurementAgents.map((item, i) => {
                                                         return (
                                                             <option key={i} value={item.procurementAgentId}>
                                                                 {getLabelText(item.label, this.state.lang)}
@@ -1868,7 +1917,7 @@ class ProcurementAgentExport extends Component {
                         {/* <br /><br /><br /><br />
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1879,7 +1928,7 @@ class ProcurementAgentExport extends Component {
                                                 bsSize="sm"
                                                 onChange={this.fetchData}
                                             >
-                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 <option value="1">{i18n.t('static.program.yes')}</option>
                                                 <option value="2">{i18n.t('static.program.no')}</option>
                                             </Input>

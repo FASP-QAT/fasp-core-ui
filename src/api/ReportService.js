@@ -61,6 +61,14 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/stockAdjustmentList`,json,{}
         );
     }
+    procurementAgentExporttList(json){
+        return axios.post(`${API_URL}/api/report/procurementAgentShipmentReport`,json,{}
+        );
+    }
+    fundingSourceExportList(json){
+        return axios.post(`${API_URL}/api/report/fundingSourceShipmentReport`,json,{}
+        );
+    }
 
 }
 export default new ReportService();
