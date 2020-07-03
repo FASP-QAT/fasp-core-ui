@@ -293,6 +293,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
 
+        if (x == 3) {
+            // var json = this.el.getJson();
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = false;
+            } else {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = true;
+            }
+        }
+
         if (x == 4) {
             var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
@@ -315,6 +332,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     this.el.setValueFromCoords(7, y, 1, true);
                     valid = true;
                 }
+            }
+        }
+
+        if (x == 5) {
+            // var json = this.el.getJson();
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = false;
+            } else {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = true;
             }
         }
 
