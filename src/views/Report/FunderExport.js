@@ -1518,21 +1518,18 @@ class FunderExport extends Component {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
 
-                        var f = 0
-                        for (var k = 0; k < this.state.fundingSources.length; k++) {
-                            if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
-                                f = 1;
-                                console.log('already exist')
-                            }
-                        }
-                        var programData = myResult[i];
-                        if (f == 0) {
-                            proList.push(programData)
+                    var f = 0
+                    for (var k = 0; k < this.state.fundingSources.length; k++) {
+                        if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+                            f = 1;
+                            console.log('already exist')
                         }
                     }
-
+                    var programData = myResult[i];
+                    if (f == 0) {
+                        proList.push(programData)
+                    }
 
                 }
 
@@ -1766,6 +1763,7 @@ class FunderExport extends Component {
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         this.state.planningUnitLabels.map(ele =>
             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push(i18n.t('static.program.isincludeplannedshipment') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
@@ -1778,7 +1776,7 @@ class FunderExport extends Component {
 
         var A = [headers]
         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
-        this.state.data.map(ele => A.push([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]));
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
         for (var i = 0; i < A.length; i++) {
             console.log(A[i])
@@ -1846,8 +1844,13 @@ class FunderExport extends Component {
                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 200, {
+                        align: 'left'
+                    })
 
                 }
 
@@ -1867,17 +1870,17 @@ class FunderExport extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
+        let data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
         let content = {
             margin: { top: 40 },
-            startY: 200,
+            startY: 220,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 170 },
-                1: { cellWidth: 171.89 },
-                6: { cellWidth: 100 }
+                0: { cellWidth: 100 },
+                1: { cellWidth: 100 },
+                2: { cellWidth: 170 },
             }
         };
 
@@ -1894,12 +1897,13 @@ class FunderExport extends Component {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let fundingSourceId = document.getElementById("fundingSourceId").value;
+        let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
 
         let planningUnitIds = this.state.planningUnitValues;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0) {
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0 && isPlannedShipmentId > 0) {
             if (versionId.includes('Local')) {
                 var db1;
                 var storeOS;
@@ -1957,7 +1961,14 @@ class FunderExport extends Component {
                             const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
                             // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
-                            const fundingSourceFilter = activeFilter.filter(c => c.fundingSource.id == fundingSourceId);
+                            let isPlannedShipment = [];
+                            if (isPlannedShipmentId == 1) {//yes
+                                isPlannedShipment = activeFilter;
+                            } else {//no
+                                isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                            }
+
+                            const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
 
                             const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
 
@@ -1988,8 +1999,8 @@ class FunderExport extends Component {
                                     "fundingSource": planningUnitFilter[j].fundingSource,
                                     "planningUnit": planningUnitFilter[j].planningUnit,
                                     "qty": planningUnitFilter[j].shipmentQty,
-                                    "totalProductCost": planningUnitFilter[j].productCost,
-                                    "freightPer": parseFloat(freight),
+                                    "productCost": planningUnitFilter[j].productCost,
+                                    "freightPerc": parseFloat(freight),
                                     "freightCost": planningUnitFilter[j].freightCost,
                                     "totalCost": planningUnitFilter[j].productCost + planningUnitFilter[j].freightCost,
                                 }
@@ -2004,16 +2015,26 @@ class FunderExport extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
+                this.setState({
+                    message: ''
+                })
+                let includePlannedShipments = true;
+                if(isPlannedShipmentId == 1){
+                    includePlannedShipments = true;
+                }else{
+                    includePlannedShipments = false;
+                }
                 var inputjson = {
                     fundingSourceId: fundingSourceId,
                     programId: programId,
                     versionId: versionId,
                     startDate: new moment(startDate),
                     stopDate: new moment(endDate),
-                    planningUnitIds: planningUnitIds
+                    planningUnitIds: planningUnitIds,
+                    includePlannedShipments: includePlannedShipments,
                 }
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.stockAdjustmentList(inputjson)
+                ReportService.fundingSourceExportList(inputjson)
                     .then(response => {
                         // console.log(JSON.stringify(response.data))
                         this.setState({
@@ -2051,18 +2072,20 @@ class FunderExport extends Component {
 
 
             }
-        } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
-
-        } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
-
         } else if (fundingSourceId == 0) {
             this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
 
-        } else {
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+        } else if (versionId == -1) {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+        } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
+        } else if (isPlannedShipmentId == 0) {
+            this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
         }
     }
 
@@ -2075,6 +2098,21 @@ class FunderExport extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+
+    addCommas(cell, row) {
+        // console.log("row---------->", row);
+        // var currencyCode = row.currency.currencyCode;
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        // return "(" + currencyCode + ")" + "  " + x1 + x2;
+        return x1 + x2;
+      }
 
     render() {
 
@@ -2143,34 +2181,41 @@ class FunderExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                formatter: this.addCommas
             },
             {
-                dataField: 'totalProductCost',
+                dataField: 'productCost',
                 text: i18n.t('static.report.productCost'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.addCommas
             },
             {
-                dataField: 'freightPer',
+                dataField: 'freightPerc',
                 text: i18n.t('static.report.freightPer'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    return cell.toFixed(2);
+                }
             },
             {
                 dataField: 'freightCost',
                 text: i18n.t('static.report.freightCost'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.addCommas
             },
             {
                 dataField: 'totalCost',
                 text: i18n.t('static.report.totalCost'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.addCommas
             },
 
         ];
@@ -2367,7 +2412,7 @@ class FunderExport extends Component {
                                                 bsSize="sm"
                                                 onChange={this.fetchData}
                                             >
-                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 <option value="1">{i18n.t('static.program.yes')}</option>
                                                 <option value="2">{i18n.t('static.program.no')}</option>
                                             </Input>
