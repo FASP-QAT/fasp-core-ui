@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Card, CardBody, CardHeader, Col, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Row } from 'reactstrap';
+import {Card, CardBody, CardHeader, Col, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Row,Badge,Button,Collapse } from 'reactstrap';
 
 class SupplyPlanFormulas extends Component {
 
@@ -8,7 +8,9 @@ class SupplyPlanFormulas extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      activeTab: 1
+      activeTab: 1,
+      accordion: [true, true, true],
+      collapse: true,
     };
   }
 
@@ -165,7 +167,6 @@ Months Of Stock = 3.54</p>
             </Card>
           </Col>
         </Row>
-     
       </div>
     );
   }

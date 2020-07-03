@@ -1495,6 +1495,11 @@ h5,
   border-color: 1px solid red;
 }
 
+.legend .lightgreenlegend {
+  background-color: #d9ead3;
+  border-color: 1px solid #d9ead3;
+}
+
 .legend .orangelegend {
   background-color: orange;
   border-color: 1px solid orange;
@@ -1976,8 +1981,8 @@ input::placeholder {
   white-space: normal;
   text-overflow: ellipsis;
   align-items: stretch!important;
-  width: 100%!important;
-  min-width: 233px!important;
+  width: 160px!important;
+  min-width: 100%!important;
   width: 0 auto!important;
   height: calc(0.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
@@ -2005,8 +2010,8 @@ input::placeholder {
       position: relative!important;
       display: flex!important;
       align-items: stretch!important;
-      width: 100%!important;
-      min-width: 233px!important;
+      width: 160px!important;
+      min-width: 100%!important;
       width: 0 auto!important;
       overflow: hidden;
     word-wrap: normal !important;
@@ -2036,6 +2041,7 @@ input::placeholder {
       position: absolute;
       margin-left: -11px!important;
       z-index: 2;
+      
   }
   
   .reportdown-box-icon {
@@ -2241,6 +2247,15 @@ input::placeholder {
     background-color: #e5edf5;
     border-color: 1px solid #e5edf5;
   }
+  .legendcommitversion .lightgreenlegend {
+    background-color: #d9ead3;
+    border-color: 1px solid #d9ead3;
+  }
+
+  .legendcommitversion .lightgreylegend{
+    background-color: #efefee;
+    border-color: 1px solid #efefef;
+  }
   
   ///supply plan
   .skipedShipmentslegend {
@@ -2302,3 +2317,35 @@ input::placeholder {
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(12){ width:4% !important; }
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(14){ width:7% !important; word-break: break-all;}
  
+  .expand-button {
+    position: relative;
+  }
+  
+  .accordion-toggle .expand-button:after
+  {
+    position: absolute;
+    left:.75rem;
+    top: 50%;
+    transform: translate(0, -50%);
+    content: '-';
+  }
+  .accordion-toggle.collapsed .expand-button:after
+  {
+    content: '+';
+  }
+
+  .supplyplanTdWidth{
+    overflow: hidden!important;
+    min-width: 195px!important;
+    word-wrap: break-word!important;
+    border:none!important;
+  }
+  .BorderNoneSupplyPlan{
+    border:none!important;
+    background: #fff!important;
+  }
+  .supplyPlanIcon{
+    color: #20a8d8;
+    font-size: 14px;
+  }
+  

@@ -26,6 +26,9 @@ import { Online, Offline } from "react-detect-offline";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import { DatePicker } from 'antd';
+import 'antd/dist/antd.css';
+const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -41,11 +44,8 @@ export default class StockStatusMatrix extends React.Component {
       planningUnits: [],
       data: [],
       programs: [],
+      versions: [],
       view: 1,
-      offlinePrograms: [],
-      offlinePlanningUnitList: [],
-      offlineProductCategoryList: [],
-      offlineInventoryList: [],
       includePlanningShipments: true,
       years: [],
       pulst: [],
@@ -53,17 +53,18 @@ export default class StockStatusMatrix extends React.Component {
       planningUnitValues: [],
       planningUnitLabels: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+startYear:new Date().getFullYear() - 1,
+endYear:new Date().getFullYear()
 
     }
     this.filterData = this.filterData.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
-    this.getPrograms = this.getPrograms.bind(this);
+    // this.getProductCategories = this.getProductCategories.bind(this)
+    //this.getPrograms = this.getPrograms.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit = this.getPlanningUnit.bind(this);
+    //this.getPlanningUnit = this.getPlanningUnit.bind(this);
 
   }
 
@@ -86,7 +87,11 @@ export default class StockStatusMatrix extends React.Component {
     })
 
   }
-
+  onYearChange=(value)=>{
+   this.setState({ startYear:value[0].format('YYYY'),
+endYear:value[1].format('YYYY')},()=>{console.log(this.state.startYear,' ',this.state.endYear )
+this.filterData()})
+  }
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
@@ -132,94 +137,625 @@ export default class StockStatusMatrix extends React.Component {
     })
     if (event.target.value == 1) {
       this.getPlanningUnit();
+    } else {
+      this.getProductCategories()
     }
   }
 
   filterData() {
-    console.log('In filter data---' + this.state.rangeValue.from.year)
-    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    //console.log('In filter data---' + this.state.rangeValue.from.year)
+    let startDate = this.state.startYear + '-01-01';
+    let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
     let programId = document.getElementById("programId").value;
-    let productCategoryId = document.getElementById("productCategoryId") != null ? document.getElementById("productCategoryId").value : 0;
-    let planningUnitId = this.state.planningUnitValues;
+    let planningUnitIds = this.state.planningUnitValues;
     let view = document.getElementById("view").value;
-    let versionId = this.getversion();
+    let versionId = document.getElementById("versionId").value;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
-    if (planningUnitId.length > 0 && programId > 0) {
-      var inputjson = {
-        "programId": programId,
-        "versionId": versionId,
-        "startDate": startDate,
-        "stopDate": endDate,
-        "ids": planningUnitId,
-        "includePlannedShipments": includePlannedShipments,
-        "view": view
-      }
+    if (planningUnitIds.length > 0 && programId > 0) {
 
-      if (navigator.onLine) {
-        let realmId = AuthenticationService.getRealmId();
-        AuthenticationService.setupAxiosInterceptors();
-        ProductService.getStockStatusMatrixData(inputjson)
-          .then(response => {
-            console.log("data---", response.data)
-            if (view == 2) {
-              this.setState({
-                data: [{
-                  name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
-                  units: { id: 1, label: { label_en: "" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
-                },
-                {
-                  name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
-                  units: { id: 1, label: { label_en: "" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
-                }],
-                view: view, message: ''
+      if (versionId.includes('Local')) {
+        var data = [];
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var version = (versionId.split('(')[0]).trim()
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          var program = `${programId}_v${version}_uId_${userId}`
+
+          var programRequest = programTransaction.get(program);
+
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            if (this.state.view == 1) {
+              planningUnitIds.map(planningUnitId => {
+
+                var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                var shipmentList =[]
+                if(document.getElementById("includePlanningShipments").selectedOptions[0].value.toString()=='true'){
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+            }else{
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
+         
+            }
+                // calculate openingBalance
+
+                var openingBalance = 0;
+                var totalConsumption = 0;
+                var totalAdjustments = 0;
+                var totalShipments = 0;
+                console.log('startDate', startDate)
+                console.log('programJson', programJson)
+                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+                console.log('consumptionRemainingList', consumptionRemainingList)
+                for (var j = 0; j < consumptionRemainingList.length; j++) {
+                  var count = 0;
+                  for (var k = 0; k < consumptionRemainingList.length; k++) {
+                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                      count++;
+                    } else {
+
+                    }
+                  }
+                  if (count == 0) {
+                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                  } else {
+                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                      totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                    }
+                  }
+                }
+
+                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                  totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+                }
+
+                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+                for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                }
+                openingBalance = totalAdjustments - totalConsumption + totalShipments;
+
+                for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
+                  var monthlydata = [];
+                  for (var month = 1; month <= 12; month++) {
+                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                    console.log(dtstr, ' ', enddtStr)
+                    var dt = dtstr
+                    console.log(openingBalance)
+                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                    var adjustment = 0;
+                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                    var consumption = 0;
+                    console.log(programJson.regionList)
+
+
+                    for (var i = 0; i < programJson.regionList.length; i++) {
+
+                      var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                      console.log(list)
+                      if (list.length > 1) {
+                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                      } else {
+                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                      }
+                    }
+
+
+
+                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                    var shipment = 0;
+                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                    console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                    var endingBalance = openingBalance + adjustment + shipment - consumption
+                    console.log('endingBalance', endingBalance)
+
+                    endingBalance = endingBalance < 0 ? 0 : endingBalance
+                    openingBalance = endingBalance
+                    var amcBeforeArray = [];
+                    var amcAfterArray = [];
+
+
+                    for (var c = 0; c < 12; c++) {
+
+                      var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
+                      if (consumptionListForAMC.length > 0) {
+                        var consumptionQty = 0;
+                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                          var count = 0;
+                          for (var k = 0; k < consumptionListForAMC.length; k++) {
+                            if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                              count++;
+                            } else {
+
+                            }
+                          }
+
+                          if (count == 0) {
+                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                          } else {
+                            if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                              consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                            }
+                          }
+                        }
+                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
+                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
+                          c = 12;
+                        }
+                      }
+                    }
+                    for (var c = 0; c < 12; c++) {
+                      var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
+                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
+                      if (consumptionListForAMC.length > 0) {
+                        var consumptionQty = 0;
+                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                          var count = 0;
+                          for (var k = 0; k < consumptionListForAMC.length; k++) {
+                            if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                              count++;
+                            } else {
+
+                            }
+                          }
+
+                          if (count == 0) {
+                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                          } else {
+                            if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                              consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                            }
+                          }
+                        }
+                        amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
+                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
+                          c = 12;
+                        }
+                      }
+
+                    }
+
+                    var amcArray = amcBeforeArray.concat(amcAfterArray);
+                    var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                    var countAMC = amcArrayFilteredForMonth.length;
+                    var sumOfConsumptions = 0;
+                    for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                      sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                    }
+
+
+                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                    console.log('amcCalcualted', amcCalcualted)
+                    var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+
+                    monthlydata.push(this.roundN(mos))
+
+                  }
+                  var json = {
+                    name: pu.planningUnit,
+                    units: inventoryList[0].unit,
+                    reorderFrequency: pu.reorderFrequencyInMonths,
+                    year: from,
+                    min: pu.minMonthsOfStock,
+                    Jan: monthlydata[0],
+                    Feb: monthlydata[1],
+                    Mar: monthlydata[2],
+                    Apr: monthlydata[3],
+                    May: monthlydata[4],
+                    Jun: monthlydata[5],
+                    Jul: monthlydata[6],
+                    Aug: monthlydata[7],
+                    Sep: monthlydata[8],
+                    Oct: monthlydata[9],
+                    Nov: monthlydata[10],
+                    Dec: monthlydata[11],
+                  }
+                  data.push(json)
+                }
+                this.setState({
+                  data: data,
+                  message: ''
+                })
               })
             } else {
-
-              this.setState({
-                data: [{
-                  name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
-                  units: { id: 1, label: { label_en: "240" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
-                },
-                {
-                  name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
-                  units: { id: 1, label: { label_en: "240" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
-                }],
-                view: view, message: ''
-              })
+              planningUnitIds.map(productCategoryId => {
+                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.active == true);
+                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId);
+                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+                var shipmentList =[]
+                if(document.getElementById("includePlanningShipments").selectedOptions[0].value.toString()=='true'){
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true &&  c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+            }else{
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId  && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
+         
             }
+                var proList = []
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                planningunitRequest.onerror = function (event) {
+                  // Handle errors!
+                };
+                planningunitRequest.onsuccess = function (e) {
+                  var myResult = [];
+                  myResult = planningunitRequest.result;
+              
+                  for (var i = 0,j=0; i < myResult.length; i++) {
+                    if (myResult[i].program.id == programId) {
+                      console.log('equal')
+                      proList[j++]=myResult[i]
+                    }
+                  }
 
-            //   let years = [...new Set(response.data.map(ele => (ele.YR)))]
-            //   let pulst = [...new Set(response.data.map(ele => (ele.LABEL_EN)))]
-            //   let consumptiondata = [];
-            //   console.log(years + " " + pulst)
-            //   for (var j = 0; j < pulst.length; j++) {
+                
 
-            //     let data = [];
-            //     for (var i = 0; i < years.length; i++) {
-            //       let d1 = response.data.filter(c => years[i] == c.YR && pulst[j] == c.LABEL_EN).map(ele => ([ele.Q1, ele.Q2, ele.Q3, ele.Q4]))
-            //       var d2 = [];
-            //       for (var k = 0; k < d1.length; k++)
-            //         d2 = [...d2, ...d1[k]]
-            //       data = [...data, ...d2];
-            //     }
 
-            //     consumptiondata.push([pulst[j], ...data])
-            //   }
-            //   console.log(consumptiondata)
-            //   this.setState({
-            //     data: consumptiondata,
-            //     view: view,
-            //     years: years,
-            //     pulst: pulst
-            //   })
-            // }
+                // calculate openingBalance
+
+                var openingBalance = 0;
+                var totalConsumption = 0;
+                var totalAdjustments = 0;
+                var totalShipments = 0;
+                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+                for (var j = 0; j < consumptionRemainingList.length; j++) {
+                  var count = 0;
+                  for (var k = 0; k < consumptionRemainingList.length; k++) {
+                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                      count++;
+                    } else {
+
+                    }
+                  }
+                  if (count == 0) {
+                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                  } else {
+                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                      totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                    }
+                  }
+                }
+
+                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                  totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+                }
+
+                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+                for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                }
+                openingBalance = totalAdjustments - totalConsumption + totalShipments;
+
+                for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
+                  var monthlydata = [];
+                  for (var month = 1; month <= 12; month++) {
+                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                    console.log(dtstr, ' ', enddtStr)
+                    var dt = dtstr
+                    console.log(openingBalance)
+                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                    var adjustment = 0;
+                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                    var consumption = 0;
+                    for (var j = 0; j < proList.length; j++) {
+                      for (var i = 0; i < programJson.regionList.length; i++) {
+                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
+                        if (list.length > 1) {
+                          list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                        } else {
+                          consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                        }
+                      }
+                    }
+
+
+                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                    var shipment = 0;
+                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                    console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                    var endingBalance = openingBalance + adjustment + shipment - consumption
+                    console.log('endingBalance', endingBalance)
+
+                    endingBalance = endingBalance < 0 ? 0 : endingBalance
+                    openingBalance = endingBalance
+                    var amcBeforeArray = [];
+                    var amcAfterArray = [];
+
+
+                    for (var c = 0; c < 12; c++) {
+
+                      var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
+                      if (consumptionListForAMC.length > 0) {
+                        var consumptionQty = 0;
+
+                        for (var j = 0; j < proList.length; j++) {
+                          for (var i = 0; i < programJson.regionList.length; i++) {
+                            var list = consumptionListForAMC.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
+                            if (list.length > 1) {
+                              list.map(ele => ele.actualFlag.toString() == 'true' ? consumptionQty = consumptionQty + ele.consumptionQty : consumptionQty)
+                            } else {
+                              consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
+                            }
+                          }
+                        }
+                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
+                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
+                          c = 12;
+                        }
+                      }
+                    }
+                    for (var c = 0; c < 12; c++) {
+                      var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
+                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
+                      if (consumptionListForAMC.length > 0) {
+                        var consumptionQty = 0;
+
+                        for (var j = 0; j < proList.length; j++) {
+                          for (var i = 0; i < programJson.regionList.length; i++) {
+                            var list = consumptionListForAMC.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
+                            if (list.length > 1) {
+                              list.map(ele => ele.actualFlag.toString() == 'true' ? consumptionQty = consumptionQty + ele.consumptionQty : consumptionQty)
+                            } else {
+                              consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
+                            }
+                          }
+                        }
+                       amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
+                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
+                          c = 12;
+                        }
+                      }
+
+                    }
+
+                    var amcArray = amcBeforeArray.concat(amcAfterArray);
+                    var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                    var countAMC = amcArrayFilteredForMonth.length;
+                    var sumOfConsumptions = 0;
+                    for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                      sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                    }
+
+
+                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                    console.log('amcCalcualted', amcCalcualted)
+                    var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+
+                    monthlydata.push(this.roundN(mos))
+
+                  }
+                  var json = {
+                    name: inventoryList[0].planningUnit.forecastingUnit.productCategory,
+                    year: from,
+                    Jan: monthlydata[0],
+                    Feb: monthlydata[1],
+                    Mar: monthlydata[2],
+                    Apr: monthlydata[3],
+                    May: monthlydata[4],
+                    Jun: monthlydata[5],
+                    Jul: monthlydata[6],
+                    Aug: monthlydata[7],
+                    Sep: monthlydata[8],
+                    Oct: monthlydata[9],
+                    Nov: monthlydata[10],
+                    Dec: monthlydata[11],
+                  }
+                  data.push(json)
+                }
+                this.setState({
+                  data: data,
+                  message: ''
+                })
+              }.bind(this);}
+              )
+            }
+          }.bind(this)
+
+
+        }.bind(this)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      } else {
+
+        var inputjson = {
+          "programId": programId,
+          "versionId": versionId,
+          "startDate": startDate,
+          "stopDate": endDate,
+          "ids": planningUnitIds,
+          "includePlannedShipments": includePlannedShipments,
+          "view": view
+        }
+
+        if (navigator.onLine) {
+          let realmId = AuthenticationService.getRealmId();
+          AuthenticationService.setupAxiosInterceptors();
+          ProductService.getStockStatusMatrixData(inputjson)
+            .then(response => {
+              console.log("data---", response.data)
+              if (view == 2) {
+                this.setState({
+                  data: [{
+                    name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
+                    units: { id: 1, label: { label_en: "" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
+                  },
+                  {
+                    name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
+                    units: { id: 1, label: { label_en: "" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
+                  }],
+                  view: view, message: ''
+                })
+              } else {
+
+                this.setState({
+                  data: [{
+                    name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
+                    units: { id: 1, label: { label_en: "240" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
+                  },
+                  {
+                    name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
+                    units: { id: 1, label: { label_en: "240" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
+                  }],
+                  view: view, message: ''
+                })
+              }
+
+            }).catch(
+              error => {
+                this.setState({
+                  data: []
+                })
+
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
+                }
+              }
+            );
+        }
+
+
+
+
+
+
+      }
+    } else if (programId == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+    } else if (view == 2 && planningUnitIds.length == 0) {
+      this.setState({ message: i18n.t('static.common.selectProductCategory'), data: [] });
+
+    } else {
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+    }
+  }
+
+  getProductCategories() {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+
+    this.setState({
+      planningUnits: [],
+      productCategories: []
+    }, () => {
+      if (versionId.includes('Local')) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var version = (versionId.split('(')[0]).trim()
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          var program = `${programId}_v${version}_uId_${userId}`
+
+          var programRequest = programTransaction.get(program);
+
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            var InventoryList = (programJson.inventoryList);
+            let productCategories = [];
+            var json;
+
+            InventoryList.map(ele => (
+              productCategories.push({
+                payload: {
+                  productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
+                  label: ele.planningUnit.forecastingUnit.productCategory.label,
+                  active: true
+                }
+              })
+
+            ))
+
+
+
+            console.log(productCategories)
+            this.setState({
+              productCategories: productCategories.reduce(
+                (accumulator, current) => accumulator.some(x => x.productCategoryId === current.productCategoryId) ? accumulator : [...accumulator, current], []
+              )
+            }, () => { console.log(this.state.productCategories) });
+
+
+          }.bind(this)
+
+        }.bind(this)
+      } else {
+        let realmId = AuthenticationService.getRealmId();
+        AuthenticationService.setupAxiosInterceptors();
+        let programId = document.getElementById("programId").value;
+        ProductService.getProductCategoryListByProgram(realmId, programId)
+          .then(response => {
+            console.log('***' + JSON.stringify(response.data))
+            this.setState({
+              productCategories: response.data
+            })
           }).catch(
             error => {
               this.setState({
-                consumptions: []
+                productCategories: []
               })
-
               if (error.message === "Network Error") {
                 this.setState({ message: error.message });
               } else {
@@ -238,403 +774,14 @@ export default class StockStatusMatrix extends React.Component {
               }
             }
           );
-      } else {
-        if (view == 1) {
-
-          var db1;
-          getDatabase();
-          var openRequest = indexedDB.open('fasp', 1);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-
-
-            programRequest.onsuccess = function (event) {
-              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              var programJson = JSON.parse(programData);
-              var offlineInventoryList1 = (programJson.inventoryList);
-              console.log("offlineInventoryList1---", offlineInventoryList1);
-
-              const activeFilter = offlineInventoryList1.filter(c => (c.active == true || c.active == "true"));
-              console.log("activeFilter---", activeFilter);
-
-              const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-              console.log("planningUnitFilter---", planningUnitFilter);
-              const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-              console.log("productCategoryFilter---", productCategoryFilter)
-
-              // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-              const filteredData = productCategoryFilter.filter(c => moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)'))
-              console.log("filteredData---", filteredData);
-              let finalOfflineInventory = [];
-              let previousYear = 0;
-              let json;
-              console.log("going to execute for loop");
-              for (let i = this.state.rangeValue.from.year; i <= this.state.rangeValue.to.year; i++) {
-                let jan = 0;
-                let feb = 0;
-                let mar = 0;
-                let apr = 0;
-                let may = 0;
-                let jun = 0;
-                let jul = 0;
-                let aug = 0;
-                let sep = 0;
-                let oct = 0;
-                let nov = 0;
-                let dec = 0;
-                let monthArray = [];
-                for (let j = 0; j <= filteredData.length; j++) {
-                  if (filteredData[j] != null && filteredData[j] != "" && (i == moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('YYYY'))) {
-                    // for (let k = 0; k <= filteredData.length; k++) {
-
-                    // }
-
-                    let month = moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('MM');
-                    if (month == "01" || month == "1" || month == 1) {
-                      jan = jan + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "02" || month == "2" || month == 2) {
-                      feb = feb + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "03" || month == "3" || month == 3) {
-                      mar = mar + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "04" || month == "4" || month == 4) {
-                      apr = apr + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "05" || month == "5" || month == 5) {
-                      may = may + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "06" || month == "6" || month == 6) {
-                      jun = jun + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "07" || month == "7" || month == 7) {
-                      jul = jul + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "08" || month == "8" || month == 8) {
-                      aug = aug + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "09" || month == "9" || month == 9) {
-                      sep = sep + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "10" || month == 10) {
-                      oct = oct + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "11" || month == 11) {
-                      nov = nov + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if (month == "12" || month == 12) {
-                      dec = dec + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                  }
-                }
-                let sel = document.getElementById("planningUnitId");
-                var text = sel.options[sel.selectedIndex].text;
-                json = {
-                  PLANNING_UNIT_LABEL_EN: text,
-                  YEAR: i,
-                  Jan: jan,
-                  Feb: feb,
-                  Mar: mar,
-                  Apr: apr,
-                  May: may,
-                  Jun: jun,
-                  Jul: jul,
-                  Aug: aug,
-                  Sep: sep,
-                  Oct: oct,
-                  Nov: nov,
-                  Dec: dec
-                }
-                finalOfflineInventory.push(json);
-              }
-              console.log("finalOfflineInventory---", finalOfflineInventory);
-              let offlineInventoryList = finalOfflineInventory;
-              console.log("offlineInventoryList---", offlineInventoryList);
-              this.setState({
-                offlineInventoryList
-              });
-
-
-            }.bind(this)
-
-          }.bind(this)
-
-        } else {
-
-          let years = []
-
-          var db1;
-          getDatabase();
-          var openRequest = indexedDB.open('fasp', 1);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-
-
-            programRequest.onsuccess = function (event) {
-              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              var programJson = JSON.parse(programData);
-              var offlineInventoryList = (programJson.inventoryList);
-              console.log("offlineInventoryList---", offlineInventoryList);
-
-              const activeFilter = offlineInventoryList.filter(c => (c.active == true || c.active == "true"));
-              console.log("activeFilter---", activeFilter);
-
-              const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-              console.log("planningUnitFilter---", planningUnitFilter);
-              const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-              console.log("productCategoryFilter---", productCategoryFilter)
-
-              // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-              const filteredData = productCategoryFilter.filter(c => moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)'))
-              console.log("filteredData---", filteredData);
-              let finalOfflineInventory = [];
-              // let previousYear = 0;
-              let json;
-              let sel = document.getElementById("planningUnitId");
-              var text = sel.options[sel.selectedIndex].text;
-              let pulst = [text]
-              console.log(pulst + " " + pulst)
-              for (let i = this.state.rangeValue.from.year; i <= this.state.rangeValue.to.year; i++) {
-                years.push(i);
-                let q1 = 0;
-                let q2 = 0;
-                let q3 = 0;
-                let q4 = 0;
-                for (let j = 0; j <= filteredData.length; j++) {
-                  if (filteredData[j] != null && filteredData[j] != "" && (i == moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('YYYY'))) {
-                    let month = moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('MM');
-                    if ((month == "01" || month == "1" || month == 1) || (month == "02" || month == "2" || month == 2) || (month == "03" || month == "3" || month == 3)) {
-                      q1 = q1 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if ((month == "04" || month == "4" || month == 4) || (month == "05" || month == "5" || month == 5) || (month == "06" || month == "6" || month == 6)) {
-                      q2 = q2 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if ((month == "07" || month == "7" || month == 7) || (month == "08" || month == "8" || month == 8) || (month == "09" || month == "9" || month == 9)) {
-                      q3 = q3 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                    if ((month == "10" || month == 10) || (month == "11" || month == 11) || (month == "12" || month == 12)) {
-                      q4 = q4 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                    }
-                  }
-                }
-                json = {
-                  PLANNING_UNIT_LABEL_EN: text,
-                  YEAR: i,
-                  Q1: q1,
-                  Q2: q2,
-                  Q3: q3,
-                  Q4: q4
-                }
-                console.log("json---", json);
-                finalOfflineInventory.push(json);
-                // finalOfflineInventory.push(json);
-              }
-              console.log(years + " " + years)
-              let consumptiondata = [];
-              for (var j = 0; j < pulst.length; j++) {
-                let data = [];
-                for (var i = 0; i < years.length; i++) {
-                  let d1 = finalOfflineInventory.filter(c => years[i] == c.YEAR && pulst[j] == c.ABEL_EN).map(ele => ([ele.Q1, ele.Q2, ele.Q3, ele.Q4]))
-                  var d2 = [];
-                  for (var k = 0; k < d1.length; k++)
-                    d2 = [...d2, ...d1[k]]
-                  data = [...data, ...d2];
-                }
-                consumptiondata.push([pulst[j], ...data])
-              }
-              console.log(consumptiondata)
-              this.setState({
-                data: consumptiondata,
-                view: view,
-                years: years,
-                pulst: pulst
-              })
-              console.log("state pulst---" + this.state.pulst);
-              // }
-              // this.setState({
-              //   offlineInventoryList: finalOfflineInventory
-              // });
-
-            }.bind(this)
-
-          }.bind(this)
-        }
       }
-    } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
-    } else if (view == 2 && planningUnitId.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), data: [] });
-
-    } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
     }
+    )
   }
 
-  getProductCategories() {
-    let programId = document.getElementById("programId").value;
-    let realmId = AuthenticationService.getRealmId();
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(realmId, programId)
-        .then(response => {
-          console.log('***' + JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              productCategories: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-    } else {
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var programRequest = programTransaction.get(programId);
-
-        programRequest.onsuccess = function (event) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          var offlineInventoryList = (programJson.inventoryList);
-          console.log("offlineInventoryList---", offlineInventoryList);
-          let offlineProductCategoryList = [];
-          var json;
-
-          for (let i = 0; i <= offlineInventoryList.length; i++) {
-            let count = 0;
-            if (offlineInventoryList[i] != null && offlineInventoryList[i] != "" && offlineInventoryList[i].planningUnit.forecastingUnit != null && offlineInventoryList[i].planningUnit.forecastingUnit != "") {
-              for (let j = 0; j <= offlineProductCategoryList.length; j++) {
-                if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineInventoryList[i].planningUnit.forecastingUnit.productCategory.id)) {
-                  count++;
-                }
-              }
-              if (count == 0 || i == 0) {
-                offlineProductCategoryList.push({
-                  id: offlineInventoryList[i].planningUnit.forecastingUnit.productCategory.id,
-                  name: offlineInventoryList[i].planningUnit.forecastingUnit.productCategory.label.label_en
-                });
-              }
-            }
-          }
-          this.setState({
-            offlineProductCategoryList
-          });
-
-        }.bind(this)
-
-      }.bind(this)
-    }
-    this.getPlanningUnit();
-
-
-  }
-  getPlanningUnit() {
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
-      let productCategoryId = document.getElementById("productCategoryId") != null ? document.getElementById("productCategoryId").value : 0;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
-        console.log('**' + JSON.stringify(response.data))
-        this.setState({ planningUnits: response.data });
-      })
-        .catch(
-          error => {
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message, planningUnits: [] });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: error.response.data.messageCode, planningUnits: [] });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError', planningUnits: [] });
-                  break;
-              }
-            }
-          }
-        );
-    } else {
-      const lan = 'en';
-      var db1;
-      var storeOS;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-        var planningunitRequest = planningunitOs.getAll();
-        var planningList = []
-        planningunitRequest.onerror = function (event) {
-          // Handle errors!
-        }.bind(this);
-        planningunitRequest.onsuccess = function (e) {
-          var myResult = [];
-          myResult = planningunitRequest.result;
-          var programId = (document.getElementById("programId").value).split("_")[0];
-          var proList = []
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].program.id == programId) {
-              var productJson = {
-                name: getLabelText(myResult[i].planningUnit.label, lan),
-                id: myResult[i].planningUnit.id
-              }
-              proList[i] = productJson
-            }
-          }
-          this.setState({
-            offlinePlanningUnitList: proList
-          })
-        }.bind(this);
-      }.bind(this)
-
-    }
-  }
-
-
-  getPrograms() {
+  getPrograms = () => {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
@@ -643,12 +790,12 @@ export default class StockStatusMatrix extends React.Component {
           console.log(JSON.stringify(response.data))
           this.setState({
             programs: response.data
-          })
+          }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
             this.setState({
               programs: []
-            })
+            }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
             } else {
@@ -669,95 +816,253 @@ export default class StockStatusMatrix extends React.Component {
         );
 
     } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-        var proList = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
+      this.consolidatedProgramList()
+    }
+
+  }
+  consolidatedProgramList = () => {
+    const lan = 'en';
+    const { programs } = this.state
+    var proList = programs;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+            console.log(programNameLabel)
+
+            var f = 0
+            for (var k = 0; k < this.state.programs.length; k++) {
+              if (this.state.programs[k].programId == programData.programId) {
+                f = 1;
+                console.log('already exist')
               }
-              proList[i] = programJson
+            }
+            if (f == 0) {
+              proList.push(programData)
             }
           }
-          this.setState({
-            offlinePrograms: proList
-          })
-
-        }.bind(this);
-
-      }
 
 
-    }
+        }
+
+        this.setState({
+          programs: proList
+        })
+
+      }.bind(this);
+
+    }.bind(this);
 
 
   }
 
 
-  componentDidMount() {
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      this.getPrograms();
+  filterVersion = () => {
+    let programId = document.getElementById("programId").value;
+    if (programId != 0) {
 
-    } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-        var offlinePrograms = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        }.bind(this);;
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              console.log("my result---", myResult[i]);
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              offlinePrograms[i] = programJson
-            }
-          }
-          console.log("program list---", offlinePrograms);
+      const program = this.state.programs.filter(c => c.programId == programId)
+      console.log(program)
+      if (program.length == 1) {
+        if (navigator.onLine) {
           this.setState({
-            offlinePrograms
-          })
+            versions: []
+          }, () => {
+            this.setState({
+              versions: program[0].versionList.filter(function (x, i, a) {
+                return a.indexOf(x) === i;
+              })
+            }, () => { this.consolidatedVersionList(programId) });
+          });
 
-        }.bind(this);
+
+        } else {
+          this.setState({
+            versions: []
+          }, () => { this.consolidatedVersionList(programId) })
+        }
+      } else {
+
+        this.setState({
+          versions: []
+        })
+
+      }
+    } else {
+      this.setState({
+        versions: []
+      })
+    }
+  }
+  consolidatedVersionList = (programId) => {
+    const lan = 'en';
+    const { versions } = this.state
+    var verList = versions;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId && myResult[i].programId == programId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = databytes.toString(CryptoJS.enc.Utf8)
+            var version = JSON.parse(programData).currentVersion
+
+            version.versionId = `${version.versionId} (Local)`
+            verList.push(version)
+
+          }
+
+
+        }
+
+        console.log(verList)
+        this.setState({
+          versions: verList.filter(function (x, i, a) {
+            return a.indexOf(x) === i;
+          })
+        })
 
       }.bind(this);
+
+
+
+    }.bind(this)
+
+
+  }
+
+  getPlanningUnitOrProductCategory = () => {
+    if (this.state.view == 1) {
+      this.getPlanningUnit()
+    } else {
+      this.getProductCategories()
     }
+  }
+
+  getPlanningUnit = () => {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+
+    this.setState({
+      planningUnits: []
+    }, () => {
+      if (versionId.includes('Local')) {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+          var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+          var planningunitRequest = planningunitOs.getAll();
+          var planningList = []
+          planningunitRequest.onerror = function (event) {
+            // Handle errors!
+          };
+          planningunitRequest.onsuccess = function (e) {
+            var myResult = [];
+            myResult = planningunitRequest.result;
+            var programId = (document.getElementById("programId").value).split("_")[0];
+            var proList = []
+            console.log(myResult)
+            for (var i = 0; i < myResult.length; i++) {
+              if (myResult[i].program.id == programId) {
+
+                proList[i] = myResult[i]
+              }
+            }
+            this.setState({
+              planningUnits: proList, message: ''
+            }, () => {
+              this.filterData();
+            })
+          }.bind(this);
+        }.bind(this)
+
+
+      }
+      else {
+        AuthenticationService.setupAxiosInterceptors();
+
+        //let productCategoryId = document.getElementById("productCategoryId").value;
+        ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          console.log('**' + JSON.stringify(response.data))
+          this.setState({
+            planningUnits: response.data, message: ''
+          }, () => {
+            this.filterData();
+          })
+        })
+          .catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
+              }
+            }
+          );
+      }
+    });
+
+  }
+
+  componentDidMount() {
+    this.getPrograms();
+
   }
   formatter = value => {
 
@@ -776,10 +1081,9 @@ export default class StockStatusMatrix extends React.Component {
   exportCSV(columns) {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + (this.state.startYear + ' ~ ' + this.state.endYear)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     if (this.state.view == 1) {
-      csvRow.push(i18n.t('static.productcategory.productcategory').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
       this.state.planningUnitLabels.map(ele =>
         csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     } else {
@@ -797,43 +1101,16 @@ export default class StockStatusMatrix extends React.Component {
 
     const headers = [];
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-
-
-    if (this.state.view == 0) {
-
-      headers[0] = i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20')
-      for (var i = 0, j = 1; i < this.state.years.length; i++) {
-        headers[j++] = ('Q1 ' + this.state.years[i]).replaceAll(' ', '%20')
-        headers[j++] = ('Q2 ' + this.state.years[i]).replaceAll(' ', '%20')
-        headers[j++] = ('Q3 ' + this.state.years[i]).replaceAll(' ', '%20')
-        headers[j++] = ('Q4 ' + this.state.years[i]).replaceAll(' ', '%20')
-      }
-    } else {
-      columns.map((item, idx) => { headers[idx] = item.text.replaceAll(' ', '%20') });
-    }
     var A = [headers]
-    var re;
-    if (navigator.onLine) {
-      re = this.state.data
+    var re = this.state.data
+    if (this.state.view == 1) {
+      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.units.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.min, ele.reorderFrequency, ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+        , ele.Dec]));
     }
     else {
-      re = this.state.offlineInventoryList
-    }
-    if (navigator.onLine) {
-      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.units.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.min,ele.reorderFrequency, ele.year,  ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
         , ele.Dec]));
-    } else {
-      if (this.state.view == 1) {
-        this.state.offlineInventoryList.map(ele => A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
-          , ele.Dec]));
-      } else {
-        this.state.data.map(ele => A.push([ele.map(item => ((item.toString()).replaceAll(',', ' ')).replaceAll(' ', '%20'))]));
-
-      }
     }
-    /*for(var item=0;item<re.length;item++){
-      A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
-    } */
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -845,7 +1122,7 @@ export default class StockStatusMatrix extends React.Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.startYear+'~'+this.state.endYear + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -874,15 +1151,6 @@ export default class StockStatusMatrix extends React.Component {
     const addHeaders = doc => {
 
       const pageCount = doc.internal.getNumberOfPages()
-
-
-      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-      // var reader = new FileReader();
-
-      //var data='';
-      // Use fs.readFile() method to read the file 
-      //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-      //}); 
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12)
         doc.setFont('helvetica', 'bold')
@@ -898,7 +1166,7 @@ export default class StockStatusMatrix extends React.Component {
         if (i == 1) {
           doc.setFontSize(8)
           doc.setFont('helvetica', 'normal')
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.startYear + ' ~ ' + this.state.endYear, doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -908,11 +1176,9 @@ export default class StockStatusMatrix extends React.Component {
             doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
               align: 'left'
             })
-            doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-              align: 'left'
-            })
+
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+            doc.text(doc.internal.pageSize.width / 8, 150, planningText)
           } else {
             doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
               align: 'left'
@@ -938,60 +1204,55 @@ export default class StockStatusMatrix extends React.Component {
 
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     let header = []
+    if (this.state.view == 1) {
 
-    if (this.state.view == 0) {
-      let header1 = [{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } }, ...this.state.years.map(ele => ({ content: ele, colSpan: 4, styles: { halign: 'center' } }))]
-      let quarterheader = [];
-      //headers[0]=i18n.t('static.planningunit.planningunit')
-      for (var i = 0, j = 0; i < this.state.years.length; i++) {
-        quarterheader[j++] = { content: 'Q1', styles: { halign: 'center' } }
-        quarterheader[j++] = { content: 'Q2', styles: { halign: 'center' } }
-        quarterheader[j++] = { content: 'Q3', styles: { halign: 'center' } }
-        quarterheader[j++] = { content: 'Q4', styles: { halign: 'center' } }
-      }
-      header = [header1, quarterheader]
-      console.log(header)
-    } else {
-      let header1 = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
+      header = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
       { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
       { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
       { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
       { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
       { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
-      ,[ 
-      { content: i18n.t('static.month.jan'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.feb'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.mar'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.apr'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.may'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.jun'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.jul'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.aug'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.sep'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.oct'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.nov'), styles: { halign: 'center' }} ,
-      { content: i18n.t('static.month.dec'), styles: { halign: 'center' }} ,]
+        , [
+        { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
       ]
-      
-      header = header1;
-    }
-
-
-    console.log(header);
-    let data;
-    if (this.state.view == 0) {
-      data = this.state.data.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
-    }
-    else if (navigator.onLine) {
-      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), getLabelText(ele.units.label, this.state.lang), ele.min, ele.reorderFrequency, ele.year,  ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
-        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
-
     } else {
-      data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+      header = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
+      { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
+        , [
+        { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
+        { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
+      ]
+    }
+    let data;
+    if (this.state.view == 1) {
+      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), getLabelText(ele.units.label, this.state.lang), ele.min, ele.reorderFrequency, ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
+    } else {
+      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
         .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
     }
-
-    // console.log(data1);
     let content = {
       margin: { top: 40 },
       startY: 200,
@@ -1003,15 +1264,6 @@ export default class StockStatusMatrix extends React.Component {
       }
     };
 
-    // let content = {
-    //   margin: { top: 80 },
-    //   startY: height,
-    //   head: headers,
-    //   body: data,
-
-    // };
-
-    // doc.text(title, marginLeft, 40);
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
@@ -1022,13 +1274,12 @@ export default class StockStatusMatrix extends React.Component {
   formatLabel(cell, row) {
     return getLabelText(cell, this.state.lang);
   }
+  roundN = num => {
+    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+  }
 
   render() {
 
-
-    const { offlinePrograms } = this.state;
-    const { offlineProductCategoryList } = this.state;
-    const { offlinePlanningUnitList } = this.state;
 
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
@@ -1093,11 +1344,21 @@ export default class StockStatusMatrix extends React.Component {
           </option>
         )
       }, this);
+    const { versions } = this.state;
+    let versionList = versions.length > 0
+      && versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionId}
+          </option>
+        )
+      }, this);
+
 
     let columns = [
       {
         dataField: 'name.label',
-        text: this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory'),
+        text: i18n.t('static.planningunit.planningunit'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -1119,7 +1380,7 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'center',
         headerAlign: 'center'
-      },{
+      }, {
         dataField: 'reorderFrequency',
         text: i18n.t('static.program.reorderFrequencyInMonths'),
         sort: true,
@@ -1131,7 +1392,7 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'center',
         headerAlign: 'center'
-      }, 
+      },
       {
         dataField: 'Jan',
         text: i18n.t('static.month.jan'),
@@ -1223,45 +1484,110 @@ export default class StockStatusMatrix extends React.Component {
 
     let columns1 = [
       {
-        dataField: 'PLANNING_UNIT_LABEL_EN',
-        text: i18n.t('static.procurementUnit.planningUnit'),
+        dataField: 'name.label',
+        text: i18n.t('static.productcategory.productcategory'),
         sort: true,
-        align: 'left',
-        headerAlign: 'left',
-        width: '180'
-      }, {
-        dataField: 'YEAR',
+        align: 'center',
+        headerAlign: 'center',
+        style: { width: '350px' },
+        formatter: this.formatLabel
+      },
+
+      {
+        dataField: 'year',
         text: i18n.t('static.common.year'),
         sort: true,
         align: 'center',
         headerAlign: 'center'
       },
       {
-        dataField: 'Q1',
-        text: i18n.t('static.common.quarter1'),
+        dataField: 'Jan',
+        text: i18n.t('static.month.jan'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
       }, {
-        dataField: 'Q2',
-        text: i18n.t('static.common.quarter2'),
+        dataField: 'Feb',
+        text: i18n.t('static.month.feb'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
       }, {
-        dataField: 'Q3',
-        text: i18n.t('static.common.quarter3'),
+        dataField: 'Mar',
+        text: i18n.t('static.month.mar'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
       }, {
-        dataField: 'Q4',
-        text: i18n.t('static.common.quarter4'),
+        dataField: 'Apr',
+        text: i18n.t('static.month.apr'),
         sort: true,
-        align: 'right',
-        headerAlign: 'center'
-      }]
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'May',
+        text: i18n.t('static.month.may'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Jun',
+        text: i18n.t('static.month.jun'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Jul',
+        text: i18n.t('static.month.jul'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Aug',
+        text: i18n.t('static.month.aug'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Sep',
+        text: i18n.t('static.month.sep'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Oct',
+        text: i18n.t('static.month.oct'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Nov',
+        text: i18n.t('static.month.nov'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }, {
+        dataField: 'Dec',
+        text: i18n.t('static.month.dec'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: formatter
+      }
 
+
+    ];
     const options = {
       hidePageListOnlyOnePage: true,
       firstPageText: i18n.t('static.common.first'),
@@ -1313,23 +1639,15 @@ export default class StockStatusMatrix extends React.Component {
         <Card>
           <CardHeader className="pb-1">
             <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
-            <Online>
-              {this.state.data.length > 0 && <div className="card-header-actions">
-                <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-              </div>}
-            </Online>
-            <Offline>
-              {this.state.offlineInventoryList.length > 0 && <div className="card-header-actions">
-                <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(this.state.view == 1 ? columns : columns1)} />
-                <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(this.state.view == 1 ? columns : columns1)} />
-              </div>}
-            </Offline>
+            {this.state.data.length > 0 && <div className="card-header-actions">
+              <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(this.state.view == 1 ? columns : columns1)} />
+              <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(this.state.view == 1 ? columns : columns1)} />
+            </div>}
           </CardHeader>
           <CardBody className="pb-md-3">
             <Col md="12 pl-0">
               <div className="row">
-                <FormGroup className="col-md-3" title="click here to select period">
+                {/*<FormGroup className="col-md-3" title="click here to select period">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                   <div className="controls">
 
@@ -1340,14 +1658,24 @@ export default class StockStatusMatrix extends React.Component {
                       lang={pickerLang}
                       //theme="light"
                       onChange={this.handleRangeChange}
-                      onDismiss={this.handleRangeDissmis}
+                      onDismiss={this.handleRangeDi ssmis}
                     >
                       <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                     </Picker>
                   </div>
 
+                </FormGroup>*/}
+ <FormGroup className="col-md-3">
+                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                <div className="controls">
+                  <RangePicker picker="year"   allowClear={false}
+                                id="date" name= "date"
+                                style={{ width: '450px', marginLeft:'20px'}} 
+                                onChange={this.onYearChange} 
+                                value={[moment(this.state.startYear.toString()),moment(this.state.endYear.toString())]}  />
+ 
+                </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                   <div className="controls ">
@@ -1357,7 +1685,7 @@ export default class StockStatusMatrix extends React.Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={(e) => { this.getProductCategories(e); this.filterData(e) }}
+                        onChange={(e) => { this.filterVersion(); this.filterData(e) }}
 
 
                       >
@@ -1368,6 +1696,25 @@ export default class StockStatusMatrix extends React.Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
+                <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">Version</Label>
+                  <div className="controls ">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="versionId"
+                        id="versionId"
+                        bsSize="sm"
+                        onChange={(e) => { this.getPlanningUnitOrProductCategory(); }}
+                      >
+                        <option value="-1">{i18n.t('static.common.select')}</option>
+                        {versionList}
+                      </Input>
+
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                   <div className="controls">
@@ -1388,29 +1735,11 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
 
-                {this.state.view == 1 && <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                  <div className="controls ">
-                    <InputGroup>
-                      <Input
-                        type="select"
-                        name="productCategoryId"
-                        id="productCategoryId"
-                        bsSize="sm"
-                        onChange={(e) => { this.getPlanningUnit(e); this.filterData(e) }}
-                      >
-                        <option value="0">{i18n.t('static.common.all')}</option>
-                        {productCategoryList}
-                      </Input>
-
-                    </InputGroup>
-                  </div>
-                </FormGroup>}
                 {this.state.view == 2 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                  <div className="controls ">
-
-                    <InputGroup>   <ReactMultiSelectCheckboxes
+                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                  <InputGroup className="box">
+                    <ReactMultiSelectCheckboxes
                       name="productCategoryId"
                       id="productCategoryId"
                       bsSize="md"
@@ -1418,20 +1747,20 @@ export default class StockStatusMatrix extends React.Component {
                       options={productCategoryListcheck && productCategoryListcheck.length > 0 ? productCategoryListcheck : []}
                     /> </InputGroup>
 
-                  </div>
+
                 </FormGroup>}
                 {this.state.view == 1 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                   <div className="controls">
-                    <InputGroup className="box">  
-                     <ReactMultiSelectCheckboxes
-                      name="planningUnitId"
-                      id="planningUnitId"
-                      bsSize="md"
-                      onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                      options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                    /> </InputGroup>    </div></FormGroup>}
+                    <InputGroup className="box">
+                      <ReactMultiSelectCheckboxes
+                        name="planningUnitId"
+                        id="planningUnitId"
+                        bsSize="md"
+                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                      /> </InputGroup>    </div></FormGroup>}
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                   <div className="controls ">
@@ -1441,7 +1770,7 @@ export default class StockStatusMatrix extends React.Component {
                         name="includePlanningShipments"
                         id="includePlanningShipments"
                         bsSize="sm"
-                        onChange={(e) => { this.viewChange(); this.formSubmit() }}
+                        onChange={(e) => { this.filterData() }}
                       >
                         <option value="true">{i18n.t('static.program.yes')}</option>
                         <option value="false">{i18n.t('static.program.no')}</option>
@@ -1450,231 +1779,109 @@ export default class StockStatusMatrix extends React.Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-
-
-                <Offline>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                    <div className="controls ">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="programId"
-                          id="programId"
-                          bsSize="sm"
-                          onChange={this.getProductCategories}
-
-                        >
-                          <option value="0">{i18n.t('static.common.selectProgram')}</option>
-                          {offlinePrograms.length > 0
-                            && offlinePrograms.map((item, i) => {
-                              return (
-                                <option key={i} value={item.id}>
-                                  {item.name}
-                                </option>
-                              )
-                            }, this)}
-                        </Input>
-
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                    <div className="controls ">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="productCategoryId"
-                          id="productCategoryId"
-                          bsSize="sm"
-                          onChange={this.getPlanningUnit}
-                        >
-                          {offlineProductCategoryList.length > 0
-                            &&
-                            <option value="0">{i18n.t('static.common.selectProductCategory')}</option>}
-                          {offlineProductCategoryList.length < 1
-                            &&
-                            <option value="0">{i18n.t('static.common.selectProgram')}</option>}
-                          {offlineProductCategoryList.length > 0
-                            && offlineProductCategoryList.map((item, i) => {
-                              return (
-                                <option key={i} value={item.id}>
-                                  {item.name}
-                                </option>
-                              )
-                            }, this)}
-                        </Input>
-
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                    <div className="controls">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
-                          onChange={this.filterData}
-                        >
-                          {offlinePlanningUnitList.length > 0
-                            &&
-                            <option value="0">{i18n.t('static.common.selectPlanningUnit')}</option>}
-                          {offlinePlanningUnitList.length < 1
-                            &&
-                            <option value="0">{i18n.t('static.common.selectProgram')}</option>}
-                          {offlinePlanningUnitList.length > 0
-                            && offlinePlanningUnitList.map((item, i) => {
-                              return (
-                                <option key={i} value={item.id}>
-                                  {item.name}
-                                </option>
-                              )
-                            }, this)}
-                        </Input>
-                        {/* <InputGroupAddon addonType="append">
-                          <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                        </InputGroupAddon> */}
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                </Offline>
-
+               
               </div>
             </Col>
-            {/* ---------------{this.state.offlineInventoryList} */}
-            {/*this.state.data.length > 0 && <ToolkitProvider
-              keyField="procurementUnitId"
-              data={this.state.data}
-              columns={columns}
-              search={{ searchFormatted: true }}
-              hover
-              filter={filterFactory()}
-
-            >
-              {
-                props => (
-                  <div className="TableCust ReportFirstHead">
-
-                    {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
-                      <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div> }
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                      pagination={paginationFactory(options)}
-
-                      {...props.baseProps}
-                    />
-                  </div>
-                )
-              }
-            </ToolkitProvider>*/}
-            {this.state.view == 1 && this.state.offlineInventoryList.length > 0 && <ToolkitProvider
-              keyField="procurementUnitId"
-              data={this.state.offlineInventoryList}
-              columns={columns}
-              search={{ searchFormatted: true }}
-              hover
-              filter={filterFactory()}
-
-            >
-              {
-                props => (
-                  <div className="TableCust ReportFirstHead">
-
-                    {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
-                      <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div> */}
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                      pagination={paginationFactory(options)}
-
-                      {...props.baseProps}
-                    />
-                  </div>
-                )
-              }
-            </ToolkitProvider>}
-            {this.state.view == 0 && this.state.data.length > 0 &&
-              <Table striped bordered hover responsive="md">
-                <thead>
-                  <tr>
-                    <th rowSpan="2" style={{ "width": "20%", "text-align": "center" }}> {i18n.t('static.planningunit.planningunit')}</th>
-                    {this.state.years.map((item, i) => {
-                      return (
-                        <th colSpan="4" style={{ "text-align": "center" }}>{item}</th>
-                      )
-                    })}
-                  </tr>
-                  <tr>
-                    {this.state.years.map(ele => { return (<><th style={{ "width": "3%", "text-align": "center" }} >Q1</th><th align="center" style={{ "width": "3%", "text-align": "center" }}>Q2</th ><th style={{ "width": "3%", "text-align": "center" }}>Q3</th><th style={{ "width": "3%", "text-align": "center" }}>Q4</th></>) })}
-
-                  </tr>
-                </thead>
-                <tbody>
-
-                  {this.state.data.map(ele => {
-                    return (<tr> {ele.map((item, index) => { return (index == 0 ? <td style={{ "text-align": "left" }}>{item}</td> : <td style={{ "text-align": "right" }}>{formatter(item)}</td>) }
-                    )}</tr>)
-                  })}
-
-                </tbody>
-              </Table>
-            }
             <div class="TableCust">
-            {this.state.data.length > 0 &&
-              <Table striped bordered hover responsive="md" style={{ width:"100%"}}>
-                <thead>
-                  <tr>
-                    <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')}</th>
-                    <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.dashboard.unit')}</th>
-                    <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.common.min')}</th>
-                    <th rowSpan="2" className="text-center" style={{width: "5%" }}>{i18n.t('static.program.reorderFrequencyInMonths')}</th>
-                    <th rowSpan="2" className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
-                    <th colSpan="12" className="text-center">{i18n.t('static.report.monthsOfStock')}</th>
+              {this.state.data.length > 0 && this.state.view == 1 &&
+                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
+                  <thead>
+                    <tr>
+                      <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.dashboard.unit')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.common.min')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.program.reorderFrequencyInMonths')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
+                      <th colSpan="12" className="text-center">{i18n.t('static.report.monthsOfStock')}</th>
 
-                  </tr>
-                  <tr> <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.mar')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.apr')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.may')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jun')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jul')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.aug')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.sep')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.oct')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.nov')}</th>
-                    <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.dec')}</th></tr>
-                </thead>
-                <tbody>
+                    </tr>
+                    <tr> <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.mar')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.apr')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.may')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jun')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jul')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.aug')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.sep')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.oct')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.nov')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.dec')}</th></tr>
+                  </thead>
+                  <tbody>
 
-                  {this.state.data.map(ele => {
-                    return (<tr>
-                      <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
-                      <td className="text-center"> {getLabelText(ele.units.label, this.state.lang)}</td>
-                      <td className="text-center">{ele.min}</td>
-                      <td className="text-center">{ele.reorderFrequency}</td>
-                      <td className="text-center">{ele.year}</td>
-                      <td className="text-center">{ele.Jan}</td>
-                      <td className="text-center">{ele.Feb}</td>
-                      <td className="text-center">{ele.Mar}</td>
-                      <td className="text-center">{ele.Apr}</td>
-                      <td className="text-center">{ele.May}</td>
-                      <td className="text-center">{ele.Jun}</td>
-                      <td className="text-center">{ele.Jul}</td>
-                      <td className="text-center">{ele.Aug}</td>
-                      <td className="text-center">{ele.Sep}</td>
-                      <td className="text-center">{ele.Oct}</td>
-                      <td className="text-center">{ele.Nov}</td>
-                      <td className="text-center">{ele.Dec}</td></tr>)
-                  })}
+                    {this.state.data.map(ele => {
+                      return (<tr>
+                        <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
+                        <td className="text-center"> {getLabelText(ele.units.label, this.state.lang)}</td>
+                        <td className="text-center">{ele.min}</td>
+                        <td className="text-center">{ele.reorderFrequency}</td>
+                        <td className="text-center">{ele.year}</td>
+                        <td className="text-center">{ele.Jan}</td>
+                        <td className="text-center">{ele.Feb}</td>
+                        <td className="text-center">{ele.Mar}</td>
+                        <td className="text-center">{ele.Apr}</td>
+                        <td className="text-center">{ele.May}</td>
+                        <td className="text-center">{ele.Jun}</td>
+                        <td className="text-center">{ele.Jul}</td>
+                        <td className="text-center">{ele.Aug}</td>
+                        <td className="text-center">{ele.Sep}</td>
+                        <td className="text-center">{ele.Oct}</td>
+                        <td className="text-center">{ele.Nov}</td>
+                        <td className="text-center">{ele.Dec}</td></tr>)
+                    })}
 
-                </tbody>
-              </Table>
-            }
-</div>
+                  </tbody>
+                </Table>
+              }
+
+
+              {this.state.data.length > 0 && this.state.view == 2 &&
+                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
+                  <thead>
+                    <tr>
+                      <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.productcategory.productcategory')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
+                      <th colSpan="12" className="text-center">{i18n.t('static.report.monthsOfStock')}</th>
+
+                    </tr>
+                    <tr> <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.mar')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.apr')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.may')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jun')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jul')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.aug')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.sep')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.oct')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.nov')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.dec')}</th></tr>
+                  </thead>
+                  <tbody>
+
+                    {this.state.data.map(ele => {
+                      return (<tr>
+                        <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
+                        <td className="text-center">{ele.year}</td>
+                        <td className="text-center">{ele.Jan}</td>
+                        <td className="text-center">{ele.Feb}</td>
+                        <td className="text-center">{ele.Mar}</td>
+                        <td className="text-center">{ele.Apr}</td>
+                        <td className="text-center">{ele.May}</td>
+                        <td className="text-center">{ele.Jun}</td>
+                        <td className="text-center">{ele.Jul}</td>
+                        <td className="text-center">{ele.Aug}</td>
+                        <td className="text-center">{ele.Sep}</td>
+                        <td className="text-center">{ele.Oct}</td>
+                        <td className="text-center">{ele.Nov}</td>
+                        <td className="text-center">{ele.Dec}</td></tr>)
+                    })}
+
+                  </tbody>
+                </Table>
+              }
+            </div>
           </CardBody>
         </Card>
 

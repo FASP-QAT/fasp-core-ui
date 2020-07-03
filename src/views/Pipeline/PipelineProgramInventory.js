@@ -74,16 +74,16 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                var json = this.el.getJson();
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    var planningUnitValue = map.get("7");
-                    if (planningUnitValue == value && y != i) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
-                        i = json.length;
-                    } else {
+                // var json = this.el.getJson();
+                // for (var i = 0; i < json.length; i++) {
+                //     var map = new Map(Object.entries(json[i]));
+                //     var planningUnitValue = map.get("7");
+                //     if (planningUnitValue == value && y != i) {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
+                //         i = json.length;
+                //     } else {
                         // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
                         // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
                         // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
@@ -92,8 +92,8 @@ export default class PipelineProgramInventory extends Component {
                         // this.el.setValueFromCoords(4, y, quantity, true);
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
-                    }
-                }
+                    // }
+                // }
 
                 var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
                 var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;

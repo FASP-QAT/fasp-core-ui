@@ -132,6 +132,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             .then(response => {
                 if (response.status == "200") {
                     this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                   
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -292,6 +293,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
 
+        if (x == 3) {
+            // var json = this.el.getJson();
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = false;
+            } else {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = true;
+            }
+        }
+
         if (x == 4) {
             var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
@@ -317,6 +335,23 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
 
+        if (x == 5) {
+            // var json = this.el.getJson();
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = false;
+            } else {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                // valid = true;
+            }
+        }
+
         this.setState({ isValidData: valid });
     }
 
@@ -331,7 +366,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     // console.log("first---->", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse, loading: false });
+                        this.setState({ rows: myResponse });
                     }
                     AuthenticationService.setupAxiosInterceptors();
                     ProcurementAgentService.getProcurementAgentListAll().then(response => {
@@ -458,7 +493,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     };
                                     var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                     this.el = elVar;
-                                    this.setState({ mapPlanningUnitEl: elVar });
+                                    this.setState({ mapPlanningUnitEl: elVar,loading: false });
+                                  
 
                                 } else {
                                     this.setState({
@@ -555,20 +591,21 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <Row>
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+               <div style={{ display: this.state.loading ? "none" : "block" }}>
+                   
                         <Card  >
 
                             <CardHeader>
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
                             </CardHeader>
-                            <CardBody>
-
+                            <CardBody className="p-0">
+                            <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
+                                </Col>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -581,7 +618,18 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                             </CardFooter>
                         </Card>
-                    </Col>
+                  
+                </div>
+                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
                 </Row>
             </div>
 

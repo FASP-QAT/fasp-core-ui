@@ -17,7 +17,9 @@ const initialValues = {
     realmId: [],
     procurementAgentCode: "",
     procurementAgentName: "",
-    submittedToApprovedLeadTime: ""
+    submittedToApprovedLeadTime: "",
+    colorHtmlCode: "",
+
 }
 
 const validationSchema = function (values) {
@@ -37,6 +39,9 @@ const validationSchema = function (values) {
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
         //     .min(0, i18n.t('static.program.validvaluetext'))
+        colorHtmlCode: Yup.string()
+            .max(6, i18n.t('static.common.max6digittext'))
+            .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
 
 
     })
@@ -79,6 +84,7 @@ class AddProcurementAgentComponent extends Component {
                 procurementAgentCode: '',
                 submittedToApprovedLeadTime: '',
                 localProcurementAgent: false,
+                colorHtmlCode:'',
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -110,6 +116,9 @@ class AddProcurementAgentComponent extends Component {
         if (event.target.name == "realmId") {
             procurementAgent.realm.id = event.target.value;
         }
+        if (event.target.name == "colorHtmlCode") {
+            procurementAgent.colorHtmlCode = event.target.value.toUpperCase();
+        }
         if (event.target.name == "procurementAgentCode") {
             procurementAgent.procurementAgentCode = event.target.value;
         }
@@ -135,7 +144,8 @@ class AddProcurementAgentComponent extends Component {
             realmId: true,
             procurementAgentCode: true,
             procurementAgentName: true,
-            submittedToApprovedLeadTime: true
+            submittedToApprovedLeadTime: true,
+            colorHtmlCode:true,
         }
         )
         this.validateForm(errors)
@@ -189,7 +199,7 @@ class AddProcurementAgentComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-              <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -204,7 +214,7 @@ class AddProcurementAgentComponent extends Component {
                                     ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -270,6 +280,22 @@ class AddProcurementAgentComponent extends Component {
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            bsSize="sm"
+                                                            name="colorHtmlCode"
+                                                            id="colorHtmlCode"
+                                                            valid={!errors.colorHtmlCode && this.state.procurementAgent.colorHtmlCode != ''}
+                                                            invalid={touched.colorHtmlCode && !!errors.colorHtmlCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            maxLength={6}
+                                                            value={this.state.procurementAgent.colorHtmlCode}
+                                                        />
+                                                        <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
@@ -364,7 +390,7 @@ class AddProcurementAgentComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/'+ i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         let { procurementAgent } = this.state;
@@ -373,6 +399,7 @@ class AddProcurementAgentComponent extends Component {
         procurementAgent.procurementAgentCode = ''
         procurementAgent.label.label_en = ''
         procurementAgent.submittedToApprovedLeadTime = ''
+        procurementAgent.colorHtmlCode = ''
 
         this.setState({
             procurementAgent

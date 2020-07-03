@@ -1279,7 +1279,7 @@ class PlanningUnitCapacity extends Component {
                     <CardHeader>
                         <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
                             <div className="table-responsive">
