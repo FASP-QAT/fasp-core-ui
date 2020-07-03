@@ -899,6 +899,7 @@
     "static.supplyPlan.sea":"Sea",
     "static.supplyPlan.air":"Air",
     "static.report.isincludeplannedshipmentSelect": "Please select include planned shipments",
-    "static.report.selectProgram": "Please select program and version"
+    "static.report.selectProgram": "Please select program and version",
+    "static.supplyPlan.qatAdjustment":"QAT Adjustment"
 
 }

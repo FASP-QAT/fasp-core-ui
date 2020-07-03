@@ -11,7 +11,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -196,7 +196,6 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
         })
-        console.log("!this.state.showTotalShipment", !this.state.showTotalShipment);
         var fields = document.getElementsByClassName("totalShipments");
         for (var i = 0; i < fields.length; i++) {
             if (!this.state.showTotalShipment == true) {
@@ -994,7 +993,20 @@ export default class SupplyPlanComponent extends React.Component {
                                             </tr>
                                         )
                                         )
+
                                     }
+                                    <tr>
+                                        <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.qatAdjustment')}</td>
+                                        {
+                                            this.state.inventoryFilteredArray.filter(c => c.region.id == -1).map(item1 => {
+                                                if (item1.adjustmentQty.toString() != '') {
+                                                    return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
+                                                } else {
+                                                    return (<td align="right"></td>)
+                                                }
+                                            })
+                                        }
+                                    </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -1119,11 +1131,11 @@ export default class SupplyPlanComponent extends React.Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-
-                        // var pjBytes = CryptoJS.AES.decrypt(myResult[i].programJson, SECRET_KEY);
-                        // var pj = pjBytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + "~v" + myResult[i].version,
+                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -1511,7 +1523,6 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     var amcArray = amcBeforeArray.concat(amcAfterArray);
                     var amcArrayFilteredForMonth = amcArray.filter(c => m[i].month == c.month);
-                    console.log("amcArray filtered", amcArrayFilteredForMonth, "Month", m[i].month);
                     var countAMC = amcArrayFilteredForMonth.length;
                     var sumOfConsumptions = 0;
                     for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
@@ -1591,7 +1602,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var adjustmentUnallocatedQty = 0;
                     for (var reg = 0; reg < regionListFiltered.length; reg++) {
                         var adjustmentQtyForRegion = 0;
-                        var c = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate) && c.region.id == regionListFiltered[reg].id);
+                        var c = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate) && c.region != null && c.region.id == regionListFiltered[reg].id);
                         var filteredJsonInventory = { adjustmentQty: '', region: { id: regionListFiltered[reg].id }, month: m[i] };
                         for (var j = 0; j < c.length; j++) {
                             adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
@@ -1603,6 +1614,18 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                         filteredArrayInventory.push(filteredJsonInventory);
                     }
+                    var c1 = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate) && c.region == null);
+                    var fInventory = { adjustmentQty: '', region: { id: -1 }, month: m[i] };
+                    var nationalAdjustment = 0;
+                    for (var j = 0; j < c1.length; j++) {
+                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                        if (c1[j].batchInfoList.length == 0 && c1[j].adjustmentQty < 0) {
+                            adjustmentUnallocatedQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                        }
+                        nationalAdjustment += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                        fInventory = { month: m[i], region: { id: -1 }, adjustmentQty: nationalAdjustment, inventoryId: c1[j].inventoryId, inventoryDate: c1[j].inventoryDate };
+                    }
+                    filteredArrayInventory.push(fInventory);
                     var adjustmentsTotalData = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate));
                     if (adjustmentsTotalData.length == 0) {
                         inventoryTotalData.push("");
@@ -1612,7 +1635,6 @@ export default class SupplyPlanComponent extends React.Component {
                         unallocatedAdjustments.push(adjustmentUnallocatedQty);
                     }
                 }
-
                 // Region wise calculations for inventory
                 for (var i = 0; i < regionListFiltered.length; i++) {
                     var regionCount = 0;
@@ -2225,7 +2247,8 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryBatchInfoDuplicateError: '',
             shipmentBatchInfoDuplicateError: '',
             inventoryNoStockError: '',
-            consumptionNoStockError: ''
+            consumptionNoStockError: '',
+            noFundsBudgetError: ''
 
         })
         if (supplyPlanType == 'Consumption') {
@@ -2285,6 +2308,7 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionBatchInfoDuplicateError: '',
             inventoryBatchInfoDuplicateError: '',
             shipmentBatchInfoDuplicateError: '',
+            noFundsBudgetError: ''
 
         })
         this.toggleLarge(supplyPlanType);
@@ -3631,11 +3655,12 @@ export default class SupplyPlanComponent extends React.Component {
                                             for (var sb = 0; sb < batchInfo.length; sb++) {
                                                 var data = [];
                                                 data[0] = batchInfo[sb].batch.batchId; //A
-                                                data[1] = adjustmentType; //B
-                                                data[2] = batchInfo[sb].adjustmentQty; //C
-                                                data[3] = batchInfo[sb].actualQty; //D
-                                                data[4] = batchInfo[sb].inventoryTransBatchInfoId; //E
-                                                data[5] = y; //F
+                                                data[1] = batchInfo[sb].batch.expiryDate;
+                                                data[2] = adjustmentType; //B
+                                                data[3] = batchInfo[sb].adjustmentQty; //C
+                                                data[4] = batchInfo[sb].actualQty; //D
+                                                data[5] = batchInfo[sb].inventoryTransBatchInfoId; //E
+                                                data[6] = y; //F
                                                 if (adjustmentType == 1) {
                                                     inventoryBatchInfoQty += parseInt(batchInfo[sb].actualQty);
                                                 } else {
@@ -3647,26 +3672,28 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var qty = parseInt(inventoryQty) - parseInt(inventoryBatchInfoQty);
                                                 var data = [];
                                                 data[0] = -1; //A
-                                                data[1] = adjustmentType; //B
+                                                data[1] = "";
+                                                data[2] = adjustmentType; //B
                                                 if (adjustmentType == 1) {
-                                                    data[2] = ""; //C
-                                                    data[3] = qty; //D
+                                                    data[3] = ""; //C
+                                                    data[4] = qty; //D
                                                 } else {
-                                                    data[2] = qty; //C
-                                                    data[3] = ""; //D
+                                                    data[3] = qty; //C
+                                                    data[4] = ""; //D
                                                 }
-                                                data[4] = 0; //E
-                                                data[5] = y; //F
+                                                data[5] = 0; //E
+                                                data[6] = y; //F
                                                 json.push(data);
                                             }
                                             if (batchInfo.length == 0) {
                                                 var data = [];
                                                 data[0] = "";
-                                                data[1] = adjustmentType;
-                                                data[2] = "";
+                                                data[1] = ""
+                                                data[2] = adjustmentType;
                                                 data[3] = "";
-                                                data[4] = 0;
-                                                data[5] = y;
+                                                data[4] = "";
+                                                data[5] = 0;
+                                                data[6] = y;
                                                 json.push(data)
                                             }
                                             var options = {
@@ -3679,6 +3706,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                         type: 'dropdown',
                                                         source: this.state.batchInfoList,
                                                         filter: this.filterBatchInfoForExistingDataForInventory
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.supplyPlan.expiryDate'),
+                                                        type: 'calendar',
+                                                        options: {
+                                                            format: 'MM-DD-YYYY',
+                                                            validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                        },
+                                                        readOnly: true
                                                     },
                                                     {
                                                         title: i18n.t('static.supplyPlan.adjustmentType'),
@@ -3727,16 +3763,16 @@ export default class SupplyPlanComponent extends React.Component {
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
-                                                    var adjustmentType = rowData[1];
+                                                    var adjustmentType = rowData[2];
                                                     if (adjustmentType == 1) {
-                                                        var cell = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                        cell.classList.add('readonly');
                                                         var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
+                                                        cell.classList.add('readonly');
+                                                        var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
                                                         cell.classList.remove('readonly');
                                                     } else {
-                                                        var cell = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                        cell.classList.remove('readonly');
                                                         var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
+                                                        cell.classList.remove('readonly');
+                                                        var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
                                                         cell.classList.add('readonly');
                                                     }
                                                 }.bind(this),
@@ -3810,11 +3846,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 onclick: function () {
                                                                     var data = [];
                                                                     data[0] = "";
-                                                                    data[1] = adjustmentType;
-                                                                    data[2] = "";
+                                                                    data[1] = "";
+                                                                    data[2] = adjustmentType;
                                                                     data[3] = "";
-                                                                    data[4] = 0;
-                                                                    data[5] = y;
+                                                                    data[4] = "";
+                                                                    data[5] = 0;
+                                                                    data[6] = y;
                                                                     obj.insertRow(data);
                                                                 }
                                                             });
@@ -4066,15 +4103,20 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
+
+                if (value != -1) {
+                    var expiryDate = this.state.batchInfoListAllForInventory.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
+                    elInstance.setValueFromCoords(1, y, expiryDate, true);
+                }
             }
         }
 
-        if (x == 2) {
-            if (elInstance.getValueFromCoords(2, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(2, y).toString().replaceAll("\,", "") != 0) {
+        if (x == 3) {
+            if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
                 // var reg = /^[0-9\b]+$/;
                 value = value.toString().replaceAll("\,", "");
-                var col = ("C").concat(parseInt(y) + 1);
+                var col = ("D").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4083,23 +4125,23 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-            } else if (elInstance.getValueFromCoords(1, y) == 2) {
-                var col = ("C").concat(parseInt(y) + 1);
+            } else if (elInstance.getValueFromCoords(2, y) == 2) {
+                var col = ("D").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                var col = ("C").concat(parseInt(y) + 1);
+                var col = ("D").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
         }
 
-        if (x == 3) {
-            if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
+        if (x == 4) {
+            if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
-                var col = ("D").concat(parseInt(y) + 1);
+                var col = ("E").concat(parseInt(y) + 1);
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -4109,20 +4151,20 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-            } else if (elInstance.getValueFromCoords(1, y) == 1) {
-                var col = ("D").concat(parseInt(y) + 1);
+            } else if (elInstance.getValueFromCoords(2, y) == 1) {
+                var col = ("E").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                var col = ("D").concat(parseInt(y) + 1);
+                var col = ("E").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
         }
 
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -4131,17 +4173,17 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
                 if (value == 1) {
-                    var cell = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    cell.classList.add('readonly');
                     var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
-                    cell.classList.remove('readonly');
-                    elInstance.setValueFromCoords(2, y, "", true);
-                } else {
-                    var cell = elInstance.getCell(`C${parseInt(y) + 1}`)
                     cell.classList.add('readonly');
-                    var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
                     cell.classList.remove('readonly');
                     elInstance.setValueFromCoords(3, y, "", true);
+                } else {
+                    var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    cell.classList.remove('readonly');
+                    elInstance.setValueFromCoords(4, y, "", true);
                 }
             }
         }
@@ -4194,14 +4236,14 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, "");
                 }
 
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y).toString().replaceAll("\,", "");
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "");
                 var reg = /-?\d+/;
                 // var reg = /^[0-9\b]+$/;
-                if (elInstance.getValueFromCoords(2, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(2, y).toString().replaceAll("\,", "") != 0) {
+                if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
                     var reg = /-?\d+/
                     // var reg = /^[0-9\b]+$/;
-                    var col = ("C").concat(parseInt(y) + 1);
+                    var col = ("D").concat(parseInt(y) + 1);
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
@@ -4211,23 +4253,23 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(1, y) == 2) {
-                    var col = ("C").concat(parseInt(y) + 1);
+                } else if (elInstance.getValueFromCoords(2, y) == 2) {
+                    var col = ("D").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    var col = ("C").concat(parseInt(y) + 1);
+                    var col = ("D").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
 
-                var value = elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "");
-                if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
+                var value = elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "");
+                if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
                     // var reg = /-?\d+/
                     var reg = /^[0-9\b]+$/;
-                    var col = ("D").concat(parseInt(y) + 1);
+                    var col = ("E").concat(parseInt(y) + 1);
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
@@ -4237,20 +4279,20 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                } else if (elInstance.getValueFromCoords(1, y) == 1) {
-                    var col = ("D").concat(parseInt(y) + 1);
+                } else if (elInstance.getValueFromCoords(2, y) == 1) {
+                    var col = ("E").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    var col = ("D").concat(parseInt(y) + 1);
+                    var col = ("E").concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
 
-                var value = elInstance.getValueFromCoords(1, y);
-                var col = ("B").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(2, y);
+                var col = ("C").concat(parseInt(y) + 1);
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -4279,24 +4321,23 @@ export default class SupplyPlanComponent extends React.Component {
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
                 if (i == 0) {
-                    rowNumber = map.get("5");
+                    rowNumber = map.get("6");
                 }
                 if (map.get("0") != -1) {
-                    var expiryDate = this.state.batchInfoListAllForInventory.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(i) + 1}`).innerText)[0].expiryDate;
                     var batchInfoJson = {
-                        consumptionTransBatchInfoId: map.get("4"),
+                        consumptionTransBatchInfoId: map.get("5"),
                         batch: {
                             batchId: map.get("0"),
                             batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
-                            expiryDate: expiryDate
+                            expiryDate: map.get("1")
                         },
-                        adjustmentQty: map.get("2").toString().replaceAll("\,", ""),
-                        actualQty: map.get("3").toString().replaceAll("\,", "")
+                        adjustmentQty: map.get("3").toString().replaceAll("\,", ""),
+                        actualQty: map.get("4").toString().replaceAll("\,", "")
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
-                totalAdjustments += parseInt(map.get("2").toString().replaceAll("\,", ""));
-                totalActualStock += parseInt(map.get("3").toString().replaceAll("\,", ""));
+                totalAdjustments += parseInt(map.get("3").toString().replaceAll("\,", ""));
+                totalActualStock += parseInt(map.get("4").toString().replaceAll("\,", ""));
             }
             var inventoryInstance = this.state.inventoryEl;
             var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
@@ -4690,6 +4731,56 @@ export default class SupplyPlanComponent extends React.Component {
 
 
                             inventoryDataList.push(inventoryJson);
+                        }
+                        var invList = inventoryDataList.filter(c => c.inventoryDate == map.get("14") && c.realmCountryPlanningUnit.id == map.get("3") && c.region != null);
+                        var actualQty = 0;
+                        var adjustmentQty = 0;
+                        var actualQtyCount = 0;
+                        var regionWiseInventoryCount = 0;
+                        for (var i = 0; i < invList.length; i++) {
+                            regionWiseInventoryCount += 1;
+                            if (invList[i].actualQty != "" && invList[i].actualQty != null) {
+                                actualQty += parseFloat(invList[i].actualQty);
+                                actualQtyCount += 1;
+                            }
+                            if (invList[i].adjustmentQty != "" && invList[i].adjustmentQty != null) {
+                                adjustmentQty += parseFloat(invList[i].adjustmentQty);
+                            }
+                        }
+                        if (actualQty > 0 && actualQtyCount > 1 && regionWiseInventoryCount == this.state.regionListFiltered.length) {
+                            var endDate = map.get("14");
+                            var index = this.state.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
+                            var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]) + adjustmentQty;
+                            var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
+                            if (nationalAdjustment != 0) {
+                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
+                                if (nationAdjustmentIndex == -1) {
+                                    var inventoryJson = {
+                                        inventoryId: 0,
+                                        dataSource: {
+                                            id: QAT_DATA_SOURCE_ID
+                                        },
+                                        region: null,
+                                        inventoryDate: map.get("14"),
+                                        adjustmentQty: nationalAdjustment,
+                                        actualQty: "",
+                                        active: true,
+                                        realmCountryPlanningUnit: {
+                                            id: map.get("3"),
+                                        },
+                                        multiplier: map.get("4"),
+                                        planningUnit: {
+                                            id: planningUnitId
+                                        },
+                                        notes: "",
+                                        batchInfoList: []
+                                    }
+                                    inventoryDataList.push(inventoryJson);
+                                } else {
+                                    inventoryDataList[parseInt(index)].adjustmentQty = nationalAdjustment;
+                                }
+                            }
+
                         }
                     }
                     programJson.inventoryList = inventoryDataList;
@@ -6916,7 +7007,20 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             shipmentError: '',
             shipmentDuplicateError: '',
+            noFundsBudgetError: ''
         })
+
+        if (x == 8 || x == 30) {
+            var col = ("I").concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
+            var col = ("AE").concat(parseInt(y) + 1);
+            if (value != "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -7206,38 +7310,44 @@ export default class SupplyPlanComponent extends React.Component {
         var mapArray = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            // console.log("Map", map);
-            // var budget = this.state.budgetListAll.filter(c => c.budgetId == map.get("8"))[0]
-            // var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
-            // var shipmentList = this.state.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("8"));
-            // var usedBudgetTotalAmount = 0;
-            // for (var s = 0; s < shipmentList.length; s++) {
-            //     usedBudgetTotalAmount += (shipmentList[s].productCost + shipmentList[s].freightCost) * shipmentList[s].currency.conversionRateToUsd;
-            // }
-            // console.log("Used budget amount", usedBudgetTotalAmount);
-            // var totalCost = ((elInstance.getCell(`AE${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
-            // console.log("Toatlcost", totalCost);
-            // console.log("map.get(6)", map.get("6"))
-            // var enteredBudgetAmt = (totalCost * map.get("6"));
-            // console.log("Entered Budget amount", enteredBudgetAmt);
-            // usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
-            // enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
-            // var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
-            // if (enteredBudgetAmt > availableBudgetAmount) {
-            //     valid = false;
-            //     var col = ("I").concat(parseInt(y) + 1);
-            //     elInstance.setStyle(col, "background-color", "transparent");
-            //     elInstance.setStyle(col, "background-color", "yellow");
-            //     elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+            if (map.get("8") != "") {
+                var budget = this.state.budgetListAll.filter(c => c.budgetId == map.get("8"))[0]
+                var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
+                var shipmentList = this.state.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("8"));
+                var usedBudgetTotalAmount = 0;
+                for (var s = 0; s < shipmentList.length; s++) {
+                    var index = "";
+                    if (shipmentList[s].shipmentId != 0) {
+                        index = shipmentList.findIndex(c => c.shipmentId == shipmentList[s].shipmentId);
+                    } else {
+                        index = shipmentList[s].index;
+                    }
+                    if (map.get("34") != index) {
+                        usedBudgetTotalAmount += parseFloat((parseFloat(shipmentList[s].productCost) + parseFloat(shipmentList[s].freightCost)) * parseFloat(shipmentList[s].currency.conversionRateToUsd));
+                    }
+                }
+                var totalCost = ((elInstance.getCell(`AE${parseInt(y) + 1}`)).innerHTML).toString().replaceAll("\,", "");
+                var enteredBudgetAmt = (totalCost * map.get("6"));
+                usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
+                enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
 
-            //     var col = ("AE").concat(parseInt(y) + 1);
-            //     elInstance.setStyle(col, "background-color", "transparent");
-            //     elInstance.setStyle(col, "background-color", "yellow");
-            //     elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
-            //     this.setState({
-            //         noFundsBudgetError: i18n.t('static.label.noFundsAvailable')
-            //     })
-            // } else {
+                var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
+                if (enteredBudgetAmt > availableBudgetAmount) {
+                    valid = false;
+                    var col = ("I").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+
+                    var col = ("AE").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
+                    this.setState({
+                        noFundsBudgetError: i18n.t('static.label.noFundsAvailable')
+                    })
+                }
+            } else {
 
                 var col = ("A").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(0, y);
@@ -7426,7 +7536,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 // }
                 // }
-            // }
+            }
         }
         return valid;
     }
@@ -7442,7 +7552,8 @@ export default class SupplyPlanComponent extends React.Component {
                 shipmentError: "",
                 shipmentDuplicateError: '',
                 shipmentBudgetError: '',
-                shipmentBatchError: ''
+                shipmentBatchError: '',
+                noFundsBudgetError: ''
             })
             var elInstance = this.state.shipmentsEl;
             var json = elInstance.getJson();
@@ -7523,7 +7634,6 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("34"))].accountFlag = map.get("37");
                         shipmentDataList[parseInt(map.get("34"))].emergencyOrder = map.get("38");
                         if (map.get("40").length != 0) {
-                            console.log("In if for length")
                             shipmentDataList[parseInt(map.get("34"))].batchInfoList = map.get("40");
                         }
                         if (shipmentStatusId == SHIPPED_SHIPMENT_STATUS) {
@@ -7532,8 +7642,6 @@ export default class SupplyPlanComponent extends React.Component {
                         if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                             shipmentDataList[parseInt(map.get("34"))].deliveredDate = moment(Date.now()).format("YYYY-MM-DD");
                             var shipmentBatchInfoList = map.get("40");
-                            console.log("Shipment BatchInfo", shipmentBatchInfoList);
-                            console.log("Shipment BatchInfo length", shipmentBatchInfoList.length);
                             if (shipmentBatchInfoList.length == 0) {
                                 var batchNo = "QAT".concat(map.get("34")).concat(this.state.versionId).concat(AuthenticationService.getLoggedInUserId());
                                 var expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
@@ -7548,8 +7656,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     shipmentQty: shipmentQty,
                                     createdDate: moment(Date.now()).format("YYYY-MM-DD")
                                 }
-                                console.log("batchInfoJson", batchInfoJson);
-                                console.log("map.get(34)", map.get("34"));
                                 var batchArr = [];
                                 batchArr.push(batchInfoJson);
                                 shipmentDataList[parseInt(map.get("34"))].batchInfoList = batchArr;
@@ -7578,7 +7684,6 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     programJson.shipmentList = shipmentDataList;
-                    console.log("Program Json after shipment------------------>", programJson);
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
 
