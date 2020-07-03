@@ -678,7 +678,7 @@
     "static.dashboard.costOfInventory": "Cost Of Inventory",
     "static.dashboard.inventoryTurns": "Inventory Turns",
     "static.dashboard.stockstatusovertime": "Stock Status Over Time",
-    "static.report.noofmonth": "Number Of Months",
+    "static.report.noofmonth": "Number of Months Included in Calculation",
     "static.supplyplan.supplyplanformula": "Supply plan formulae",
     "static.message.shipmentSaved": "Shipment Data Saved",
     "static.report.historicalConsumptionActual": "Historical Actual Consumption",
@@ -900,6 +900,11 @@
     "static.supplyPlan.air":"Air",
     "static.report.isincludeplannedshipmentSelect": "Please select include planned shipments",
     "static.report.selectProgram": "Please select program and version",
-    "static.supplyPlan.qatAdjustment":"QAT Adjustment"
-
+    "static.supplyPlan.qatAdjustment":"QAT Adjustment",
+    "static.dashboard.stockstatusacrossplanningunit":"Stock Status (Across Planning Units)",
+    "static.supplyPlan.lastinventorydt":"Last Inventory Date",
+    "static.report.withinstock":"Within Stock?",
+    "static.report.low":"Low Stock",
+    "static.report.excess":"Excess Stock",
+    "static.report.ok":"Okay"
 }
