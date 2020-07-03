@@ -882,7 +882,17 @@
     "static.budget.budgetCode": "Budget Code",
     "static.program.programCode": "Program Code",
     "static.procurementAgent.procurementAgentHTMLCode": "Please enter color code",
-    "static.procurementagent.procurementAgentColorCode": "Color Code"
+    "static.procurementagent.procurementAgentColorCode": "Color Code",
+    "static.procurementAgent.selectProcurementAgent": "Please select procurement agent",
+    "static.fundingSource.selectFundingSource": "Please select funding source",
+    "static.report.procurementAgent": "Procurement Agent Report",
+    "static.report.fundingSource": "Funding Source Report",
+    "static.report.qty": "Qty",
+    "static.report.productCost": "Product Cost (USD)",
+    "static.report.freightPer": "Freight (%)",
+    "static.report.freightCost": "Freight Cost (USD)",
+    "static.report.totalCost": "Total Cost (USD)",
+    "static.report.procurementagentcode": "Procurement Agent Code"
     
     
 
