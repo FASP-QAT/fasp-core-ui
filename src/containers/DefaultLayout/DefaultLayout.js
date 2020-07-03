@@ -478,6 +478,13 @@ class DefaultLayout extends Component {
                             url: '/report/stockStatus',
                             icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                          }, ,
+                          {
+                            name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                            url: '/report/stockStatusAcrossPlanningUnits',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                        
                           },
                           {
                             name: i18n.t('static.report.warehouseCapacity'),
@@ -687,12 +694,28 @@ class DefaultLayout extends Component {
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
-                          }
-                          /* {
+                          },
+                          {
+                            name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                            url: '/report/aggregateShipmentByProduct',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          },
+                           {
                              name: i18n.t('static.dashboard.stockstatus'),
                              url: '/report/stockStatus',
-                             icon: 'fa fa-exchange'
-                           }*/
+                             icon: 'fa fa-exchange',
+                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                         
+                           }
+                           ,
+                           {
+                             name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                             url: '/report/stockStatusAcrossPlanningUnits',
+                             icon: 'fa fa-exchange',
+                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                         
+                           }
                         ]
                       }
                     ]
