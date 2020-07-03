@@ -74,6 +74,7 @@ hideSecondComponent() {
     }
   }
   componentDidMount() {
+    console.log("props--------------------",this.props);
     AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
     ProgramService.getProgramList().then(response => {

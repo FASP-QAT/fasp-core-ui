@@ -1033,6 +1033,11 @@ class AuthenticationService {
         return false;
 
     }
+    displayHeaderTitle(url) {
+        if (url.includes("/program/listProgram")) {
+            return "Programs";
+        }
+    }
 
 }
 

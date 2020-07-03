@@ -1,54 +1,44 @@
+import { AppAside, AppFooter, AppHeader, AppSidebar, AppSidebarFooter, AppSidebarForm, AppSidebarHeader, AppSidebarMinimizer, AppSidebarNav } from '@coreui/react';
 import React, { Component, Suspense } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container } from 'reactstrap';
-import { Online, Offline } from "react-detect-offline";
-import {
-  AppAside,
-  AppBreadcrumb,
-  AppFooter,
-  AppHeader,
-  AppSidebar,
-  AppSidebarFooter,
-  AppSidebarForm,
-  AppSidebarHeader,
-  AppSidebarMinimizer,
-  AppSidebarNav,
-} from '@coreui/react';
-// sidebar nav config
-import navigation from '../../_nav';
-// routes config
-import routes from '../../routes';
-import LogoutService from "../../api/LogoutService";
-import AuthenticationService from '../../views/Common/AuthenticationService.js';
-import i18n from '../../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { Offline, Online } from "react-detect-offline";
+import { Redirect, Route, Switch } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import i18n from '../../i18n';
+// routes config
+import routes from '../../routes';
+import AuthenticationService from '../../views/Common/AuthenticationService.js';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
-
 
 class DefaultLayout extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      businessFunctions: []
+      businessFunctions: [],
+      name: ""
     }
   }
 
+  displayHeaderTitle = (name) => {
+    if (this.state.name !== name) {
+      this.setState({
+        name
+      });
+    }
+  }
   componentDidMount() {
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
-    console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
       for (let i = 0; i < curUserBusinessFunctions.length; i++) {
         bfunction.push(curUserBusinessFunctions[i]);
       }
       this.setState({ businessFunctions: bfunction });
-      console.log("log--------------"+this.state.businessFunctions.includes('ROLE_BF_CREATE_PROGRAM'));
-      console.log("log--------------",this.state.businessFunctions);
     }
 
   }
@@ -84,7 +74,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} title={this.state.name} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -551,7 +541,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           }
                           ,
-                          
+
                           {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
@@ -705,7 +695,7 @@ class DefaultLayout extends Component {
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name)} />
                             ) : (
                               <Redirect to={{ pathname: "/login/static.accessDenied" }} />
                             )
