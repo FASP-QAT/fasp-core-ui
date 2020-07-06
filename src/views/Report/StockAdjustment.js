@@ -391,7 +391,7 @@ class StockAdjustmentComponent extends Component {
 
 
         var A = [headers]
-        this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
         for (var i = 0; i < A.length; i++) {
             console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -476,7 +476,7 @@ class StockAdjustmentComponent extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.program.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]);
         let content = {
             margin: { top: 40 },
             startY: 200,
@@ -555,12 +555,13 @@ class StockAdjustmentComponent extends Component {
 
                                     var json = {
                                         program: programJson,
-                                        inventoryDate: new moment(dt).format('MMM YYYY'),
+                                        inventoryDate:moment(dt).format('MMM YYYY'),
                                         planningUnit: list[0].planningUnit,
                                         stockAdjustemntQty: adjustment,
                                         lastModifiedBy: programJson.currentVersion.lastModifiedBy,
                                         lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-                                        notes: list[0].notes
+                                        notes: list[0].notes,
+                                        dataSource:list[0].dataSource
                                     }
                                     data.push(json)
                                 } else {
@@ -684,8 +685,8 @@ class StockAdjustmentComponent extends Component {
 
         const columns = [
             {
-                dataField: 'program.label',
-                text: i18n.t('static.program.program'),
+                dataField: 'dataSource.label',
+                text: i18n.t('static.datasource.datasource'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -822,7 +823,7 @@ class StockAdjustmentComponent extends Component {
 
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Program</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
