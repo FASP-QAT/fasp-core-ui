@@ -197,21 +197,21 @@ class ApplicationDashboard extends Component {
       <div className="animated fadeIn">
         <h5  className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
        
-        <Row className="mt-2">
+        {/* <Row className="mt-2">
           
         <Col xs="12" sm="6" lg="3">
         <Widget01 color="warning" header="14%" mainText="Country">
-              {/* <small className="text-muted">Excepteur sint occaecat...</small> */}
+             
             </Widget01>
           </Col>
           <Col xs="12" sm="6" lg="3">
           <Widget01 color="warning" header="16%" mainText="Technical Area">
-              {/* <small className="text-muted">Excepteur sint occaecat...</small> */}
+             
             </Widget01>
           </Col>
           <Col xs="12" sm="6" lg="3">
             <Widget01 color="warning" header="200%" mainText="Region">
-              {/* <small className="text-muted">Excepteur sint occaecat...</small> */}
+              
             </Widget01>
           </Col>
           <Col xs="12" sm="6" lg="3">
@@ -227,7 +227,7 @@ class ApplicationDashboard extends Component {
               <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
               <div className="card-header-actions">
               <a className="card-header-action">
-                  {/* <small className="text-muted">98</small> */}
+                
                 </a>
               </div>
             </CardHeader>
@@ -238,7 +238,7 @@ class ApplicationDashboard extends Component {
             </CardBody>
           </Card>
           </Col> 
-        </Row>
+        </Row> */}
      {/* <Row>
         <Col md="8">
             <Card>
@@ -363,7 +363,7 @@ class ApplicationDashboard extends Component {
         </Row> 
  */}
 
-      </div>
+     </div>
     );
   }
 }
