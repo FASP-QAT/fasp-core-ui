@@ -887,12 +887,12 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                    case "/report/stockStatusAcrossPlanningUnits":
-                        if (bfunction.includes("ROLE_BF_STOCK_STATUS_REPORT")) {
-                            return true;
-                        }
-                        break;
-                   
+                case "/report/stockStatusAcrossPlanningUnits":
+                    if (bfunction.includes("ROLE_BF_STOCK_STATUS_REPORT")) {
+                        return true;
+                    }
+                    break;
+
                 case "/report/qatProblemPlusActionReport":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
@@ -929,6 +929,11 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/warehouseCapacity":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/report/stockStatusAccrossPlanningUnitGlobalView":
                     if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
                         return true;
                     }

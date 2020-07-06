@@ -1497,7 +1497,7 @@ class RegionListComponent extends Component {
                             "gln": '1298769856365',
                             "capacityCbm": '40,000',
                             "regionIdString": "1",
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                            "programName": "HIV/AIDS - Kenya - Ministry Of Health   \n HIV/AIDS - Malawi - National ",
                         },
                         {
                             "active": true,
@@ -1546,7 +1546,7 @@ class RegionListComponent extends Component {
                             "gln": '6758432123456',
                             "capacityCbm": '18,000',
                             "regionIdString": "2",
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                            "programName": "HIV/AIDS - Kenya - Ministry Of Health \n Malaria - Kenya - National",
                         },
                         {
                             "active": true,
@@ -1595,7 +1595,7 @@ class RegionListComponent extends Component {
                             "gln": '5678903456789',
                             "capacityCbm": '13,500',
                             "regionIdString": "3",
-                            "programName": "HIV/AIDS - Kenya - Ministry Of Health",
+                            "programName": "HIV/AIDS - Kenya - Ministry Of Health \n Malaria - Kenya - National",
                         }
 
                         ],
@@ -1650,7 +1650,8 @@ class RegionListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                formatter: this.formatLabel,
+                style: { width: '80px' },
             },
             {
                 dataField: 'label',
@@ -1658,29 +1659,32 @@ class RegionListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                formatter: this.formatLabel,
+                style: { width: '80px' },
             },
             {
-                dataField: 'label',
-                text: i18n.t('static.region.region'),
+                dataField: 'programName',
+                text: i18n.t('static.program.program'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                style: { width: '80px' },
             },
             {
                 dataField: 'gln',
                 text: i18n.t('static.region.gln'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                style: { width: '10px' },
             },
             {
                 dataField: 'capacityCbm',
                 text: 'Capacity (CBM)',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                style: { width: '10px' },
             }
 
         ];
@@ -1799,14 +1803,14 @@ class RegionListComponent extends Component {
                                                 onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
-                                                <option value="1" selected>HIV/AIDS - Malawi - Ministry Of Health</option>
+                                                {/* <option value="1" selected>HIV/AIDS - Malawi - Ministry Of Health</option> */}
                                             </Input>
 
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                {/* <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">Version</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -1823,7 +1827,7 @@ class RegionListComponent extends Component {
 
                                         </InputGroup>
                                     </div>
-                                </FormGroup>
+                                </FormGroup> */}
                             </div>
                         </Col>
 
@@ -1839,7 +1843,7 @@ class RegionListComponent extends Component {
                             {
                                 props => (
 
-                                    <div className="TableCust listPrportFundingAlignThtd">
+                                    <div className="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />

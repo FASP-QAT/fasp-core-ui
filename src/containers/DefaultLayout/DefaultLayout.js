@@ -493,6 +493,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
+                            name: i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView'),
+                            url: '/report/stockStatusAccrossPlanningUnitGlobalView',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.report.stockAdjustment'),
                             url: '/report/stockAdjustment',
                             icon: 'fa fa-line-chart',
@@ -610,7 +616,7 @@ class DefaultLayout extends Component {
                         url: '/pipeline/pieplineProgramList',
                         icon: 'fa fa-sitemap',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') ? false : true) }
-                      }
+                      },
 
                     ]
 

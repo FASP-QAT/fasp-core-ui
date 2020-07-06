@@ -907,5 +907,6 @@
     "static.report.withinstock":"Within Stock?",
     "static.report.low":"Low Stock",
     "static.report.excess":"Excess Stock",
-    "static.report.ok":"Okay"
+    "static.report.ok":"Okay",
+    "static.report.StockStatusAccrossPlanningUnitGlobalView": "Stock Status Accross PlanningUnit Global View"
 }
