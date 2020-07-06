@@ -219,7 +219,9 @@ const InventoryTurnsReport=React.lazy(() => import('./views/Report/InventoryTurn
 const ShipmentSummery = React.lazy(() => import('./views/Report/ShipmentSummery'));
 
 const WarehouseCapacity = React.lazy(() => import('./views/Report/WarehouseCapacity'));
+const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('./views/Report/StockStatusAccrossPlanningUnitGlobalView'));
 const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'));
+const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -461,6 +463,8 @@ const routes = [
 
   { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
+  { path: '/report/stockStatusAcrossPlanningUnits', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
+  
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
@@ -529,6 +533,7 @@ const routes = [
   { path: '/shipment/shipmentList/:message', component: ShipmentList },
   { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: 'Edit Shipment Details', component: EditShipment },
   { path: '/report/warehouseCapacity', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
+  { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
   { path: '/report/stockAdjustment', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
 ];
 export default routes;

@@ -2190,6 +2190,59 @@ class Consumption extends Component {
                           </Picker>
                         </div>
                       </FormGroup>
+
+                      <Online>
+                        <FormGroup className="col-md-3">
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                          <div className="controls ">
+                            <InputGroup>
+                              <Input
+                                type="select"
+                                name="productCategoryId"
+                                id="productCategoryId"
+                                bsSize="sm"
+                                onChange={this.getPlanningUnit}
+                              >
+                                <option value="0">{i18n.t('static.common.all')}</option>
+                                {productCategories.length > 0
+                                  && productCategories.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup></div>
+
+                        </FormGroup>
+                      </Online>
+                      <Offline>
+                        <FormGroup className="col-md-3">
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                          <div className="controls">
+                            <InputGroup>
+                              <Input
+                                type="select"
+                                name="productCategoryId"
+                                id="productCategoryId"
+                                bsSize="sm"
+                                onChange={this.getPlanningUnit}
+                              >
+                                <option value="0">{i18n.t('static.common.all')}</option>
+                                {offlineProductCategoryList.length > 0
+                                  && offlineProductCategoryList.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.id}>
+                                        {item.name}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup></div>
+
+                        </FormGroup>
+                      </Offline>
                       <Online>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -2246,61 +2299,10 @@ class Consumption extends Component {
                           </div>
                         </FormGroup>
                       </Offline>
+
                       <Online>
                         <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input
-                                type="select"
-                                name="productCategoryId"
-                                id="productCategoryId"
-                                bsSize="sm"
-                                onChange={this.getPlanningUnit}
-                              >
-                                <option value="0">{i18n.t('static.common.all')}</option>
-                                {productCategories.length > 0
-                                  && productCategories.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
-                            </InputGroup></div>
-
-                        </FormGroup>
-                      </Online>
-                      <Offline>
-                        <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                          <div className="controls">
-                            <InputGroup>
-                              <Input
-                                type="select"
-                                name="productCategoryId"
-                                id="productCategoryId"
-                                bsSize="sm"
-                                onChange={this.getPlanningUnit}
-                              >
-                                <option value="0">{i18n.t('static.common.all')}</option>
-                                {offlineProductCategoryList.length > 0
-                                  && offlineProductCategoryList.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.id}>
-                                        {item.name}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
-                            </InputGroup></div>
-
-                        </FormGroup>
-                      </Offline>
-                      <Online>
-                        <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
                           <div className="controls">
                             <InputGroup>
                               <Input
@@ -2329,7 +2331,7 @@ class Consumption extends Component {
                       </Online>
                       <Offline>
                         <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
                           <div className="controls ">
                             <InputGroup>
                               <Input

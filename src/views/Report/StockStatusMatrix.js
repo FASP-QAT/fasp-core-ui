@@ -1665,14 +1665,16 @@ this.filterData()})
                   </div>
 
                 </FormGroup>*/}
- <FormGroup className="col-md-3">
+               <FormGroup className="col-md-3">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                <div className="controls">
-                  <RangePicker picker="year"   allowClear={false}
-                                id="date" name= "date"
-                                style={{ width: '450px', marginLeft:'20px'}} 
-                                onChange={this.onYearChange} 
-                                value={[moment(this.state.startYear.toString()),moment(this.state.endYear.toString())]}  />
+                <div className="controls box">
+                  <RangePicker 
+                         picker="year"  
+                        allowClear={false}
+                        id="date" name= "date"
+                      //  style={{ width: '450px', marginLeft:'20px'}} 
+                        onChange={this.onYearChange} 
+                        value={[moment(this.state.startYear.toString()),moment(this.state.endYear.toString())]}  />
  
                 </div>
                 </FormGroup>

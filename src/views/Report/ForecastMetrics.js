@@ -1019,7 +1019,7 @@ class ForecastMetrics extends Component {
                         {
                           props => (
                             <div className="TableCust ">
-                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left mt-reporttable">
+                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left table-mt">
                                 <SearchBar {...props.searchProps} />
                                 <ClearSearchButton {...props.searchProps} /></div>
                               <BootstrapTable striped rowClasses={this.rowClassNameFormat} hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell

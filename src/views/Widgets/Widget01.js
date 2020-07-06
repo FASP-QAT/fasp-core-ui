@@ -18,8 +18,8 @@ const propTypes = {
 
 const defaultProps = {
   header: '89.9%',
-  mainText: 'Lorem ipsum...',
-  smallText: 'Lorem ipsum dolor sit amet enim.',
+  // mainText: 'Lorem ipsum...',
+  // smallText: 'Lorem ipsum dolor sit amet enim.',
   // color: '',
   value: '25',
   variant: '',
