@@ -999,6 +999,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/ProgramDashboard":
+                    case "/RealmDashboard":
                     if (bfunction.includes("ROLE_BF_PROGRAM_DASHBOARD")) {
                         return true;
                     }

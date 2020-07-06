@@ -122,7 +122,7 @@ class ProgramDashboard extends Component {
       <div className="animated fadeIn">
  
          <Row>
-          <Col md="6" style={{padding:'0px 33px 0px 2px' }}>
+          {/* <Col md="6" style={{padding:'0px 33px 0px 2px' }}>
           <Card>
             <CardHeader className="text-center">
            
@@ -138,11 +138,11 @@ class ProgramDashboard extends Component {
               </div>
             </CardBody>
           </Card>
-          </Col> 
+          </Col>  */}
        
-        <Col md="6" style={{padding:' 0px 4px 0px 10px' }}>
-            <Card>
-              <CardHeader className="text-center">
+        <Col md="8" style={{padding:' 0px 4px 0px 10px' }}>
+            <Card className="mt-2">
+              <CardHeader className="text-center ">
               <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels  <span className="count-clr"></span></b>
               </CardHeader>
               <CardBody>
@@ -159,7 +159,7 @@ class ProgramDashboard extends Component {
                   <tr>
                  
                     <td>
-                      <div>Program 1</div>
+                      <div>HIV / Aids - Kenya - Ministry of Health</div>
                      
                     </td>
                     
@@ -179,7 +179,7 @@ class ProgramDashboard extends Component {
                   <tr>
                  
                  <td>
-                   <div>Program 2</div>
+                   <div>Malaria - Kenya - National</div>
                   
                  </td>
                  
@@ -199,7 +199,7 @@ class ProgramDashboard extends Component {
                <tr>
                  
                  <td>
-                   <div>Program 3</div>
+                   <div>HIV/AIDS - Malawi - National</div>
                   
                  </td>
                  
@@ -216,7 +216,7 @@ class ProgramDashboard extends Component {
                  </td>
                 
                </tr>
-               <tr>
+               {/* <tr>
                  
                     <td>
                       <div>Program 4</div>
@@ -235,7 +235,7 @@ class ProgramDashboard extends Component {
                       <Progress className="progress-xs" color="warning" value="50" />
                     </td>
                    
-                  </tr>
+                  </tr> */}
          
                   </tbody>
                 </Table>

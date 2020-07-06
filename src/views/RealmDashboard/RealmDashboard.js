@@ -52,28 +52,30 @@ const options = {
 
 
 const bar = {
-  labels: ['Program1', 'Program2', 'Program3', 'Program4'],
+  labels: ['Malawi', 'Kenya', 'Zimbabwe', 'USA'],
   datasets: [
     {
-      label: 'Inventory At Threshold',
-      backgroundColor: '#ffc107',
+      label: 'Active Programs',
+      backgroundColor: '#118B70',
       borderColor: 'rgba(179,181,198,1)',
       pointBackgroundColor: 'rgba(179,181,198,1)',
       pointBorderColor: '#fff',
+      barThickness: 120,
+      barPercentage: 0.5,
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(179,181,198,1)',
-      data: [65, 59, 90, 81, 56, 55, 40],
+      data: [55, 45, 80, 76, 56, 55, 40],
     },
-    {
-      label: 'Inventory Below Threshold',
-      backgroundColor: '#f86c6b',
-      borderColor: 'rgba(255,99,132,1)',
-      pointBackgroundColor: 'rgba(255,99,132,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(255,99,132,1)',
-      data: [28, 48, 40, 19, 96, 27, 100],
-    },
+    // {
+    //   label: 'Inventory Below Threshold',
+    //   backgroundColor: '#f86c6b',
+    //   borderColor: 'rgba(255,99,132,1)',
+    //   pointBackgroundColor: 'rgba(255,99,132,1)',
+    //   pointBorderColor: '#fff',
+    //   pointHoverBackgroundColor: '#fff',
+    //   pointHoverBorderColor: 'rgba(255,99,132,1)',
+    //   data: [28, 48, 40, 19, 96, 27, 100],
+    // },
   ],
   
 };
@@ -111,8 +113,67 @@ class RealmDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
+
+{/* <Row className="mt-2">
+          
+          <Col xs="12" sm="6" lg="3">
+          <Widget01 color="warning" header="14%" mainText="Country">
+               
+              </Widget01>
+            </Col>
+            <Col xs="12" sm="6" lg="3">
+            <Widget01 color="warning" header="16%" mainText="Technical Area">
+               
+              </Widget01>
+            </Col>
+            <Col xs="12" sm="6" lg="3">
+              <Widget01 color="warning" header="200%" mainText="Region">
+                
+              </Widget01>
+            </Col>
+            <Col xs="12" sm="6" lg="3">
+              <Widget01 color="danger" value="95" header="120%" mainText="Organisation">
+                </Widget01>
+            </Col>
+          </Row> */}
+            <Row className="mt-2">
+            <Col sm="6" md="3">
+              <Widget04 icon="cui-globe" color="info" header="04" value="25">Country</Widget04>
+            </Col>
+            <Col sm="6" md="3">
+              <Widget04 icon="fa fa-medkit " color="success" header="20" value="25">Technical Area</Widget04>
+            </Col>
+            <Col sm="6" md="3">
+              <Widget04 icon="cui-map " color="warning" header="10" value="10">Region</Widget04>
+            </Col>
+            <Col sm="6" md="3">
+              <Widget04 icon="fa fa-building-o" color="primary" header="28" value="15">Organisation</Widget04>
+            </Col>
+            
+          </Row>
+  
+          <Row>
+            <Col md="12">
+            <Card>
+              {/* <CardHeader className="text-center">
+                <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
+                <div className="card-header-actions">
+                <a className="card-header-action">
+                  
+                  </a>
+                </div>
+              </CardHeader> */}
+              <CardBody>
+                <div className="chart-wrapper chart-graph">
+                  <Bar data={bar} options={options} />
+                </div>
+              </CardBody>
+            </Card>
+            </Col> 
+          </Row> 
+    
         
-        <Row>
+        {/* <Row>
         <Col md="8">
             <Card>
               <CardHeader>
@@ -218,7 +279,7 @@ class RealmDashboard extends Component {
                 </Card>
                 </Col>
                 
-        </Row>
+        </Row> */}
 
         
        
