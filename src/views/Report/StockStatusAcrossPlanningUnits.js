@@ -688,7 +688,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             this.setState({
                                 data: data,
                                 message: ''
-                            })
+                            },()=>{console.log(this.state.data)})
                         }.bind(this)
 
                     }.bind(this)
