@@ -1812,17 +1812,17 @@ class GlobalConsumption extends Component {
                     <div className="col-md-12">
                         <div className="table-responsive ">
 
-                          <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                          <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
 
                             <thead>
                               <tr>
-                                <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.product')} </th>
-                                <th className="text-center " style={{ width: '34%' }}> MOZ </th>
-                                <th className="text-center" style={{ width: '34%' }}>TAZ</th>
-                                <th className="text-center" style={{ width: '34%' }}>ZAM</th>
-                                <th className="text-center" style={{ width: '34%' }}>KEN</th>
-                                <th className="text-center" style={{ width: '34%' }}>AIA</th>
-                                <th className="text-center" style={{ width: '34%' }}>AFG</th>
+                                <th className="text-center" style={{ width: '23%' }}> {i18n.t('static.dashboard.product')} </th>
+                                <th className="text-center " style={{ width: '12%' }}> MOZ </th>
+                                <th className="text-center" style={{ width: '12%' }}>TAZ</th>
+                                <th className="text-center" style={{ width: '12%' }}>ZAM</th>
+                                <th className="text-center" style={{ width: '12%' }}>KEN</th>
+                                <th className="text-center" style={{ width: '12%' }}>AIA</th>
+                                <th className="text-center" style={{ width: '12%' }}>AFG</th>
                               </tr>
                             </thead>
 
