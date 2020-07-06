@@ -1370,7 +1370,7 @@ class ProcurementAgentExport extends Component {
                             // })
 
                             var shipmentList = (programJson.shipmentList);
-                            console.log("shipmentList---->>>", shipmentList);
+                            // console.log("regionList---->>>", (programJson.regionList));
 
                             const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
                             // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
@@ -1653,7 +1653,8 @@ class ProcurementAgentExport extends Component {
                 headerAlign: 'center',
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
-                }
+                },
+                style: { width: '100px' },
             },
             {
                 dataField: 'procurementAgent.code',
@@ -1661,6 +1662,7 @@ class ProcurementAgentExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '100px' },
             },
             {
                 dataField: 'planningUnit.label',
@@ -1670,7 +1672,8 @@ class ProcurementAgentExport extends Component {
                 headerAlign: 'center',
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
-                }
+                },
+                style: { width: '200px' },
             },
             {
                 dataField: 'qty',
@@ -1678,7 +1681,8 @@ class ProcurementAgentExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.addCommas
+                formatter: this.addCommas,
+                style: { width: '100px' },
             },
             {
                 dataField: 'productCost',
@@ -1686,7 +1690,8 @@ class ProcurementAgentExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.addCommas
+                formatter: this.addCommas,
+                style: { width: '100px' },
             },
             {
                 dataField: 'freightPerc',
@@ -1696,7 +1701,8 @@ class ProcurementAgentExport extends Component {
                 headerAlign: 'center',
                 formatter: (cell, row) => {
                     return cell.toFixed(2);
-                }
+                },
+                style: { width: '100px' },
             },
             {
                 dataField: 'freightCost',
@@ -1704,7 +1710,8 @@ class ProcurementAgentExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.addCommas
+                formatter: this.addCommas,
+                style: { width: '100px' },
             },
             {
                 dataField: 'totalCost',
@@ -1712,7 +1719,8 @@ class ProcurementAgentExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.addCommas
+                formatter: this.addCommas,
+                style: { width: '100px' },
             },
 
         ];
@@ -1899,7 +1907,8 @@ class ProcurementAgentExport extends Component {
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="">
+
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
