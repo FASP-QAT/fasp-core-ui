@@ -1758,7 +1758,7 @@ class ProcurementAgentExport extends Component {
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
+                    <CardHeader className="pb-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.report.procurementAgent')}</strong>
                         {/* <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
@@ -1787,14 +1787,14 @@ class ProcurementAgentExport extends Component {
                             }
                         </Offline>
                     </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    <CardBody >
 
                         <Col md="12 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
-                                    <div className="controls SelectGo Regioncalender">
-                                        <InputGroup>
+                            <div className="row ">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
+                                    <div className="controls  Regioncalender">
+                                       
                                             <Picker
                                                 ref="pickRange"
                                                 years={{ min: 2013 }}
@@ -1807,13 +1807,13 @@ class ProcurementAgentExport extends Component {
                                                 <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                             </Picker>
 
-                                        </InputGroup>
+                                     
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -1838,9 +1838,9 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -1865,9 +1865,9 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -1884,10 +1884,10 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup className="box">
                                             <ReactMultiSelectCheckboxes
                                                 name="planningUnitId"
@@ -1900,17 +1900,35 @@ class ProcurementAgentExport extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                                
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="isPlannedShipmentId"
+                                                id="isPlannedShipmentId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                <option value="1">{i18n.t('static.program.yes')}</option>
+                                                <option value="2">{i18n.t('static.program.no')}</option>
+                                            </Input>
 
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
                             </div>
                         </Col>
-                        <br /><br /><br /><br />
+                        {/* <br /><br /><br /><br />
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
 
-                                <FormGroup className="">
-
+                            <FormGroup className="">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -1928,7 +1946,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                        </Col>
+                        </Col> */}
 
 
 
@@ -1945,7 +1963,7 @@ class ProcurementAgentExport extends Component {
                                 props => (
 
                                     <div className="TableCust">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left table-accesscnl-mt">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>

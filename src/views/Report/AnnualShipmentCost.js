@@ -75,14 +75,16 @@ class AnnualShipmentCost extends Component {
     fetchData() {
 
         let json = {
-            "reportbaseValue": (document.getElementById("view").selectedOptions[0].value == 0 ? false : true),
-            "programId": document.getElementById("programId").selectedOptions[0].value,
-            "planningUnitId": document.getElementById("planningUnitId").selectedOptions[0].value,
-            "procurementAgentId": document.getElementById("procurementAgentId").selectedOptions[0].value,
-            "fundingSourceId": document.getElementById("fundingSourceId").selectedOptions[0].value,
-            "shipmentStatusId": document.getElementById("shipmentStatusId").selectedOptions[0].value,
+            "programId": document.getElementById("programId").value,
+            "versionId": document.getElementById("versionId").value,
+            "procurementAgentId": document.getElementById("procurementAgentId").value,
+            "planningUnitId": document.getElementById("planningUnitId").value,
+            "fundingSourceId": document.getElementById("fundingSourceId").value,
+            "shipmentStatusId": document.getElementById("shipmentStatusId").value,
             "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
-            "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate()
+            "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+            "reportbaseValue": document.getElementById("view").value,
+            
         }
 
         let versionId = document.getElementById("versionId").value;
@@ -250,12 +252,36 @@ class AnnualShipmentCost extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
+                alert("in else online version");
+                console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.getAnnualShipmentCost(json)
                     .then(response => {
-                        console.log(JSON.stringify(response.data))
+                        console.log("-----response", JSON.stringify(response.data));
+                        var outPutList=[];
+                        var responseData = response.data;
+                        for (var i = 0; i < responseData.length; i++) {
+                            var shipmentAmt = responseData[i].shipmentAmt;
+                            var json = {
+                                'FUNDING_SOURCE_ID': responseData[i].fundingSource.id,
+                                'PROCUREMENT_AGENT_ID': responseData[i].procurementAgent.id,
+                                'fundingsource': getLabelText(responseData[i].fundingSource.label, this.state.lang),
+                                'procurementAgent': getLabelText(responseData[i].procurementAgent.label, this.state.lang),
+                                'PLANNING_UNIT_ID': responseData[i].planningUnit.id,
+                                'planningUnit': getLabelText(responseData[i].planningUnit.label, this.state.lang)
+                            }
+                            for (var key in shipmentAmt) {
+                                var keyName=key.split("-")[1];
+                                var keyValue=shipmentAmt[key];
+                                console.log("keyName--",keyName);
+                                console.log("keyValue--",keyValue);
+                                json[keyName] = keyValue;
+                            }
+                            outPutList.push(json);
+                        }
+                        console.log("json final---", json);
                         this.setState({
-                            outPutList: response.data
+                            outPutList: outPutList
                         })
                     }).catch(
                         error => {

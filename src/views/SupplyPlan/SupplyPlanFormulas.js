@@ -161,6 +161,24 @@ Months Of Stock = 3.54</p>
                     </ListGroupItemText>
                   </ListGroupItem>
 
+                  <ListGroupItem action>
+                    <ListGroupItemHeading className="formulasheading">Cost Of Inventory</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Cost-Of-Inventory.png"/>
+                    
+                    </ListGroupItemText>
+                  </ListGroupItem>
+
+                  <ListGroupItem action>
+                    <ListGroupItemHeading className="formulasheading">Inventory Turns</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Inventory Turns.png"/>
+                    
+                    </ListGroupItemText>
+                  </ListGroupItem>
+
                   
                 </ListGroup>
               </CardBody>

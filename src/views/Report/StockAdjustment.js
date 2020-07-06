@@ -1001,6 +1001,46 @@ class RegionListComponent extends Component {
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+<<<<<<< HEAD
+=======
+    formatter = (value) => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    exportCSV(columns) {
+
+        var csvRow = [];
+        csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        this.state.planningUnitLabels.map(ele =>
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
+
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+
+
+        var A = [headers]
+        this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
+        for (var i = 0; i < A.length; i++) {
+            console.log(A[i])
+            csvRow.push(A[i].join(","))
+>>>>>>> dev
 
     filterData() {
         let countryId = document.getElementById("realmCountryId").value;
@@ -1136,9 +1176,66 @@ class RegionListComponent extends Component {
                 }
             })
 
+<<<<<<< HEAD
         RealmCountryService.getRealmCountryListAll()
             .then(response => {
                 if (response.status == 200) {
+=======
+            }
+        }
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(8);
+
+
+
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = (item.text) });
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]);
+        let content = {
+            margin: { top: 40 },
+            startY: 200,
+            head: [headers],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            columnStyles: {
+                0: { cellWidth: 170 },
+                1: { cellWidth: 171.89 },
+                6: { cellWidth: 100 }
+            }
+        };
+
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.report.stockAdjustment') + ".pdf")
+    }
+
+
+
+    fetchData = () => {
+        let versionId = document.getElementById("versionId").value;
+        let programId = document.getElementById("programId").value;
+
+        let planningUnitIds = this.state.planningUnitValues;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (versionId.includes('Local')) {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var regionList = [];
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onerror = function (event) {
+>>>>>>> dev
                     this.setState({
                         realmCountryList: response.data
                     })
@@ -1146,6 +1243,73 @@ class RegionListComponent extends Component {
                     this.setState({
                         message: response.data.messageCode
                     })
+
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var version = (versionId.split('(')[0]).trim()
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var program = `${programId}_v${version}_uId_${userId}`
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                    console.log("1----",program)
+                    var programRequest = programDataOs.get(program);
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    programRequest.onsuccess = function (e) {
+                        console.log("2----",programRequest)
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var inventoryList = []
+                        // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
+                        planningUnitIds.map(planningUnitId =>
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId &&( c.inventoryDate>=startDate && c.inventoryDate<=endDate)))]);
+                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
+                        var data = []
+                        planningUnitIds.map(planningUnitId => {
+                            dates.map(dt => {
+
+                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
+                                console.log("3--->",list)
+                                if (list.length > 0) {
+                                    var adjustment = 0;
+                                    list.map(ele => adjustment = adjustment + ele.adjustmentQty);
+
+                                    var json = {
+                                        program: programJson,
+                                        inventoryDate:moment(dt).format('MMM YYYY'),
+                                        planningUnit: list[0].planningUnit,
+                                        stockAdjustemntQty: adjustment,
+                                        lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+                                        lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                        notes: list[0].notes,
+                                        dataSource:list[0].dataSource
+                                    }
+                                    data.push(json)
+                                } else {
+
+                                }
+                            })
+                        })
+                        console.log(data)
+                        this.setState({
+                            data: data
+                            , message: ''
+                        })
+                    }.bind(this)
+                }.bind(this)
+            } else {
+                var inputjson = {
+                    programId: programId,
+                    versionId: versionId,
+                    startDate: new moment(startDate),
+                    stopDate: new moment(endDate),
+                    planningUnitIds: planningUnitIds
                 }
             })
     }
@@ -1186,8 +1350,13 @@ class RegionListComponent extends Component {
 
         const columns = [
             {
+<<<<<<< HEAD
                 dataField: 'dataSource',
                 text: 'Data Source',
+=======
+                dataField: 'dataSource.label',
+                text: i18n.t('static.datasource.datasource'),
+>>>>>>> dev
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1318,7 +1487,7 @@ class RegionListComponent extends Component {
 
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Program</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
