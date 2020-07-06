@@ -1076,7 +1076,7 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-let dendoLabels = [{ label:"Today",pointStyle:"triangle"}]
+let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const options = {
   title: {
     display: true,
@@ -1099,22 +1099,22 @@ const options = {
     xAxes: [{
       ticks: {
         fontColor: 'black',
-       
+
       }
     }]
   },
   annotation: {
     annotations: [{
-      type:'triangle',
-    //  mode: 'vertical',
+      type: 'triangle',
+      //  mode: 'vertical',
       drawTime: 'beforeDatasetsDraw',
       scaleID: 'x-axis-0',
       value: 'Mar-2020',
-     
+
       backgroundColor: 'rgba(0, 255, 0, 0.1)'
-   }],
-   
-},
+    }],
+
+  },
   tooltips: {
     enabled: false,
     custom: CustomTooltips
@@ -1423,12 +1423,12 @@ class GlobalConsumption extends Component {
     this.setState({
       consumptions: [
         {
-          
+
         },
       ],
       message: ''
     })
-    
+
   }
 
   getCountrys() {
@@ -1728,7 +1728,7 @@ class GlobalConsumption extends Component {
           </option>
         )
       }, this);
-    
+
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
@@ -1751,7 +1751,7 @@ class GlobalConsumption extends Component {
               <Form >
                 <Col md="12 pl-0">
                   <div className="row">
-                    
+
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1772,7 +1772,7 @@ class GlobalConsumption extends Component {
                         </div>
                       </InputGroup>
                     </FormGroup>
-                    
+
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                       <div className="controls ">
@@ -1799,7 +1799,7 @@ class GlobalConsumption extends Component {
                       </div>
 
                     </FormGroup>
-                   
+
                   </div>
                 </Col>
               </Form>
@@ -1810,95 +1810,96 @@ class GlobalConsumption extends Component {
                   </div>
                   <div className="row">
                     <div className="col-md-12">
-                        <div className="table-responsive ">
+                      <div className="table-responsive ">
 
-                          <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
+                        <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
 
-                            <thead>
-                              <tr>
-                                <th className="text-center" style={{ width: '23%' }}> {i18n.t('static.dashboard.product')} </th>
-                                <th className="text-center " style={{ width: '12%' }}> MOZ </th>
-                                <th className="text-center" style={{ width: '12%' }}>TAZ</th>
-                                <th className="text-center" style={{ width: '12%' }}>ZAM</th>
-                                <th className="text-center" style={{ width: '12%' }}>KEN</th>
-                                <th className="text-center" style={{ width: '12%' }}>AIA</th>
-                                <th className="text-center" style={{ width: '12%' }}>AFG</th>
-                              </tr>
-                            </thead>
 
-                            <tbody>
-                             
+                          <thead>
+                            <tr>
+                              <th className="text-center" style={{ width: '27%' }}> {i18n.t('static.dashboard.product')} </th>
+                              <th className="text-center " style={{ width: '7%' }}> MOZ </th>
+                              <th className="text-center" style={{ width: '7%' }}>TAZ</th>
+                              <th className="text-center" style={{ width: '7%' }}>ZAM</th>
+                              <th className="text-center" style={{ width: '7%' }}>KEN</th>
+                              <th className="text-center" style={{ width: '7%' }}>AIA</th>
+                              <th className="text-center" style={{ width: '7%' }}>AFG</th>
+                            </tr>
+                          </thead>
 
-                                  <tr>
-                                  <td>CC 1: HIV / AIDS Pharmaceuticals</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
-                                  <tr>
-                                  <td>HIV/AIDS Pharmaceuticals</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
-                                  <tr>
-                                  <td>CC 2: Laboratory Commodities, VMMC</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
-                                  <tr>
-                                  <td>HIV Rapid Test Kits (RTKs)</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
-                                  <tr>
-                                  <td>Laboratory Consumables</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
-                                  <tr>
-                                  <td>Laboratory Equipment</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
-                                  <tr>
-                                  <td>Voluntary Male Circumcision (VMMC) Kits</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  <td>1</td>
-                                  </tr>
+                          <tbody>
 
-                              
-                            </tbody>
-                          </Table>
 
-                        </div>
-                      
+                            <tr>
+                              <td>CC 1: HIV / AIDS Pharmaceuticals</td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>HIV/AIDS Pharmaceuticals</td>
+                              <td></td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>CC 2: Laboratory Commodities, VMMC</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td style={{backgroundColor:'#f2ff00'}}>excess</td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>HIV Rapid Test Kits (RTKs)</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td style={{backgroundColor:'#ff0000'}}>out</td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>Laboratory Consumables</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
+                            </tr>
+                            <tr>
+                              <td>Laboratory Equipment</td>
+                              <td></td>
+                              <td></td>
+                              <td style={{backgroundColor:'#f2ff00'}}>excess</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>Voluntary Male Circumcision (VMMC) Kits</td>
+                              <td></td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+
+
+                          </tbody>
+                        </Table>
+
+                      </div>
+
 
                     </div>
                   </div>

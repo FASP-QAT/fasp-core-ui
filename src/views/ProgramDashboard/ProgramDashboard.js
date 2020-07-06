@@ -172,7 +172,7 @@ class ProgramDashboard extends Component {
                           <small className="text-muted">Inventory At Threshold</small>
                         </div>
                       </div>
-                      <Progress className="progress-xs" color="warning" value="50" />
+                      <Progress className="progress-xs" color="success" value="90" />
                     </td>
                    
                   </tr>
@@ -192,7 +192,7 @@ class ProgramDashboard extends Component {
                        <small className="text-muted">Inventory Below Threshold</small>
                      </div>
                    </div>
-                   <Progress className="progress-xs" color="danger" value="30" />
+                   <Progress className="progress-xs" color="info" value="50" />
                  </td>
                 
                </tr>
@@ -212,7 +212,7 @@ class ProgramDashboard extends Component {
                        <small className="text-muted">Inventory Above Threshold</small>
                      </div>
                    </div>
-                   <Progress className="progress-xs" color="success" value="80" />
+                   <Progress className="progress-xs" color="warning" value="30" />
                  </td>
                 
                </tr>

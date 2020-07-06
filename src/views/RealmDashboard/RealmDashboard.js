@@ -137,6 +137,30 @@ class RealmDashboard extends Component {
             </Col>
           </Row> */}
             <Row className="mt-2">
+            {/* <Col sm="6" md="2">
+            <Card className="text-white bg-info">
+              <CardBody className="pb-0">
+                <ButtonGroup className="float-right">
+                  <ButtonDropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
+                    <DropdownToggle caret className="p-0" color="transparent">
+                      <i className="icon-settings"></i>
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <DropdownItem>Action</DropdownItem>
+                      <DropdownItem>Another action</DropdownItem>
+                      <DropdownItem disabled>Disabled action</DropdownItem>
+                      <DropdownItem>Something else here</DropdownItem>
+                    </DropdownMenu>
+                  </ButtonDropdown>
+                </ButtonGroup>
+                <div className="text-value">9.823</div>
+                <div>Members online</div>
+                <div className="chart-wrapper mt-3" style={{ height: '70px' }}>
+                  <Line data={cardChartData2} options={cardChartOpts2} height={70} />
+                </div>
+              </CardBody>
+            </Card>
+          </Col> */}
             <Col sm="6" md="3">
               <Widget04 icon="cui-globe" color="info" header="04" value="25">Country</Widget04>
             </Col>
