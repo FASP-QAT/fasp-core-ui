@@ -31,7 +31,7 @@ class SupplyPlanFormulas extends Component {
             <h5></h5>
             <Card>
               <CardHeader>
-                <i className="fa fa-align-justify"></i><strong>Supply Plan Formulae</strong>
+                <i className="fa fa-align-justify"></i><strong>Formulae</strong>
               </CardHeader>
               <CardBody>
                 <ListGroup>
