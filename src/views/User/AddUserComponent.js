@@ -341,9 +341,9 @@ class AddUserComponent extends Component {
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
@@ -404,7 +404,7 @@ class AddUserComponent extends Component {
                                         handleReset
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
-                                                <CardBody>
+                                                <CardBody className="pt-2 pb-0">
                                                     <Input
                                                         type="hidden"
                                                         name="showRealm"
