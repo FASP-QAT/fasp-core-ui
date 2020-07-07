@@ -40,6 +40,20 @@ const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
 
 const options = {
+  scales: {
+    yAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'Program Count'
+      }
+    }],
+    xAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'Realm'
+      }
+    }],
+  },
   tooltips: {
     enabled: false,
     custom: CustomTooltips
@@ -78,7 +92,7 @@ const pie = {
 
 const bar = {
 
-  labels: [i18n.t('static.realm.realmName') , i18n.t('static.realm.realmName1') , i18n.t('static.realm.realmName2')  ],
+  labels: [i18n.t('static.realm.realmName'), i18n.t('static.realm.realmName1'), i18n.t('static.realm.realmName2')],
   datasets: [
     {
       label: i18n.t('static.graph.activeProgram'),
@@ -170,9 +184,9 @@ class ApplicationDashboard extends Component {
   }
   hideFirstComponent() {
     setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+      document.getElementById('div1').style.display = 'none';
     }, 8000);
-}
+  }
 
   toggle() {
     this.setState({
@@ -186,7 +200,7 @@ class ApplicationDashboard extends Component {
     });
   }
   componentDidMount() {
-    
+
     this.hideFirstComponent();
   }
 
@@ -196,10 +210,10 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-        <h5  className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-       
+        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
+
         <Row className="mt-2">
-            <Col md="12">
+          <Col md="12">
             <Card>
               {/* <CardHeader className="text-center">
                 <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
@@ -215,9 +229,9 @@ class ApplicationDashboard extends Component {
                 </div>
               </CardBody>
             </Card>
-            </Col> 
-          </Row> 
-     {/* <Row>
+          </Col>
+        </Row>
+        {/* <Row>
         <Col md="8">
             <Card>
               <CardHeader>
@@ -341,7 +355,7 @@ class ApplicationDashboard extends Component {
         </Row> 
  */}
 
-     </div>
+      </div>
     );
   }
 }

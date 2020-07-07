@@ -41,6 +41,20 @@ const brandDanger = getStyle('--danger')
 
 /////
 const options = {
+  scales: {
+    yAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'Program Count'
+      }
+    }],
+    xAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'Country'
+      }
+    }],
+  },
   tooltips: {
     enabled: false,
     custom: CustomTooltips
