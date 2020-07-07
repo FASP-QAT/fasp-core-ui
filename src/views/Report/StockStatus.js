@@ -1314,9 +1314,9 @@ console.log(pu)
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="tab-ml-1">
+                      <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">Version</Label>
-                        <div className="controls SelectGo">
+                        <div className="controls ">
                           <InputGroup>
                             <Input
                               type="select"
