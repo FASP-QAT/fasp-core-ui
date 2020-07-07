@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
-    CardFooter, Button, Table, Col, Row, FormFeedback, Form
+    CardFooter, Button, Table, Col, Row, FormFeedback, Form, InputGroupAddon, InputGroupText, InputGroup
 
 } from 'reactstrap';
 import { Date } from 'core-js';
@@ -706,6 +706,7 @@ console.log(initialValues)
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
+                                            <InputGroup>
                                             <Input type="number"
                                                 name="multiplier"
                                                 id="multiplier"
@@ -716,7 +717,12 @@ console.log(initialValues)
                                                 onBlur={handleBlur}
                                                 value={this.state.multiplier}
                                                 required />
-                                            <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                                  <InputGroupAddon addonType="append">
+                                                                <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" title="Country planning unit is a multiple of the planning unit"></i></InputGroupText>
+                                                            </InputGroupAddon>
+                                                            <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                                        </InputGroup>
+                                            
                                         </FormGroup>
                                        {/* <FormGroup className="col-md-6">
                                             <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span class="red Reqasterisk">*</span></Label>

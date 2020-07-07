@@ -180,7 +180,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.realm'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) },
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) },
                             children: [{
                               name: i18n.t('static.dashboard.realm'),
                               url: '/realm/realmlist',
