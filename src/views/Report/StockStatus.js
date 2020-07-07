@@ -71,12 +71,14 @@ const options = {
       position: 'left',
       scaleLabel: {
         display: true,
-        fontSize: "12"
+        fontSize: "12",
+        fontColor: 'blue'
       },
       ticks: {
         beginAtZero: true,
-        fontColor: 'black'
-      }
+        fontColor: 'blue'
+      },
+     
     }, {
       id: 'B',
       position: 'right',
@@ -87,6 +89,10 @@ const options = {
       ticks: {
         beginAtZero: true,
         fontColor: 'black'
+      },
+      gridLines: {
+        color: 'rgba(171,171,171,1)',
+        lineWidth: 0.5
       }
     }],
     xAxes: [{
@@ -1093,7 +1099,7 @@ console.log(pu)
           backgroundColor: 'rgba(255,193,8,0.2)',
           borderColor: '#f86c6b',
           borderStyle: 'dotted',
-          borderDash: [10, 10],
+          //borderDash: [10, 10],
           fill: '+1',
           ticks: {
             fontSize: 2,
@@ -1112,7 +1118,7 @@ console.log(pu)
           backgroundColor: 'rgba(0,0,0,0)',
           borderColor: '#ffc107',
           borderStyle: 'dotted',
-          borderDash: [10, 10],
+         // borderDash: [10, 10],
           fill: true,
           ticks: {
             fontSize: 2,
@@ -1156,20 +1162,7 @@ console.log(pu)
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
         },*/
-        {
-          label: "Stock",
-          yAxisID: 'A',
-          type: 'line',
-          borderColor: 'rgba(179,181,158,1)',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          pointStyle: 'line',
-          showInLegend: true,
-          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
-        }, {
+         {
           label: 'Delivered',
           yAxisID: 'A',
           stack: 1,
@@ -1241,6 +1234,20 @@ console.log(pu)
             }))
             return count
           })
+        },
+        {
+          label: "Stock",
+          yAxisID: 'A',
+          type: 'line',
+          borderColor: 'transparent',
+          ticks: {
+            fontSize: 2,
+            fontColor: 'transparent',
+          },
+          lineTension: 0,
+          pointStyle: 'line',
+          showInLegend: true,
+          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
         }
 
       ],

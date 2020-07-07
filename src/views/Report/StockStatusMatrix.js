@@ -160,7 +160,24 @@ this.filterData()})
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
-
+          var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+          var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
+          var planningunitRequest = planningUnitObjectStore.getAll();
+           planningunitRequest.onerror = function (event) {
+            // Handle errors!
+        };
+        var plunit=[]
+        planningunitRequest.onsuccess = function (e) {
+            var myResult1 = [];
+            myResult1 =  e.target.result;
+            console.log(myResult1)
+            var plunit1=[]
+             planningUnitIds.map(planningUnitId => {
+              plunit=[... plunit,...(myResult1.filter(c=>c.planningUnitId==  planningUnitId))]
+             
+            })
+        console.log(plunit)
+        }.bind(this)
           var transaction = db1.transaction(['programData'], 'readwrite');
           var programTransaction = transaction.objectStore('programData');
           var version = (versionId.split('(')[0]).trim()
@@ -349,9 +366,9 @@ this.filterData()})
                     monthlydata.push(this.roundN(mos))
 
                   }
-                  var json = {
+                 var json = {
                     name: pu.planningUnit,
-                    units: inventoryList[0].unit,
+                    units: plunit.filter(c=>c.planningUnitId==planningUnitId)[0].unit,
                     reorderFrequency: pu.reorderFrequencyInMonths,
                     year: from,
                     min: pu.minMonthsOfStock,
@@ -369,6 +386,9 @@ this.filterData()})
                     Dec: monthlydata[11],
                   }
                   data.push(json)
+
+                 
+               
                 }
                 this.setState({
                   data: data,
@@ -603,12 +623,12 @@ this.filterData()})
           "versionId": versionId,
           "startDate": startDate,
           "stopDate": endDate,
-          "ids": planningUnitIds,
+          "planningUnitIds": planningUnitIds,
           "includePlannedShipments": includePlannedShipments,
           "view": view
         }
 
-        if (navigator.onLine) {
+      
           let realmId = AuthenticationService.getRealmId();
           AuthenticationService.setupAxiosInterceptors();
           ProductService.getStockStatusMatrixData(inputjson)
@@ -629,14 +649,7 @@ this.filterData()})
               } else {
 
                 this.setState({
-                  data: [{
-                    name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
-                    units: { id: 1, label: { label_en: "240" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
-                  },
-                  {
-                    name: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
-                    units: { id: 1, label: { label_en: "240" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
-                  }],
+                  data: response.data,
                   view: view, message: ''
                 })
               }
@@ -665,7 +678,7 @@ this.filterData()})
                 }
               }
             );
-        }
+        
 
 
 
@@ -1275,7 +1288,10 @@ this.filterData()})
     return getLabelText(cell, this.state.lang);
   }
   roundN = num => {
+    if(num==NaN){
+      return ''}else{
     return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    }
   }
 
   render() {
