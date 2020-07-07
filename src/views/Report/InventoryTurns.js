@@ -277,7 +277,7 @@ export default class InventoryTurns extends Component {
     }
     formatter = value => {
 
-        var cell1 = value
+        var cell1 = this.round(value)
         cell1 += '';
         var x = cell1.split('.');
         var x1 = x[0];
@@ -291,11 +291,10 @@ export default class InventoryTurns extends Component {
     exportCSV = (columns) => {
 
         var csvRow = [];
-
+        csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -306,7 +305,7 @@ export default class InventoryTurns extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.roundN(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)]));
+        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -356,18 +355,19 @@ export default class InventoryTurns extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+                  
                 }
 
             }
@@ -400,7 +400,10 @@ export default class InventoryTurns extends Component {
             startY: 170,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' , cellWidth: 120 },
+            columnStyles: {
+                0: { cellWidth: 281.89 },
+              }
         };
         doc.autoTable(content);
         addHeaders(doc)
@@ -417,7 +420,7 @@ export default class InventoryTurns extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
-        var dt = new Date(`${value.year}-${value.month}-01`)
+        var dt = new Date(`${value.year}`,`${value.month}`,1)
         costOfInventoryInput.dt = dt
         this.setState({ singleValue2: value, costOfInventoryInput }, () => {
             this.formSubmit();
@@ -617,7 +620,7 @@ console.log(endingBalanceArray)
                                 var json = {
                                     totalConsumption: totalConsumption,
                                     planningUnit: inventoryList[0].planningUnit,
-                                    avergeStock: this.round(avergeStock),
+                                    avergeStock: avergeStock,
                                     noOfMonths: monthcnt,
                                     inventoryTurns: this.roundN(totalConsumption / avergeStock)
 
@@ -640,11 +643,7 @@ console.log(endingBalanceArray)
                 ReportService.inventoryTurns(this.state.CostOfInventoryInput).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: [{ "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "totalConsumption": 148417, "avergeStock": 23023, "noOfMonths": 7, "inventoryTurns": 6.4462 },
-                        { "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "totalConsumption": 36571, "avergeStock": 13812, "noOfMonths": 7, "inventoryTurns": 2.6476 },
-                        { "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "totalConsumption": 69755, "avergeStock": 22305, "noOfMonths": 7, "inventoryTurns": 3.1273 },
-                        { "planningUnit": { "id": 157, "label": { "active": false, "labelId": 9103, "label_en": "Abacavir 60 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "totalConsumption": 143698, "avergeStock": 23453, "noOfMonths": 7, "inventoryTurns": 6.1269 }], message: ''
-                    });
+                        costOfInventory: response.data    });
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
@@ -700,7 +699,7 @@ console.log(endingBalanceArray)
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center' },
+                style: { align: 'center' ,width: '480px' },
                 formatter: this.formatLabel
             },
             {
@@ -709,6 +708,7 @@ console.log(endingBalanceArray)
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { align: 'center' ,width: '200px' },
                 formatter: this.formatter
 
             },
@@ -718,6 +718,7 @@ console.log(endingBalanceArray)
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { align: 'center' ,width: '200px' },
                 formatter: this.formatter
             },
             {
@@ -726,7 +727,7 @@ console.log(endingBalanceArray)
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center' },
+                style: { align: 'center' ,width: '200px' },
                 formatter: this.formatter
             },
             {
@@ -734,8 +735,8 @@ console.log(endingBalanceArray)
                 text: i18n.t('static.dashboard.inventoryTurns'),
                 sort: true,
                 align: 'center',
-                style: { align: 'center' },
                 headerAlign: 'center',
+                style: { align: 'center' ,width: '200px' },
                 formatter: this.formatterDouble
             }
         ];
@@ -890,21 +891,10 @@ console.log(endingBalanceArray)
                                         <BootstrapTable
                                             hover
                                             striped
-                                            // tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            // rowEvents={{
-                                            //     onClick: (e, row, rowIndex) => {
-                                            //         // row.startDate = moment(row.startDate).format('YYYY-MM-DD');
-                                            //         // row.stopDate = moment(row.stopDate).format('YYYY-MM-DD');
-                                            //         // row.startDate = moment(row.startDate);
-                                            //         // row.stopDate = moment(row.stopDate);
-                                            //         // this.editBudget(row);
-                                            //     }
-                                            // }}
                                             {...props.baseProps}
                                         />
-                                        {/* <h5>*Row is in red color indicates there is no money left or budget hits the end date</h5> */}
-                                    </div>
+                                         </div>
                                 )
                             }
                         </ToolkitProvider>}
