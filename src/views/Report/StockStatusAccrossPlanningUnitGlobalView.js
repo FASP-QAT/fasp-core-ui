@@ -1812,7 +1812,7 @@ class GlobalConsumption extends Component {
                     <div className="col-md-12">
                       <div className="table-responsive ">
 
-                        <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                        <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
 
 
                           <thead>
@@ -1832,7 +1832,7 @@ class GlobalConsumption extends Component {
 
                             <tr>
                               <td>CC 1: HIV / AIDS Pharmaceuticals</td>
-                              <td>low</td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
                               <td></td>
                               <td></td>
                               <td></td>
@@ -1842,7 +1842,7 @@ class GlobalConsumption extends Component {
                             <tr>
                               <td>HIV/AIDS Pharmaceuticals</td>
                               <td></td>
-                              <td>low</td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
                               <td></td>
                               <td></td>
                               <td></td>
@@ -1853,7 +1853,7 @@ class GlobalConsumption extends Component {
                               <td></td>
                               <td></td>
                               <td></td>
-                              <td>excess</td>
+                              <td style={{backgroundColor:'#f2ff00'}}>excess</td>
                               <td></td>
                               <td></td>
                             </tr>
@@ -1863,7 +1863,7 @@ class GlobalConsumption extends Component {
                               <td></td>
                               <td></td>
                               <td></td>
-                              <td>out</td>
+                              <td style={{backgroundColor:'#ff0000'}}>out</td>
                               <td></td>
                             </tr>
                             <tr>
@@ -1873,13 +1873,13 @@ class GlobalConsumption extends Component {
                               <td></td>
                               <td></td>
                               <td></td>
-                              <td>low</td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
                             </tr>
                             <tr>
                               <td>Laboratory Equipment</td>
                               <td></td>
                               <td></td>
-                              <td>excess</td>
+                              <td style={{backgroundColor:'#f2ff00'}}>excess</td>
                               <td></td>
                               <td></td>
                               <td></td>
@@ -1887,7 +1887,7 @@ class GlobalConsumption extends Component {
                             <tr>
                               <td>Voluntary Male Circumcision (VMMC) Kits</td>
                               <td></td>
-                              <td>low</td>
+                              <td style={{backgroundColor:'#f5771a'}}>low</td>
                               <td></td>
                               <td></td>
                               <td></td>

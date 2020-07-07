@@ -95,12 +95,13 @@ class DefaultLayout extends Component {
                         icon: 'cui-dashboard icons',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_APPLICATION_DASHBOARD') ? false : true) }
                       },
-                      // {
-                      //   name: i18n.t('static.dashboard.realmdashboard'),
-                      //   url: '/RealmDashboard',
-                      //   icon: 'cui-dashboard icons',
-                      // },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: i18n.t('static.dashboard.realmdashboard'),
+                        url: '/RealmDashboard',
+                        icon: 'cui-dashboard icons',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
+                      },
+                      //!this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
