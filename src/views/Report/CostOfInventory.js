@@ -289,7 +289,7 @@ export default class CostOfInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.batchNo, this.dateformatter(ele.expiryDate).replaceAll(' ', '%20'), ele.stock, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.rate, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.cost]));
+        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),ele.stock, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.rate, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.cost]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -376,7 +376,7 @@ export default class CostOfInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label), ele.batchNo, this.dateformatter(ele.expiryDate), this.formatter(ele.stock), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.rate), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.cost)]);
+        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label),  this.formatter(ele.stock), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.rate), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.cost)]);
 
         let content = {
             margin: { top: 80 },
@@ -490,13 +490,17 @@ export default class CostOfInventory extends Component {
                           proList.map(planningUnit=>{
                             console.log('planningunit',planningUnit.planningUnit.id)
                         var inventoryList = []
-                        var batchNos = programJson.batchInfoList.filter(c =>c.planningUnitId== planningUnit.planningUnit.id )
-                        console.log('batchNos',batchNos)
-                        batchNos.map(batch=>{    
-                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true  && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
-                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id  && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
-                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
-
+                      
+                     
+                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true );
+                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id  );
+                var shipmentList =[]
+                if(document.getElementById("includePlanningShipments").value.toString()=='true'){
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
+            }else{
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
+         
+            }
                 // calculate openingBalance
 
                 var openingBalance = 0;
@@ -532,11 +536,8 @@ export default class CostOfInventory extends Component {
 
                 var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
                 for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                    console.log(shipmentsRemainingList[j].batchInfoList)
-                    for (var k = 0; k < (shipmentsRemainingList[j].batchInfoList).length; k++) {
-                    if(shipmentsRemainingList[j].batchInfoList[k].batch.batchId==batch.batchId)
-                  totalShipments += parseInt((shipmentsRemainingList[j].batchInfoList[k].shipmentQty));}
-                }
+                    totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                  }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
                 var endingBalance
               
@@ -578,8 +579,6 @@ export default class CostOfInventory extends Component {
                    
                var json={
                    planningUnit:planningUnit.planningUnit,
-                   batchNo:batch.batchNo,
-                   expiryDate:batch.expiryDate,
                    stock:endingBalance,
                    rate:planningUnit.catalogPrice,
                    cost:(endingBalance*planningUnit.catalogPrice)
@@ -587,7 +586,7 @@ export default class CostOfInventory extends Component {
                   data.push(json)  
                 })
 
-                          })
+                       
                         console.log(data)
                         this.setState({
                             costOfInventory: data
@@ -601,13 +600,7 @@ export default class CostOfInventory extends Component {
                 ReportService.costOfInventory(this.state.CostOfInventoryInput).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: [{ "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": "A1001", "expiryDate": "2020-04-01", "cost": 3800.0, "stock": 3800, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": "T2480", "expiryDate": "2020-04-01", "cost": 1000.0, "stock": 1000, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": "Z4051", "expiryDate": "2020-04-01", "cost": 50000.0, "stock": 50000, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": null, "expiryDate": "2099-12-31", "cost": 15865.0, "stock": 15865, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": null, "expiryDate": "2099-12-31", "cost": 28648.0, "stock": 28648, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 157, "label": { "active": false, "labelId": 9103, "label_en": "Abacavir 60 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": null, "expiryDate": "2099-12-31", "cost": 21653.0, "stock": 21653, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 }], message: ''
-                    });
+                        costOfInventory: response.data });
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
@@ -665,7 +658,7 @@ export default class CostOfInventory extends Component {
                 style: { align: 'center' },
                 formatter: this.formatLabel
             },
-            {
+          /*  {
                 dataField: 'batchNo',
                 text: 'Batch No',
                 sort: true,
@@ -680,7 +673,7 @@ export default class CostOfInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.dateformatter
-            },
+            },*/
             {
                 dataField: 'stock',
                 text: 'Stock',

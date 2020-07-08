@@ -192,7 +192,7 @@ class ForecastMetrics extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.selectMonth') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
     this.state.countryLabels.map(ele =>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.programLabels.map(ele =>
@@ -224,7 +224,7 @@ class ForecastMetrics extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.forecastmetrics') + this.makeText(this.state.singleValue2) + ".csv"
+    a.download = i18n.t('static.dashboard.forecastmetrics') + + '_' + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -273,9 +273,9 @@ class ForecastMetrics extends Component {
         if (i == 1) {
           doc.setFontSize(8)
           doc.setFont('helvetica', 'normal')
-          doc.text(i18n.t('static.report.selectMonth') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 80, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
-          })
+        })
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 100, planningText)
 
@@ -396,12 +396,12 @@ class ForecastMetrics extends Component {
     let CountryIds = this.state.countryValues;
     let planningUnitIds = this.state.planningUnitValues;
     let programIds = this.state.programValues
-    let startDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
-    //let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+    let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
     if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
 
       var inputjson = {
-        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate
+        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "stopDate": stopDate
       }
       AuthenticationService.setupAxiosInterceptors();
 
@@ -695,7 +695,9 @@ class ForecastMetrics extends Component {
     //
   }
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value })
+    this.setState({ rangeValue: value }, () => {
+      this.filterData();
+    })
 
   }
   handleClickMonthBox2 = (e) => {
@@ -881,7 +883,7 @@ class ForecastMetrics extends Component {
                 <Col md="12 pl-0">
                   <div className="row">
 
-                    <FormGroup className="col-md-3">
+                 {/*}    <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
                         <Picker
@@ -897,9 +899,9 @@ class ForecastMetrics extends Component {
                         </Picker>
                       </div>
 
-                    </FormGroup>
-                    {/*} <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                    </FormGroup>*/}
+                     <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
 
                         <Picker
@@ -915,7 +917,7 @@ class ForecastMetrics extends Component {
                         </Picker>
                       </div>
 
-    </FormGroup>*/}
+    </FormGroup>
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
@@ -1019,7 +1021,7 @@ class ForecastMetrics extends Component {
                         {
                           props => (
                             <div className="TableCust ">
-                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left mt-reporttable">
+                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left table-mt">
                                 <SearchBar {...props.searchProps} />
                                 <ClearSearchButton {...props.searchProps} /></div>
                               <BootstrapTable striped rowClasses={this.rowClassNameFormat} hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell

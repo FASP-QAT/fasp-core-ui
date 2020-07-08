@@ -71,12 +71,14 @@ const options = {
       position: 'left',
       scaleLabel: {
         display: true,
-        fontSize: "12"
+        fontSize: "12",
+        fontColor: 'blue'
       },
       ticks: {
         beginAtZero: true,
-        fontColor: 'black'
-      }
+        fontColor: 'blue'
+      },
+     
     }, {
       id: 'B',
       position: 'right',
@@ -87,6 +89,10 @@ const options = {
       ticks: {
         beginAtZero: true,
         fontColor: 'black'
+      },
+      gridLines: {
+        color: 'rgba(171,171,171,1)',
+        lineWidth: 0.5
       }
     }],
     xAxes: [{
@@ -385,14 +391,20 @@ class StockStatus extends Component {
 
             // }
             // calculate openingBalance
+           
+            let invmin=moment.min(inventoryList.map(d => moment(d.inventoryDate)))
+            let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+            let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
+            var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
 
             var openingBalance = 0;
+            if(minDate.isBefore(startDate)){
             var totalConsumption = 0;
             var totalAdjustments = 0;
             var totalShipments = 0;
             console.log('startDate', startDate)
             console.log('programJson', programJson)
-            var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+            var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore( minDate));
             console.log('consumptionRemainingList', consumptionRemainingList)
             for (var j = 0; j < consumptionRemainingList.length; j++) {
               var count = 0;
@@ -412,17 +424,68 @@ class StockStatus extends Component {
               }
             }
 
-            var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+            var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore( minDate));
             for (var j = 0; j < adjustmentsRemainingList.length; j++) {
               totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
             }
 
-            var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+            var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate ).isBefore( minDate) && c.accountFlag == true);
             console.log('shipmentsRemainingList',shipmentsRemainingList)
             for (var j = 0; j < shipmentsRemainingList.length; j++) {
               totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
             }
             openingBalance = totalAdjustments - totalConsumption + totalShipments;
+            for (i = 1; ; i++) {
+              var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
+              var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
+              console.log(dtstr, ' ', enddtStr)
+              var dt = dtstr
+              console.log(openingBalance)
+              console.log(inventoryList)
+              var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+              var adjustment = 0;
+              invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+              console.log(consumptionList)
+              var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+              var consumption = 0;
+              console.log(programJson.regionList)
+
+              var actualFlag = false
+              for (var i = 0; i < programJson.regionList.length; i++) {
+
+                  var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                  console.log(list)
+                  if (list.length > 1) {
+                      for (var l = 0; l < list.length; l++) {
+                          if (list[l].actualFlag.toString() == 'true') {
+                              actualFlag = true;
+                              consumption = consumption + list[l].consumptionQty
+                          }
+                      }
+                  } else {
+                      consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                  }
+              }
+
+
+              console.log(shipmentList)
+              var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+              var shipment = 0;
+              shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+              console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+              var endingBalance = openingBalance + adjustment + shipment - consumption
+              console.log('endingBalance', endingBalance)
+
+              endingBalance = endingBalance < 0 ? 0 : endingBalance
+              openingBalance = endingBalance
+              minDate=minDate.add(1,'month')
+              
+             if(minDate.startOf('month').isAfter(startDate)){
+                 break;
+             }
+          }
+        }
             var monthstartfrom = this.state.rangeValue.from.month
             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
               var monthlydata = [];
@@ -1036,7 +1099,7 @@ console.log(pu)
           backgroundColor: 'rgba(255,193,8,0.2)',
           borderColor: '#f86c6b',
           borderStyle: 'dotted',
-          borderDash: [10, 10],
+          //borderDash: [10, 10],
           fill: '+1',
           ticks: {
             fontSize: 2,
@@ -1055,7 +1118,7 @@ console.log(pu)
           backgroundColor: 'rgba(0,0,0,0)',
           borderColor: '#ffc107',
           borderStyle: 'dotted',
-          borderDash: [10, 10],
+         // borderDash: [10, 10],
           fill: true,
           ticks: {
             fontSize: 2,
@@ -1083,7 +1146,7 @@ console.log(pu)
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.mos))
         }
-        , {
+        , /*{
           type: "line",
           yAxisID: 'A',
           label: "Consumption",
@@ -1098,21 +1161,8 @@ console.log(pu)
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
-        },
-        {
-          label: "Stock",
-          yAxisID: 'A',
-          type: 'line',
-          borderColor: 'rgba(179,181,158,1)',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          pointStyle: 'line',
-          showInLegend: true,
-          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
-        }, {
+        },*/
+         {
           label: 'Delivered',
           yAxisID: 'A',
           stack: 1,
@@ -1184,6 +1234,20 @@ console.log(pu)
             }))
             return count
           })
+        },
+        {
+          label: "Stock",
+          yAxisID: 'A',
+          type: 'line',
+          borderColor: 'transparent',
+          ticks: {
+            fontSize: 2,
+            fontColor: 'transparent',
+          },
+          lineTension: 0,
+          pointStyle: 'line',
+          showInLegend: true,
+          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
         }
 
       ],
@@ -1257,9 +1321,9 @@ console.log(pu)
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="tab-ml-1">
+                      <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">Version</Label>
-                        <div className="controls SelectGo">
+                        <div className="controls">
                           <InputGroup>
                             <Input
                               type="select"
