@@ -933,6 +933,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/report/stockStatusAccrossPlanningUnitGlobalView":
+                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/report/stockAdjustment":
                     if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
                         return true;
@@ -1004,6 +1009,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/ProgramDashboard":
+                    case "/RealmDashboard":
                     if (bfunction.includes("ROLE_BF_PROGRAM_DASHBOARD")) {
                         return true;
                     }

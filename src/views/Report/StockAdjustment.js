@@ -697,7 +697,7 @@ class StockAdjustmentComponent extends Component {
             },
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.planningunit.planningunit'),
+                text: i18n.t('static.dashboard.product'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -868,7 +868,7 @@ class StockAdjustmentComponent extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                    <Label htmlFor="appendedInputButton">Product</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls SelectGo">
                                         <InputGroup className="box">
