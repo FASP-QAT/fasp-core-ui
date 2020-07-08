@@ -86,7 +86,7 @@ class ListBudgetComponent extends Component {
   }
   formatDate(cell, row) {
     if (cell != null && cell != "") {
-      var modifiedDate = moment(cell).format('MM-DD-YYYY');
+      var modifiedDate = moment(cell).format('DD-MMM-YY');
       return modifiedDate;
     } else {
       return "";

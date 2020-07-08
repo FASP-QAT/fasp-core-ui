@@ -261,7 +261,8 @@ class ListUserComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.lastLoginDate ? moment(row.lastLoginDate).format('MM-DD-YYYY hh:mm A') : null)
+                    (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY') : null)
+                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                 );
             }
         }, {

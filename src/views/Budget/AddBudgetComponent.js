@@ -636,10 +636,12 @@ class AddBudgetComponent extends Component {
                                                             minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
-                                                            placeholderText="mm-dd-yyy"
+                                                            placeholderText="dd-mmm-yy"
+                                                            // placeholderText="mm-dd-yyy"
                                                             className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
+                                                            dateFormat="dd-MMM-yy"
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
@@ -652,10 +654,11 @@ class AddBudgetComponent extends Component {
                                                             minDate={this.state.budget.startDate}
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                            placeholderText="mm-dd-yyy"
+                                                            placeholderText="dd-mmm-yy"
                                                             className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
+                                                            dateFormat="dd-MMM-yy"
                                                         />
                                                     </FormGroup>
                                                 </CardBody>
