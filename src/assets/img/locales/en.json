@@ -865,9 +865,9 @@
     "static.supplyPlan.manualEntryShipments":"Manual Entry Shipments",
     "static.supplyPlan.delivered":"Delivered",
     "static.supplyPlan.shipmentsDetails":"Shipments Details",
-    "static.supplyPlan.shipped":"Shipped",
-    "static.supplyPlan.ordered":"Ordered",
-    "static.supplyPlan.planned":"Planned",
+    "static.supplyPlan.shipped":"Shipped (Shipped, Arrived)",
+    "static.supplyPlan.ordered":"Approved",
+    "static.supplyPlan.planned":"Planned (Planned, Draft, On hold, Submitted)",
     "static.supplyPlan.erpShipments":"Shipments from ERP",
     "static.report.warehouseCapacity": "Warehouse Capacity",
     "static.report.stockAdjustment": "Stock Adjustment",
@@ -906,5 +906,6 @@
     "static.report.withinstock":"Within Stock?",
     "static.report.low":"Low Stock",
     "static.report.excess":"Excess Stock",
-    "static.report.ok":"Okay"
+    "static.report.ok":"Okay",
+    "static.supplyplan.exipredStock":"Exipred Stock"
 }
