@@ -742,6 +742,17 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           }
                           ,
+                           }, {
+                            name: i18n.t('static.dashboard.costOfInventory'),
+                            url: '/report/costOfInventory',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          }, {
+                            name: i18n.t('static.dashboard.inventoryTurns'),
+                            url: '/report/inventoryTurns',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          }
                         ]
                       }
                     ]
