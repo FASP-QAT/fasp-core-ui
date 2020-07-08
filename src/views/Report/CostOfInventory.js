@@ -43,7 +43,7 @@ export default class CostOfInventory extends Component {
                 planningUnitIds: [],
                 regionIds: [],
                 versionId: -1,
-                dt: new Date(),
+                dt: moment(new Date()).endOf('month').format('YYYY-MM-DD'),
                 includePlanningShipments: true
             },
             programs: [],
@@ -258,6 +258,23 @@ export default class CostOfInventory extends Component {
         var dt = new Date(value)
         return moment(dt).format('MMM-DD-YYYY');
     }
+    roundN = num => {
+        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    }
+    formatterDouble = value => {
+
+        var cell1 = this.roundN(value)
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+    
     formatter = value => {
 
         var cell1 = value
@@ -289,7 +306,7 @@ export default class CostOfInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),ele.stock, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.rate, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.cost]));
+        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),ele.stock,  ele.catalogPrice, ele.cost]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -298,7 +315,7 @@ export default class CostOfInventory extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Cost Of Inventory Report.csv"
+        a.download =  i18n.t('static.dashboard.costOfInventory') +".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -376,7 +393,7 @@ export default class CostOfInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label),  this.formatter(ele.stock), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.rate), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.cost)]);
+        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label),  this.formatter(ele.stock), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
 
         let content = {
             margin: { top: 80 },
@@ -388,7 +405,7 @@ export default class CostOfInventory extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Cost Of Inventory Report.pdf")
+        doc.save( i18n.t('static.dashboard.costOfInventory') +".pdf")
     }
 
     handleClickMonthBox2 = (e) => {
@@ -400,8 +417,8 @@ export default class CostOfInventory extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
-        var dt = new Date(`${value.year}-${value.month}-01`)
-        costOfInventoryInput.dt = dt
+        var dt = new Date(`${value.year}`,`${value.month}`,1)
+        costOfInventoryInput.dt = moment(dt).endOf('month').format('YYYY-MM-DD')
         this.setState({ singleValue2: value, costOfInventoryInput }, () => {
             this.formSubmit();
         })
@@ -432,6 +449,7 @@ export default class CostOfInventory extends Component {
     }
 
     formSubmit() {
+        console.log('in form submit')
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
         if (programId != 0 && versionId != -1) {
@@ -503,13 +521,19 @@ export default class CostOfInventory extends Component {
             }
                 // calculate openingBalance
 
+                let invmin=moment.min(inventoryList.map(d => moment(d.inventoryDate)))
+                let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+                let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
+                var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
+    
                 var openingBalance = 0;
+                if(minDate.isBefore(startDate)){
                 var totalConsumption = 0;
                 var totalAdjustments = 0;
                 var totalShipments = 0;
                 console.log('startDate', startDate)
                 console.log('programJson', programJson)
-                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+                var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore( minDate));
                 console.log('consumptionRemainingList', consumptionRemainingList)
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                   var count = 0;
@@ -517,7 +541,7 @@ export default class CostOfInventory extends Component {
                     if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
                       count++;
                     } else {
-
+    
                     }
                   }
                   if (count == 0) {
@@ -528,76 +552,98 @@ export default class CostOfInventory extends Component {
                     }
                   }
                 }
-
-                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+    
+                var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore( minDate));
                 for (var j = 0; j < adjustmentsRemainingList.length; j++) {
                   totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
                 }
-
-                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+    
+                var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate ).isBefore( minDate) && c.accountFlag == true);
+                console.log('shipmentsRemainingList',shipmentsRemainingList)
                 for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                    totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                  }
+                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
-                var endingBalance
-              
-                    var dtstr = startDate
-                    var enddtStr = endDate
-                    console.log(dtstr, ' ', enddtStr)
-                    var dt = dtstr
-                    console.log(openingBalance)
-                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                    var adjustment = 0;
-                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                    var consumption = 0;
-                    console.log(programJson.regionList)
-
-
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-
+                for (i = 1; ; i++) {
+                  var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
+                  var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
+                  console.log(dtstr, ' ', enddtStr)
+                  var dt = dtstr
+                  console.log(openingBalance)
+                  console.log(inventoryList)
+                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                  var adjustment = 0;
+                  invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                  console.log(consumptionList)
+                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                  var consumption = 0;
+                  console.log(programJson.regionList)
+    
+                  var actualFlag = false
+                  for (var i = 0; i < programJson.regionList.length; i++) {
+    
                       var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
                       console.log(list)
                       if (list.length > 1) {
-                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                          for (var l = 0; l < list.length; l++) {
+                              if (list[l].actualFlag.toString() == 'true') {
+                                  actualFlag = true;
+                                  consumption = consumption + list[l].consumptionQty
+                              }
+                          }
                       } else {
-                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                          consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
                       }
-                    }
-
-
-
-                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                    var shipment = 0;
-                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                    console.log(shiplist.length ,'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                   endingBalance = openingBalance + adjustment + shipment - consumption
-                    console.log('endingBalance', endingBalance)
-
-                    //endingBalance = endingBalance < 0 ? 0 : endingBalance
-                   
+                  }
+    
+    
+                  console.log(shipmentList)
+                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                  var shipment = 0;
+                  shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+    
+                  console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                  var endingBalance = openingBalance + adjustment + shipment - consumption
+                  console.log('endingBalance', endingBalance)
+    
+                  endingBalance = endingBalance < 0 ? 0 : endingBalance
+                  openingBalance = endingBalance
+                  minDate=minDate.add(1,'month')
+                  
+                 if(minDate.startOf('month').isAfter(startDate)){
+                     break;
+                 }
+              }
+            }
+                
                var json={
                    planningUnit:planningUnit.planningUnit,
                    stock:endingBalance,
-                   rate:planningUnit.catalogPrice,
-                   cost:(endingBalance*planningUnit.catalogPrice)
+                   catalogPrice:planningUnit.catalogPrice,
+                   cost:this.roundN(endingBalance*planningUnit.catalogPrice)
                }
                   data.push(json)  
+                 
                 })
 
                        
-                        console.log(data)
-                        this.setState({
-                            costOfInventory: data
-                            , message: ''
-                        })
+                this.setState({
+                    costOfInventory: data
+                    , message: ''
+                })
+                        
                     }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
+                var inputjson={
+                    "programId":programId,
+                    "versionId":versionId,
+                    "dt":moment(new Date(this.state.singleValue2.year,(this.state.singleValue2.month-1),1)).startOf('month').format('YYYY-MM-DD'),
+                    "includePlannedShipments":document.getElementById("includePlanningShipments").value?1:0
+                }
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.costOfInventory(this.state.CostOfInventoryInput).then(response => {
+                ReportService.costOfInventory(inputjson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
                         costOfInventory: response.data });
@@ -683,7 +729,7 @@ export default class CostOfInventory extends Component {
                 style: { align: 'center' },
                 formatter: this.formatter
             }, {
-                dataField: 'rate',
+                dataField: 'catalogPrice',
                 text: 'Rate (USD)',
                 sort: true,
                 align: 'center',
@@ -698,7 +744,7 @@ export default class CostOfInventory extends Component {
                 align: 'center',
                 style: { align: 'center' },
                 headerAlign: 'center',
-                formatter: this.formatter
+                formatter: this.formatterDouble
             }
         ];
         const options = {
