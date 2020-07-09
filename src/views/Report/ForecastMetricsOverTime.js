@@ -185,6 +185,7 @@ class ForcastMatrixOverTime extends Component {
       matricsList: [],
       dropdownOpen: false,
       radioSelected: 2,
+      programs:[],
       productCategories: [],
       planningUnits: [],
       categories: [],
@@ -364,11 +365,107 @@ class ForcastMatrixOverTime extends Component {
     doc.text(15, 15, "Cool Chart");
     doc.save('canvas.pdf');*/
   }
+  getPrograms = () => {
+    if (navigator.onLine) {
+        AuthenticationService.setupAxiosInterceptors();
+        let realmId = AuthenticationService.getRealmId();
+        ProgramService.getProgramByRealmId(realmId)
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    programs: response.data
+                }, () => { this.consolidatedProgramList() })
+            }).catch(
+                error => {
+                    this.setState({
+                        programs: []
+                    }, () => { this.consolidatedProgramList() })
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    } else {
+        console.log('offline')
+        this.consolidatedProgramList()
+    }
+
+}
+consolidatedProgramList = () => {
+    const lan = 'en';
+    const { programs } = this.state
+    var proList = programs;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var program = transaction.objectStore('programData');
+        var getRequest = program.getAll();
+
+        getRequest.onerror = function (event) {
+            // Handle errors!
+        };
+        getRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = getRequest.result;
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].userId == userId) {
+                    var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                    var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                    console.log(programNameLabel)
+
+                    var f = 0
+                    for (var k = 0; k < this.state.programs.length; k++) {
+                        if (this.state.programs[k].programId == programData.programId) {
+                            f = 1;
+                            console.log('already exist')
+                        }
+                    }
+                    if (f == 0) {
+                        proList.push(programData)
+                    }
+                }
+
+
+            }
+
+            this.setState({
+                programs: proList
+            })
+
+        }.bind(this);
+
+    }.bind(this);
+
+
+}
+
 
 
 
   fetchData() {
-   let countryId = document.getElementById("countryId").value;
+   let countryId = 2;//document.getElementById("countryId").value;
    let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate=this.state.rangeValue.from.year + '-' +  ("00"+this.state.rangeValue.from.month).substr(-2) + '-01';
@@ -531,6 +628,7 @@ class ForcastMatrixOverTime extends Component {
     }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
+    this.getPrograms()
     this.getCountrylist();
      this.getProductCategories() 
   }
@@ -578,6 +676,7 @@ class ForcastMatrixOverTime extends Component {
           </option>
         )
       }, this);
+      const { programs } = this.state
     const { countries } = this.state;
    // console.log(JSON.stringify(countrys))
    let countryList = countries.length > 0 && countries.map((item, i) => {
@@ -680,8 +779,34 @@ class ForcastMatrixOverTime extends Component {
                             </div>
 
                           </FormGroup>
- 
-                            <FormGroup className="col-md-3">
+                          <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="countryId"
+                                                id="countryId"
+                                                bsSize="sm"
+                                                onChange={this.filterVersion}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programs.length > 0
+                                                    && programs.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.programId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                              
+                            {/* <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.country')}</Label>
                               <div className="controls ">
                                 <InputGroup>
@@ -699,8 +824,8 @@ class ForcastMatrixOverTime extends Component {
 
                                 </InputGroup>
                               </div>
-                            </FormGroup>
-                            <FormGroup className="col-md-3">
+                            </FormGroup>*/}
+                            <FormGroup className="col-md-3"> 
                             <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                         <div className="controls ">
                                             <InputGroup>

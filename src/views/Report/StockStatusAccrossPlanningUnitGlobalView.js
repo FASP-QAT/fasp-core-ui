@@ -1812,7 +1812,7 @@ class GlobalConsumption extends Component {
                     <div className="col-md-12">
                       <div className="table-responsive ">
 
-                        <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                        <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
 
 
                           <thead>

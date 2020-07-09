@@ -71,12 +71,14 @@ const options = {
       position: 'left',
       scaleLabel: {
         display: true,
-        fontSize: "12"
+        fontSize: "12",
+        fontColor: 'blue'
       },
       ticks: {
         beginAtZero: true,
-        fontColor: 'black'
-      }
+        fontColor: 'blue'
+      },
+     
     }, {
       id: 'B',
       position: 'right',
@@ -87,6 +89,10 @@ const options = {
       ticks: {
         beginAtZero: true,
         fontColor: 'black'
+      },
+      gridLines: {
+        color: 'rgba(171,171,171,1)',
+        lineWidth: 0.5
       }
     }],
     xAxes: [{
@@ -190,6 +196,7 @@ class StockStatus extends Component {
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
@@ -277,7 +284,10 @@ class StockStatus extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
 
@@ -1093,7 +1103,7 @@ console.log(pu)
           backgroundColor: 'rgba(255,193,8,0.2)',
           borderColor: '#f86c6b',
           borderStyle: 'dotted',
-          borderDash: [10, 10],
+          //borderDash: [10, 10],
           fill: '+1',
           ticks: {
             fontSize: 2,
@@ -1112,7 +1122,7 @@ console.log(pu)
           backgroundColor: 'rgba(0,0,0,0)',
           borderColor: '#ffc107',
           borderStyle: 'dotted',
-          borderDash: [10, 10],
+         // borderDash: [10, 10],
           fill: true,
           ticks: {
             fontSize: 2,
@@ -1140,7 +1150,7 @@ console.log(pu)
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.mos))
         }
-        , {
+        , /*{
           type: "line",
           yAxisID: 'A',
           label: "Consumption",
@@ -1155,21 +1165,8 @@ console.log(pu)
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
-        },
-        {
-          label: "Stock",
-          yAxisID: 'A',
-          type: 'line',
-          borderColor: 'rgba(179,181,158,1)',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          pointStyle: 'line',
-          showInLegend: true,
-          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
-        }, {
+        },*/
+         {
           label: 'Delivered',
           yAxisID: 'A',
           stack: 1,
@@ -1241,6 +1238,20 @@ console.log(pu)
             }))
             return count
           })
+        },
+        {
+          label: "Stock",
+          yAxisID: 'A',
+          type: 'line',
+          borderColor: 'transparent',
+          ticks: {
+            fontSize: 2,
+            fontColor: 'transparent',
+          },
+          lineTension: 0,
+          pointStyle: 'line',
+          showInLegend: true,
+          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
         }
 
       ],
@@ -1314,9 +1325,9 @@ console.log(pu)
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="tab-ml-1">
+                      <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">Version</Label>
-                        <div className="controls SelectGo">
+                        <div className="controls">
                           <InputGroup>
                             <Input
                               type="select"

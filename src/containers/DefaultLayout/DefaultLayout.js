@@ -105,12 +105,13 @@ class DefaultLayout extends Component {
                         icon: 'cui-dashboard icons',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_APPLICATION_DASHBOARD') ? false : true) }
                       },
-                      // {
-                      //   name: i18n.t('static.dashboard.realmdashboard'),
-                      //   url: '/RealmDashboard',
-                      //   icon: 'cui-dashboard icons',
-                      // },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: i18n.t('static.dashboard.realmdashboard'),
+                        url: '/RealmDashboard',
+                        icon: 'cui-dashboard icons',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
+                      },
+                      //!this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
@@ -583,6 +584,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                           },
+                          {
+                            name: i18n.t('static.report.expiredInventory'),
+                            url: '/report/expiredInventory',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
                           // {
                           //   name: i18n.t('static.report.supplyplanversionandreviewReport'),
                           //   url: '/report/supplyPlanVersionAndReview',
@@ -727,6 +734,28 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
 
+                          },
+                          {
+                            name: i18n.t('static.report.expiredInventory'),
+                            url: '/report/expiredInventory',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.supplierLeadTimes'),
+                            url: '/report/supplierLeadTimes',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          },{
+                            name: i18n.t('static.dashboard.costOfInventory'),
+                            url: '/report/costOfInventory',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          }, {
+                            name: i18n.t('static.dashboard.inventoryTurns'),
+                            url: '/report/inventoryTurns',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           }
                         ]
                       }
