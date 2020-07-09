@@ -802,7 +802,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     console.log("getProcurementAgentPlaningUnitList--", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse});
+                        this.setState({ rows: myResponse });
                     }
 
                     ProcurementAgentService.getProcurementAgentListAll()
@@ -914,6 +914,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     if (papuDataArr.length == 0) {
                                                         data = [];
                                                         data[0] = this.props.match.params.procurementAgentId;
+                                                        data[9] = true;
+                                                        data[10] = 0;
+                                                        data[11] = 1;
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
@@ -1222,9 +1225,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 changedFlag: 0,
 
             },
-            () => {
-                this.hideSecondComponent();
-            })
+                () => {
+                    this.hideSecondComponent();
+                })
             return false;
         } else {
             return true;
@@ -1419,14 +1422,16 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson();
+        console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var col = ("L").concat(parseInt(y) + 1);
+            // var col = ("L").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
 
                 //planning unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
+                console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1597,7 +1602,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
-        &nbsp;
+                                &nbsp;
     </FormGroup>
                         </CardFooter>
                     </Card>
