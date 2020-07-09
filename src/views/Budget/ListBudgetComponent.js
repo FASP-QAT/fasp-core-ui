@@ -15,6 +15,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { DATE_FORMAT_CAP } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
 
@@ -86,7 +87,7 @@ class ListBudgetComponent extends Component {
   }
   formatDate(cell, row) {
     if (cell != null && cell != "") {
-      var modifiedDate = moment(cell).format('DD-MMM-YY');
+      var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
       return modifiedDate;
     } else {
       return "";

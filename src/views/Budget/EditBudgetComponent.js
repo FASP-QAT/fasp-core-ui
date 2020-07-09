@@ -13,6 +13,7 @@ import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
+import { DATE_FORMAT_SM,DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
@@ -142,7 +143,9 @@ class EditBudgetComponent extends Component {
 
 
     addMonths(date, months) {
+        console.log("add months date 1---" + date);
         date.setMonth(date.getMonth() + months);
+        console.log("add months date 2---" + date);
         return date;
     }
 
@@ -174,9 +177,12 @@ class EditBudgetComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     console.log("(response.data.startDate)--", new Date(response.data.startDate));
-
-                    response.data.startDate = new Date(response.data.startDate);
-                    response.data.stopDate = new Date(response.data.stopDate);
+                    if (response.data.startDate != null && response.data.startDate != "") {
+                        response.data.startDate = new Date(response.data.startDate);
+                    }
+                    if (response.data.stopDate != null && response.data.stopDate != "") {
+                        response.data.stopDate = new Date(response.data.stopDate);
+                    }
                     var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                     response.data.budgetAmt = getBudgetAmount;
 
@@ -562,11 +568,11 @@ class EditBudgetComponent extends Component {
                                                             minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
-                                                            placeholderText="dd-mmm-yy"
+                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
                                                             className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
-                                                            dateFormat="dd-MMM-yy"
+                                                            dateFormat={DATE_FORMAT_SM}
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
@@ -578,11 +584,11 @@ class EditBudgetComponent extends Component {
                                                             minDate={this.state.budget.startDate}
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                            placeholderText="dd-mmm-yy"
+                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
                                                             className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
-                                                            dateFormat="dd-MMM-yy"
+                                                            dateFormat={DATE_FORMAT_SM}
                                                         />
                                                     </FormGroup>
                                                 </CardBody>
@@ -617,8 +623,14 @@ class EditBudgetComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
-                response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
-                response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                if (response.data.startDate != null && response.data.startDate != "") {
+                    response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                }
+                if (response.data.stopDate != null && response.data.stopDate != "") {
+                    response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                }
+                var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
+                response.data.budgetAmt = getBudgetAmount;
                 this.setState({
                     budget: response.data
                 });
