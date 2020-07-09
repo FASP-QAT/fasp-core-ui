@@ -1049,7 +1049,8 @@ class Consumption extends Component {
 
                 <Card>
                     <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong>
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong> */}
+                        <i className="icon-menu"></i><strong>Shipment Details</strong>
                         {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                         <Online>
                             {/* {
@@ -1099,10 +1100,10 @@ class Consumption extends Component {
                                 <Form >
                                     <Col md="12 pl-0">
                                         <div className="row">
-                                            <FormGroup  className="tab-ml-1">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
-                                                <div className="controls SelectGo Regioncalender">
-                                                    <InputGroup>
+                                            <FormGroup  className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls  Regioncalender">
+                                                    {/* <InputGroup> */}
                                                         <Picker
                                                             ref="pickRange"
                                                             years={{ min: 2013 }}
@@ -1115,14 +1116,14 @@ class Consumption extends Component {
                                                             <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                         </Picker>
 
-                                                    </InputGroup>
+                                                    {/* </InputGroup> */}
                                                 </div>
                                             </FormGroup>
 
 
-                                            <FormGroup className="tab-ml-1">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Program</Label>
-                                                <div className="controls SelectGo">
+                                                <div className="controls ">
                                                     <InputGroup>
                                                         <Input
                                                             type="select"
@@ -1146,7 +1147,7 @@ class Consumption extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="tab-ml-1">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Version</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1165,8 +1166,9 @@ class Consumption extends Component {
                                                 </div>
                                             </FormGroup>
 
-                                            <FormGroup className="tab-ml-1">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
                                                     <InputGroup className="box">
                                                         <ReactMultiSelectCheckboxes
@@ -1180,7 +1182,7 @@ class Consumption extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="tab-ml-1">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Report View</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1286,80 +1288,84 @@ class Consumption extends Component {
                                                     <thead>
                                                         <tr>
                                                             <th style={{ 'text-align': 'left' }}>Planning Unit/Forecasting Unit</th>
-                                                            <th>ID</th>
+                                                            <th style={{ 'width': '87px' }}>ID</th>
                                                             <th>Procurement Agent</th>
                                                             <th>Funder</th>
                                                             <th>Status</th>
-                                                            <th>Notes</th>
+                                                            
                                                             <th style={{ 'text-align': 'right' }}>Qty</th>
-                                                            <th style={{ 'width': '87px' }}>Order Date</th>
-                                                            <th>Date/Month Receipt Expected</th>
+                                                            {/* <th style={{ 'width': '87px' }}>Order Date</th> */}
+                                                            <th>Expected Receipt Date</th>
                                                             <th style={{ 'text-align': 'right' }}>Product Cost (USD)</th>
-                                                            <th style={{ 'text-align': 'right' }}>Freight(%)</th>
+                                                            {/* <th style={{ 'text-align': 'right' }}>Freight(%)</th> */}
                                                             <th style={{ 'text-align': 'right' }}>Freight Cost (USD)</th>
                                                             <th style={{ 'text-align': 'right' }}>Total Cost (USD)</th>
                                                             <th style={{ 'text-align': 'right' }}>Containers</th>
+                                                            <th>Notes</th>
                                                         </tr>
 
                                                     </thead>
 
                                                     <tbody>
-                                                        <tr>
+                                                        {/* <tr>
                                                             <th colSpan="14" style={{ 'text-align': 'left' }}>Feb 2020</th>
-                                                        </tr>
+                                                        </tr> */}
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
+                                                            <td style={{ 'width': '87px' }}>01</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Received</td>
-                                                            <td></td>
+                                                            
                                                             <td style={{ 'text-align': 'right' }}>2,000</td>
-                                                            <td>Feb-03-2020</td>
+                                                            {/* <td>Feb-03-2020</td> */}
                                                             <td>Apr-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>3,400,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>340,000</td>
                                                             <td style={{ 'text-align': 'right' }}>3,740,000</td>
                                                             <td style={{ 'text-align': 'right' }}>1</td>
+                                                            <td></td>
                                                         </tr>
-                                                        <tr>
+                                                        {/* <tr>
                                                             <th colSpan="14" style={{ 'text-align': 'left' }}>May 2020</th>
-                                                        </tr>
+                                                        </tr> */}
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>02</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Ordered</td>
-                                                            <td></td>
+                                                            
                                                             <td style={{ 'text-align': 'right' }}>3,000</td>
-                                                            <td>May-07-2020</td>
+                                                            {/* <td>May-07-2020</td> */}
                                                             <td>Sep-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>5,100,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>510,000</td>
                                                             <td style={{ 'text-align': 'right' }}>5,610,000</td>
                                                             <td style={{ 'text-align': 'right' }}>1.5</td>
+                                                            <td></td>
                                                         </tr>
-                                                        <tr>
+                                                        {/* <tr>
                                                             <th colSpan="14" style={{ 'text-align': 'left' }}>Jun 2020</th>
-                                                        </tr>
+                                                        </tr> */}
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>03</td>
                                                             <td>PEPFAR</td>
                                                             <td>GHSC-PSM</td>
                                                             <td>Planned</td>
-                                                            <td></td>
+                                                            
                                                             <td style={{ 'text-align': 'right' }}>4,000</td>
-                                                            <td>Jun-03-2020</td>
+                                                            {/* <td>Jun-03-2020</td> */}
                                                             <td>Nov-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>6,800,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>680,000</td>
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
+                                                            <td></td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>}

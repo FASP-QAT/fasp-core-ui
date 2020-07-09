@@ -916,7 +916,8 @@ class ShipmentGlobalView extends Component {
 
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Shipment Global View</strong>
+                        {/* <i className="icon-menu"></i><strong>Shipment Global View</strong> */}
+                        <i className="icon-menu"></i><strong>Global Demand - Single Product</strong>
                         {/* {this.state.consumptions.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1017,7 +1018,7 @@ class ShipmentGlobalView extends Component {
                                         <FormGroup className="col-sm-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <div className="controls">
+                                            {/* <div className="controls">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
 
@@ -1027,6 +1028,21 @@ class ShipmentGlobalView extends Component {
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     />
+                                                </InputGroup>
+                                            </div> */}
+                                            <div className="controls SelectGo">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="planningUnitId"
+                                                        id="planningUnitId"
+                                                        bsSize="sm"
+                                                        onChange={this.callFunction}
+                                                    >
+                                                        <option value="0">Please Select</option>
+                                                        {/* {planningUnitList} */}
+                                                    </Input>
+
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>

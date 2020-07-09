@@ -1,7 +1,8 @@
 // Here you can add other styles
 body {
-  font-size: 0.775rem;
+  font-size: 0.775rem!important;
   color: #212721 !important;
+  background-color: #e4e5e6!important;
 }
 
 ::placeholder {
@@ -2336,7 +2337,7 @@ input::placeholder {
 
   .supplyplanTdWidth{
     overflow: hidden!important;
-    min-width: 195px!important;
+    min-width: 315px!important;
     word-wrap: break-word!important;
     border:none!important;
   }
@@ -2348,4 +2349,106 @@ input::placeholder {
     color: #20a8d8;
     font-size: 14px;
   }
+  ///year Range picker
+
+  .ant-picker {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: #212721!important;
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 0.5715;
+    list-style: none;
+    -webkit-font-feature-settings: 'tnum';
+    font-feature-settings: 'tnum';
+    padding:0px 20px 0px!important;
+    position: relative;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background:transparent!important;
+    border: none!important; 
+    border-radius: 2px;
+    -webkit-transition: border 0.3s, -webkit-box-shadow 0.3s;
+    transition: border 0.3s, -webkit-box-shadow 0.3s;
+    transition: border 0.3s, box-shadow 0.3s;
+    transition: border 0.3s, box-shadow 0.3s, -webkit-box-shadow 0.3s;
+}
+
+.ant-picker-suffix {
+  -ms-flex-item-align: center;
+  align-self: center;
+  margin-left: 4px;
+  display: none!important;
+  color: #212721;
+  pointer-events: none;
+}
   
+.ant-picker-focused {
+  border-color:none!important;
+  border-right-width: 1px !important;
+  outline: 0;
+  -webkit-box-shadow:  none!important;
+  box-shadow: none!important;
+}
+.ant-picker:hover, .ant-picker-focused {
+  border-color:none!important;
+  border-right-width: 1px !important;
+}
+.ant-select-focused.ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  border-color:#fff!important;
+  border-right-width: 1px !important;
+  outline: 0;
+  -webkit-box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+.ant-select-focused.ant-select-multiple .ant-select-selector {
+  border-color: #fff!important;
+  border-right-width: 1px !important;
+  outline: 0;
+  -webkit-box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+.ant-picker-range .ant-picker-active-bar {
+  bottom: -1px;
+  height: 2px;
+  margin-left: 11px;
+  background: none!important;
+  opacity: 0;
+  -webkit-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+  pointer-events: none;
+}
+.anticon {
+  display: inline-block;
+  color: inherit;
+  font-style: normal;
+  line-height: 0;
+  text-align: center;
+  text-transform: none;
+  vertical-align: 1.875em!important;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.ant-picker-input > input {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  font-size:13px !important;
+  margin-top: -2px!important;
+}
+
+.icon-color{
+  color: #20a8d8;
+}
+
+.textrealmdashboard {
+    color: #73818f !important;
+    font-size: 13px!important;
+}

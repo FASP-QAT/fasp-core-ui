@@ -31,7 +31,7 @@ class SupplyPlanFormulas extends Component {
             <h5></h5>
             <Card>
               <CardHeader>
-                <i className="fa fa-align-justify"></i><strong>Supply Plan Formulae</strong>
+                <i className="fa fa-align-justify"></i><strong>Formulae</strong>
               </CardHeader>
               <CardBody>
                 <ListGroup>
@@ -158,6 +158,24 @@ AMC = 6,392<br></br>
 Months Of Stock = Ending Balance / AMC<br></br>
 Months Of Stock = 22,642 / 6,392<br></br>
 Months Of Stock = 3.54</p>
+                    </ListGroupItemText>
+                  </ListGroupItem>
+
+                  <ListGroupItem action>
+                    <ListGroupItemHeading className="formulasheading">Cost Of Inventory</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Cost-Of-Inventory.png"/>
+                    
+                    </ListGroupItemText>
+                  </ListGroupItem>
+
+                  <ListGroupItem action>
+                    <ListGroupItemHeading className="formulasheading">Inventory Turns</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Inventory Turns.png"/>
+                    
                     </ListGroupItemText>
                   </ListGroupItem>
 

@@ -29,6 +29,7 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
+import Widget01 from '../../views/Widgets/Widget01';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -77,7 +78,7 @@ const pie = {
 
 const bar = {
 
-  labels: [i18n.t('static.realm.realmName') + "1", i18n.t('static.realm.realmName') + "2", i18n.t('static.realm.realmName') + "3", i18n.t('static.realm.realmName') + "4"],
+  labels: [i18n.t('static.realm.realmName') , i18n.t('static.realm.realmName1') , i18n.t('static.realm.realmName2')  ],
   datasets: [
     {
       label: i18n.t('static.graph.activeProgram'),
@@ -85,20 +86,21 @@ const bar = {
       borderColor: 'rgba(179,181,198,1)',
       pointBackgroundColor: 'rgba(179,181,198,1)',
       pointBorderColor: '#fff',
+      barThickness: 150,
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(179,181,198,1)',
-      data: [65, 59, 90, 81, 56, 55, 40],
+      data: [65, 59, 89, 81, 56, 55, 40],
     },
-    {
-      label: i18n.t('static.graph.inactiveProgram'),
-      backgroundColor: '#cfcdc9',
-      borderColor: 'rgba(255,99,132,1)',
-      pointBackgroundColor: 'rgba(255,99,132,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(255,99,132,1)',
-      data: [28, 48, 40, 19, 96, 27, 100],
-    },
+    // {
+    //   label: i18n.t('static.graph.inactiveProgram'),
+    //   backgroundColor: '#cfcdc9',
+    //   borderColor: 'rgba(255,99,132,1)',
+    //   pointBackgroundColor: 'rgba(255,99,132,1)',
+    //   pointBorderColor: '#fff',
+    //   pointHoverBackgroundColor: '#fff',
+    //   pointHoverBorderColor: 'rgba(255,99,132,1)',
+    //   data: [28, 48, 40, 19, 96, 27, 100],
+    // },
   ],
 
 };
@@ -196,7 +198,26 @@ class ApplicationDashboard extends Component {
       <div className="animated fadeIn">
         <h5  className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
        
-        {/* <Row>
+        <Row className="mt-2">
+            <Col md="12">
+            <Card>
+              {/* <CardHeader className="text-center">
+                <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
+                <div className="card-header-actions">
+                <a className="card-header-action">
+                  
+                  </a>
+                </div>
+              </CardHeader> */}
+              <CardBody>
+                <div className="chart-wrapper chart-graph">
+                  <Bar data={bar} options={options} />
+                </div>
+              </CardBody>
+            </Card>
+            </Col> 
+          </Row> 
+     {/* <Row>
         <Col md="8">
             <Card>
               <CardHeader>
@@ -317,10 +338,10 @@ class ApplicationDashboard extends Component {
                 </Card>
                 </Col>
                 
-        </Row> */}
+        </Row> 
+ */}
 
-
-      </div>
+     </div>
     );
   }
 }

@@ -567,7 +567,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 const entityname = i18n.t('static.dashboard.productcatalog');
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
-const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456870" }];
+const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3,000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456,870", "isActive": 'Active' }];
 const data1 = [{ "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "paskuCode": "100000DGA04S", "PlanningUnitMOQ": "3000", "PlanningUnitsperPallet": "1", "PlanningUnitsperContainer": "0.5", "PlanningUnitVolumem3": "4090", "PlanningUnitWeightkg": "500", "ProcurementUnit": "(Campaign Bulk) LLIN 190x180x150 cm (LxWxH) Single Pyrethroid Rectangular (White)", "Supplier": "A To Z TEXTTILE LIMITED", "Weight": "1.115", "Height": "", "Length": "", "Width": "", "gtin": "12345678912345", "Labeling": "Olyset 150 Denier Polyethylene", "UnitsperCase": "10,000", "UnitsperPallet": "5,000", "UnitsperContainer": "3,000", "ESTPrice": "2,456" }];
 export default class ProductCatalog extends React.Component {
     constructor(props) {
@@ -674,8 +674,10 @@ export default class ProductCatalog extends React.Component {
         this.filterDataForRealm();
 
         let realmId = AuthenticationService.getRealmId();
+        console.log("realmId----->",realmId);
         TracerCategoryService.getTracerCategoryByRealmId(realmId)
             .then(response => {
+                console.log("tracer report---->", response);
                 this.setState({
                     tracerCategories: response.data, loading: false
                 })
@@ -1036,17 +1038,24 @@ export default class ProductCatalog extends React.Component {
             },
             {
                 dataField: 'ShelfLife',
-                text: "Shelf Life(Months)",
+                text: "Shelf Life (Months)",
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
             },
             {
                 dataField: 'CatalogPrice',
-                text: "Catalog Price",
+                text: "Catalog Price (USD)",
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
+            },
+            {
+                dataField: 'isActive',
+                text: "Status",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             }
 
 
@@ -1349,7 +1358,7 @@ export default class ProductCatalog extends React.Component {
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '}
                         {this.state.data.length > 0 && <div className="card-header-actions">
-                            {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} /> */}
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
 
                         </div>}
@@ -1408,33 +1417,33 @@ export default class ProductCatalog extends React.Component {
                                                     bsSize="sm"
                                                     onChange={this.callFunction}
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                    {planningUnitList}
+                                                    <option value="0">Please Select</option>
+                                                    {/* {planningUnitList} */}
                                                 </Input>
 
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    {/* <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                    <FormGroup className="tab-ml-1">
+                                        <Label htmlFor="appendedInputButton">Product Category</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
-                                                    name="planningUnitId"
-                                                    id="planningUnitId"
+                                                    name="productCategoryId"
+                                                    id="productCategoryId"
                                                     bsSize="sm"
                                                     onChange={this.callFunction}
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                    {planningUnitList}
+                                                    <option value="-1">All</option>
+                                                    {/* {planningUnitList} */}
                                                 </Input>
 
                                             </InputGroup>
                                         </div>
-                                    </FormGroup> */}
+                                    </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Product Category</Label>
+                                        <Label htmlFor="appendedInputButton">Tracer Category</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
@@ -1445,13 +1454,13 @@ export default class ProductCatalog extends React.Component {
                                                     onChange={this.callFunction}
                                                 // onChange={this.filterData}
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                                    <option value="-1">All</option>
                                                     {tracercategoryList}
                                                 </Input>
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    {/* <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">Tracer Category</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
@@ -1463,12 +1472,12 @@ export default class ProductCatalog extends React.Component {
                                                     onChange={this.callFunction}
                                                 >
                                                     <option value="0">{i18n.t('static.common.all')}</option>
-                                                    {planningUnitList}
+                                                    {tracercategoryList}
                                                 </Input>
 
                                             </InputGroup>
                                         </div>
-                                    </FormGroup>
+                                    </FormGroup> */}
                                 </div>
                             </Col>
                         </Form><br /><br /><br />

@@ -75,14 +75,16 @@ class AnnualShipmentCost extends Component {
     fetchData() {
 
         let json = {
-            "reportbaseValue": (document.getElementById("view").selectedOptions[0].value == 0 ? false : true),
-            "programId": document.getElementById("programId").selectedOptions[0].value,
-            "planningUnitId": document.getElementById("planningUnitId").selectedOptions[0].value,
-            "procurementAgentId": document.getElementById("procurementAgentId").selectedOptions[0].value,
-            "fundingSourceId": document.getElementById("fundingSourceId").selectedOptions[0].value,
-            "shipmentStatusId": document.getElementById("shipmentStatusId").selectedOptions[0].value,
+            "programId": document.getElementById("programId").value,
+            "versionId": document.getElementById("versionId").value,
+            "procurementAgentId": document.getElementById("procurementAgentId").value,
+            "planningUnitId": document.getElementById("planningUnitId").value,
+            "fundingSourceId": document.getElementById("fundingSourceId").value,
+            "shipmentStatusId": document.getElementById("shipmentStatusId").value,
             "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
-            "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate()
+            "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+            "reportbaseValue": document.getElementById("view").value,
+            
         }
 
         let versionId = document.getElementById("versionId").value;
@@ -244,18 +246,42 @@ class AnnualShipmentCost extends Component {
                                     outPutList.push(json);
                                 });
                                 console.log("9----", outPutList);
-                                this.setState({ outPutList: outPutList });
+                                this.setState({ outPutList: outPutList,message:'' });
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
+                alert("in else online version");
+                console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.getAnnualShipmentCost(json)
                     .then(response => {
-                        console.log(JSON.stringify(response.data))
+                        console.log("-----response", JSON.stringify(response.data));
+                        var outPutList=[];
+                        var responseData = response.data;
+                        for (var i = 0; i < responseData.length; i++) {
+                            var shipmentAmt = responseData[i].shipmentAmt;
+                            var json = {
+                                'FUNDING_SOURCE_ID': responseData[i].fundingSource.id,
+                                'PROCUREMENT_AGENT_ID': responseData[i].procurementAgent.id,
+                                'fundingsource': getLabelText(responseData[i].fundingSource.label, this.state.lang),
+                                'procurementAgent': getLabelText(responseData[i].procurementAgent.label, this.state.lang),
+                                'PLANNING_UNIT_ID': responseData[i].planningUnit.id,
+                                'planningUnit': getLabelText(responseData[i].planningUnit.label, this.state.lang)
+                            }
+                            for (var key in shipmentAmt) {
+                                var keyName=key.split("-")[1];
+                                var keyValue=shipmentAmt[key];
+                                console.log("keyName--",keyName);
+                                console.log("keyValue--",keyValue);
+                                json[keyName] = keyValue;
+                            }
+                            outPutList.push(json);
+                        }
+                        console.log("json final---", json);
                         this.setState({
-                            outPutList: response.data
+                            outPutList: outPutList
                         })
                     }).catch(
                         error => {
@@ -512,11 +538,11 @@ class AnnualShipmentCost extends Component {
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
             year.push(from);
         }
-        // var year = ['2018','2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
-        var data = this.state.outPutList;
-        // var data = [{ 2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
-        // { 2019: 15234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "PEPFAR", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
-        // { 2019: 0, 2020: 17234, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "GF", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" }]
+        var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
+        //var data = this.state.outPutList;
+        var data = [{ 2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
+        { 2019: 15234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "PEPFAR", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
+        { 2019: 0, 2020: 17234, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "GF", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" }]
         //this.state.matricsList;//[['GHSC-PSM \n PEPFAR \nplanning unit 1', 200000, 300000], ['PPM \nGF \n planning unit 1', 15826, 2778993]]
         var index = doc.internal.pageSize.width / (year.length + 3);
         var initalvalue = index + 10
