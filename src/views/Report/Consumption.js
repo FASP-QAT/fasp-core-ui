@@ -1403,8 +1403,110 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
+    this.getProductCategories = this.getProductCategories.bind(this);
+    this.storeProduct = this.storeProduct.bind(this);
+    this.toggleView = this.toggleView.bind(this);
     //this.pickRange = React.createRef()
+
+  }
+
+  toggleView() {
+    var tempConsumptionList = [];
+    var tempConsumptionList1 = [];
+    var multiplier = this.state.multiplier;
+    if (navigator.onLine) {
+      tempConsumptionList = this.state.consumptions;
+
+      for (let i = 0; i < tempConsumptionList.length; i++) {
+        let json = {
+          consumption_date: tempConsumptionList[i].consumption_date,
+          Actual: tempConsumptionList[i].Actual * multiplier,
+          forcast: tempConsumptionList[i].forcast * multiplier
+        }
+        tempConsumptionList1.push(json);
+      }
+      this.setState({
+        consumptions: tempConsumptionList1,
+      })
+
+    } else {
+      tempConsumptionList = this.state.offlineConsumptionList;
+      for (let i = 0; i < tempConsumptionList.length; i++) {
+        let json = {
+          consumption_date: tempConsumptionList[i].consumption_date,
+          Actual: tempConsumptionList[i].Actual * multiplier,
+          forcast: tempConsumptionList[i].forcast * multiplier
+        }
+        tempConsumptionList1.push(json);
+      }
+      this.setState({
+        offlineConsumptionList: tempConsumptionList1,
+      })
+    }
+
+  }
+
+  storeProduct(planningUnitId) {
+
+    let productId = planningUnitId;
+    // let productFilter = this.state.productList.filter(c => (c.planningUnit.id == productId));
+    // console.log("EEEEEEEEE--------", productId);
+    if (navigator.onLine) {
+      RealmService.getRealmListAll()
+        .then(response => {
+          if (response.status == 200) {
+            this.setState({
+              realmId: response.data[0].realmId,
+            })
+
+            PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
+              // console.log("RESP-----", response.data)
+              let productFilter = response.data.filter(c => (c.planningUnitId == productId));
+              this.setState({
+                multiplier: productFilter[0].multiplier,
+              },
+                () => {
+                  console.log("MULTIPLIER----", this.state.multiplier);
+                })
+            })
+
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            },
+              () => {
+                // this.hideSecondComponent();
+              })
+          }
+        })
+    } else {
+      const lan = 'en';
+      var db1;
+      var storeOS;
+      getDatabase();
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+        var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+        var planningunitRequest = planningunitOs.getAll();
+        var planningList = []
+        planningunitRequest.onerror = function (event) {
+          // Handle errors!
+        };
+        planningunitRequest.onsuccess = function (e) {
+          var myResult = [];
+          myResult = planningunitRequest.result;
+          let productFilter = myResult.filter(c => (c.planningUnitId == productId));
+          this.setState({
+            multiplier: productFilter[0].multiplier,
+          },
+            () => {
+              console.log("MULTIPLIER----", this.state.multiplier);
+            })
+        }.bind(this);
+      }.bind(this)
+    }
 
   }
 
@@ -1651,6 +1753,8 @@ class Consumption extends Component {
     } else {
       programId = (document.getElementById("programId").value).split("_")[0];
     }
+
+    let viewById = document.getElementById("viewById").value;
     let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1662,11 +1766,17 @@ class Consumption extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
           .then(response => {
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
             this.setState({
               consumptions: response.data,
               message: ''
-            })
+            },
+              () => {
+                this.storeProduct(planningUnitId);
+                if (viewById == 2) {
+                  this.toggleView();
+                }
+              })
           }).catch(
             error => {
               this.setState({
@@ -1763,7 +1873,13 @@ class Consumption extends Component {
             console.log("final consumption---", finalOfflineConsumption);
             this.setState({
               offlineConsumptionList: finalOfflineConsumption
-            });
+            },
+              () => {
+                this.storeProduct(planningUnitId);
+                if (viewById == 2) {
+                  this.toggleView();
+                }
+              });
 
           }.bind(this)
 
@@ -1864,9 +1980,9 @@ class Consumption extends Component {
       let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
       ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
-        console.log('**' + JSON.stringify(response.data))
+        // console.log('RESP----------', response.data);
         this.setState({
-          planningUnits: response.data,
+          planningUnits: response.data
         }, () => {
           this.filterData();
         })
@@ -1924,7 +2040,7 @@ class Consumption extends Component {
             }
           }
           this.setState({
-            offlinePlanningUnitList: proList
+            offlinePlanningUnitList: proList,
           })
         }.bind(this);
       }.bind(this)
@@ -2387,6 +2503,7 @@ class Consumption extends Component {
                                 id="planningUnitId"
                                 bsSize="sm"
                                 onChange={this.filterData}
+                              // onChange={(e) => { this.storeProduct(e); this.filterData(); }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {planningUnits.length > 0
@@ -2443,9 +2560,10 @@ class Consumption extends Component {
                               name="viewById"
                               id="viewById"
                               bsSize="sm"
+                              onChange={this.filterData}
                             >
-                              <option value="1">Planning Unit</option>
-                              <option value="2">Forecasting Unit</option>
+                              <option value="1">{i18n.t('static.dashboard.product')}</option>
+                              <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
                             </Input>
                           </InputGroup>
                         </div>
