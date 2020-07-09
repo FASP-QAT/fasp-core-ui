@@ -1521,6 +1521,10 @@ class Consumption extends Component {
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
+          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+            align: 'left'
+          })
+
         }
 
       }
@@ -1550,12 +1554,42 @@ class Consumption extends Component {
     i18n.t('static.report.forecastConsumption'),
     i18n.t('static.report.actualConsumption')]];
     const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
+    // let content = {
+    //   margin: { top: 80 },
+    //   startY: height,
+    //   head: headers,
+    //   body: data,
+    //   styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+    // };
+
+
+    let head = [];
+    let head1 = [];
+    let row1 = [];
+    let row2 = [];
+    let row3 = [];
+    if (navigator.onLine) {
+      let consumptionArray = this.state.consumptions;
+      head.push(i18n.t('static.report.consumptionDate'));
+      row1.push(i18n.t('static.report.forecastConsumption'));
+      row2.push(i18n.t('static.report.actualConsumption'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forcast);
+        row2.push(consumptionArray[i].Actual);
+      }
+    }
+    head1[0] = head;
+    row3[0] = row1;
+    row3[1] = row2;
+
 
     let content = {
       margin: { top: 80 },
       startY: height,
-      head: headers,
-      body: data,
+      head: head1,
+      body: row3,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
@@ -2359,13 +2393,13 @@ class Consumption extends Component {
 
 
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">Report View</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input
                               type="select"
-                              name="planningUnitId"
-                              id="planningUnitId"
+                              name="viewById"
+                              id="viewById"
                               bsSize="sm"
                             >
                               <option value="1">Planning Unit</option>
@@ -2432,7 +2466,7 @@ class Consumption extends Component {
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
                       {this.state.show &&
-                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                           <tbody>
                             <>
