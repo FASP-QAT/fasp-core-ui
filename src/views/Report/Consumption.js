@@ -1438,16 +1438,40 @@ class Consumption extends Component {
     csvRow.push('')
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.consumptionDate')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20')]]
+
     if (navigator.onLine) {
       re = this.state.consumptions
     } else {
       re = this.state.offlineConsumptionList
     }
 
-    for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumption_date, re[item].forcast, re[item].Actual])
+    // var A = [[(i18n.t('static.report.consumptionDate')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20')]]
+    // for (var item = 0; item < re.length; item++) {
+    //   A.push([re[item].consumption_date, re[item].forcast, re[item].Actual])
+    // }
+
+    let head = [];
+    let head1 = [];
+    let row1 = [];
+    let row2 = [];
+    let row3 = [];
+    if (navigator.onLine) {
+      let consumptionArray = this.state.consumptions;
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forcast);
+        row2.push(consumptionArray[i].Actual);
+      }
     }
+    var A = [];
+    A[0] = head;
+    A[1] = row1;
+    A[2] = row2;
+
+
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
     }
@@ -1551,8 +1575,8 @@ class Consumption extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
     const headers = [[i18n.t('static.report.consumptionDate'),
-    i18n.t('static.report.forecastConsumption'),
-    i18n.t('static.report.actualConsumption')]];
+    i18n.t('static.report.forecasted'),
+    i18n.t('static.report.actual')]];
     const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
     // let content = {
     //   margin: { top: 80 },
@@ -1571,9 +1595,19 @@ class Consumption extends Component {
     let row3 = [];
     if (navigator.onLine) {
       let consumptionArray = this.state.consumptions;
-      head.push(i18n.t('static.report.consumptionDate'));
-      row1.push(i18n.t('static.report.forecastConsumption'));
-      row2.push(i18n.t('static.report.actualConsumption'));
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forcast);
+        row2.push(consumptionArray[i].Actual);
+      }
+    } else {
+      let consumptionArray = this.state.finalOfflineConsumption;
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
         row1.push(consumptionArray[i].forcast);
@@ -1611,7 +1645,12 @@ class Consumption extends Component {
 
 
   filterData() {
-    let programId = document.getElementById("programId").value;
+    let programId = 0;
+    if (navigator.onLine) {
+      programId = document.getElementById("programId").value;
+    } else {
+      programId = (document.getElementById("programId").value).split("_")[0];
+    }
     let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1654,6 +1693,7 @@ class Consumption extends Component {
           );
       } else {
         // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+        programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
@@ -2109,6 +2149,22 @@ class Consumption extends Component {
         labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
         datasets: [
           {
+            type: "line",
+            lineTension: 0,
+            label: i18n.t('static.report.forecastConsumption'),
+            backgroundColor: 'transparent',
+            borderColor: '#000',
+            borderDash: [10, 10],
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            showInLegend: true,
+            pointStyle: 'line',
+            pointBorderWidth: 5,
+            yValueFormatString: "$#,##0",
+            data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
+          }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
             borderColor: 'rgba(179,181,198,1)',
@@ -2117,20 +2173,6 @@ class Consumption extends Component {
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
             data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
-          }, {
-            type: "line",
-            label: i18n.t('static.report.forecastConsumption'),
-            backgroundColor: 'transparent',
-            borderColor: 'rgba(179,181,158,1)',
-            borderStyle: 'dotted',
-            ticks: {
-              fontSize: 2,
-              fontColor: 'transparent',
-            },
-            showInLegend: true,
-            yValueFormatString: "$#,##0",
-            lineTension: 0,
-            data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
           }
         ],
 
@@ -2465,53 +2507,104 @@ class Consumption extends Component {
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                      {this.state.show &&
-                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
+                      <Online>
+                        {this.state.show &&
+                          <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
-                          <tbody>
-                            <>
-                              <tr>
-                                <th style={{ width: '140px' }}></th>
-                                {
-                                  this.state.consumptions.length > 0
-                                  &&
-                                  this.state.consumptions.map((item, idx) =>
-                                    <td id="addr0" key={idx}>
-                                      {moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
-                                    </td>
-                                  )
-                                }
-                              </tr>
+                            <tbody>
+                              <>
+                                <tr>
+                                  <th style={{ width: '140px' }}></th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
 
-                              <tr>
-                                <th style={{ width: '140px' }}>Forecasted</th>
-                                {
-                                  this.state.consumptions.length > 0
-                                  &&
-                                  this.state.consumptions.map((item, idx) =>
-                                    <td id="addr0" key={idx}>
-                                      {this.formatter(this.state.consumptions[idx].forcast)}
-                                    </td>
-                                  )
-                                }
-                              </tr>
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.consumptions[idx].forcast)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
 
-                              <tr>
-                                <th style={{ width: '140px' }}>Actual</th>
-                                {
-                                  this.state.consumptions.length > 0
-                                  &&
-                                  this.state.consumptions.map((item, idx) =>
-                                    <td id="addr0" key={idx}>
-                                      {this.formatter(this.state.consumptions[idx].Actual)}
-                                    </td>
-                                  )
-                                }
-                              </tr>
-                            </>
-                          </tbody>
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.consumptions[idx].Actual)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+                              </>
+                            </tbody>
 
-                        </Table>}
+                          </Table>}
+                      </Online>
+                      <Offline>
+                        {this.state.show &&
+                          <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
+
+                            <tbody>
+                              <>
+                                <tr>
+                                  <th style={{ width: '140px' }}></th>
+                                  {
+                                    this.state.offlineConsumptionList.length > 0
+                                    &&
+                                    this.state.offlineConsumptionList.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
+                                  {
+                                    this.state.offlineConsumptionList.length > 0
+                                    &&
+                                    this.state.offlineConsumptionList.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.offlineConsumptionList[idx].forcast)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
+                                  {
+                                    this.state.offlineConsumptionList.length > 0
+                                    &&
+                                    this.state.offlineConsumptionList.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.offlineConsumptionList[idx].Actual)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+                              </>
+                            </tbody>
+
+                          </Table>}
+                      </Offline>
                     </div>
                   </div>
 

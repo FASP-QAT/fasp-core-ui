@@ -913,7 +913,9 @@
     "static.supplyplan.exipredStock":"Exipred Stock",
     "static.report.expiredInventory": "Expired Inventory",
     "static.report.StockStatusAccrossPlanningUnitGlobalView": "Stock Status Accross PlanningUnit Global View",
-    "static.report.updatestatus":"Update Program Status"
+    "static.report.updatestatus":"Update Program Status",
+    "static.report.forecasted":"Forecasted",
+    "static.report.actual":"Actual"
 }
     
 
