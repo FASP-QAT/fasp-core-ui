@@ -249,7 +249,7 @@
 //                     }
 
 //                 }
-                
+
 //                 this.setState({
 //                     procurementAgents: proList
 //                 })
@@ -935,7 +935,7 @@
 
 //     addCommas(cell, row) {
 //         // console.log("row---------->", row);
-        
+
 //         cell += '';
 //         var x = cell.split('.');
 //         var x1 = x[0];
@@ -1131,7 +1131,7 @@
 //                                 <FormGroup className="col-md-3">
 //                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
 //                                     <div className="controls  Regioncalender">
-                                       
+
 //                                             <Picker
 //                                                 ref="pickRange"
 //                                                 years={{ min: 2013 }}
@@ -1144,7 +1144,7 @@
 //                                                 <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
 //                                             </Picker>
 
-                                     
+
 //                                     </div>
 //                                 </FormGroup>
 
@@ -1237,7 +1237,7 @@
 //                                         </InputGroup>
 //                                     </div>
 //                                 </FormGroup>
-                                
+
 //                                 <FormGroup className="col-md-3">
 //                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
 //                                     <div className="controls ">
@@ -1340,6 +1340,7 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
+import FundingSourceService from '../../api/FundingSourceService';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1357,6 +1358,8 @@ class ProcurementAgentExport extends Component {
             selRegion: [],
             realmCountryList: [],
             procurementAgents: [],
+            fundingSources: [],
+            viewby: '',
             programs: [],
             versions: [],
             planningUnits: [],
@@ -1560,7 +1563,7 @@ class ProcurementAgentExport extends Component {
                     }
 
                 }
-                
+
                 this.setState({
                     procurementAgents: proList
                 })
@@ -1785,9 +1788,16 @@ class ProcurementAgentExport extends Component {
 
     exportCSV(columns) {
 
+        let viewby = document.getElementById("viewById").value;
+
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-        csvRow.push(i18n.t('static.procurementagent.procurementagent') + ' , ' + (document.getElementById("procurementAgentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        if (viewby == 1) {
+            csvRow.push(i18n.t('static.procurementagent.procurementagent') + ' , ' + (document.getElementById("procurementAgentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        } else if (viewby == 2) {
+            csvRow.push(i18n.t('static.budget.fundingsource') + ' , ' + (document.getElementById("fundingSourceId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        }
+
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         this.state.planningUnitLabels.map(ele =>
@@ -1805,7 +1815,14 @@ class ProcurementAgentExport extends Component {
 
         var A = [headers]
         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
-        this.state.data.map(ele => A.push([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]));
+        if (viewby == 1) {
+            this.state.data.map(ele => A.push([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]));
+        } else if (viewby == 2) {
+            this.state.data.map(ele => A.push([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]));
+        } else {
+            this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]));
+        }
+
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
         for (var i = 0; i < A.length; i++) {
             console.log(A[i])
@@ -1818,7 +1835,7 @@ class ProcurementAgentExport extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.procurementAgent') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+        a.download = i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1847,6 +1864,7 @@ class ProcurementAgentExport extends Component {
         const addHeaders = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
+            var viewby = document.getElementById("viewById").value;
 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
@@ -1854,7 +1872,7 @@ class ProcurementAgentExport extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.procurementAgent'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1863,9 +1881,17 @@ class ProcurementAgentExport extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.procurementagent.procurementagent') + ' : ' + document.getElementById("procurementAgentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                        align: 'left'
-                    })
+
+                    if (viewby == 1) {
+                        doc.text(i18n.t('static.procurementagent.procurementagent') + ' : ' + document.getElementById("procurementAgentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                            align: 'left'
+                        })
+                    } else if (viewby == 2) {
+                        doc.text(i18n.t('static.budget.fundingsource') + ' : ' + document.getElementById("fundingSourceId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                            align: 'left'
+                        })
+                    }
+
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
@@ -1895,11 +1921,20 @@ class ProcurementAgentExport extends Component {
 
         doc.setFontSize(8);
 
+        var viewby = document.getElementById("viewById").value;
 
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
+        let data = [];
+        if (viewby == 1) {
+            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]);
+        } else if (viewby == 2) {
+            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]);
+        } else {
+            data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]);
+        }
+
         let content = {
             margin: { top: 40 },
             startY: 220,
@@ -1916,7 +1951,7 @@ class ProcurementAgentExport extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.report.procurementAgent') + ".pdf")
+        doc.save(i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text + ".pdf")
     }
 
 
@@ -1925,201 +1960,702 @@ class ProcurementAgentExport extends Component {
         console.log("-------------------IN FETCHDATA-----------------------------");
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
-        let procurementAgentId = 1;
+        let viewby = document.getElementById("viewById").value;
+        let procurementAgentId = document.getElementById("procurementAgentId").value;
+        let fundingSourceId = document.getElementById("fundingSourceId").value;
         let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
 
         let planningUnitIds = this.state.planningUnitValues;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0 && isPlannedShipmentId > 0) {
-            if (versionId.includes('Local')) {
-                var db1;
-                var storeOS;
-                getDatabase();
-                var regionList = [];
-                var openRequest = indexedDB.open('fasp', 1);
-                openRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    var version = (versionId.split('(')[0]).trim()
-
-                    //for user id
-                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-                    //for program id
-                    var program = `${programId}_v${version}_uId_${userId}`
-
-                    db1 = e.target.result;
-                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                    var programDataOs = programDataTransaction.objectStore('programData');
-                    // console.log(program)
-                    var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function (event) {
+        if (viewby == 1) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0 && isPlannedShipmentId > 0) {
+                if (versionId.includes('Local')) {
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var regionList = [];
+                    var openRequest = indexedDB.open('fasp', 1);
+                    openRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
+                    openRequest.onsuccess = function (e) {
+                        var version = (versionId.split('(')[0]).trim()
+
+                        //for user id
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                        //for program id
+                        var program = `${programId}_v${version}_uId_${userId}`
+
+                        db1 = e.target.result;
+                        var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                        var programDataOs = programDataTransaction.objectStore('programData');
+                        // console.log(program)
+                        var programRequest = programDataOs.get(program);
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext')
+                            })
+                        }.bind(this);
+                        programRequest.onsuccess = function (e) {
+                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson = JSON.parse(programData);
 
 
-                        var programTransaction = db1.transaction(['program'], 'readwrite');
-                        var programOs = programTransaction.objectStore('program');
-                        var program1Request = programOs.getAll();
-                        program1Request.onsuccess = function (event) {
-                            var programResult = [];
-                            programResult = program1Request.result;
-                            let airFreight = 0;
-                            let seaFreight = 0;
-                            for (var k = 0; k < programResult.length; k++) {
-                                if (programId == programResult[k].programId) {
-                                    airFreight = programResult[k].airFreightPerc;
-                                    seaFreight = programResult[k].seaFreightPerc;
-                                }
-                            }
-
-                            var shipmentList = (programJson.shipmentList);
-
-                            const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
-
-                            let isPlannedShipment = [];
-                            if (isPlannedShipmentId == 1) {//yes
-                                isPlannedShipment = activeFilter;
-                            } else {//no
-                                isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
-                            }
-
-                            const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
-
-                            const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-
-                            let data = [];
-                            let planningUnitFilter = [];
-                            for (let i = 0; i < planningUnitIds.length; i++) {
-                                for (let j = 0; j < dateFilter.length; j++) {
-                                    if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
-                                        planningUnitFilter.push(dateFilter[j]);
+                            var programTransaction = db1.transaction(['program'], 'readwrite');
+                            var programOs = programTransaction.objectStore('program');
+                            var program1Request = programOs.getAll();
+                            program1Request.onsuccess = function (event) {
+                                var programResult = [];
+                                programResult = program1Request.result;
+                                let airFreight = 0;
+                                let seaFreight = 0;
+                                for (var k = 0; k < programResult.length; k++) {
+                                    if (programId == programResult[k].programId) {
+                                        airFreight = programResult[k].airFreightPerc;
+                                        seaFreight = programResult[k].seaFreightPerc;
                                     }
                                 }
-                            }
 
-                            console.log("offline data----", planningUnitFilter);
-                            for (let j = 0; j < planningUnitFilter.length; j++) {
-                                let freight = 0;
-                                if (planningUnitFilter[j].shipmentMode === "Air") {
-                                    freight = airFreight;
-                                } else {
-                                    freight = seaFreight;
-                                }
-                                let json = {
-                                    "active": true,
-                                    "shipmentId": planningUnitFilter[j].shipmentId,
-                                    "procurementAgent": planningUnitFilter[j].procurementAgent,
-                                    "fundingSource": planningUnitFilter[j].fundingSource,
-                                    "planningUnit": planningUnitFilter[j].planningUnit,
-                                    "qty": planningUnitFilter[j].shipmentQty,
-                                    "productCost": planningUnitFilter[j].productCost,
-                                    "freightPerc": parseFloat(freight),
-                                    "freightCost": planningUnitFilter[j].freightCost,
-                                    "totalCost": planningUnitFilter[j].productCost + planningUnitFilter[j].freightCost,
-                                }
-                                data.push(json);
-                            }
+                                var shipmentList = (programJson.shipmentList);
+                                console.log("shipmentList----*********----", shipmentList);
 
-                            this.setState({
-                                data: data
-                                , message: ''
-                            })
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+
+                                let isPlannedShipment = [];
+                                if (isPlannedShipmentId == 1) {//yes
+                                    isPlannedShipment = activeFilter;
+                                } else {//no
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                                }
+
+                                const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
+
+                                const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+                                let data = [];
+                                let planningUnitFilter = [];
+                                for (let i = 0; i < planningUnitIds.length; i++) {
+                                    for (let j = 0; j < dateFilter.length; j++) {
+                                        if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+                                            planningUnitFilter.push(dateFilter[j]);
+                                        }
+                                    }
+                                }
+
+                                console.log("offline data----", planningUnitFilter);
+                                for (let j = 0; j < planningUnitFilter.length; j++) {
+                                    let freight = 0;
+                                    if (planningUnitFilter[j].shipmentMode === "Air") {
+                                        freight = airFreight;
+                                    } else {
+                                        freight = seaFreight;
+                                    }
+                                    let json = {
+                                        "active": true,
+                                        "shipmentId": planningUnitFilter[j].shipmentId,
+                                        "procurementAgent": planningUnitFilter[j].procurementAgent,
+                                        "fundingSource": planningUnitFilter[j].fundingSource,
+                                        "planningUnit": planningUnitFilter[j].planningUnit,
+                                        "qty": planningUnitFilter[j].shipmentQty,
+                                        "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                        "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                        "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                        "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+                                    }
+                                    data.push(json);
+                                }
+
+                                this.setState({
+                                    data: data
+                                    , message: ''
+                                })
+                            }.bind(this)
                         }.bind(this)
                     }.bind(this)
-                }.bind(this)
-            } else {
-                this.setState({
-                    message: ''
-                })
-                let includePlannedShipments = true;
-                if(isPlannedShipmentId == 1){
-                    includePlannedShipments = true;
-                }else{
-                    includePlannedShipments = false;
-                }
-                var inputjson = {
-                    procurementAgentId: procurementAgentId,
-                    programId: programId,
-                    versionId: versionId,
-                    startDate: new moment(startDate),
-                    stopDate: new moment(endDate),
-                    planningUnitIds: planningUnitIds,
-                    includePlannedShipments: includePlannedShipments,
-                }
-                AuthenticationService.setupAxiosInterceptors();
-                ReportService.procurementAgentExporttList(inputjson)
-                    .then(response => {
-                        console.log("Online Data------",response.data);
-                        this.setState({
-                            data: response.data
-                        }, () => {
-                            this.consolidatedProgramList();
-                            this.consolidatedProcurementAgentList();
-                        })
-                    }).catch(
-                        error => {
+                } else {
+                    this.setState({
+                        message: ''
+                    })
+                    let includePlannedShipments = true;
+                    if (isPlannedShipmentId == 1) {
+                        includePlannedShipments = true;
+                    } else {
+                        includePlannedShipments = false;
+                    }
+                    var inputjson = {
+                        procurementAgentId: procurementAgentId,
+                        programId: programId,
+                        versionId: versionId,
+                        startDate: new moment(startDate),
+                        stopDate: new moment(endDate),
+                        planningUnitIds: planningUnitIds,
+                        includePlannedShipments: includePlannedShipments,
+                    }
+                    AuthenticationService.setupAxiosInterceptors();
+                    ReportService.procurementAgentExporttList(inputjson)
+                        .then(response => {
+                            console.log("Online Data------", response.data);
                             this.setState({
-                                data: []
+                                data: response.data
                             }, () => {
                                 this.consolidatedProgramList();
                                 this.consolidatedProcurementAgentList();
                             })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    data: []
+                                }, () => {
+                                    this.consolidatedProgramList();
+                                    this.consolidatedProcurementAgentList();
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
 
 
+                }
+            } else if (programId == 0) {
+                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+            } else if (versionId == -1) {
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+            } else if (planningUnitIds.length == 0) {
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+            } else if (isPlannedShipmentId == 0) {
+                this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
+            } else if (procurementAgentId == 0) {
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
             }
-        } else if (procurementAgentId == 0) {
-            this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
+        } else if (viewby == 2) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0 && isPlannedShipmentId > 0) {
+                if (versionId.includes('Local')) {
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var regionList = [];
+                    var openRequest = indexedDB.open('fasp', 1);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        var version = (versionId.split('(')[0]).trim()
 
-        } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+                        //for user id
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-        } else if (versionId == -1) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+                        //for program id
+                        var program = `${programId}_v${version}_uId_${userId}`
 
-        } else if (planningUnitIds.length == 0) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+                        db1 = e.target.result;
+                        var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                        var programDataOs = programDataTransaction.objectStore('programData');
+                        // console.log(program)
+                        var programRequest = programDataOs.get(program);
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext')
+                            })
+                        }.bind(this);
+                        programRequest.onsuccess = function (e) {
+                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson = JSON.parse(programData);
 
-        } else if (isPlannedShipmentId == 0) {
-            this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
+
+                            var programTransaction = db1.transaction(['program'], 'readwrite');
+                            var programOs = programTransaction.objectStore('program');
+                            var program1Request = programOs.getAll();
+                            program1Request.onsuccess = function (event) {
+                                var programResult = [];
+                                programResult = program1Request.result;
+                                let airFreight = 0;
+                                let seaFreight = 0;
+                                for (var k = 0; k < programResult.length; k++) {
+                                    if (programId == programResult[k].programId) {
+                                        airFreight = programResult[k].airFreightPerc;
+                                        seaFreight = programResult[k].seaFreightPerc;
+                                    }
+                                }
+
+                                var shipmentList = (programJson.shipmentList);
+
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+
+                                let isPlannedShipment = [];
+                                if (isPlannedShipmentId == 1) {//yes
+                                    isPlannedShipment = activeFilter;
+                                } else {//no
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                                }
+
+                                const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
+
+                                const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+                                console.log("DB LIST---", dateFilter);
+                                console.log("SELECTED LIST---", planningUnitIds);
+
+                                let data = [];
+                                let planningUnitFilter = [];
+                                for (let i = 0; i < planningUnitIds.length; i++) {
+                                    for (let j = 0; j < dateFilter.length; j++) {
+                                        if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+                                            planningUnitFilter.push(dateFilter[j]);
+                                        }
+                                    }
+                                }
+
+                                console.log("offline data----", planningUnitFilter);
+                                for (let j = 0; j < planningUnitFilter.length; j++) {
+                                    let freight = 0;
+                                    if (planningUnitFilter[j].shipmentMode === "Air") {
+                                        freight = airFreight;
+                                    } else {
+                                        freight = seaFreight;
+                                    }
+                                    let json = {
+                                        "active": true,
+                                        "shipmentId": planningUnitFilter[j].shipmentId,
+                                        "fundingSource": planningUnitFilter[j].fundingSource,
+                                        "planningUnit": planningUnitFilter[j].planningUnit,
+                                        "qty": planningUnitFilter[j].shipmentQty,
+                                        "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                        "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                        "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                        "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+                                    }
+                                    data.push(json);
+                                }
+                                console.log("end offline data----", data);
+                                this.setState({
+                                    data: data
+                                    , message: ''
+                                })
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                } else {
+                    this.setState({
+                        message: ''
+                    })
+                    let includePlannedShipments = true;
+                    if (isPlannedShipmentId == 1) {
+                        includePlannedShipments = true;
+                    } else {
+                        includePlannedShipments = false;
+                    }
+                    var inputjson = {
+                        fundingSourceId: fundingSourceId,
+                        programId: programId,
+                        versionId: versionId,
+                        startDate: new moment(startDate),
+                        stopDate: new moment(endDate),
+                        planningUnitIds: planningUnitIds,
+                        includePlannedShipments: includePlannedShipments,
+                    }
+                    AuthenticationService.setupAxiosInterceptors();
+                    ReportService.fundingSourceExportList(inputjson)
+                        .then(response => {
+                            // console.log(JSON.stringify(response.data))
+                            this.setState({
+                                data: response.data
+                            }, () => {
+                                this.consolidatedProgramList();
+                                this.consolidatedFundingSourceList();
+                            })
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    data: []
+                                }, () => {
+                                    this.consolidatedProgramList();
+                                    this.consolidatedFundingSourceList();
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
+                }
+            } else if (programId == 0) {
+                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+            } else if (versionId == -1) {
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+            } else if (planningUnitIds.length == 0) {
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+            } else if (isPlannedShipmentId == 0) {
+                this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
+            } else if (fundingSourceId == 0) {
+                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
+            }
+        } else {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && isPlannedShipmentId > 0) {
+                if (versionId.includes('Local')) {
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var regionList = [];
+                    var openRequest = indexedDB.open('fasp', 1);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        var version = (versionId.split('(')[0]).trim()
+
+                        //for user id
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                        //for program id
+                        var program = `${programId}_v${version}_uId_${userId}`
+
+                        db1 = e.target.result;
+                        var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                        var programDataOs = programDataTransaction.objectStore('programData');
+                        // console.log(program)
+                        var programRequest = programDataOs.get(program);
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext')
+                            })
+                        }.bind(this);
+                        programRequest.onsuccess = function (e) {
+                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson = JSON.parse(programData);
+
+
+                            var programTransaction = db1.transaction(['program'], 'readwrite');
+                            var programOs = programTransaction.objectStore('program');
+                            var program1Request = programOs.getAll();
+                            program1Request.onsuccess = function (event) {
+                                var programResult = [];
+                                programResult = program1Request.result;
+                                let airFreight = 0;
+                                let seaFreight = 0;
+                                for (var k = 0; k < programResult.length; k++) {
+                                    if (programId == programResult[k].programId) {
+                                        airFreight = programResult[k].airFreightPerc;
+                                        seaFreight = programResult[k].seaFreightPerc;
+                                    }
+                                }
+
+                                var shipmentList = (programJson.shipmentList);
+
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+
+                                let isPlannedShipment = [];
+                                if (isPlannedShipmentId == 1) {//yes
+                                    isPlannedShipment = activeFilter;
+                                } else {//no
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                                }
+
+                                const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+                                let data = [];
+                                let planningUnitFilter = [];
+                                for (let i = 0; i < planningUnitIds.length; i++) {
+                                    for (let j = 0; j < dateFilter.length; j++) {
+                                        if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+                                            planningUnitFilter.push(dateFilter[j]);
+                                        }
+                                    }
+                                }
+
+                                console.log("offline data----", planningUnitFilter);
+                                for (let j = 0; j < planningUnitFilter.length; j++) {
+                                    let freight = 0;
+                                    if (planningUnitFilter[j].shipmentMode === "Air") {
+                                        freight = airFreight;
+                                    } else {
+                                        freight = seaFreight;
+                                    }
+                                    let json = {
+                                        "active": true,
+                                        "shipmentId": planningUnitFilter[j].shipmentId,
+                                        "planningUnit": planningUnitFilter[j].planningUnit,
+                                        "qty": planningUnitFilter[j].shipmentQty,
+                                        "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                        "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                        "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                        "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+                                    }
+                                    data.push(json);
+                                }
+
+                                this.setState({
+                                    data: data
+                                    , message: ''
+                                })
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                } else {
+                    this.setState({
+                        message: ''
+                    })
+                    let includePlannedShipments = true;
+                    if (isPlannedShipmentId == 1) {
+                        includePlannedShipments = true;
+                    } else {
+                        includePlannedShipments = false;
+                    }
+                    var inputjson = {
+                        programId: programId,
+                        versionId: versionId,
+                        startDate: new moment(startDate),
+                        stopDate: new moment(endDate),
+                        planningUnitIds: planningUnitIds,
+                        includePlannedShipments: includePlannedShipments,
+                    }
+                    AuthenticationService.setupAxiosInterceptors();
+                    ReportService.AggregateShipmentByProduct(inputjson)
+                        .then(response => {
+                            console.log("Online Data------", response.data);
+                            this.setState({
+                                data: response.data
+                            }, () => {
+                                this.consolidatedProgramList();
+                            })
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    data: []
+                                }, () => {
+                                    this.consolidatedProgramList();
+                                    this.consolidatedProcurementAgentList();
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
+                }
+            } else if (programId == 0) {
+                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+            } else if (versionId == -1) {
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+            } else if (planningUnitIds.length == 0) {
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+            } else if (isPlannedShipmentId == 0) {
+                this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
+            }
+        }
+
+    }
+
+    toggleView = () => {
+        let viewby = document.getElementById("viewById").value;
+        this.setState({
+            viewby: viewby
+        });
+        if (viewby == 1) {
+            document.getElementById("fundingSourceDiv").style.display = "none";
+            document.getElementById("procurementAgentDiv").style.display = "block";
+            this.setState({
+                data: []
+            }, () => {
+                this.fetchData();
+                // this.consolidatedProgramList();
+                // this.consolidatedProcurementAgentList();
+            })
+
+
+        } else if (viewby == 2) {
+            document.getElementById("procurementAgentDiv").style.display = "none";
+            document.getElementById("fundingSourceDiv").style.display = "block";
+            this.setState({
+                data: []
+            }, () => {
+                this.fetchData();
+                // this.consolidatedProgramList();
+                // this.consolidatedProcurementAgentList();
+            })
+
+
+        } else {
+            document.getElementById("procurementAgentDiv").style.display = "none";
+            document.getElementById("fundingSourceDiv").style.display = "none";
+            this.setState({
+                data: []
+            }, () => {
+                // this.consolidatedProgramList();
+                // this.consolidatedProcurementAgentList();
+                this.fetchData();
+            })
+
+
+
         }
     }
 
     componentDidMount() {
         this.getProcurementAgent();
+        this.getFundingSource();
         this.getPrograms();
+        document.getElementById("fundingSourceDiv").style.display = "none";
+        let viewby = document.getElementById("viewById").value;
+        this.setState({
+            viewby: viewby
+        });
 
     }
+
+    getFundingSource = () => {
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors();
+            FundingSourceService.getFundingSourceListAll()
+                .then(response => {
+                    // console.log(JSON.stringify(response.data))
+                    this.setState({
+                        fundingSources: response.data
+                    }, () => { this.consolidatedFundingSourceList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            fundingSources: []
+                        }, () => { this.consolidatedFundingSourceList() })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log('offline')
+            this.consolidatedFundingSourceList()
+        }
+
+    }
+
+    consolidatedFundingSourceList = () => {
+        const lan = 'en';
+        const { fundingSources } = this.state
+        var proList = fundingSources;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['fundingSource'], 'readwrite');
+            var fundingSource = transaction.objectStore('fundingSource');
+            var getRequest = fundingSource.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+
+                    var f = 0
+                    for (var k = 0; k < this.state.fundingSources.length; k++) {
+                        if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+                            f = 1;
+                            console.log('already exist')
+                        }
+                    }
+                    var programData = myResult[i];
+                    if (f == 0) {
+                        proList.push(programData)
+                    }
+
+                }
+
+                this.setState({
+                    fundingSources: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+    }
+
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -2127,18 +2663,18 @@ class ProcurementAgentExport extends Component {
 
     addCommas(cell, row) {
         // console.log("row---------->", row);
-        
+
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
         var x2 = x.length > 1 ? '.' + x[1] : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         // return "(" + currencyCode + ")" + "  " + x1 + x2;
         return x1 + x2;
-      }
+    }
 
     render() {
 
@@ -2150,6 +2686,8 @@ class ProcurementAgentExport extends Component {
         );
 
         const { procurementAgents } = this.state;
+
+        const { fundingSources } = this.state;
 
         const { programs } = this.state;
 
@@ -2173,8 +2711,12 @@ class ProcurementAgentExport extends Component {
         const { rangeValue } = this.state
 
 
-        const columns = [
-            {
+        let viewby = this.state.viewby;
+        // console.log("RENDER VIEWBY-------", viewby);
+        let obj1 = {}
+        let obj2 = {}
+        if (viewby == 1) {
+            obj1 = {
                 dataField: 'procurementAgent.label',
                 text: 'Procurement Agent',
                 sort: true,
@@ -2183,16 +2725,54 @@ class ProcurementAgentExport extends Component {
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 },
-                style: { width: '100px' },
-            },
-            {
+                style: { width: '70px' },
+            }
+
+            obj2 = {
                 dataField: 'procurementAgent.code',
                 text: 'Procurement Agent Code',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '70px' },
+            }
+
+        } else if (viewby == 2) {
+            obj1 = {
+                dataField: 'fundingSource.label',
+                text: i18n.t('static.budget.fundingsource'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                },
                 style: { width: '100px' },
-            },
+            }
+
+            obj2 = {
+                dataField: 'fundingSource.code',
+                text: i18n.t('static.fundingsource.fundingsourceCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '100px' },
+            }
+        } else {
+            obj1 = {
+                hidden: true
+            }
+
+            obj2 = {
+                hidden: true
+
+            }
+        }
+
+
+        const columns = [
+            obj1,
+            obj2,
             {
                 dataField: 'planningUnit.label',
                 text: i18n.t('static.dashboard.product'),
@@ -2202,7 +2782,7 @@ class ProcurementAgentExport extends Component {
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 },
-                style: { width: '200px' },
+                style: { width: '400px' },
             },
             {
                 dataField: 'qty',
@@ -2323,49 +2903,22 @@ class ProcurementAgentExport extends Component {
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
                                     <div className="controls  Regioncalender">
-                                       
-                                            <Picker
-                                                ref="pickRange"
-                                                years={{ min: 2013 }}
-                                                value={rangeValue}
-                                                lang={pickerLang}
-                                                //theme="light"
-                                                onChange={this.handleRangeChange}
-                                                onDismiss={this.handleRangeDissmis}
-                                            >
-                                                <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                            </Picker>
 
-                                     
+                                        <Picker
+                                            ref="pickRange"
+                                            years={{ min: 2013 }}
+                                            value={rangeValue}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+
+
                                     </div>
                                 </FormGroup>
-
-                                {/* <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                    <div className="controls ">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="procurementAgentId"
-                                                id="procurementAgentId"
-                                                bsSize="sm"
-                                                onChange={this.fetchData}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {procurementAgents.length > 0
-                                                    && procurementAgents.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.procurementAgentId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-
-                                            </Input>
-
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup> */}
 
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -2429,7 +2982,7 @@ class ProcurementAgentExport extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                
+
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
@@ -2456,20 +3009,77 @@ class ProcurementAgentExport extends Component {
                                         <InputGroup>
                                             <Input
                                                 type="select"
-                                                name="isPlannedShipmentId"
-                                                id="isPlannedShipmentId"
+                                                name="viewById"
+                                                id="viewById"
                                                 bsSize="sm"
-                                                // onChange={this.fetchData}
+                                                onChange={this.toggleView}
                                             >
-                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                {/* <option value="-1">{i18n.t('static.common.select')}</option> */}
                                                 <option value="1">Procurement Agent</option>
                                                 <option value="2">Funding Source</option>
-                                                <option value="3">Aggregate Shipment by Product</option>
+                                                <option value="3">Product</option>
                                             </Input>
 
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+
+                                <FormGroup className="col-md-3" id="procurementAgentDiv">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="procurementAgentId"
+                                                id="procurementAgentId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {procurementAgents.length > 0
+                                                    && procurementAgents.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.procurementAgentId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="fundingSourceId"
+                                                id="fundingSourceId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {fundingSources.length > 0
+                                                    && fundingSources.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.fundingSourceId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
+
+
                             </div>
                         </Col>
 
