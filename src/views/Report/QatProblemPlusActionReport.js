@@ -89,7 +89,7 @@ export default class ConsumptionDetails extends React.Component {
                 data[0] = 'Unplanned Order';
                 data[1] = 'HIV/AIDS - Malavi';
                 data[2] = 'Abacvair 20 mg/ml Solution';
-                data[3] = '30-03-2020';
+                data[3] = 'Mar-30-20';
                 data[4] = '60';
                 data[5] = 'High';
                 data[6] = 'Button. Which will be clickable and redirect on respective page';

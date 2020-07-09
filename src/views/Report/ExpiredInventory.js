@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY } from '../../Constants.js';
+import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png'
 import {
@@ -607,6 +607,12 @@ export default class ExpiredInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.expDate ? moment(row.expDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
                 // formatter: (cell, row) => {
                 //     var decimalFixedValue = cell.toFixed(2);
                 //     decimalFixedValue += '';

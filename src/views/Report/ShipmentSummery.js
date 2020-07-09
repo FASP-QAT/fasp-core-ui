@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
