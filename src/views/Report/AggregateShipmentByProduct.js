@@ -899,9 +899,10 @@ class AggregateShipmentByProduct extends Component {
                     planningUnitIds: planningUnitIds
                 }
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.stockAdjustmentList(inputjson)
+
+                ReportService.AggregateShipmentByProduct(inputjson)
                     .then(response => {
-                        console.log(JSON.stringify(response.data))
+                        console.log("RESP------",response.data)
                         this.setState({
                             data: response.data
                         }, () => { this.consolidatedProgramList() })

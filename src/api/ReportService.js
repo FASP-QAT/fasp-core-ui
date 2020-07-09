@@ -69,6 +69,14 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/fundingSourceShipmentReport`,json,{}
         );
     }
+    AggregateShipmentByProduct(json){
+        return axios.post(`${API_URL}/api/report/aggregateShipmentByProduct`,json,{}
+        );
+    }
+    wareHouseCapacityExporttList(json){
+        return axios.post(`${API_URL}/api/report/warehouseCapacityReport`,json,{}
+        );
+    }
 
 }
 export default new ReportService();
