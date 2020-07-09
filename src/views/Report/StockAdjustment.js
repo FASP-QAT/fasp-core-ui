@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -391,7 +391,7 @@ class StockAdjustmentComponent extends Component {
 
 
         var A = [headers]
-        this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]));
         for (var i = 0; i < A.length; i++) {
             console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -476,7 +476,7 @@ class StockAdjustmentComponent extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let content = {
             margin: { top: 40 },
             startY: 200,
@@ -743,7 +743,7 @@ class StockAdjustmentComponent extends Component {
                 headerAlign: 'center',
                 style: { width: '80px' },
                 formatter: (cell, row) => {
-                    return new moment(cell).format('MMM-DD-YYYY');
+                    return new moment(cell).format(`${DATE_FORMAT_CAP}`);
                 }
             },
             {

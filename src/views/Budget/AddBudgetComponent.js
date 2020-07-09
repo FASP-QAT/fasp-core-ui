@@ -15,6 +15,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
+import { DATE_FORMAT_SM,DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -636,10 +637,12 @@ class AddBudgetComponent extends Component {
                                                             minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
-                                                            placeholderText="mm-dd-yyy"
+                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                            // placeholderText="mm-dd-yyy"
                                                             className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
+                                                            dateFormat={DATE_FORMAT_SM}
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
@@ -652,10 +655,11 @@ class AddBudgetComponent extends Component {
                                                             minDate={this.state.budget.startDate}
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                            placeholderText="mm-dd-yyy"
+                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
                                                             className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
+                                                            dateFormat={DATE_FORMAT_SM}
                                                         />
                                                     </FormGroup>
                                                 </CardBody>
@@ -690,13 +694,15 @@ class AddBudgetComponent extends Component {
         let { budget } = this.state;
 
         budget.label.label_en = ''
-        budget.program.programId = ''
+        // budget.program.programId = ''
+        budget.program.id= ''
         budget.fundingSource.fundingSourceId = ''
         budget.budgetAmt = ''
         budget.startDate = ''
         budget.stopDate = ''
         budget.currency.currencyId = ''
         budget.budgetCode = ''
+        budget.currency.conversionRateToUsd = ''
 
 
             this.setState({

@@ -222,6 +222,7 @@ const WarehouseCapacity = React.lazy(() => import('./views/Report/WarehouseCapac
 const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('./views/Report/StockStatusAccrossPlanningUnitGlobalView'));
 const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
+const ExpiredInventory= React.lazy(() => import('./views/Report/ExpiredInventory'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -535,5 +536,7 @@ const routes = [
   { path: '/report/warehouseCapacity', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
   { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
   { path: '/report/stockAdjustment', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
+  // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+  { path: '/report/expiredInventory',name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
 ];
 export default routes;

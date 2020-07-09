@@ -86,10 +86,10 @@ export default class ConsumptionDetails extends React.Component {
 
 
                 data = [];
-                data[0] = 'abc';
-                data[1] = 'a';
-                data[2] = '';
-                data[3] = '30-03-2020';
+                data[0] = 'Unplanned Order';
+                data[1] = 'HIV/AIDS - Malavi';
+                data[2] = 'Abacvair 20 mg/ml Solution';
+                data[3] = 'Mar-30-20';
                 data[4] = '60';
                 data[5] = 'High';
                 data[6] = 'Button. Which will be clickable and redirect on respective page';
@@ -352,7 +352,7 @@ export default class ConsumptionDetails extends React.Component {
                 <Card>
 
                     <CardHeader>
-                        <strong>QAT PROBLEM+ACTION REPORT</strong>
+                        <strong>QAT PROBLEM PLUS ACTION REPORT</strong>
                         {
                             // this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
