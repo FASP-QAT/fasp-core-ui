@@ -259,9 +259,9 @@ class AddRoleComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
@@ -321,7 +321,7 @@ class AddRoleComponent extends Component {
                                         setFieldValue,
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
-                                                <CardBody>
+                                                <CardBody className="pt-2 pb-0">
                                                     <FormGroup>
                                                         <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
