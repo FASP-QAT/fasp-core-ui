@@ -41,7 +41,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
-import moment from "moment";
+import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import { Online, Offline } from "react-detect-offline";
@@ -189,6 +189,7 @@ class ForcastMatrixOverTime extends Component {
       dropdownOpen: false,
       radioSelected: 2,
       programs: [],
+      versions: [],
       productCategories: [],
       planningUnits: [],
       categories: [],
@@ -199,13 +200,13 @@ class ForcastMatrixOverTime extends Component {
 
 
     };
-    this.getCountrylist = this.getCountrylist.bind(this);
+
     this.fetchData = this.fetchData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
+    // this.getPlanningUnit = this.getPlanningUnit.bind(this);
+    // this.getProductCategories = this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
      this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
@@ -380,18 +381,10 @@ class ForcastMatrixOverTime extends Component {
       let realmId = AuthenticationService.getRealmId();
       ProgramService.getProgramByRealmId(realmId)
         .then(response => {
-          if (response.status == 200) {
-            console.log(JSON.stringify(response.data))
-            this.setState({
-              programs: response.data
-            }, () => { this.consolidatedProgramList() })
-          } else {
-            this.setState({ message: response.data.messageCode },
-              () => {
-                this.hideSecondComponent();
-              })
-          }
-
+          console.log(JSON.stringify(response.data))
+          this.setState({
+            programs: response.data
+          }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
             this.setState({
@@ -479,62 +472,333 @@ class ForcastMatrixOverTime extends Component {
   }
 
 
+  filterVersion = () => {
+    let programId = document.getElementById("programId").value;
+    if (programId != 0) {
+
+      const program = this.state.programs.filter(c => c.programId == programId)
+      console.log(program)
+      if (program.length == 1) {
+        if (navigator.onLine) {
+          this.setState({
+            versions: []
+          }, () => {
+            this.setState({
+              versions: program[0].versionList.filter(function (x, i, a) {
+                return a.indexOf(x) === i;
+              })
+            }, () => { this.consolidatedVersionList(programId) });
+          });
+
+
+        } else {
+          this.setState({
+            versions: []
+          }, () => { this.consolidatedVersionList(programId) })
+        }
+      } else {
+
+        this.setState({
+          versions: []
+        })
+
+      }
+    } else {
+      this.setState({
+        versions: []
+      })
+    }
+  }
+  consolidatedVersionList = (programId) => {
+    const lan = 'en';
+    const { versions } = this.state
+    var verList = versions;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId && myResult[i].programId == programId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = databytes.toString(CryptoJS.enc.Utf8)
+            var version = JSON.parse(programData).currentVersion
+
+            version.versionId = `${version.versionId} (Local)`
+            verList.push(version)
+
+          }
+
+
+        }
+
+        console.log(verList)
+        this.setState({
+          versions: verList.filter(function (x, i, a) {
+            return a.indexOf(x) === i;
+          })
+        })
+
+      }.bind(this);
+
+
+
+    }.bind(this)
+
+
+  }
+
+  getPlanningUnit = () => {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+    this.setState({
+      planningUnits: []
+    }, () => {
+      if (versionId.includes('Local')) {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+          var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+          var planningunitRequest = planningunitOs.getAll();
+          var planningList = []
+          planningunitRequest.onerror = function (event) {
+            // Handle errors!
+          };
+          planningunitRequest.onsuccess = function (e) {
+            var myResult = [];
+            myResult = planningunitRequest.result;
+            var programId = (document.getElementById("programId").value).split("_")[0];
+            var proList = []
+            console.log(myResult)
+            for (var i = 0; i < myResult.length; i++) {
+              if (myResult[i].program.id == programId) {
+
+                proList[i] = myResult[i]
+              }
+            }
+            this.setState({
+              planningUnits: proList, message: ''
+            }, () => {
+              this.fetchData();
+            })
+          }.bind(this);
+        }.bind(this)
+
+
+      }
+      else {
+        AuthenticationService.setupAxiosInterceptors();
+
+        ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          console.log('**' + JSON.stringify(response.data))
+          this.setState({
+            planningUnits: response.data, message: ''
+          }, () => {
+            this.fetchData();
+          })
+        })
+          .catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
+              }
+            }
+          );
+      }
+    });
+
+  }
+
+  componentDidMount() {
+
+    this.getPrograms();
+
+
+  }
 
 
   fetchData() {
-    let countryId = 2;//document.getElementById("countryId").value;
-    let productCategoryId = document.getElementById("productCategoryId").value;
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01';
     let stopDate = this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
-    var input = { "realmCountryId": countryId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate }
-    if (countryId > 0 && planningUnitId > 0) {
-      AuthenticationService.setupAxiosInterceptors();
-      ReportService.getForecastMatricsOverTime(input)
-        .then(response => {
-          if (response.status == 200) {
+    var input = { "realmCountryId": programId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate }
+    if (programId > 0 && planningUnitId > 0 && versionId != 0) {
+      if (versionId.includes('Local')) {
+        let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+        let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var version = (versionId.split('(')[0]).trim()
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          var program = `${programId}_v${version}_uId_${userId}`
+          var data = [];
+          var programRequest = programTransaction.get(program);
+
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            console.log('programJson',programJson)
+            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+            var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+            var monthstartfrom = this.state.rangeValue.from.month
+            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+              var monthlydata = [];
+              for (var month = monthstartfrom; month <= 12; month++) {
+                var year = from;
+                var actualconsumption = 0;
+                var forcastConsumption = 0;
+               var montcnt = 0
+               var  absvalue = 0;
+                for (var i = month, j = 0; j < 6; i-- , j++) {
+
+                  var dt = from + "-" + String(i).padStart(2, '0') + "-01"
+                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                  var actconsumption = 0;
+                  var forConsumption = 0;
+                  for (var k = 0; k < programJson.regionList.length; k++) {
+                  var list = conlist.filter(c => c.region.id == programJson.regionList[k].regionId)
+                  console.log(list)
+                  if (list.length > 1) {
+                    for (var l = 0; l < list.length; l++) {
+                      if (list[l].actualFlag.toString() == 'true') {
+                        actconsumption = actconsumption + list[l].consumptionQty
+                      } else {
+                        forConsumption = forConsumption + list[l].consumptionQty
+                      }
+                      if(actconsumption>0&& forConsumption>0){
+                        actualconsumption = actualconsumption + actconsumption
+                        forcastConsumption = forcastConsumption + forConsumption
+                        absvalue = absvalue + (Math.abs(actconsumption - forConsumption))
+                        }
+                     
+                    }
+                  } else {
+                    montcnt++
+                  }}
+                 
+                  if (i == 0) {
+                    i = 12;
+                    year = year - 1
+                  }
+                }
+                console.log('absvalue',absvalue,' actualconsumption',actualconsumption)
+                var json = {
+                  consumptionDateString: moment(new Date(from, month - 1)).format('MMM YY'),
+                  actualConsumption: actualconsumption,
+                  forecastedConsumption: forcastConsumption,
+                  forecastError: absvalue / actualconsumption
+
+                }
+                data.push(json)
+
+                if (month == this.state.rangeValue.to.month && from == to) {
+                  this.setState({
+                    matricsList: data,
+                    message: ''
+                  })
+
+                  return;
+                }
+              }
+              monthstartfrom = 1
+
+            }
+           
+          }.bind(this)
+        }.bind(this)
+      } else {
+
+
+        AuthenticationService.setupAxiosInterceptors();
+        ReportService.getForecastMatricsOverTime(input)
+          .then(response => {
             console.log(JSON.stringify(response.data));
             this.setState({
               matricsList: response.data,
               message: ''
             })
-          } else {
-            this.setState({ message: response.data.messageCode },
-              () => {
-                this.hideSecondComponent();
+          }).catch(
+            error => {
+              this.setState({
+                matricsList: []
               })
-          }
-        }).catch(
-          error => {
-            this.setState({
-              matricsList: []
-            })
 
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
               }
             }
-          }
-        );
+          );
+      }
     }
-    else if (countryId == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext') });
+    else if (programId == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram') });
 
-    } else if (productCategoryId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory') });
+    } else if (versionId == 0) {
+      this.setState({ message: i18n.t('static.program.validversion') });
 
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText') });
@@ -547,143 +811,6 @@ class ForcastMatrixOverTime extends Component {
   }
 
 
-  getPlanningUnit() {
-
-    AuthenticationService.setupAxiosInterceptors();
-    let productCategoryId = document.getElementById("productCategoryId").value;
-    PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-
-      if (response.status == 200) {
-        console.log('**' + JSON.stringify(response.data))
-        this.setState({
-          planningUnits: response.data,
-        })
-      }
-      else {
-        this.setState({ message: response.data.messageCode },
-          () => {
-            this.hideSecondComponent();
-          })
-      }
-
-    })
-      .catch(
-        error => {
-          this.setState({
-            planningUnits: [],
-          })
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
-    this.fetchData();
-  }
-  getProductCategories() {
-    AuthenticationService.setupAxiosInterceptors();
-    let realmId = AuthenticationService.getRealmId();
-    ProductService.getProductCategoryList(realmId)
-      .then(response => {
-        if (response.status == 200) {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          })
-        }
-        else {
-          this.setState({ message: response.data.messageCode },
-            () => {
-              this.hideSecondComponent();
-            })
-        }
-      }).catch(
-        error => {
-          this.setState({
-            productCategories: []
-          })
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
-
-  }
-
-  getCountrylist() {
-
-    AuthenticationService.setupAxiosInterceptors();
-    let realmId = AuthenticationService.getRealmId();
-    RealmCountryService.getRealmCountryrealmIdById(realmId)
-      .then(response => {
-
-        if (response.status == 200) {
-          this.setState({
-            countries: response.data
-          })
-        }
-        else {
-          this.setState({ message: response.data.messageCode },
-            () => {
-              this.hideSecondComponent();
-            })
-        }
-      }).catch(
-        error => {
-          this.setState({
-            countrys: []
-          })
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
-
-  }
-  componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
-    this.getPrograms()
-    this.getCountrylist();
-    this.getProductCategories()
-  }
 
   toggle() {
     this.setState({
@@ -723,34 +850,29 @@ class ForcastMatrixOverTime extends Component {
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnitId}>
+          <option key={i} value={item.planningUnit.id}>
+            {getLabelText(item.planningUnit.label, this.state.lang)}
+          </option>
+        )
+      }, this);
+    const { programs } = this.state;
+    let programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+          <option key={i} value={item.programId}>
             {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
-    const { programs } = this.state
-    const { countries } = this.state;
-    // console.log(JSON.stringify(countrys))
-    let countryList = countries.length > 0 && countries.map((item, i) => {
-      console.log(JSON.stringify(item))
-      return (
-        <option key={i} value={item.realmCountryId}>
-          {getLabelText(item.country.label, this.state.lang)}
-        </option>
-
-      )
-    }, this);
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
+    const { versions } = this.state;
+    let versionList = versions.length > 0
+      && versions.map((item, i) => {
         return (
-          <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-            {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+          <option key={i} value={item.versionId}>
+            {item.versionId}
           </option>
         )
       }, this);
-
-
 
     const bar = {
 
@@ -837,8 +959,8 @@ class ForcastMatrixOverTime extends Component {
                               <InputGroup>
                                 <Input
                                   type="select"
-                                  name="countryId"
-                                  id="countryId"
+                                  name="programId"
+                                  id="programId"
                                   bsSize="sm"
                                   onChange={this.filterVersion}
                                 >
@@ -876,25 +998,43 @@ class ForcastMatrixOverTime extends Component {
 
                                 </InputGroup>
                               </div>
+                            </FormGroup>
+                            <FormGroup className="col-md-3"> 
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                        <div className="controls ">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="productCategoryId"
+                                                    id="productCategoryId"
+                                                    bsSize="sm"
+                                                    onChange={this.getPlanningUnit}
+                                                >
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {productCategoryList}
+                                                </Input>
+
+                                            </InputGroup>
+                                        </div>
+
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                            <div className="controls ">
+                            <Label htmlFor="appendedInputButton">Version</Label>
+                            <div className="controls">
                               <InputGroup>
                                 <Input
                                   type="select"
-                                  name="productCategoryId"
-                                  id="productCategoryId"
+                                  name="versionId"
+                                  id="versionId"
                                   bsSize="sm"
-                                  onChange={this.getPlanningUnit}
+                                  onChange={(e) => { this.getPlanningUnit(); }}
                                 >
-                                  <option value="0">{i18n.t('static.common.select')}</option>
-                                  {productCategoryList}
+                                  <option value="-1">{i18n.t('static.common.select')}</option>
+                                  {versionList}
                                 </Input>
 
                               </InputGroup>
                             </div>
-
                           </FormGroup>
                           <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>

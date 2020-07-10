@@ -58,7 +58,7 @@ class ReportService {
         );
     }
     stockAdjustmentList(json){
-        return axios.post(`${API_URL}/api/report/stockAdjustmentList`,json,{}
+        return axios.post(`${API_URL}/api/report/stockAdjustmentReport`,json,{}
         );
     }
     procurementAgentExporttList(json){
