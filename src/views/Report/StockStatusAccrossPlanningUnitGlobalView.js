@@ -1785,7 +1785,7 @@ class GlobalConsumption extends Component {
                             onChange={this.filterData}
                           >
                             <option value="-1">{i18n.t('static.common.select')}</option>
-                            <option value="1" selected>7 Selected</option>
+                            <option value="1" selected>7 selected</option>
                             {/* {productCategories.length > 0
                               && productCategories.map((item, i) => {
                                 return (
@@ -1832,66 +1832,66 @@ class GlobalConsumption extends Component {
 
                             <tr>
                               <td>CC 1: HIV / AIDS Pharmaceuticals</td>
-                              <td style={{backgroundColor:'#f5771a'}}>low</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td style={{backgroundColor: '#f5771a'}}>low</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
                             </tr>
                             <tr>
                               <td>HIV/AIDS Pharmaceuticals</td>
-                              <td></td>
-                              <td style={{backgroundColor:'#f5771a'}}>low</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: '#f5771a'}}>low</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
                             </tr>
                             <tr>
                               <td>CC 2: Laboratory Commodities, VMMC</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td style={{backgroundColor:'#f2ff00'}}>excess</td>
-                              <td></td>
-                              <td></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: '#f2ff00'}}>excess</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
                             </tr>
                             <tr>
                               <td>HIV Rapid Test Kits (RTKs)</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td style={{backgroundColor:'#ff0000'}}>out</td>
-                              <td></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: '#ff0000'}}>out</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
                             </tr>
                             <tr>
                               <td>Laboratory Consumables</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td style={{backgroundColor:'#f5771a'}}>low</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: '#f5771a'}}>low</td>
                             </tr>
                             <tr>
                               <td>Laboratory Equipment</td>
-                              <td></td>
-                              <td></td>
-                              <td style={{backgroundColor:'#f2ff00'}}>excess</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: '#f2ff00'}}>excess</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
                             </tr>
                             <tr>
                               <td>Voluntary Male Circumcision (VMMC) Kits</td>
-                              <td></td>
-                              <td style={{backgroundColor:'#f5771a'}}>low</td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: '#f5771a'}}>low</td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
+                              <td style={{backgroundColor: "#4dbd74"}}></td>
                             </tr>
 
 

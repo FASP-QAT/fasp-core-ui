@@ -697,6 +697,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
+                            name: i18n.t('static.report.warehouseCapacity'),
+                            url: '/report/warehouseCapacity',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.dashboard.procurementAgentExport'),
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-wpforms',
@@ -746,7 +752,18 @@ class DefaultLayout extends Component {
                             url: '/report/productCatalog',
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
-                          },
+                          
+                          },{
+                            name: i18n.t('static.dashboard.costOfInventory'),
+                            url: '/report/costOfInventory',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          }, {
+                            name: i18n.t('static.dashboard.inventoryTurns'),
+                            url: '/report/inventoryTurns',
+                            icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          }
                         ]
                       }
                     ]

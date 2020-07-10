@@ -2337,9 +2337,14 @@ input::placeholder {
 
   .supplyplanTdWidth{
     overflow: hidden!important;
-    min-width: 195px!important;
+    min-width: 315px!important;
     word-wrap: break-word!important;
     border:none!important;
+  }
+
+  .supplyplanTdWidthForMonths{
+    overflow: hidden!important;
+    min-width: 56px!important;
   }
   .BorderNoneSupplyPlan{
     border:none!important;
