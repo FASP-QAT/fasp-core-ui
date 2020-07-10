@@ -1125,7 +1125,7 @@ class ProductCatalog extends Component {
         const columns = [
             {
                 dataField: 'program.label',
-                text: "Program",
+                text: i18n.t('static.program.program'),
                 sort: true,
                 align: 'left',
                 headerAlign: 'left',
@@ -1165,7 +1165,7 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'fUnit.label',
-                text: "Unit",
+                text: i18n.t('static.unit.unit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1175,7 +1175,7 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'genericName',
-                text: "Generic Name",
+                text: i18n.t('static.report.genericName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1185,14 +1185,14 @@ class ProductCatalog extends Component {
             },
             {
                 dataField: 'forecastingtoPlanningUnitMultiplier',
-                text: "Forecasting Unit To Planning Unit Multiplier",
+                text: i18n.t('static.report.forecastingtoPlanningUnitMultiplier'),
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
             },
             {
                 dataField: 'planningUnit.label',
-                text: "Planning Unit",
+                text: i18n.t('static.report.planningUnit'),
                 sort: true,
                 align: 'left',
                 headerAlign: 'left',
@@ -1210,7 +1210,7 @@ class ProductCatalog extends Component {
 
             {
                 dataField: 'pUnit.label',
-                text: "Punit",
+                text: i18n.t('static.unit.unit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1227,35 +1227,35 @@ class ProductCatalog extends Component {
             // },
             {
                 dataField: 'minMonthsOfStock',
-                text: "Min",
+                text: i18n.t('static.report.min'),
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
             },
             {
                 dataField: 'reorderFrequencyInMonths',
-                text: "Reorder Frequecy",
+                text: i18n.t('static.report.reorderFrequencyInMonths'),
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
             },
             {
                 dataField: 'shelfLife',
-                text: "Shelf Life (Months)",
+                text: i18n.t('static.report.shelfLife'),
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
             },
             {
                 dataField: 'catalogPrice',
-                text: "Catalog Price (USD)",
+                text: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                 sort: true,
                 align: 'right',
                 headerAlign: 'right'
             },
             {
                 dataField: 'active',
-                text: "Status",
+                text: i18n.t('static.common.status'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1306,7 +1306,7 @@ class ProductCatalog extends Component {
                 <Card>
                     <CardHeader>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
-                        <i className="icon-menu"></i><strong>Product Catalog</strong>
+                        <i className="icon-menu"></i><strong>{i18n.t('static.report.productCatalog')}</strong>
                         {/* {this.state.procurementAgents.length > 0 &&  */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1323,7 +1323,7 @@ class ProductCatalog extends Component {
                             <Col md="6 pl-0">
                                 <div className="d-md-flex Selectdiv2">
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Program</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
@@ -1334,7 +1334,7 @@ class ProductCatalog extends Component {
                                                     // onChange={this.filterVersion}
                                                     onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
                                                 >
-                                                    <option value="0">Please Select</option>
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
                                                     {programs.length > 0
                                                         && programs.map((item, i) => {
                                                             return (
@@ -1348,7 +1348,7 @@ class ProductCatalog extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Product Category</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
@@ -1374,7 +1374,7 @@ class ProductCatalog extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Tracer Category</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
