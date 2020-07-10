@@ -787,6 +787,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -889,7 +890,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     if (papuList.length != 0) {
                                                         for (var j = 0; j < papuList.length; j++) {
 
-
                                                             data = [];
                                                             data[0] = parseInt(papuList[j].procurementAgent.id);
                                                             data[1] = parseInt(papuList[j].planningUnit.id);
@@ -910,10 +910,18 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         }
                                                     }
 
-                                                    // console.log("inventory Data Array-->", papuDataArr);
+                                                    console.log("papuDataArr.length-->", papuDataArr.length);
                                                     if (papuDataArr.length == 0) {
                                                         data = [];
                                                         data[0] = this.props.match.params.procurementAgentId;
+                                                        data[1] = "";
+                                                        data[2] = "";
+                                                        data[3] = "";
+                                                        data[4] = "";
+                                                        data[5] = "";
+                                                        data[6] = "";
+                                                        data[7] = "";
+                                                        data[8] = "";
                                                         data[9] = true;
                                                         data[10] = 0;
                                                         data[11] = 1;
