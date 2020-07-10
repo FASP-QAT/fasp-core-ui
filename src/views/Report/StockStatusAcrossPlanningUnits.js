@@ -87,7 +87,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.inventoryTurns') + ".csv"
+        a.download = i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -172,7 +172,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.inventoryTurns') + ".pdf")
+        doc.save(i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".pdf")
     }
 
 
@@ -598,7 +598,7 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                 var amcAfterArray = [];
 
 
-                                for (var c = 0; c < 12; c++) {
+                                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
 
                                     var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -624,12 +624,12 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                         }
                                         amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
                                         var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
+                                        /*if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
                                             c = 12;
-                                        }
+                                        }*/
                                     }
                                 }
-                                for (var c = 0; c < 12; c++) {
+                                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
                                     var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                                     if (consumptionListForAMC.length > 0) {
@@ -654,15 +654,16 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                         }
                                         amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
                                         amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
+                                       /* if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
                                             c = 12;
-                                        }
+                                        }*/
                                     }
 
                                 }
 
                                 var amcArray = amcBeforeArray.concat(amcAfterArray);
                                 var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                                console.log('amcArrayFilteredForMonth'+JSON.stringify(amcArrayFilteredForMonth))
                                 var countAMC = amcArrayFilteredForMonth.length;
                                 var sumOfConsumptions = 0;
                                 for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {

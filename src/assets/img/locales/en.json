@@ -426,7 +426,7 @@
     "static.procurementUnit.validProcurementUnitText": "Please enter procurement unit name.",
     "static.procurementUnit.procurementUnitText": "Enter procurement unit name",
     "static.procurementUnit.procurementUnit": "Procurement Unit",
-    "static.procurementUnit.validPlanningUnitText": "Please select planning unit.",
+    "static.procurementUnit.validPlanningUnitText": "Please select product.",
     "static.procurementUnit.planningUnit": "Planning unit",
     "static.procurementUnit.validMultiplierText": "Please enter multiplier.",
     "static.procurementUnit.validValueText": "Please enter value greater than 0",
@@ -887,7 +887,7 @@
     "static.procurementagent.procurementAgentColorCode": "Color Code",
     "static.procurementAgent.selectProcurementAgent": "Please select procurement agent",
     "static.fundingSource.selectFundingSource": "Please select funding source",
-    "static.report.procurementAgent": "Shipment Cost By Procurement Agent",
+    "static.report.procurementAgent": "Shipment Cost Report",
     "static.report.fundingSource": "Shipment Cost By Funding Source",
     "static.report.qty": "Qty",
     "static.report.productCost": "Product Cost (USD)",
@@ -920,7 +920,9 @@
     "static.supplyPlan.adjustedPalletsEuro1":"Adjusted Pallets EURO 1",
     "static.supplyPlan.adjustedPalletsEuro2":"Adjusted Pallets EURO 2",
     "static.supplyPlan.palletEuro1":"Pallet EURO 1",
-    "static.supplyPlan.palletEuro2":"Pallet EURO 2"
+    "static.supplyPlan.palletEuro2":"Pallet EURO 2",
+    "static.report.forecasted":"Forecasted",
+    "static.report.actual":"Actual"
 }
     
 

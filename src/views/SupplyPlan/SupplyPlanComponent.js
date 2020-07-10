@@ -208,8 +208,14 @@ export default class SupplyPlanComponent extends React.Component {
         this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
         this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
         this.calculationsForOpeningAndClosingBalanceAccordingToMonths = this.calculationsForOpeningAndClosingBalanceAccordingToMonths.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
     toggleAccordionTotalShipments() {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
@@ -2572,6 +2578,9 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentBatchInfoDuplicateError: '',
             noFundsBudgetError: ''
 
+        },
+        () => {
+            this.hideSecondComponent();
         })
         this.toggleLarge(supplyPlanType);
     }
@@ -6233,7 +6242,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className="red">{this.state.supplyPlanError}</h5>
 
                 <Card>
