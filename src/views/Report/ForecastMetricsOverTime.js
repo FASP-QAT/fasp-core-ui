@@ -41,12 +41,12 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
-import moment from "moment";
+import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import { Online, Offline } from "react-detect-offline";
 import csvicon from '../../assets/img/csv.png'
-import { LOGO }  from '../../CommonComponent/Logo.js'
+import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import RealmCountryService from '../../api/RealmCountryService';
@@ -71,8 +71,8 @@ const options = {
   title: {
     display: true,
     fontColor: 'black',
-    fontStyle:"normal",
-    fontSize:"12"
+    fontStyle: "normal",
+    fontSize: "12"
   },
   scales: {
     yAxes: [
@@ -81,75 +81,78 @@ const options = {
           display: true,
           labelString: i18n.t('static.report.error'),
           fontColor: 'black',
-          fontStyle:"normal",
-    fontSize:"12"
+          fontStyle: "normal",
+          fontSize: "12"
         },
-        ticks: { yValueFormatString: "$#####%",
-        beginAtZero:true,
-        Max:900,
+        ticks: {
+          yValueFormatString: "$#####%",
+          beginAtZero: true,
+          Max: 900,
           callback: function (value) {
-            return value+"%";
-        }}
+            return value + "%";
+          }
+        }
       }
-    ] ,xAxes: [{
-      
-        scaleLabel: {
-          display: true,
-          labelString: i18n.t('static.report.month'),
-          fontColor: 'black',
-          fontStyle:"normal",
-    fontSize:"12"
-        },
+    ], xAxes: [{
+
+      scaleLabel: {
+        display: true,
+        labelString: i18n.t('static.report.month'),
+        fontColor: 'black',
+        fontStyle: "normal",
+        fontSize: "12"
+      },
       ticks: {
         fontColor: 'black',
-        fontStyle:"normal",
-  fontSize:"12"
+        fontStyle: "normal",
+        fontSize: "12"
       }
-  }]
+    }]
   },
   hover: {
     animationDuration: 0
   },
   animation: {
-    onComplete: function() {
+    onComplete: function () {
       const chartInstance = this.chart,
         ctx = chartInstance.ctx;
 
-     
+
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
-      this.data.datasets.forEach(function(dataset, i) {
+      this.data.datasets.forEach(function (dataset, i) {
         const meta = chartInstance.controller.getDatasetMeta(i);
-        meta.data.forEach(function(bar, index) {
-          const data = dataset.data[index]+ "%";
+        meta.data.forEach(function (bar, index) {
+          const data = dataset.data[index] + "%";
           ctx.fillStyle = "#000";
           ctx.fillText(data, bar._model.x, bar._model.y - 2);
         });
       });
     }
   },
-  tooltips: { mode: 'index',
+  tooltips: {
+    mode: 'index',
     callbacks: {
       label: function (tooltipItems, data) {
-      
-          return tooltipItems.yLabel + "%";
-       }
+
+        return tooltipItems.yLabel + "%";
+      }
     },
     enabled: true,
-//    custom: CustomTooltips
+    //    custom: CustomTooltips
   },
   maintainAspectRatio: false,
-  legend:{
+  legend: {
     display: true,
     position: 'bottom',
     labels: {
       usePointStyle: true,
       fontColor: 'black',
-      fontStyle:"normal",
-fontSize:"12"
+      fontStyle: "normal",
+      fontSize: "12"
     }
   },
-  
+
 }
 
 
@@ -185,24 +188,25 @@ class ForcastMatrixOverTime extends Component {
       matricsList: [],
       dropdownOpen: false,
       radioSelected: 2,
-      programs:[],
+      programs: [],
+      versions: [],
       productCategories: [],
       planningUnits: [],
       categories: [],
-      countries:[],
+      countries: [],
       show: false,
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
 
     };
-    this.getCountrylist = this.getCountrylist.bind(this);
+
     this.fetchData = this.fetchData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
+    // this.getPlanningUnit = this.getPlanningUnit.bind(this);
+    // this.getProductCategories = this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
 
   }
@@ -220,36 +224,36 @@ class ForcastMatrixOverTime extends Component {
     }
     return x1 + x2;
   }
- 
-   makeText = m => {
+
+  makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
-  roundN = num=>{
-    return parseFloat(Math.round(num * Math.pow(10, 2)) /Math.pow(10,2)).toFixed(2);
+  roundN = num => {
+    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
   }
 
-  toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
+  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange')+' , '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.dashboard.country')+' , '+ (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.dashboard.country') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ','%20')+' , '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'),( (i18n.t('static.report.error')).replaceAll(' ','%20')).replaceAll(' ','%20')]]
-   
-      re = this.state.matricsList
-   
+    var A = [[(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')]]
+
+    re = this.state.matricsList
+
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumptionDateString.replaceAll(' ','%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100)+'%'])
+      A.push([re[item].consumptionDateString.replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError * 100) + '%'])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -258,66 +262,66 @@ class ForcastMatrixOverTime extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.forecasterrorovertime') +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.report.forecasterrorovertime') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
-  
+
 
   exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
-    
+
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
-      
+
         doc.setPage(i)
-        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
-        align: 'center'
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+          align: 'center'
         })
-        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
-        align: 'center'
+        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+          align: 'center'
         })
-      
-        
+
+
       }
     }
     const addHeaders = doc => {
       const pageCount = doc.internal.getNumberOfPages()
-    
-     
+
+
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12)
         doc.setFont('helvetica', 'bold')
 
         doc.setPage(i)
-        
-        doc.addImage(LOGO,'png', 0, 10,180,50,'','FAST');
+
+        doc.addImage(LOGO, 'png', 0, 10, 180, 50, '', 'FAST');
 
         doc.setTextColor("#002f6c");
         doc.text(i18n.t('static.report.forecasterrorovertime'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
-        if(i==1){
+        if (i == 1) {
           doc.setFont('helvetica', 'normal')
 
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country')+' : '+ document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
           doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
         }
-       
+
       }
     }
     const unit = "pt";
@@ -325,168 +329,61 @@ class ForcastMatrixOverTime extends Component {
     const orientation = "landscape"; // portrait or landscape
 
     const marginLeft = 10;
-    const doc = new jsPDF(orientation, unit, size,true);
+    const doc = new jsPDF(orientation, unit, size, true);
 
     doc.setFontSize(8);
 
     var canvas = document.getElementById("cool-canvas");
     //creates image
-    
-    var canvasImg = canvas.toDataURL("image/png",1.0);
-    var width = doc.internal.pageSize.width;    
-    var height = doc.internal.pageSize.height;
-    var h1=50;
-    var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png',  50, 220,750,210,'CANVAS' );
-    const headers =[ [   i18n.t('static.report.month'),
-    i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.error')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,this.formatter(elt.forecastedConsumption),this.formatter(elt.actualConsumption),this.roundN(elt.forecastError*100)+'%']);
-    
+    var canvasImg = canvas.toDataURL("image/png", 1.0);
+    var width = doc.internal.pageSize.width;
+    var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    var aspectwidth1 = (width - h1);
+
+    doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
+    const headers = [[i18n.t('static.report.month'),
+    i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
+    const data = this.state.matricsList.map(elt => [elt.consumptionDateString, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.roundN(elt.forecastError * 100) + '%']);
+
     let content = {
-    margin: {top: 80},
-    startY:  height,
-    head: headers,
-    body: data,
-    styles: { lineWidth: 1, fontSize: 8 , halign: 'center'}
-    
-  };
-  
-   
-   
+      margin: { top: 80 },
+      startY: height,
+      head: headers,
+      body: data,
+      styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+    };
+
+
+
     //doc.text(title, marginLeft, 40);
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
     doc.save("ForecastMetricsOverTime.pdf")
     //creates PDF from img
-  /*  var doc = new jsPDF('landscape');
-    doc.setFontSize(20);
-    doc.text(15, 15, "Cool Chart");
-    doc.save('canvas.pdf');*/
+    /*  var doc = new jsPDF('landscape');
+      doc.setFontSize(20);
+      doc.text(15, 15, "Cool Chart");
+      doc.save('canvas.pdf');*/
   }
   getPrograms = () => {
     if (navigator.onLine) {
-        AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProgramService.getProgramByRealmId(realmId)
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    programs: response.data
-                }, () => { this.consolidatedProgramList() })
-            }).catch(
-                error => {
-                    this.setState({
-                        programs: []
-                    }, () => { this.consolidatedProgramList() })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-    } else {
-        console.log('offline')
-        this.consolidatedProgramList()
-    }
-
-}
-consolidatedProgramList = () => {
-    const lan = 'en';
-    const { programs } = this.state
-    var proList = programs;
-
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
-    openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-
-        getRequest.onerror = function (event) {
-            // Handle errors!
-        };
-        getRequest.onsuccess = function (event) {
-            var myResult = [];
-            myResult = getRequest.result;
-            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-            var userId = userBytes.toString(CryptoJS.enc.Utf8);
-            for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].userId == userId) {
-                    var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                    var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                    console.log(programNameLabel)
-
-                    var f = 0
-                    for (var k = 0; k < this.state.programs.length; k++) {
-                        if (this.state.programs[k].programId == programData.programId) {
-                            f = 1;
-                            console.log('already exist')
-                        }
-                    }
-                    if (f == 0) {
-                        proList.push(programData)
-                    }
-                }
-
-
-            }
-
-            this.setState({
-                programs: proList
-            })
-
-        }.bind(this);
-
-    }.bind(this);
-
-
-}
-
-
-
-
-  fetchData() {
-   let countryId = 2;//document.getElementById("countryId").value;
-   let productCategoryId = document.getElementById("productCategoryId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
-    let startDate=this.state.rangeValue.from.year + '-' +  ("00"+this.state.rangeValue.from.month).substr(-2) + '-01';
-    let stopDate=this.state.rangeValue.to.year + '-' + ("00"+this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-   
-    var input= {"realmCountryId":countryId,"planningUnitId":planningUnitId,"startDate": startDate,"stopDate":stopDate}
-    if(countryId>0 && planningUnitId>0){
       AuthenticationService.setupAxiosInterceptors();
-      ReportService.getForecastMatricsOverTime(input)
+      let realmId = AuthenticationService.getRealmId();
+      ProgramService.getProgramByRealmId(realmId)
         .then(response => {
-          console.log(JSON.stringify(response.data));
+          console.log(JSON.stringify(response.data))
           this.setState({
-            matricsList : response.data,
-            message:''
-          })
+            programs: response.data
+          }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
             this.setState({
-              matricsList: []
-            })
-
+              programs: []
+            }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
             } else {
@@ -504,134 +401,410 @@ consolidatedProgramList = () => {
               }
             }
           }
-        );}
-        else if(countryId==0){
-          this.setState({ message: i18n.t('static.program.validcountrytext') });
-                  
-        }else if(productCategoryId==0){
-          this.setState({ message: i18n.t('static.common.selectProductCategory') });
-      
-        }else{
-          this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText') });
-     
-        }
-     /*   this.setState({
-          matricsList: [{ACTUAL_DATE:"2019-04",errorperc:30},{ACTUAL_DATE:"2019-05",errorperc:50},{ACTUAL_DATE:"2019-06",errorperc:40},]
-        })*/
-        console.log('matrix list updated'+this.state.matricsList )
-     }
+        );
 
- 
-  getPlanningUnit() {
-   
-      AuthenticationService.setupAxiosInterceptors();
-      let productCategoryId = document.getElementById("productCategoryId").value;
-      PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-        console.log('**' + JSON.stringify(response.data))
-        this.setState({
-          planningUnits: response.data,
-        })
-      })
-        .catch(
-          error => {
-            this.setState({
-              planningUnits: [],
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: error.response.data.messageCode });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-  this.fetchData();
-  }
-  getProductCategories() {
-    AuthenticationService.setupAxiosInterceptors();
-    let realmId =AuthenticationService.getRealmId();
-    ProductService.getProductCategoryList(realmId)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              productCategories: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-    
-  }
-
-  getCountrylist() {
-   
-      AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
-      RealmCountryService.getRealmCountryrealmIdById(realmId)
-        .then(response => {
-          this.setState({
-            countries: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              countrys: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-       
+    } else {
+      console.log('offline')
+      this.consolidatedProgramList()
     }
-  componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
-    this.getPrograms()
-    this.getCountrylist();
-     this.getProductCategories() 
+
   }
+  consolidatedProgramList = () => {
+    const lan = 'en';
+    const { programs } = this.state
+    var proList = programs;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+            console.log(programNameLabel)
+
+            var f = 0
+            for (var k = 0; k < this.state.programs.length; k++) {
+              if (this.state.programs[k].programId == programData.programId) {
+                f = 1;
+                console.log('already exist')
+              }
+            }
+            if (f == 0) {
+              proList.push(programData)
+            }
+          }
+
+
+        }
+
+        this.setState({
+          programs: proList
+        })
+
+      }.bind(this);
+
+    }.bind(this);
+
+
+  }
+
+
+  filterVersion = () => {
+    let programId = document.getElementById("programId").value;
+    if (programId != 0) {
+
+      const program = this.state.programs.filter(c => c.programId == programId)
+      console.log(program)
+      if (program.length == 1) {
+        if (navigator.onLine) {
+          this.setState({
+            versions: []
+          }, () => {
+            this.setState({
+              versions: program[0].versionList.filter(function (x, i, a) {
+                return a.indexOf(x) === i;
+              })
+            }, () => { this.consolidatedVersionList(programId) });
+          });
+
+
+        } else {
+          this.setState({
+            versions: []
+          }, () => { this.consolidatedVersionList(programId) })
+        }
+      } else {
+
+        this.setState({
+          versions: []
+        })
+
+      }
+    } else {
+      this.setState({
+        versions: []
+      })
+    }
+  }
+  consolidatedVersionList = (programId) => {
+    const lan = 'en';
+    const { versions } = this.state
+    var verList = versions;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId && myResult[i].programId == programId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = databytes.toString(CryptoJS.enc.Utf8)
+            var version = JSON.parse(programData).currentVersion
+
+            version.versionId = `${version.versionId} (Local)`
+            verList.push(version)
+
+          }
+
+
+        }
+
+        console.log(verList)
+        this.setState({
+          versions: verList.filter(function (x, i, a) {
+            return a.indexOf(x) === i;
+          })
+        })
+
+      }.bind(this);
+
+
+
+    }.bind(this)
+
+
+  }
+
+  getPlanningUnit = () => {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+    this.setState({
+      planningUnits: []
+    }, () => {
+      if (versionId.includes('Local')) {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+          var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+          var planningunitRequest = planningunitOs.getAll();
+          var planningList = []
+          planningunitRequest.onerror = function (event) {
+            // Handle errors!
+          };
+          planningunitRequest.onsuccess = function (e) {
+            var myResult = [];
+            myResult = planningunitRequest.result;
+            var programId = (document.getElementById("programId").value).split("_")[0];
+            var proList = []
+            console.log(myResult)
+            for (var i = 0; i < myResult.length; i++) {
+              if (myResult[i].program.id == programId) {
+
+                proList[i] = myResult[i]
+              }
+            }
+            this.setState({
+              planningUnits: proList, message: ''
+            }, () => {
+              this.fetchData();
+            })
+          }.bind(this);
+        }.bind(this)
+
+
+      }
+      else {
+        AuthenticationService.setupAxiosInterceptors();
+
+        ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          console.log('**' + JSON.stringify(response.data))
+          this.setState({
+            planningUnits: response.data, message: ''
+          }, () => {
+            this.fetchData();
+          })
+        })
+          .catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
+              }
+            }
+          );
+      }
+    });
+
+  }
+
+  componentDidMount() {
+
+    this.getPrograms();
+
+
+  }
+
+
+  fetchData() {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+    let planningUnitId = document.getElementById("planningUnitId").value;
+    let startDate = this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01';
+    let stopDate = this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+
+    var input = { "realmCountryId": programId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate }
+    if (programId > 0 && planningUnitId > 0 && versionId != 0) {
+      if (versionId.includes('Local')) {
+        let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+        let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var version = (versionId.split('(')[0]).trim()
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          var program = `${programId}_v${version}_uId_${userId}`
+          var data = [];
+          var programRequest = programTransaction.get(program);
+
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            console.log('programJson',programJson)
+            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+            var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+            var monthstartfrom = this.state.rangeValue.from.month
+            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+              var monthlydata = [];
+              for (var month = monthstartfrom; month <= 12; month++) {
+                var year = from;
+                var actualconsumption = 0;
+                var forcastConsumption = 0;
+               var montcnt = 0
+               var  absvalue = 0;
+                for (var i = month, j = 0; j < 6; i-- , j++) {
+
+                  var dt = from + "-" + String(i).padStart(2, '0') + "-01"
+                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                  var actconsumption = 0;
+                  var forConsumption = 0;
+                  for (var k = 0; k < programJson.regionList.length; k++) {
+                  var list = conlist.filter(c => c.region.id == programJson.regionList[k].regionId)
+                  console.log(list)
+                  if (list.length > 1) {
+                    for (var l = 0; l < list.length; l++) {
+                      if (list[l].actualFlag.toString() == 'true') {
+                        actconsumption = actconsumption + list[l].consumptionQty
+                      } else {
+                        forConsumption = forConsumption + list[l].consumptionQty
+                      }
+                      if(actconsumption>0&& forConsumption>0){
+                        actualconsumption = actualconsumption + actconsumption
+                        forcastConsumption = forcastConsumption + forConsumption
+                        absvalue = absvalue + (Math.abs(actconsumption - forConsumption))
+                        }
+                     
+                    }
+                  } else {
+                    montcnt++
+                  }}
+                 
+                  if (i == 0) {
+                    i = 12;
+                    year = year - 1
+                  }
+                }
+                console.log('absvalue',absvalue,' actualconsumption',actualconsumption)
+                var json = {
+                  consumptionDateString: moment(new Date(from, month - 1)).format('MMM YY'),
+                  actualConsumption: actualconsumption,
+                  forecastedConsumption: forcastConsumption,
+                  forecastError: absvalue / actualconsumption
+
+                }
+                data.push(json)
+
+                if (month == this.state.rangeValue.to.month && from == to) {
+                  this.setState({
+                    matricsList: data,
+                    message: ''
+                  })
+
+                  return;
+                }
+              }
+              monthstartfrom = 1
+
+            }
+           
+          }.bind(this)
+        }.bind(this)
+      } else {
+
+
+        AuthenticationService.setupAxiosInterceptors();
+        ReportService.getForecastMatricsOverTime(input)
+          .then(response => {
+            console.log(JSON.stringify(response.data));
+            this.setState({
+              matricsList: response.data,
+              message: ''
+            })
+          }).catch(
+            error => {
+              this.setState({
+                matricsList: []
+              })
+
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
+              }
+            }
+          );
+      }
+    }
+    else if (programId == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram') });
+
+    } else if (versionId == 0) {
+      this.setState({ message: i18n.t('static.program.validversion') });
+
+    } else {
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText') });
+
+    }
+    /*   this.setState({
+         matricsList: [{ACTUAL_DATE:"2019-04",errorperc:30},{ACTUAL_DATE:"2019-05",errorperc:50},{ACTUAL_DATE:"2019-06",errorperc:40},]
+       })*/
+    console.log('matrix list updated' + this.state.matricsList)
+  }
+
+
 
   toggle() {
     this.setState({
@@ -671,57 +844,52 @@ consolidatedProgramList = () => {
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnitId}>
+          <option key={i} value={item.planningUnit.id}>
+            {getLabelText(item.planningUnit.label, this.state.lang)}
+          </option>
+        )
+      }, this);
+    const { programs } = this.state;
+    let programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+          <option key={i} value={item.programId}>
             {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
-      const { programs } = this.state
-    const { countries } = this.state;
-   // console.log(JSON.stringify(countrys))
-   let countryList = countries.length > 0 && countries.map((item, i) => {
-     console.log(JSON.stringify(item))
-    return(
-      <option key={i} value={item.realmCountryId}>
-      {getLabelText(item.country.label, this.state.lang)}
-  </option>
-    
-    )
-  }, this);
-      const { productCategories } = this.state;
-      let productCategoryList = productCategories.length > 0
-          && productCategories.map((item, i) => {
-              return (
-                <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
-                {Array(item.level).fill(' ').join('')+(getLabelText(item.payload.label, this.state.lang))}
-              </option>
-              )
-          }, this);
-         
+    const { versions } = this.state;
+    let versionList = versions.length > 0
+      && versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionId}
+          </option>
+        )
+      }, this);
 
-    
-    const  bar = {
-    
-        labels: this.state.matricsList.map((item, index) => (item.consumptionDateString)),
-        datasets: [
-           {
-            type: "line",
-            label: i18n.t('static.report.forecasterrorovertime'),
-            backgroundColor: 'transparent',
-            borderColor: '#ffc107',
-            lineTension:0,
-            showActualPercentages: true,
-            showInLegend: true,
-            pointStyle: 'line',
-            yValueFormatString: "$#####%",
-            
-            data: this.state.matricsList.map((item, index) => (this.roundN(item.forecastError*100)))
-          }
-        ],
+    const bar = {
+
+      labels: this.state.matricsList.map((item, index) => (item.consumptionDateString)),
+      datasets: [
+        {
+          type: "line",
+          label: i18n.t('static.report.forecasterrorovertime'),
+          backgroundColor: 'transparent',
+          borderColor: '#ffc107',
+          lineTension: 0,
+          showActualPercentages: true,
+          showInLegend: true,
+          pointStyle: 'line',
+          yValueFormatString: "$#####%",
+
+          data: this.state.matricsList.map((item, index) => (this.roundN(item.forecastError * 100)))
+        }
+      ],
 
 
 
-      
+
     }
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -733,7 +901,7 @@ consolidatedProgramList = () => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
       return '?'
     }
-   
+
 
     return (
       <div className="animated fadeIn" >
@@ -744,20 +912,20 @@ consolidatedProgramList = () => {
             <Card>
               <CardHeader>
                 <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong>
-                
-                  {
-                    this.state.matricsList.length > 0 &&
-                    <div className="card-header-actions">
-                      <a className="card-header-action">
-                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
-                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                      </a> </div>
-                  }
-              
-                </CardHeader>
+
+                {
+                  this.state.matricsList.length > 0 &&
+                  <div className="card-header-actions">
+                    <a className="card-header-action">
+                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                    </a> </div>
+                }
+
+              </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                     <div ref={ref}>
+                  <div ref={ref}>
                     <Form >
                       <Col md="12 pl-0">
                         <div className="row">
@@ -780,33 +948,33 @@ consolidatedProgramList = () => {
 
                           </FormGroup>
                           <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls ">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="countryId"
-                                                id="countryId"
-                                                bsSize="sm"
-                                                onChange={this.filterVersion}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {programs.length > 0
-                                                    && programs.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.programId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                            <div className="controls ">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="programId"
+                                  id="programId"
+                                  bsSize="sm"
+                                  onChange={this.filterVersion}
+                                >
+                                  <option value="0">{i18n.t('static.common.select')}</option>
+                                  {programs.length > 0
+                                    && programs.map((item, i) => {
+                                      return (
+                                        <option key={i} value={item.programId}>
+                                          {getLabelText(item.label, this.state.lang)}
+                                        </option>
+                                      )
+                                    }, this)}
 
-                                            </Input>
+                                </Input>
 
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                              
-                            {/* <FormGroup className="col-md-3">
+                              </InputGroup>
+                            </div>
+                          </FormGroup>
+
+                          {/* <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.country')}</Label>
                               <div className="controls ">
                                 <InputGroup>
@@ -824,7 +992,7 @@ consolidatedProgramList = () => {
 
                                 </InputGroup>
                               </div>
-                            </FormGroup>*/}
+                            </FormGroup>
                             <FormGroup className="col-md-3"> 
                             <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                         <div className="controls ">
@@ -843,96 +1011,114 @@ consolidatedProgramList = () => {
                                             </InputGroup>
                                         </div>
 
-                            </FormGroup>
-                            <FormGroup className="col-md-3">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                              <div className="controls">
-                                <InputGroup>
-                                  <Input
-                                    type="select"
-                                    name="planningUnitId"
-                                    id="planningUnitId"
-                                    bsSize="sm"
-                                    onChange={this.fetchData}
-                                  >
-                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                    {planningUnitList}
-                                  </Input>
-                                  {/* <InputGroupAddon addonType="append">
+                            </FormGroup>*/}
+                          <FormGroup className="col-md-3">
+                            <Label htmlFor="appendedInputButton">Version</Label>
+                            <div className="controls">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="versionId"
+                                  id="versionId"
+                                  bsSize="sm"
+                                  onChange={(e) => { this.getPlanningUnit(); }}
+                                >
+                                  <option value="-1">{i18n.t('static.common.select')}</option>
+                                  {versionList}
+                                </Input>
+
+                              </InputGroup>
+                            </div>
+                          </FormGroup>
+                          <FormGroup className="col-md-3">
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                            <div className="controls">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="planningUnitId"
+                                  id="planningUnitId"
+                                  bsSize="sm"
+                                  onChange={this.fetchData}
+                                >
+                                  <option value="0">{i18n.t('static.common.select')}</option>
+                                  {planningUnitList}
+                                </Input>
+                                {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
                                   </InputGroupAddon> */}
-                                </InputGroup>
-                              </div>
-                            </FormGroup>
-                           </div>
+                              </InputGroup>
+                            </div>
+                          </FormGroup>
+                        </div>
                       </Col>
                     </Form>
                     <Col md="12 pl-0">
                       <div className="row">
-                    {
-                        this.state.matricsList.length > 0
-                        &&
-                        <div className="col-md-12 p-0">
-                          <div className="col-md-12">
-                        <div   className="chart-wrapper chart-graph-report">
-                          <Bar id="cool-canvas" data={bar} options={options} />
-                         </div>
-                         </div>
+                        {
+                          this.state.matricsList.length > 0
+                          &&
+                          <div className="col-md-12 p-0">
+                            <div className="col-md-12">
+                              <div className="chart-wrapper chart-graph-report">
+                                <Bar id="cool-canvas" data={bar} options={options} />
+                              </div>
+                            </div>
+                            <div className="col-md-12">
+                              <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                {this.state.show ? 'Hide Data' : 'Show Data'}
+                              </button>
+
+                            </div>
+                          </div>}
+                      </div>
+
+                      <div className="row">
                         <div className="col-md-12">
-                        <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                          {this.state.show ? 'Hide Data' : 'Show Data'}
-                        </button>
+                          {this.state.show && this.state.matricsList.length > 0 &&
+                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                      </div> 
-                      </div>}
-                         </div>
-                        
-                         <div className="row">
-                    <div className="col-md-12">
-                      {this.state.show && this.state.matricsList.length > 0 &&
-                       <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                              <thead>
+                                <tr>
+                                  <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.report.month')} </th>
+                                  <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.report.forecastConsumption')} </th>
+                                  <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.report.actualConsumption')}</th>
+                                  <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.report.error')}</th>
+                                </tr>
+                              </thead>
 
-                        <thead>
-                          <tr>
-                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.month')} </th>
-                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.forecastConsumption')} </th>
-                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.actualConsumption')}</th>
-                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.error')}</th>
-                             </tr>
-                        </thead>
-                       
-                          <tbody>
-                            {
-                              this.state.matricsList.length > 0
-                              &&
-                              this.state.matricsList.map((item, idx) =>
+                              <tbody>
+                                {
+                                  this.state.matricsList.length > 0
+                                  &&
+                                  this.state.matricsList.map((item, idx) =>
 
-                                <tr id="addr0" key={idx} >
-                                
-                                  <td>{this.state.matricsList[idx].consumptionDateString}</td>
-                                  <td>
+                                    <tr id="addr0" key={idx} >
 
-                                    {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
-                                  </td>
-                                  <td>
-                                    {this.formatter(this.state.matricsList[idx].actualConsumption)}
-                                  </td>
-                                  <td>
-                                    {this.roundN(this.state.matricsList[idx].forecastError*100)+'%'}
-                                  </td>
-                                 </tr>)
+                                      <td>{this.state.matricsList[idx].consumptionDateString}</td>
+                                      <td>
 
-                            }
-                          </tbody>
-                 </Table>}
+                                        {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
+                                      </td>
+                                      <td>
+                                        {this.formatter(this.state.matricsList[idx].actualConsumption)}
+                                      </td>
+                                      <td>
+                                        {this.roundN(this.state.matricsList[idx].forecastError * 100) + '%'}
+                                      </td>
+                                    </tr>)
 
-                   </div>
-                   </div></Col>
+                                }
+                              </tbody>
+                            </Table>}
 
-                 
-                  
+                        </div>
+                      </div></Col>
+
+
+
                   </div>
-              </div></CardBody>
+                </div></CardBody>
             </Card>
           </Col>
         </Row>
