@@ -772,8 +772,8 @@ console.log(endingBalanceArray)
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.inventoryTurns')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.inventoryTurns')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -786,8 +786,8 @@ console.log(endingBalanceArray)
                                 </div>}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pt-lg-0 pb-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
 

@@ -351,8 +351,8 @@ export default class ConsumptionDetails extends React.Component {
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
 
-                    <CardHeader>
-                        <strong>QAT PROBLEM PLUS ACTION REPORT</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <strong>QAT PROBLEM PLUS ACTION REPORT</strong> */}
                         {
                             // this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
@@ -370,8 +370,8 @@ export default class ConsumptionDetails extends React.Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} />
                             </div>
                         }
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className=" pt-lg-0">
                         <Formik
                             render={
                                 ({

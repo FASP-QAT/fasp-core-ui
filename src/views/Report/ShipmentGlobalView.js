@@ -915,9 +915,9 @@ class ShipmentGlobalView extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
+                    <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Shipment Global View</strong> */}
-                        <i className="icon-menu"></i><strong>Global Demand - Single Product</strong>
+                        {/* <i className="icon-menu"></i><strong>Global Demand - Single Product</strong> */}
                         {/* {this.state.consumptions.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -927,8 +927,8 @@ class ShipmentGlobalView extends Component {
                             </a>
                         </div>
                         {/* } */}
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div ref={ref}>
 
                             <Form >

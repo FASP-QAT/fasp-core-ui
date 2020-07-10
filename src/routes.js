@@ -226,9 +226,9 @@ const ExpiredInventory= React.lazy(() => import('./views/Report/ExpiredInventory
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/report/inventoryTurns',name: 'Report  / Inventory Turns',component: InventoryTurnsReport },
-  { path: '/report/costOfInventory',name: 'Report  /  Cost Of Inventory',component: CostOfInventoryReport },
-  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'PlanningUnit List',component: PlanningUnitListNegativeInventory },
+  { path: '/report/inventoryTurns',name: ' Inventory Turns',component: InventoryTurnsReport },
+  { path: '/report/costOfInventory',name: ' Cost Of Inventory',component: CostOfInventoryReport },
+  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'Planning Unit List',component: PlanningUnitListNegativeInventory },
   { path: '/pipeline/pieplineProgramList/:color/:message', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramList',exact: true ,name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
@@ -331,7 +331,7 @@ const routes = [
 
   { path: '/region/addRegion', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.region') }), component: AddRegion },
   // { path: '/region/listRegion', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.region') }), component: ListRegion },
-  { path: '/region/listRegion', exact: true,  name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.region'), component: ListRegion },
+  { path: '/region/listRegion', exact: true,  name:  i18n.t('static.dashboard.region'), component: ListRegion },
   { path: '/region/editRegion/:regionId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.region') }), component: EditRegion },
   { path: '/region/listRegion/:message', component: ListRegion },
  
@@ -410,8 +410,8 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.supplyplan'), component: SupplyPlan },
-  { path: '/supplyPlanFormulas', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
+  { path: '/supplyPlan', name:  i18n.t('static.dashboard.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlanFormulas', name:  i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 
   { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
@@ -424,7 +424,7 @@ const routes = [
   { path: '/planningUnit/listPlanningUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.planningunit') }), component: PlanningUnitList },
   // { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
   { path: '/planningUnit/listPlanningUnit/:color/:message',name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.planningunit') }), component: PlanningUnitList },
-  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
+  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name:  i18n.t('static.dashboad.planningunitcapacityheader'), component: PlanningUnitCapacity },
 
 
   { path: '/procurementUnit/addProcurementUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementUnitheader') }), component: AddProcurementUnit },
@@ -434,39 +434,39 @@ const routes = [
   { path: '/procurementUnit/editProcurementUnit', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementUnitheader') }), component: EditProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId',name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementUnitheader') }), component: EditProcurementUnit },
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunitheader') }), component: EditPlanningUnit },
-  { path: '/realmCountry/listRealmCountryPlanningUnit', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountryList },
-  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
-  { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
-  { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacityList },
-  { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.regioncountry'), component: RealmCountryRegion },
-  { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.productcatalog'), component: ProductCatalog },
-  { path: '/report/consumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: ConsumptionReport },
-  { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusmatrix'), component: StockStatusMatrixReport },
-  { path: '/report/stockStatus', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
-  { path: '/report/globalConsumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.globalconsumption'), component: GlobalConsumptionReport },
-  { path: '/report/forecastOverTheTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
-  { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
-  { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
+  { path: '/realmCountry/listRealmCountryPlanningUnit', name:  i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountryList },
+  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name:  i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
+  { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name:  i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
+  { path: '/planningUnitCapacity/listPlanningUnitCapacity', name:  i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacityList },
+  { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboad.regioncountry'), component: RealmCountryRegion },
+  { path: '/report/productCatalog', name:  i18n.t('static.dashboard.productcatalog'), component: ProductCatalog },
+  { path: '/report/consumption', name:i18n.t('static.dashboard.consumption'), component: ConsumptionReport },
+  { path: '/report/stockStatusMatrix', name:  i18n.t('static.dashboard.stockstatusmatrix'), component: StockStatusMatrixReport },
+  { path: '/report/stockStatus', name:  i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
+  { path: '/report/globalConsumption', name:  i18n.t('static.dashboard.globalconsumption'), component: GlobalConsumptionReport },
+  { path: '/report/forecastOverTheTime', name:  i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
+  { path: '/report/stockStatusOverTime', name:  i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
+  { path: '/report/forecastMetrics', name:  i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
 
-  { path: '/report/qatProblemPlusActionReport', name: i18n.t('static.dashboard.report') + " / " + 'QatProblemPlusActionReport', component: QatProblemPlusActionReport },
+  { path: '/report/qatProblemPlusActionReport', name:  'Qat Problem Plus Action Report', component: QatProblemPlusActionReport },
 
-  { path: '/report/funderExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.funderExport'), component: FunderExport },
-  { path: '/report/procurementAgentExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
-  { path: '/report/supplierLeadTimes', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: SupplierLeadTimes },
-  { path: '/report/shipmentGlobalDemandView', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ShipmentGlobalDemandView },
-  { path: '/report/aggregateShipmentByProduct', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: AggregateShipmentByProduct },
-  { path: '/report/shipmentGlobalView', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ShipmentGlobalView },
+  { path: '/report/funderExport', name: i18n.t('static.dashboard.funderExport'), component: FunderExport },
+  { path: '/report/procurementAgentExport', name:  i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
+  { path: '/report/supplierLeadTimes', name:  i18n.t('static.dashboard.supplierLeadTimes'), component: SupplierLeadTimes },
+  { path: '/report/shipmentGlobalDemandView', name:  i18n.t('static.dashboard.shipmentGlobalDemandViewheader'), component: ShipmentGlobalDemandView },
+  { path: '/report/aggregateShipmentByProduct', name:  i18n.t('static.dashboard.aggregateShipmentByProduct'), component: AggregateShipmentByProduct },
+  { path: '/report/shipmentGlobalView', name: i18n.t('static.dashboard.shipmentGlobalViewheader'), component: ShipmentGlobalView },
   
 
-  { path: '/report/annualShipmentCost', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.annualshipmentcost'), component: AnnualShipmentCost },
+  { path: '/report/annualShipmentCost', name: i18n.t('static.report.annualshipmentcost'), component: AnnualShipmentCost },
 
-  { path: '/report/supplyPlanVersionAndReview', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
+  { path: '/report/supplyPlanVersionAndReview', exact: true, name:  i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
   { path: '/report/editStatus/:programId/:versionId', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: EditSupplyPlanStatus },
   { path: '/report/supplyPlanVersionAndReview/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
 
-  { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
+  { path: '/report/shipmentSummery', exact: true, name:  i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
-  { path: '/report/stockStatusAcrossPlanningUnits', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
+  { path: '/report/stockStatusAcrossPlanningUnits', name:  i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
   
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
@@ -535,10 +535,10 @@ const routes = [
   { path: '/shipment/ShipmentList', exact: true, name: 'Shipment Details', component: ShipmentList },
   { path: '/shipment/shipmentList/:message', component: ShipmentList },
   { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: 'Edit Shipment Details', component: EditShipment },
-  { path: '/report/warehouseCapacity', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
-  { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
-  { path: '/report/stockAdjustment', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
+  { path: '/report/warehouseCapacity', name: i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
+  { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name:  i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
+  { path: '/report/stockAdjustment', name:  i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
-  { path: '/report/expiredInventory',name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+  { path: '/report/expiredInventory',name:  i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
 ];
 export default routes;

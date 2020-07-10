@@ -742,8 +742,8 @@ consolidatedProgramList = () => {
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader>
-                <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong>
+              <div className="Card-header-reporticon">
+                {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong> */}
                 
                   {
                     this.state.matricsList.length > 0 &&
@@ -754,8 +754,8 @@ consolidatedProgramList = () => {
                       </a> </div>
                   }
               
-                </CardHeader>
-              <CardBody>
+                </div>
+              <CardBody className="pb-lg-0 pt-lg-0">
                 <div className="TableCust" >
                      <div ref={ref}>
                     <Form >

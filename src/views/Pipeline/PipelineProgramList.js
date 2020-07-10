@@ -166,15 +166,15 @@ export default class PipelineProgramList extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>Programs</strong>{' '}
+                    <div className="Card-header-addicon">
+                        {/* <i className="icon-menu"></i><strong>Programs</strong>{' '} */}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Import New program" onClick={this.importNewProgram}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
-                    </CardHeader>
+                    </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <ToolkitProvider
                             keyField="pipelineId"

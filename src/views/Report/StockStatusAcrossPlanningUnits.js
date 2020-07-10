@@ -968,8 +968,8 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong> */}
 
                         <div className="card-header-actions">
 
@@ -980,8 +980,8 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                 </div>}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-2 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
 

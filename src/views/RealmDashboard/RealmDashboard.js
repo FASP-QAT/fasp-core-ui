@@ -236,7 +236,7 @@ class RealmDashboard extends Component {
  <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="p-0">
-              <div class="h1 text-muted text-center mb-0 m-3">
+              <div class="h1 text-muted text-left mb-0 m-3">
                 <i class="icon-people icon-color"></i>
                 <ButtonGroup className="float-right">
                   <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>

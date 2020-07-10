@@ -668,16 +668,16 @@ export default class ExpiredInventory extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>Expired Inventory</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>Expired Inventory</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 {true && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
                                 {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
                                 {/* <Form > */}
