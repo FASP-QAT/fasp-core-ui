@@ -892,7 +892,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     if (papuList.length != 0) {
                                                         for (var j = 0; j < papuList.length; j++) {
 
-
                                                             data = [];
                                                             data[0] = parseInt(papuList[j].procurementAgent.id);
                                                             data[1] = parseInt(papuList[j].planningUnit.id);
@@ -914,7 +913,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         }
                                                     }
 
-                                                    // console.log("inventory Data Array-->", papuDataArr);
+                                                    console.log("papuDataArr.length-->", papuDataArr.length);
                                                     if (papuDataArr.length == 0) {
                                                         data = [];
                                                         data[0] = this.props.match.params.procurementAgentId;

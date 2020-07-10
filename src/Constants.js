@@ -34,3 +34,5 @@ export const QAT_DATA_SOURCE_ID = 1
 export const DATE_FORMAT_SM = "MMM-dd-yy"
 export const DATE_FORMAT_CAP = "MMM-DD-YY"
 export const DATE_PLACEHOLDER_TEXT = "mmm-dd-yy"
+export const QAT_DATA_SOURCE_ID = 13
+export const FIRST_DATA_ENTRY_DATE='2017-01-01'
