@@ -363,7 +363,7 @@ class ApplicationDashboard extends Component {
               </div>
                
                 <div className="TextTittle ">TOTAL REALM </div>
-                <div className="text-count">01</div>
+                <div className="text-count">03</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
               </div>

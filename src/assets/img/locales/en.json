@@ -454,6 +454,8 @@
     "static.procurementUnit.labeling": "Labeling",
     "static.procurementUnit.labelingText": "Enter labeling",
     "static.procurementUnit.unitsPerContainer": "Units per container",
+    "static.procurementUnit.unitsPerCase": "Units per case",
+    "static.procurementUnit.unitsPerPallet": "Units per pallet",
     "static.procurementUnit.unitsPerContainerText": "Enter units per container",
     "static.procurementUnit.validNumberText": "Please specify a number",
     "static.procurementAgentProcurementUnit.procurementUnitAlreadyExists": "Procurement unit already exists.",
