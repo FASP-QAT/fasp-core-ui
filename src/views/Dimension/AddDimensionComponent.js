@@ -124,10 +124,10 @@ export default class AddDimensionComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
-                            <CardBody>
+                            </CardHeader> */}
+                          
                                 <Formik
                                     initialValues={initialValues}
                                     validate={validate(validationSchema)}
@@ -188,7 +188,7 @@ export default class AddDimensionComponent extends Component {
                                             handleReset
                                         }) => (
                                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
-
+                                                     <CardBody>
 
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
@@ -204,7 +204,8 @@ export default class AddDimensionComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
-
+                                                    </CardBody>
+                                                    <CardFooter>
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
@@ -212,11 +213,12 @@ export default class AddDimensionComponent extends Component {
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
+                                                    </CardFooter>
                                                 </Form>
                                             )}
 
                                 />
-                            </CardBody>
+                           
                         </Card>
                     </Col>
                 </Row>
