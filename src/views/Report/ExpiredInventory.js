@@ -80,7 +80,7 @@ export default class ExpiredInventory extends Component {
     }
 
     handleRangeChange(value, text, listIndex) {
-        //
+        
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
@@ -687,8 +687,8 @@ export default class ExpiredInventory extends Component {
                                                     value={rangeValue}
                                                     lang={pickerLang}
                                                     //theme="light"
-                                                    onChange={this.handleRangeChange}
-                                                    onDismiss={this.handleRangeDissmis}
+                                                    // onChange={this.handleRangeChange}
+                                                    // onDismiss={this.handleRangeDissmis}
                                                 >
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                 </Picker>

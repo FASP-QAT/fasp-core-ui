@@ -73,6 +73,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/stockStatusForProgram`,json,{}
         );
     }
+    programProductCatalog(json){
+        return axios.post(`${API_URL}/api/report/programProductCatalog`,json,{}
+        );
+    }
 
 }
 export default new ReportService();
