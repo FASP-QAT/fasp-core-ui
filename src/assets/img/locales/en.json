@@ -912,7 +912,15 @@
     "static.supplyplan.exipredStock":"Exipred Stock",
     "static.report.expiredInventory": "Expired Inventory",
     "static.report.StockStatusAccrossPlanningUnitGlobalView": "Stock Status Accross PlanningUnit Global View",
-    "static.report.updatestatus":"Update Program Status"
+    "static.report.updatestatus":"Update Program Status",
+    "static.procurementAgentPlanningUnit.unitPerPalletEuro1":"Units Per Pallet EURO 1",
+    "static.procurementAgentPlanningUnit.unitPerPalletEuro2":"Units Per Pallet EURO 2",
+    "static.supplyPlan.noOfPalletsEuro1":"No Of Pallets EURO 1",
+    "static.supplyPlan.noOfPalletsEuro2":"No Of Pallets EURO 2",
+    "static.supplyPlan.adjustedPalletsEuro1":"Adjusted Pallets EURO 1",
+    "static.supplyPlan.adjustedPalletsEuro2":"Adjusted Pallets EURO 2",
+    "static.supplyPlan.palletEuro1":"Pallet EURO 1",
+    "static.supplyPlan.palletEuro2":"Pallet EURO 2"
 }
     
 
