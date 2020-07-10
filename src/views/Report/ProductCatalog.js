@@ -562,6 +562,7 @@ import csvicon from '../../assets/img/csv.png'
 import pdfIcon from '../../assets/img/pdf.png';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import PlanningUnitService from '../../api/PlanningUnitService';
+import { BreadcrumbDivider } from "semantic-ui-react";
 
 
 const entityname = i18n.t('static.dashboard.productcatalog');
@@ -1355,15 +1356,15 @@ export default class ProductCatalog extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '}
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '} */}
                         {this.state.data.length > 0 && <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
 
                         </div>}
-                    </CardHeader>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-2">
                         <Form >
                             <Col md="12 pl-0">
                                 <div className="d-md-flex prodCatselect">

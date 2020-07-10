@@ -102,12 +102,12 @@ class DefaultLayout extends Component {
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
                       },
                       //!this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
-                      {
-                        name: i18n.t('static.dashboard.programdashboard'),
-                        url: '/ProgramDashboard',
-                        icon: 'cui-dashboard icons',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.programdashboard'),
+                      //   url: '/ProgramDashboard',
+                      //   icon: 'cui-dashboard icons',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
+                      // },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.translations.translations'),

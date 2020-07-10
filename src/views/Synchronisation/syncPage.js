@@ -1842,15 +1842,15 @@ export default class syncPage extends Component {
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
-              <CardHeader>
+              {/* <CardHeader>
                 <strong>{i18n.t('static.dashboard.commitVersion')}</strong>
-                {/* <ul className="legend">
-                            <li><span className="lightpinklegend"></span> <span className="legendText">Difference between versions</span></li>
-                            <li><span className="greenlegend"></span><span className="legendText"> New data from current version</span></li>
-                            <li><span className="notawesome"></span><span className="legendText">  New data from latest version</span></li>
-                            <li><span className="redlegend"></span><span className="legendText"> Inactive Data</span></li>
-                          </ul> */}
-              </CardHeader>
+              //  <ul className="legend">
+              //               <li><span className="lightpinklegend"></span> <span className="legendText">Difference between versions</span></li>
+              //               <li><span className="greenlegend"></span><span className="legendText"> New data from current version</span></li>
+              //               <li><span className="notawesome"></span><span className="legendText">  New data from latest version</span></li>
+              //               <li><span className="redlegend"></span><span className="legendText"> Inactive Data</span></li>
+              //             </ul> 
+              </CardHeader> */}
               <CardBody>
 
                 <Form name='simpleForm'>

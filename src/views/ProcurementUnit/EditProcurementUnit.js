@@ -356,10 +356,10 @@ export default class EditProcurementUnit extends Component {
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm'>
-                                                <CardHeader>
+                                                {/* <CardHeader>
                                                     <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
-                                                </CardHeader>
-                                                <CardBody>
+                                                </CardHeader> */}
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input

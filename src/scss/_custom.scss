@@ -2457,11 +2457,16 @@ input::placeholder {
 {
   padding:10px 20px 10px 20px;
 }
+.Card-header-reporticon{
+  padding: 8px 20px 0px 20px;
+}
+
 /////application dashboard card css
 .ImgCont{
   // float: left !important;
   // width: 50%;
   visibility: hidden;
+  height:108px;
   // margin-top: -17%;
 }
  .TextCont{
@@ -2479,10 +2484,10 @@ input::placeholder {
 }
 .carousel-caption {
   position: absolute;
-  right: 20px!important;
+  right: 15%!important;
   bottom: 20px;
-  left: 9%!important;
-  z-index: 10;
+  left: 12%!important;
+  z-index: 0!important;
   padding-top: 20px;
   padding-bottom: 20px;
   color: #fff;
@@ -2530,6 +2535,7 @@ input::placeholder {
   border: 1px solid #c8ced3;
   border-radius: 0.25rem;
 }
+
 @media (min-width: 576px){
 
 .card-group > .cardRealmDashboard:not(:last-child) {
@@ -2571,10 +2577,10 @@ input::placeholder {
   background-color: transparent;
   border-color: transparent;
 }
-.RealmDashboardTextCont {
-  margin-top: 42%;
+// .RealmDashboardTextCont {
+//   margin-top: 42%;
   
-}
+// }
 .RealmDashboardTextCont p{
   // color: black !important;
   font-size: 16px;
@@ -2592,12 +2598,51 @@ input::placeholder {
   font-weight: 700;
   
 }
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 50px;
+  width: 50px;
+  outline: black;
+  // background-size: 100%, 100%;
+  // background-image: none;
+}
 
+.carousel-control-next-icon:after{
+  content: '>';
+  font-size: 20px;
+  color: black;
+}
+
+.carousel-control-prev-icon:after {
+  content: '<';
+  font-size: 20px;
+  color: #000;
+}
+.carousel-indicators li {
+  box-sizing: content-box;
+  flex: 0 1 auto;
+  // width: 30px;
+  // height: 3px;
+  margin-right: 3px;
+  margin-left: 3px;
+  text-indent: 0!important;
+  cursor: pointer;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  opacity: .5;
+  transition: opacity 0;
+  width: 8px!important;
+  height: 8px!important;
+  border-radius: 50%!important;
+}
 @media (min-width: 1920px) {
   .ImgCont{
     // float: left !important;
      width: 50%;
     visibility: hidden;
+    // margin-top: -42px;
   }
   .box-p{
     padding-bottom: 15px !important;
@@ -2624,50 +2669,3 @@ input::placeholder {
     
   }
 }
-// .TextCont{
-//   padding: 1% !important;
-//   position: relative;
-//   height: 50%;
-//   right: 4%;
-//   width: 50%;
-//   font-size: 25px;
-// }
-
-// .carousel-caption{
-//   position: relative !important;
-//   top: 0 !important;
-//   height: 100% !important;
-//   width: 75% !important;
-// }
-// .trustedMechCarousel{
-//   width: 100%;
-//   height: 100%;
-// }
-
-// .carouselCont{
-  // background-color: #f1f2ed;
-  // display: flex !important;
-  // flex-direction: row !important;
-  // align-items: center;
-// }
-
-// .carousel-control-prev-icon,
-// .carousel-control-next-icon {
-//   height: 100px;
-//   width: 100px;
-//   outline: black;
-//   background-size: 100%, 100%;
-//   background-image: none;
-// }
-
-// .carousel-control-next-icon:after{
-//   content: '>';
-//   font-size: 55px;
-//   color: black;
-// }
-
-// .carousel-control-prev-icon:after {
-//   content: '<';
-//   font-size: 55px;
-//   color: white;
-// }

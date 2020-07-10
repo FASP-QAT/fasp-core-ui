@@ -595,9 +595,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                    
                         <Card  >
 
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody className="p-0">
                             <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>

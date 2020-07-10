@@ -328,11 +328,23 @@ class ApplicationDashboard extends Component {
               <CardBody className="p-0">
               <div class="h1 text-muted text-center mb-0 m-3">
                 <i class="icon-people icon-color"></i>
+                <ButtonGroup className="float-right">
+                  <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
+                  <DropdownToggle caret className="p-0" color="transparent">
+                      {/* <i className="icon-settings"></i> */}
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                    <DropdownItem>View User</DropdownItem>
+                      <DropdownItem>Add User</DropdownItem>
+                     
+                    </DropdownMenu>
+                  </Dropdown>
+                </ButtonGroup>
               <Carousel className='trustedMechCarousel' activeIndex={activeIndex} next={this.next} previous={this.previous}>
           <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
           {slides}
-          {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> */}
-          {/* <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} /> */}
+          {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
+           <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />  */}
         </Carousel>
         <div className="chart-wrapper " >
                 {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
@@ -375,24 +387,52 @@ class ApplicationDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
-                <i class="icon-layers  icon-color"></i>
+                <i class="fa fa-file-text-o icon-color"></i>
               
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                  <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
                     <DropdownMenu right>
-                      <DropdownItem>View Product Catlog</DropdownItem>
-                      <DropdownItem>Add Product Catlog</DropdownItem>
+                      <DropdownItem>View Setup Program</DropdownItem>
+                      {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
                      
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
               </div>
                
-                <div className="TextTittle ">product catlog </div>
-                <div className="text-count">01</div>
+                <div className="TextTittle ">Setup Program </div>
+                {/* <div className="text-count">01</div> */}
+                <div className="chart-wrapper mt-4 pb-2" >
+                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+              </div>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col xs="12" sm="6" lg="3">
+            <Card className=" CardHeight">
+              <CardBody className="box-p">
+              <div class="h1 text-muted text-left mb-2  ">
+                <i class="icon-list  icon-color"></i>
+              
+                <ButtonGroup className="float-right">
+                  <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                  <DropdownToggle caret className="p-0" color="transparent">
+                      {/* <i className="icon-settings"></i> */}
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <DropdownItem>View Pipeline Program Import</DropdownItem>
+                      {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
+                     
+                    </DropdownMenu>
+                  </Dropdown>
+                </ButtonGroup>
+              </div>
+               
+                <div className="TextTittle ">Pipeline Program Import </div>
+                {/* <div className="text-count">01</div> */}
                 <div className="chart-wrapper mt-4 pb-2" >
                 {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
               </div>
