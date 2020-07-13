@@ -590,7 +590,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.unitsPerCase}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitsPerCase">{i18n.t('static.procurementUnit.unitsPerPallet')}</Label>
+                                                        <Label htmlFor="unitsPerPallet">{i18n.t('static.procurementUnit.unitsPerPallet')}</Label>
                                                         <Input
                                                             type="number" name="unitsPerPallet" valid={!errors.unitsPerPallet && this.state.procurementUnit.unitsPerPallet != ''}
                                                             bsSize="sm"
