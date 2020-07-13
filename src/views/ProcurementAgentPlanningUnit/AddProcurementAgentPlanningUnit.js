@@ -31,7 +31,8 @@ let initialValues = {
     skuCode: '',
     catalogPrice: '',
     moq: 0,
-    unitsPerPallet: 0,
+    unitsPerPalletEuro1: 0,
+    unitsPerPalletEuro2: 0,
     unitsPerContainer: 0,
     volume: 0,
     weight: 0,
@@ -760,7 +761,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             skuCode: '',
             catalogPrice: '',
             moq: 0,
-            unitsPerPallet: 0,
+            unitsPerPalletEuro1: 0,
+            unitsPerPalletEuro2: 0,
             unitsPerContainer: 0,
             volume: 0,
             weight: 0,
@@ -787,6 +789,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -802,7 +805,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     console.log("getProcurementAgentPlaningUnitList--", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
-                        this.setState({ rows: myResponse});
+                        this.setState({ rows: myResponse });
                     }
 
                     ProcurementAgentService.getProcurementAgentListAll()
@@ -889,20 +892,20 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     if (papuList.length != 0) {
                                                         for (var j = 0; j < papuList.length; j++) {
 
-
                                                             data = [];
                                                             data[0] = parseInt(papuList[j].procurementAgent.id);
                                                             data[1] = parseInt(papuList[j].planningUnit.id);
                                                             data[2] = papuList[j].skuCode;
                                                             data[3] = papuList[j].catalogPrice;
                                                             data[4] = papuList[j].moq;
-                                                            data[5] = papuList[j].unitsPerPallet;
-                                                            data[6] = papuList[j].unitsPerContainer;
-                                                            data[7] = papuList[j].volume;
-                                                            data[8] = papuList[j].weight;
-                                                            data[9] = papuList[j].active;
-                                                            data[10] = papuList[j].procurementAgentPlanningUnitId;
-                                                            data[11] = 0;
+                                                            data[5] = papuList[j].unitsPerPalletEuro1;
+                                                            data[6] = papuList[j].unitsPerPalletEuro2;
+                                                            data[7] = papuList[j].unitsPerContainer;
+                                                            data[8] = papuList[j].volume;
+                                                            data[9] = papuList[j].weight;
+                                                            data[10] = papuList[j].active;
+                                                            data[11] = papuList[j].procurementAgentPlanningUnitId;
+                                                            data[12] = 0;
                                                             papuDataArr[count] = data;
                                                             count++;
 
@@ -910,10 +913,22 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         }
                                                     }
 
-                                                    // console.log("inventory Data Array-->", papuDataArr);
+                                                    console.log("papuDataArr.length-->", papuDataArr.length);
                                                     if (papuDataArr.length == 0) {
                                                         data = [];
                                                         data[0] = this.props.match.params.procurementAgentId;
+                                                        data[1] = "";
+                                                        data[2] = "";
+                                                        data[3] = "";
+                                                        data[4] = "";
+                                                        data[5] = "";
+                                                        data[6] = "";
+                                                        data[7] = "";
+                                                        data[8] = "";
+                                                        data[9] = "";
+                                                        data[10] = true;
+                                                        data[11] = 0;
+                                                        data[12] = 1;
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
@@ -924,7 +939,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     var options = {
                                                         data: data,
                                                         columnDrag: true,
-                                                        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                         columns: [
 
                                                             {
@@ -955,7 +970,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'number',
                                                             },
                                                             {
-                                                                title: "Unit Per Pallet",
+                                                                title: "Unit Per Pallet (EURO1)",
+                                                                type: 'numeric',
+                                                            },
+                                                            {
+                                                                title: "Unit Per Pallet (EURO2)",
                                                                 type: 'numeric',
                                                             },
                                                             {
@@ -1120,9 +1139,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         data[6] = "";
         data[7] = "";
         data[8] = "";
-        data[9] = true;
-        data[10] = 0;
-        data[11] = 1;
+        data[9] = "";
+        data[10] = true;
+        data[11] = 0;
+        data[12] = 1;
 
         this.el.insertRow(
             data, 0, 1
@@ -1138,7 +1158,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("11")) === 1) {
+                if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         planningUnit: {
                             id: parseInt(map1.get("1")),
@@ -1149,12 +1169,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                         skuCode: map1.get("2"),
                         catalogPrice: map1.get("3"),
                         moq: map1.get("4"),
-                        unitsPerPallet: map1.get("5"),
-                        unitsPerContainer: map1.get("6"),
-                        volume: map1.get("7"),
-                        weight: map1.get("8"),
-                        active: map1.get("9"),
-                        procurementAgentPlanningUnitId: parseInt(map1.get("10"))
+                        unitsPerPalletEuro1: map1.get("5"),
+                        unitsPerPalletEuro2: map1.get("6"),
+                        unitsPerContainer: map1.get("7"),
+                        volume: map1.get("8"),
+                        weight: map1.get("9"),
+                        active: map1.get("10"),
+                        procurementAgentPlanningUnitId: parseInt(map1.get("11"))
                     }
                     changedpapuList.push(json);
                 }
@@ -1222,9 +1243,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 changedFlag: 0,
 
             },
-            () => {
-                this.hideSecondComponent();
-            })
+                () => {
+                    this.hideSecondComponent();
+                })
             return false;
         } else {
             return true;
@@ -1336,7 +1357,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             }
         }
 
-        //unit per pallet
+        //unit per pallet euro1
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
@@ -1352,7 +1373,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             }
         }
 
-        //unit per container
+        //unit per pallet euro2
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
@@ -1368,9 +1389,25 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             }
         }
 
-        //volume
+        //unit per container
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
+            var reg = /^[0-9\b]+$/;
+            if (this.el.getValueFromCoords(x, y) != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        //volume
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1389,8 +1426,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         }
 
         //weight
-        if (x == 8) {
-            var col = ("I").concat(parseInt(y) + 1);
+        if (x == 9) {
+            var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1412,21 +1449,23 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        this.el.setValueFromCoords(11, y, 1, true);
+        this.el.setValueFromCoords(12, y, 1, true);
     }.bind(this);
 
 
     checkValidation() {
         var valid = true;
         var json = this.el.getJson();
+        console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var col = ("L").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(11, y);
+            // var col = ("L").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(12, y);
             if (parseInt(value) == 1) {
 
                 //planning unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
+                console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1489,7 +1528,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     }
                 }
 
-                //unitPerPallet
+                //unitPerPalletEuro1
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
                 if (value == "") {
@@ -1509,7 +1548,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     }
                 }
 
-                //unitPerContainer
+                //unitPerPalletEuro2
                 var col = ("G").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(6, y);
                 if (value == "") {
@@ -1529,9 +1568,29 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     }
                 }
 
-                //volume
+                //unitPerContainer
                 var col = ("H").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(7, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //volume
+                var col = ("I").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(8, y);
                 if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1547,8 +1606,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }
 
                 //weight
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(8, y);
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
                 if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1597,7 +1656,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
-        &nbsp;
+                                &nbsp;
     </FormGroup>
                         </CardFooter>
                     </Card>

@@ -375,7 +375,7 @@ class ApplicationDashboard extends Component {
               </div>
                
                 <div className="TextTittle ">TOTAL REALM </div>
-                <div className="text-count">01</div>
+                <div className="text-count">03</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
               </div>
@@ -442,21 +442,21 @@ class ApplicationDashboard extends Component {
         </Row>
         {/* <Row className="mt-2">
           <Col md="12">
-            <Card>
-              <CardHeader className="text-center">
+            <Card> */}
+              {/* <CardHeader className="text-center">
                 <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
                 <div className="card-header-actions">
                 <a className="card-header-action">
                   
                   </a>
                 </div>
-              </CardHeader> 
-              <CardBody>
+              </CardHeader> */}
+              {/* <CardBody>
                 <div className="chart-wrapper chart-graph">
                   <Bar data={bar} options={options} />
                 </div>
-              </CardBody>
-            </Card>
+              </CardBody> */}
+            {/* </Card>
           </Col>
         </Row> */}
         {/* <Row>

@@ -252,7 +252,7 @@ class AnnualShipmentCost extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
-                alert("in else online version");
+                // alert("in else online version");
                 console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.getAnnualShipmentCost(json)

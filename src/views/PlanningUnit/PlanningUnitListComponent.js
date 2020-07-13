@@ -118,7 +118,7 @@ export default class PlanningUnitListComponent extends Component {
                     })
 
                     PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
-                        console.log(response.data)
+                        console.log("RESP-----",response.data)
                         this.setState({
                             planningUnitList: response.data,
                             selSource: response.data

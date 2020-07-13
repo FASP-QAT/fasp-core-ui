@@ -583,6 +583,48 @@ class warehouseCapacity extends Component {
         return getLabelText(cell, this.state.lang);
     }
 
+    exportCSV() {
+
+        var csvRow = [];
+
+        if (navigator.onLine) {
+            csvRow.push(i18n.t('static.program.realmcountry') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        } else {
+            csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programIdOffline").selectedOptions[0].text).replaceAll(' ', '%20'))
+        }
+
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
+
+        var re;
+        var A = [[(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')]]
+
+        re = this.state.data;
+        // console.log("DATA--------",re);
+
+        for (var item = 0; item < re.length; item++) {
+            // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
+            A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm])
+            for (var item1 = 1; item1 < re[item].programList.length; item1++) {
+                A.push(['','',(getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),'',''])
+            }
+        }
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.report.warehouseCapacity') + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+
     exportPDF = (columns) => {
         const addFooters = doc => {
 

@@ -34,7 +34,9 @@ let initialValues = {
     weightUnitId: '',
     weightQty: 0,
     labeling: '',
-    unitsPerContainer: 0
+    unitsPerContainer: 0,
+    unitsPerCase: 0,
+    unitsPerPallet: 0
 }
 
 const validationSchema = function (values) {
@@ -60,6 +62,12 @@ const validationSchema = function (values) {
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         weightQty: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerCase: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerPallet: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         unitsPerContainer: Yup.number()
@@ -140,6 +148,8 @@ export default class EditProcurementUnit extends Component {
                 },
                 weightQty: 0,
                 labeling: '',
+                unitsPerCase: 0,
+                unitsPerPallet: 0,
                 unitsPerContainer: 0
             },
             regionId: '',
@@ -193,6 +203,8 @@ export default class EditProcurementUnit extends Component {
                 weightUnitId: this.state.procurementUnit.weightUnit.id,
                 weightQty: this.state.procurementUnit.weightQty,
                 labeling: this.state.procurementUnit.labeling,
+                unitsPerCase: this.state.procurementUnit.unitsPerCase,
+                unitsPerPallet: this.state.procurementUnit.unitsPerPallet,
                 unitsPerContainer: this.state.procurementUnit.unitsPerContainer
             }
             AuthenticationService.setupAxiosInterceptors();
@@ -203,12 +215,12 @@ export default class EditProcurementUnit extends Component {
                             unitList: response.data
                         })
                     } else {
-                       this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     }
                 })
 
@@ -260,6 +272,12 @@ export default class EditProcurementUnit extends Component {
         if (event.target.name == "labeling") {
             procurementUnit.labeling = event.target.value;
         }
+        if (event.target.name == "unitsPerCase") {
+            procurementUnit.unitsPerCase = event.target.value;
+        }
+        if (event.target.name == "unitsPerPallet") {
+            procurementUnit.unitsPerPallet = event.target.value;
+        }
         if (event.target.name == "unitsPerContainer") {
             procurementUnit.unitsPerContainer = event.target.value;
         } else if (event.target.name === "active") {
@@ -282,6 +300,8 @@ export default class EditProcurementUnit extends Component {
             weightUnitId: true,
             weightQty: true,
             labeling: true,
+            unitsPerCase: true,
+            unitsPerPallet: true,
             unitsPerContainer: true
         }
         )
@@ -369,7 +389,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.label.label_en}
-                                                            id="procurementUnitName" placeholder={i18n.t('static.procurementUnit.procurementUnitText')} />
+                                                            id="procurementUnitName" />
                                                         <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -396,7 +416,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.multiplier}
-                                                            id="multiplier" placeholder={i18n.t('static.procurementUnit.multiplierText')} />
+                                                            id="multiplier" />
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -453,7 +473,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.heightQty}
-                                                            id="heightQty" placeholder={i18n.t('static.procurementUnit.heightQtyText')} />
+                                                            id="heightQty" />
                                                         <FormFeedback className="red">{errors.heightQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -480,7 +500,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.lengthQty}
-                                                            id="lengthQty" placeholder={i18n.t('static.procurementUnit.lengthQtyText')} />
+                                                            id="lengthQty" />
                                                         <FormFeedback className="red">{errors.lengthQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -507,7 +527,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.widthQty}
-                                                            id="widthQty" placeholder={i18n.t('static.procurementUnit.widthQtyText')} />
+                                                            id="widthQty" />
                                                         <FormFeedback className="red">{errors.widthQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -534,7 +554,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.weightQty}
-                                                            id="weightQty" placeholder={i18n.t('static.procurementUnit.weightQtyText')} />
+                                                            id="weightQty" />
                                                         <FormFeedback className="red">{errors.weightQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -546,8 +566,32 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.labeling}
-                                                            id="labeling" placeholder={i18n.t('static.procurementUnit.labelingText')} />
+                                                            id="labeling" />
                                                         <FormFeedback className="red">{errors.labeling}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitsPerCase">{i18n.t('static.procurementUnit.unitsPerCase')}</Label>
+                                                        <Input
+                                                            type="number" name="unitsPerCase" valid={!errors.unitsPerCase}
+                                                            bsSize="sm"
+                                                            invalid={touched.unitsPerCase && !!errors.unitsPerCase}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.unitsPerCase}
+                                                            id="unitsPerCase" />
+                                                        <FormFeedback className="red">{errors.unitsPerCase}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitsPerPallet">{i18n.t('static.procurementUnit.unitsPerPallet')}</Label>
+                                                        <Input
+                                                            type="number" name="unitsPerPallet" valid={!errors.unitsPerPallet}
+                                                            bsSize="sm"
+                                                            invalid={touched.unitsPerPallet && !!errors.unitsPerPallet}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.unitsPerPallet}
+                                                            id="unitsPerPallet" />
+                                                        <FormFeedback className="red">{errors.unitsPerPallet}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="unitsPerContainer">{i18n.t('static.procurementUnit.unitsPerContainer')}</Label>
@@ -558,7 +602,7 @@ export default class EditProcurementUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerContainer}
-                                                            id="unitsPerContainer" placeholder={i18n.t('static.procurementUnit.unitsPerContainerText')} />
+                                                            id="unitsPerContainer" />
                                                         <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -618,7 +662,7 @@ export default class EditProcurementUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementUnit/listProcurementUnit/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
         AuthenticationService.setupAxiosInterceptors();
@@ -642,6 +686,8 @@ export default class EditProcurementUnit extends Component {
                 weightUnitId: this.state.procurementUnit.weightUnit.id,
                 weightQty: this.state.procurementUnit.weightQty,
                 labeling: this.state.procurementUnit.labeling,
+                unitsPerCase: this.state.procurementUnit.unitsPerCase,
+                unitsPerPallet: this.state.procurementUnit.unitsPerPallet,
                 unitsPerContainer: this.state.procurementUnit.unitsPerContainer
             }
             AuthenticationService.setupAxiosInterceptors();

@@ -32,7 +32,15 @@ class RegionListComponent extends Component {
         this.addRegion = this.addRegion.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     filterData() {
         let countryId = document.getElementById("realmCountryId").value;
         if (countryId != 0) {
@@ -70,7 +78,10 @@ class RegionListComponent extends Component {
                         loading: false
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({ message: response.data.messageCode },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
         // .catch(
@@ -103,7 +114,11 @@ class RegionListComponent extends Component {
                 } else {
                     this.setState({
                         message: response.data.messageCode
-                    })
+                    }
+                        ,
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
             })
         // .catch(
@@ -227,7 +242,7 @@ class RegionListComponent extends Component {
                     this.setState({ message: message })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.regionreport')}</strong>{' '} */}

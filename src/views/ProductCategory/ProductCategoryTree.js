@@ -364,12 +364,14 @@ export default class ProductCategoryTree extends Component {
             submitJson.push(json);
         }
         )
-        // console.log("submit json---->", submitJson);
+        console.log("submit json---->", submitJson);
+        console.log("submit json---->", JSON.stringify(submitJson));
         ProductCategoryService.addProductCategory(submitJson)
             .then(response => {
                 if (response.status == 200) {
                     // console.log("success-------------------------.");
-                    this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
+                    // this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
+                    this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.productCategory.success'))
                 } else {
                     this.setState({
                         message: response.data.messageCode

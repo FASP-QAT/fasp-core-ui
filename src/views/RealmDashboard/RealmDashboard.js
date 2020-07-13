@@ -1,5 +1,5 @@
 import React, { Component, lazy, Suspense } from 'react';
-import { Bar, Line,Pie} from 'react-chartjs-2';
+import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 
 import {
@@ -25,10 +25,10 @@ import {
   PaginationItem,
   PaginationLink,
   Row,
-  Carousel, 
-  CarouselCaption, 
-  CarouselControl, 
-  CarouselIndicators, 
+  Carousel,
+  CarouselCaption,
+  CarouselControl,
+  CarouselIndicators,
   CarouselItem,
   CardColumns,
   Table,
@@ -97,49 +97,49 @@ const bar = {
     //   data: [28, 48, 40, 19, 96, 27, 100],
     // },
   ],
-  
+
 };
 
 const items = [
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'TOTAL USER',
-     caption: '06'
+    header: 'TOTAL USER',
+    caption: '06'
   },
-  
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'REALM LEVEL ADMIN',
-     caption: '04'
+    header: 'REALM LEVEL ADMIN',
+    caption: '04'
   },
-  
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'PROGRAM LEVEL ADMIN',
-     caption: '03'
+    header: 'PROGRAM LEVEL ADMIN',
+    caption: '03'
   },
-  
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'PROGRAM USER',
-     caption: '05'
+    header: 'PROGRAM USER',
+    caption: '05'
   },
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'SUPPLY PLAN REVIEWER',
-     caption: '02'
+    header: 'SUPPLY PLAN REVIEWER',
+    caption: '02'
   },
- 
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'GUEST USER',
-     caption: '05'
+    header: 'GUEST USER',
+    caption: '05'
   },
 ];
 
@@ -157,7 +157,7 @@ class RealmDashboard extends Component {
     this.state = {
       activeIndex: 0,
     };
-  
+
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
@@ -187,15 +187,15 @@ class RealmDashboard extends Component {
 
   next() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndex === items.length - 1 ? 0 : 
-    this.state.activeIndex + 1;
+    const nextIndex = this.state.activeIndex === items.length - 1 ? 0 :
+      this.state.activeIndex + 1;
     this.setState({ activeIndex: nextIndex });
   }
 
   previous() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndex === 0 ? items.length - 1 : 
-    this.state.activeIndex - 1;
+    const nextIndex = this.state.activeIndex === 0 ? items.length - 1 :
+      this.state.activeIndex - 1;
     this.setState({ activeIndex: nextIndex });
   }
 
@@ -203,37 +203,37 @@ class RealmDashboard extends Component {
     if (this.animating) return;
     this.setState({ activeIndex: newIndex });
   }
-  
+
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
     const { activeIndex } = this.state;
     const slides = items.map((item) => {
 
-    return (
-      <CarouselItem
-        onExiting={this.onExiting}
-        onExited={this.onExited}
-       key={item.src}
-      >
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={item.src}
+        >
 
-        <div className='carouselCont'>
-          <div className='ImgCont'>
-            <img width='100%' src={item.src}  />
+          <div className='carouselCont'>
+            <div className='ImgCont'>
+              <img width='100%' src={item.src} />
+            </div>
+            <div className='RealmDashboardTextCont'>
+              <CarouselCaption captionHeader={item.header} captionText={item.caption} />
+            </div>
           </div>
-          <div className='RealmDashboardTextCont'>
-            <CarouselCaption captionHeader={item.header}  captionText={item.caption}  />
-          </div>
-        </div>
-      </CarouselItem>
+        </CarouselItem>
       );
     });
 
 
     return (
       <div className="animated fadeIn">
- <Row className="mt-2">
- <Col xs="12" sm="6" lg="3">
+        <Row className="mt-2">
+          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="p-0">
               <div class="h1 text-muted text-left mb-0 m-3">
@@ -263,30 +263,30 @@ class RealmDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
-        <Col xs="12" sm="6" lg="3">
+          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="cui-globe icon-color"></i>
-                <ButtonGroup className="float-right">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Country</DropdownItem>
-                      <DropdownItem>Add Country</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="cui-globe icon-color"></i>
+                  <ButtonGroup className="float-right">
+                    <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                        {/* <i className="icon-settings"></i> */}
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem>View Country</DropdownItem>
+                        <DropdownItem>Add Country</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Country </div>
                 <div className="text-count">04</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -313,8 +313,8 @@ class RealmDashboard extends Component {
                 <div className="TextTittle ">Technical Area </div>
                 <div className="text-count">20</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -341,8 +341,8 @@ class RealmDashboard extends Component {
                 <div className="TextTittle ">Region </div>
                 <div className="text-count">10</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -368,8 +368,8 @@ class RealmDashboard extends Component {
                 <div className="TextTittle ">Organisation </div>
                 <div className="text-count">15</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -396,8 +396,8 @@ class RealmDashboard extends Component {
                 <div className="TextTittle ">Total Program </div>
                 <div className="text-count">07</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -424,11 +424,12 @@ class RealmDashboard extends Component {
                 <div className="TextTittle ">Setup Program </div>
                 {/* <div className="text-count">01</div> */}
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
+
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
@@ -452,15 +453,14 @@ class RealmDashboard extends Component {
                 <div className="TextTittle ">Pipeline Program Import </div>
                 {/* <div className="text-count">01</div> */}
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
-     
         </Row>
 
-          {/* <Row>
+        {/* <Row>
             <Col md="12">
             <Card>
               <CardHeader className="text-center">
@@ -479,8 +479,8 @@ class RealmDashboard extends Component {
             </Card>
             </Col> 
           </Row>  */}
-    
-    </div>
+
+      </div>
     );
   }
 }

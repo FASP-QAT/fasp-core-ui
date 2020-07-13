@@ -57,10 +57,6 @@ export default class syncPage extends Component {
 
     this.loadedFunctionForMergeInventory = this.loadedFunctionForMergeInventory.bind(this);
     this.loadedFunctionForMergeShipment = this.loadedFunctionForMergeShipment.bind(this);
-    // this.loadedFunctionInventory = this.loadedFunctionInventory.bind(this)
-
-    // this.loadedFunctionLatestInventory = this.loadedFunctionLatestInventory.bind(this);
-    // this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
     this.synchronize = this.synchronize.bind(this);
     this.checkValidationForNegativeStockInBatch = this.checkValidationForNegativeStockInBatch.bind(this);
@@ -170,12 +166,8 @@ export default class syncPage extends Component {
         var shipmentStatusList = []
         var latestDataJsonConsumption = []
         var oldDataJsonConsumption = []
-        var mergedDataConsumption = [];
-        var mergedConsumptionList = [];
         var latestDataJsonInventory = []
         var oldDataJsonInventory = []
-        var mergedDataInventory = []
-        var mergedInventoryList = []
         var oldInventoryList = [];
         var oldConsumptionList = [];
         var oldShipmentList = [];
@@ -184,8 +176,6 @@ export default class syncPage extends Component {
         var latestShipmentList = [];
         var latestDataJsonShipment = []
         var oldDataJsonShipment = []
-        var mergedDataShipment = []
-        var mergedShipmentList = []
         var procurementAgentListAll = [];
         var procurementUnitListAll = [];
         var shipmentStatusListAll = []
@@ -532,74 +522,6 @@ export default class syncPage extends Component {
                             // this.el.destroy();
                             oldDataJsonConsumption = consumptionDataArr;
                             oldConsumptionList = consumptionList;
-                            // this.setState({
-                            //   oldDataJsonConsumption: oldDataJsonConsumption
-                            // })
-                            // var options = {
-                            //   data: oldDataJsonConsumption,
-                            //   columnDrag: true,
-                            //   colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                            //   columns: [
-                            //     {
-                            //       title: 'Consumption Id',
-                            //       type: 'hidden'
-                            //     },
-                            //     {
-                            //       title: 'Planning unit',
-                            //       type: 'dropdown',
-                            //       source: planningUnitList
-                            //     },
-                            //     {
-                            //       title: 'Data source',
-                            //       type: 'dropdown',
-                            //       source: dataSourceList
-                            //     },
-                            //     {
-                            //       title: 'Region',
-                            //       type: 'dropdown',
-                            //       source: regionList
-                            //     },
-                            //     {
-                            //       title: 'Consumption Quantity',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Days of Stock out',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'StartDate',
-                            //       type: 'calendar'
-                            //     },
-                            //     {
-                            //       title: 'StopDate',
-                            //       type: 'calendar'
-                            //     },
-                            //     {
-                            //       title: 'Active',
-                            //       type: 'hidden',
-                            //     },
-                            //     {
-                            //       title: 'Actual Flag',
-                            //       type: 'dropdown',
-                            //       source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
-                            //     }
-                            //   ],
-                            //   pagination: 10,
-                            //   search: true,
-                            //   columnSorting: true,
-                            //   tableOverflow: true,
-                            //   wordWrap: true,
-                            //   allowInsertColumn: false,
-                            //   allowManualInsertColumn: false,
-                            //   allowDeleteRow: false,
-                            //   onchange: this.changed,
-                            //   editable: false,
-                            //   onload: this.loadedFunction
-                            // };
-
-                            // this.el = jexcel(document.getElementById("oldVersionConsumption"), options);
-
 
                             var data = [];
                             var inventoryDataArr = []
@@ -623,8 +545,6 @@ export default class syncPage extends Component {
                               inventoryDataArr[j] = data;
 
                             }
-                            // this.el = jexcel(document.getElementById("oldVersionInventory"), '');
-                            // this.el.destroy();
                             oldDataJsonInventory = inventoryDataArr;
                             oldInventoryList = inventoryList;
 
@@ -658,228 +578,9 @@ export default class syncPage extends Component {
                               shipmentDataArr[j] = data;
                             }
 
-                            // this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
-                            // this.el.destroy();
                             oldDataJsonShipment = shipmentDataArr;
                             oldShipmentList = shipmentList;
-                            // this.setState({
-                            //   oldDataJsonInventory: oldDataJsonInventory
-                            // })
-                            // var options = {
-                            //   data: oldDataJsonInventory,
-                            //   columnDrag: true,
-                            //   colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                            //   columns: [
-                            //     {
-                            //       title: 'Inventory Id',
-                            //       type: 'hidden'
-                            //     },
-                            //     {
-                            //       title: 'Country SKU',
-                            //       type: 'dropdown',
-                            //       source: countrySkuList
-                            //     },
-                            //     {
-                            //       title: 'Data source',
-                            //       type: 'dropdown',
-                            //       source: dataSourceList
-                            //     },
-                            //     {
-                            //       title: 'Region',
-                            //       type: 'dropdown',
-                            //       source: regionList
-                            //     },
-                            //     {
-                            //       title: 'Inventory Date',
-                            //       type: 'calendar'
-
-                            //     },
-                            //     {
-                            //       title: 'Expected Stock',
-                            //       type: 'text',
-                            //       readOnly: true
-                            //     },
-                            //     {
-                            //       title: 'Manual Adjustment',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Actual Stock',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Batch Number',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Expire Date',
-                            //       type: 'calendar'
-
-                            //     },
-                            //     {
-                            //       title: 'Active',
-                            //       type: 'hidden'
-                            //     }
-
-                            //   ],
-                            //   pagination: 10,
-                            //   search: true,
-                            //   columnSorting: true,
-                            //   tableOverflow: true,
-                            //   wordWrap: true,
-                            //   allowInsertColumn: false,
-                            //   allowManualInsertColumn: false,
-                            //   allowDeleteRow: false,
-                            //   onchange: this.changed,
-                            //   oneditionend: this.onedit,
-                            //   editable: false,
-                            //   onload: this.loadedFunctionInventory
-                            // };
-
-                            // this.el = jexcel(document.getElementById("oldVersionInventory"), options);
-
-                            // this.el = jexcel(document.getElementById("latestVersionConsumption"), '');
-                            // this.el.destroy();
-                            // var options = {
-                            //   data: latestDataJsonConsumption,
-                            //   columnDrag: true,
-                            //   colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                            //   columns: [
-                            //     {
-                            //       title: 'Consumption Id',
-                            //       type: 'hidden',
-                            //     },
-                            //     {
-                            //       title: 'Planning unit',
-                            //       type: 'dropdown',
-                            //       source: planningUnitList
-                            //     },
-                            //     {
-                            //       title: 'Data source',
-                            //       type: 'dropdown',
-                            //       source: dataSourceList
-                            //     },
-                            //     {
-                            //       title: 'Region',
-                            //       type: 'dropdown',
-                            //       source: regionList
-                            //     },
-                            //     {
-                            //       title: 'Consumption Quantity',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Days of Stock out',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'StartDate',
-                            //       type: 'calendar'
-                            //     },
-                            //     {
-                            //       title: 'StopDate',
-                            //       type: 'calendar'
-                            //     },
-                            //     {
-                            //       title: 'Active',
-                            //       type: 'hidden'
-                            //     },
-                            //     {
-                            //       title: 'Actual Flag',
-                            //       type: 'dropdown',
-                            //       source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
-                            //     }
-                            //   ],
-                            //   pagination: 10,
-                            //   search: true,
-                            //   columnSorting: true,
-                            //   tableOverflow: true,
-                            //   wordWrap: true,
-                            //   allowInsertColumn: false,
-                            //   allowManualInsertColumn: false,
-                            //   allowDeleteRow: false,
-                            //   onchange: this.changed,
-                            //   editable: false,
-                            //   onload: this.loadedFunctionLatest
-                            // };
-
-                            // this.el = jexcel(document.getElementById("latestVersionConsumption"), options);
-
-                            // this.el = jexcel(document.getElementById("latestVersionInventory"), '');
-                            // this.el.destroy();
-                            // var options = {
-                            //   data: latestDataJsonInventory,
-                            //   columnDrag: true,
-                            //   colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                            //   columns: [
-                            //     {
-                            //       title: 'Inventory Id',
-                            //       type: 'hidden'
-                            //     },
-                            //     {
-                            //       title: 'Country SKU',
-                            //       type: 'dropdown',
-                            //       source: countrySkuList
-                            //     },
-                            //     {
-                            //       title: 'Data source',
-                            //       type: 'dropdown',
-                            //       source: dataSourceList
-                            //     },
-                            //     {
-                            //       title: 'Region',
-                            //       type: 'dropdown',
-                            //       source: regionList
-                            //     },
-                            //     {
-                            //       title: 'Inventory Date',
-                            //       type: 'calendar'
-
-                            //     },
-                            //     {
-                            //       title: 'Expected Stock',
-                            //       type: 'text',
-                            //       readOnly: true
-                            //     },
-                            //     {
-                            //       title: 'Manual Adjustment',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Actual Stock',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Batch Number',
-                            //       type: 'text'
-                            //     },
-                            //     {
-                            //       title: 'Expire Date',
-                            //       type: 'calendar'
-
-                            //     },
-                            //     {
-                            //       title: 'Active',
-                            //       type: 'hidden'
-                            //     }
-
-                            //   ],
-                            //   pagination: 10,
-                            //   search: true,
-                            //   columnSorting: true,
-                            //   tableOverflow: true,
-                            //   wordWrap: true,
-                            //   allowInsertColumn: false,
-                            //   allowManualInsertColumn: false,
-                            //   allowDeleteRow: false,
-                            //   onchange: this.changed,
-                            //   oneditionend: this.onedit,
-                            //   editable: false,
-                            //   onload: this.loadedFunctionLatestInventory
-                            // };
-
-                            // this.el = jexcel(document.getElementById("latestVersionInventory"), options);
-
+                            
                             var mergedDataConsumption = [];
                             var mergedConsumptionList = [];
                             var consumptionIdArray = [];
@@ -1244,47 +945,7 @@ export default class syncPage extends Component {
       );
   }
 
-
-  // loadedFunction = function (instance) {
-  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-  //   var elInstance = instance.jexcel;
-  //   var latestDataJsonConsumption = this.state.latestDataJsonConsumption
-  //   var jsonData = elInstance.getJson();
-  //   for (var y = 0; y < jsonData.length; y++) {
-  //     if ((jsonData[y])[8] == true) {
-  //       if ((jsonData[y])[0] != 0) {
-  //         var latestFilteredData = (latestDataJsonConsumption[y])[0];
-  //         var col = ("A").concat(parseInt(y) + 1);
-  //         var value = elInstance.getValueFromCoords(0, y);
-  //         if (value == latestFilteredData) {
-  //           for (var j = 1; j < colArr.length; j++) {
-  //             var col = (colArr[j]).concat(parseInt(y) + 1);
-  //             var valueToCompare = elInstance.getValueFromCoords(j, y);
-  //             var valueToCompareWith = (latestDataJsonConsumption[y])[j];
-  //             if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-  //               elInstance.setStyle(col, "background-color", "transparent");
-  //             } else {
-  //               elInstance.setStyle(col, "background-color", "#FFCCCB");
-  //             }
-  //           }
-  //         }
-  //       } else {
-  //         for (var j = 0; j < colArr.length; j++) {
-  //           var col = (colArr[j]).concat(parseInt(y) + 1);
-  //           elInstance.setStyle(col, "background-color", "#98FB98");
-  //         }
-  //       }
-  //     } else {
-  //       for (var j = 0; j < colArr.length; j++) {
-  //         var col = (colArr[j]).concat(parseInt(y) + 1);
-  //         elInstance.setStyle(col, "background-color", "#FF8686");
-  //       }
-  //     }
-  //   }
-  // }
-
   loadedFunctionForMerge = function (instance) {
-    // jExcelLoadedFunction(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
@@ -1338,44 +999,6 @@ export default class syncPage extends Component {
       }
     }
   }
-
-  // loadedFunctionInventory = function (instance) {
-  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-  //   var elInstance = instance.jexcel;
-  //   var latestDataJsonInventory = this.state.latestDataJsonInventory
-  //   var jsonData = elInstance.getJson();
-  //   for (var y = 0; y < jsonData.length; y++) {
-  //     if ((jsonData[y])[10] == true) {
-  //       if ((jsonData[y])[0] != 0) {
-  //         var latestFilteredData = (latestDataJsonInventory[y])[0];
-  //         var col = ("A").concat(parseInt(y) + 1);
-  //         var value = elInstance.getValueFromCoords(0, y);
-  //         if (value == latestFilteredData) {
-  //           for (var j = 1; j < colArr.length; j++) {
-  //             var col = (colArr[j]).concat(parseInt(y) + 1);
-  //             var valueToCompare = elInstance.getValueFromCoords(j, y);
-  //             var valueToCompareWith = (latestDataJsonInventory[y])[j];
-  //             if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-  //               elInstance.setStyle(col, "background-color", "transparent");
-  //             } else {
-  //               elInstance.setStyle(col, "background-color", "#FFCCCB");
-  //             }
-  //           }
-  //         }
-  //       } else {
-  //         for (var j = 0; j < colArr.length; j++) {
-  //           var col = (colArr[j]).concat(parseInt(y) + 1);
-  //           elInstance.setStyle(col, "background-color", "#98FB98");
-  //         }
-  //       }
-  //     } else {
-  //       for (var j = 0; j < colArr.length; j++) {
-  //         var col = (colArr[j]).concat(parseInt(y) + 1);
-  //         elInstance.setStyle(col, "background-color", "#FF8686");
-  //       }
-  //     }
-  //   }
-  // }
 
   loadedFunctionForMergeInventory = function (instance) {
     // jExcelLoadedFunction(instance);
@@ -1649,165 +1272,41 @@ export default class syncPage extends Component {
         }
       }
     }
-
-    // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
-    // // var colArrForOrderNumberAndLineNumber = ['D', 'E']
-    // var elInstance = instance.jexcel;
-    // var jsonData = elInstance.getJson();
-    // var latestDataJson = this.state.latestDataJsonShipment
-    // var shipmentIdArray = this.state.shipmentIdArray;
-    // for (var y = 0; y < jsonData.length; y++) {
-    //   if ((jsonData[y])[18] == true) {
-    //     if ((jsonData[y])[0] != 0) {
-    //       if (shipmentIdArray.includes((jsonData[y])[0])) {
-    //         for (var z = 0; z < latestDataJson.length; z++) {
-    //           if ((jsonData[y])[0] == (latestDataJson[z])[0]) {
-
-    //             // var col = (colArr[j]).concat(parseInt(y) + 1);
-
-    //             z = latestDataJson.length
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
   }
-
-  // loadedFunctionLatest = function (instance) {
-  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-  //   var elInstance = instance.jexcel;
-  //   var jsonData = elInstance.getJson();
-  //   for (var y = 0; y < jsonData.length; y++) {
-  //     if ((jsonData[y])[8] == true) {
-  //     } else {
-  //       for (var j = 0; j < colArr.length; j++) {
-  //         var col = (colArr[j]).concat(parseInt(y) + 1);
-  //         elInstance.setStyle(col, "background-color", "#FF8686");
-  //       }
-  //     }
-  //   }
-  // }
-
-  // loadedFunctionLatestInventory = function (instance) {
-  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-  //   var elInstance = instance.jexcel;
-  //   var jsonData = elInstance.getJson();
-  //   for (var y = 0; y < jsonData.length; y++) {
-  //     if ((jsonData[y])[10] == true) {
-  //     } else {
-  //       for (var j = 0; j < colArr.length; j++) {
-  //         var col = (colArr[j]).concat(parseInt(y) + 1);
-  //         elInstance.setStyle(col, "background-color", "#FF8686");
-  //       }
-  //     }
-  //   }
-  // }
 
   tabPane() {
     return (
       <>
         <TabPane tabId="1">
-          {/* <Row>
-            <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-              <Card>
-                <CardHeader>
-                  <strong>Current Version</strong>
-                </CardHeader>
-                <CardBody>
-                  <Col md="12 pl-0" id="realmDiv">
-                    <div className="table-responsive RemoveStriped">
-                      <div id="oldVersionConsumption" />
-                    </div>
-                  </Col>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-              <Card>
-                <CardHeader>
-                  <strong>Latest Version</strong>
-                </CardHeader>
-                <CardBody>
-                  <Col md="12 pl-0" id="realmDiv">
-                    <div className="table-responsive RemoveStriped">
-                      <div id="latestVersionConsumption" />
-                    </div>
-                  </Col>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row> */}
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              {/* <Card>
-                <CardHeader>
-                  <strong>Merged Version</strong>
-                </CardHeader> */}
-              {/* <CardBody> */}
               <Col md="12 pl-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped">
                   <div id="mergedVersionConsumption" />
                 </div>
               </Col>
-              {/* </CardBody> */}
-              {/* </Card> */}
             </Col>
           </Row>
         </TabPane>
         <TabPane tabId="2">
-          {/* <Row>
-            <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-              <Card>
-                <CardHeader>
-                  <strong>Current Version</strong>
-                </CardHeader>
-                <CardBody>
-                  <Col md="12 pl-0" id="realmDiv">
-                    <div className="table-responsive RemoveStriped">
-                      <div id="oldVersionInventory" />
-                    </div>
-                  </Col>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-              <Card>
-                <CardHeader>
-                  <strong>Latest Version</strong>
-                </CardHeader>
-                <CardBody>
-                  <Col md="12 pl-0" id="realmDiv">
-                    <div className="table-responsive RemoveStriped" >
-                      <div id="latestVersionInventory" />
-                    </div>
-                  </Col>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row> */}
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              {/* <CardBody> */}
               <Col md="12 pl-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped">
                   <div id="mergedVersionInventory" />
                 </div>
               </Col>
-              {/* </CardBody> */}
             </Col>
           </Row>
         </TabPane>
         <TabPane tabId="3">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              {/* <CardBody> */}
               <Col md="12 pl-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped">
                   <div id="mergedVersionShipment" />
                 </div>
               </Col>
-              {/* </CardBody> */}
             </Col>
           </Row>
         </TabPane>
@@ -1884,14 +1383,6 @@ export default class syncPage extends Component {
                           <li><span class="orangeredlegend legendcolor"></span><span className="legendcommitversionText"> {i18n.t('static.commit.duplicateErp')} </span></li>
 
                         </ul>
-                        {/* <ul className="legend legendsync">
-                          <li><span className="lightpinklegend"></span> <span className="legendTextsync">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
-                          <li><span className="greenlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.newDataCurrentVersion')}</span></li>
-                          <li><span className="notawesome"></span><span className="legendTextsync">  {i18n.t('static.commit.newDataLatestVersion')}</span></li>
-                          <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.inactiveData')}</span></li>
-                          <li><span className="orangelegend"></span><span className="legendTextsync"> {i18n.t('static.commit.erpDidNotMatch')}</span></li>
-                          <li><span className="orangeredlegend"></span><span className="legendTextsync"> {i18n.t('static.commit.duplicateErp')}</span></li>
-                        </ul> */}
                       </div>
                     </div>
                   </Col>
@@ -2120,9 +1611,6 @@ export default class syncPage extends Component {
       })
     }
   }
-
-  // checkValidationForOrderNumberAndLineNumber() {
-  // }
 
   cancelClicked() {
     console.log("inside cancel")
