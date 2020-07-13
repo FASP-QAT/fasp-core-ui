@@ -1305,19 +1305,15 @@ class ProductCatalog extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
 
-                <Card>
-                    <CardHeader>
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.productCatalog')}</strong>
-                        {/* {this.state.procurementAgents.length > 0 &&  */}
-                        <div className="card-header-actions">
-                            <a className="card-header-action">
-                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />}
-                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />}
-                            </a>
-                        </div>
-                        {/* } */}
-                    </CardHeader>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '} */}
+                        {this.state.outPutList.length > 0 && <div className="card-header-actions">
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
+
+                        </div>}
+                    </div>
                     <CardBody className="pb-lg-0">
                         {/* <div ref={ref}> */}
                         <br />

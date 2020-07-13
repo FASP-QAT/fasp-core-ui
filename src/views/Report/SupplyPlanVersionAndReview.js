@@ -660,8 +660,8 @@ class SupplyPlanVersionAndReview extends Component {
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong> */}
                         {
                             this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
@@ -672,8 +672,8 @@ class SupplyPlanVersionAndReview extends Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                             </div>
                         }
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
 
                         <div>
                             <Form >

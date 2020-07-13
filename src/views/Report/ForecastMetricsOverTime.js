@@ -916,20 +916,20 @@ class ForcastMatrixOverTime extends Component {
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader>
-                <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong>
-
-                {
-                  this.state.matricsList.length > 0 &&
-                  <div className="card-header-actions">
-                    <a className="card-header-action">
-                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                    </a> </div>
-                }
-
-              </CardHeader>
-              <CardBody>
+              <div className="Card-header-reporticon">
+                {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong> */}
+                
+                  {
+                    this.state.matricsList.length > 0 &&
+                    <div className="card-header-actions">
+                      <a className="card-header-action">
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      </a> </div>
+                  }
+              
+                </div>
+              <CardBody className="pb-lg-0 pt-lg-0">
                 <div className="TableCust" >
                   <div ref={ref}>
                     <Form >

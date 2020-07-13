@@ -1048,9 +1048,9 @@ class Consumption extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader className="pb-1">
+                    <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong> */}
-                        <i className="icon-menu"></i><strong>Shipment Details</strong>
+                        {/* <i className="icon-menu"></i><strong>Shipment Details</strong> */}
                         {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                         <Online>
                             {/* {
@@ -1093,8 +1093,8 @@ class Consumption extends Component {
                                 </div>
                             }
                         </Offline>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="" >
                             <div ref={ref}>
                                 <Form >

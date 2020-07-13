@@ -1040,8 +1040,8 @@ class warehouseCapacity extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.warehouseCapacity')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.warehouseCapacity')}</strong> */}
 
                         <Online>
                             {
@@ -1065,8 +1065,8 @@ class warehouseCapacity extends Component {
                                 </div>
                             }
                         </Offline>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div>
                                 <Form >
