@@ -239,7 +239,7 @@ class RealmDashboard extends Component {
               <div class="h1 text-muted text-left mb-0 m-3">
                 <i class="icon-people icon-color"></i>
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                  <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
@@ -297,7 +297,7 @@ class RealmDashboard extends Component {
               <div class="h1 text-muted text-left mb-2  ">
                 <i class="fa fa-medkit  icon-color"></i>
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                  <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
@@ -325,7 +325,7 @@ class RealmDashboard extends Component {
               <div class="h1 text-muted text-left mb-2  ">
                 <i class="icon-location-pin icon-color"></i>
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                  <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
@@ -352,7 +352,7 @@ class RealmDashboard extends Component {
               <div class="h1 text-muted text-left mb-2  ">
                 <i class="fa fa-sitemap icon-color"></i>
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                  <Dropdown id='card5' isOpen={this.state.card5} toggle={() => { this.setState({ card5: !this.state.card5 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
@@ -380,7 +380,7 @@ class RealmDashboard extends Component {
                 <i class="fa fa-file-text-o icon-color"></i>
               
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
+                  <Dropdown id='card6' isOpen={this.state.card6} toggle={() => { this.setState({ card6: !this.state.card6 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
@@ -408,7 +408,7 @@ class RealmDashboard extends Component {
                 <i class="icon-list  icon-color"></i>
               
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                  <Dropdown id='card7' isOpen={this.state.card7} toggle={() => { this.setState({ card7: !this.state.card7 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
@@ -436,7 +436,7 @@ class RealmDashboard extends Component {
                 <i class="fa fa-list-alt icon-color"></i>
               
                 <ButtonGroup className="float-right">
-                  <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                  <Dropdown id='card8' isOpen={this.state.card8} toggle={() => { this.setState({ card8: !this.state.card8 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
