@@ -168,9 +168,9 @@ class EditTracerCategoryComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={
@@ -211,7 +211,7 @@ class EditTracerCategoryComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
-                                                <CardBody>
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}

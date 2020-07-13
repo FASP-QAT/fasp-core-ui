@@ -17,16 +17,29 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Online } from 'react-detect-offline';
+import CryptoJS from 'crypto-js'
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS } from '../../Constants.js';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+
+
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
-
 const brandPrimary = getStyle('--primary')
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+
 class SupplierLeadTimes extends Component {
     constructor(props) {
         super(props);
@@ -42,34 +55,68 @@ class SupplierLeadTimes extends Component {
             programValues: [],
             programLabels: [],
             programs: [],
-            message: ''
+            message: '',
+            planningUnits: [],
+            versions: [],
+
+            planningUnitValues: [],
+            planningUnitLabels: [],
+
+            procurementAgenttValues: [],
+            procurementAgentLabels: [],
+            outPutList: []
         };
         this.filterData = this.filterData.bind(this);
-        this.getPrograms = this.getPrograms.bind(this)
-        this.handleChangeProgram = this.handleChangeProgram.bind(this)
+        this.getPrograms = this.getPrograms.bind(this);
+        this.handleChangeProgram = this.handleChangeProgram.bind(this);
+        this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
+        this.filterVersion = this.filterVersion.bind(this);
+        this.consolidatedVersionList = this.consolidatedVersionList.bind(this);
+        this.getPlanningUnit = this.getPlanningUnit.bind(this);
+        this.getProcurementAgent = this.getProcurementAgent.bind(this);
+        this.consolidatedProcurementAgentList = this.consolidatedProcurementAgentList.bind(this);
+        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this);
+        this.handleProcurementAgentChange = this.handleProcurementAgentChange.bind(this);
+        this.fetchData = this.fetchData.bind(this);
     }
 
-    exportCSV() {
-
+    exportCSV(columns) {
         var csvRow = [];
+        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        // this.state.programLabels.map(ele =>
+        // csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        // csvRow.push('')
+        // csvRow.push('')
+        // csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        // csvRow.push('')
+        // var re;
+        // var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
+        // re = this.state.procurementAgents
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        var A = [headers];
 
-        this.state.programLabels.map(ele =>
-            csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push('')
-        csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
-        csvRow.push('')
-        var re;
+        this.state.outPutList.map(
+            ele => A.push([
+                (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ele.plannedToDraftLeadTime,
+                ele.draftToSubmittedLeadTime,
+                ele.submittedToApprovedLeadTime,
+                ele.approvedToShippedLeadTime,
+                ele.shippedToArrivedBySeaLeadTime,
+                ele.shippedToArrivedByAirLeadTime,
+                ele.arrivedToDeliveredLeadTime,
+                ele.totalSeaLeadTime,
+                ele.totalAirLeadTime,
+                ele.localProcurementLeadTime
 
-        var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
-
-        re = this.state.procurementAgents
-
-        for (var item = 0; item < re.length; item++) {
-            let totalSeaLeadTime = re[item].plannedToDraftLeadTime + re[item].draftToSubmittedLeadTime + re[item].submittedToApprovedLeadTime + re[item].approvedToShippedLeadTime + re[item].shippedToArrivedBySeaLeadTime + re[item].arrivedToDeliveredLeadTime;
-            let totalAirLeadTime = re[item].plannedToDraftLeadTime + re[item].draftToSubmittedLeadTime + re[item].submittedToApprovedLeadTime + re[item].approvedToShippedLeadTime + re[item].shippedToArrivedByAirLeadTime + re[item].arrivedToDeliveredLeadTime;
-            A.push([[getLabelText(re[item].label), re[item].seaFreightPerc, re[item].airFreightPerc, re[item].plannedToDraftLeadTime, re[item].draftToSubmittedLeadTime, re[item].submittedToApprovedLeadTime, re[item].approvedToShippedLeadTime, re[item].shippedToArrivedBySeaLeadTime, re[item].shippedToArrivedByAirLeadTime, re[item].arrivedToDeliveredLeadTime, totalSeaLeadTime, totalAirLeadTime]])
-        }
+                // (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'),
+                // ele.stockAdjustemntQty,
+                // ele.lastModifiedBy.username,
+                // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
+            ]));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -81,16 +128,15 @@ class SupplierLeadTimes extends Component {
         document.body.appendChild(a)
         a.click()
     }
-    exportPDF = () => {
+
+
+    exportPDF = (columns) => {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(10)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -98,12 +144,9 @@ class SupplierLeadTimes extends Component {
                 doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
             for (var i = 1; i <= pageCount; i++) {
@@ -116,7 +159,7 @@ class SupplierLeadTimes extends Component {
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
-                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 90, planningText)
 
                 }
@@ -126,34 +169,50 @@ class SupplierLeadTimes extends Component {
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "landscape"; // portrait or landscape
-
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
-
         const title = "Procurement Agent Report";
         // var canvas = document.getElementById("cool-canvas");
         //creates image
-
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         // var aspectwidth1 = (width - h1);
-
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
+        // const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
+        // const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
 
-        const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
-        const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = (item.text) });
+        let data = this.state.outPutList.map(ele => [
+            getLabelText(ele.country.label, this.state.lang),
+            getLabelText(ele.program.label, this.state.lang),
+            getLabelText(ele.planningUnit.label, this.state.lang),
+            ele.plannedToDraftLeadTime,
+            ele.draftToSubmittedLeadTime,
+            ele.submittedToApprovedLeadTime,
+            ele.approvedToShippedLeadTime,
+            ele.shippedToArrivedBySeaLeadTime,
+            ele.shippedToArrivedByAirLeadTime,
+            ele.arrivedToDeliveredLeadTime,
+            ele.totalSeaLeadTime,
+            ele.totalAirLeadTime,
+            ele.localProcurementLeadTime
+        ]);
 
         let content = {
-            margin: { top: 80 },
-            startY: 150,
-            head: headers,
+            margin: { top: 40 },
+            startY: 200,
+            head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8 }
-
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 60, halign: 'center' },
+            // columnStyles: {
+            //     0: { cellWidth: 170 },
+            //     1: { cellWidth: 171.89 },
+            //     6: { cellWidth: 100 }
+            // }
         };
         doc.autoTable(content);
         addHeaders(doc)
@@ -167,10 +226,28 @@ class SupplierLeadTimes extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
 
-            this.filterData(this.state.rangeValue)
+            // this.filterData(this.state.rangeValue)
         })
 
     }
+    handlePlanningUnitChange = (planningUnitIds) => {
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+            this.fetchData()
+        })
+    }
+
+    handleProcurementAgentChange = (procurementAgentIds) => {
+        this.setState({
+            procurementAgenttValues: procurementAgentIds.map(ele => ele.value),
+            procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
+        }, () => {
+            this.fetchData()
+        })
+    }
+
     filterData(rangeValue) {
         setTimeout('', 10000);
         let programIds = this.state.programValues;
@@ -219,43 +296,490 @@ class SupplierLeadTimes extends Component {
 
 
     getPrograms() {
-        AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProgramService.getProgramByRealmId(realmId)
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    programs: response.data
-                })
-            }).catch(
-                error => {
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors();
+            let realmId = AuthenticationService.getRealmId();
+            ProgramService.getProgramByRealmId(realmId)
+                .then(response => {
+                    console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
+                        programs: response.data
+                    }, () => { this.consolidatedProgramList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            programs: []
+                        }, () => { this.consolidatedProgramList() })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            console.log('offline')
+            this.consolidatedProgramList()
+        }
+    }
+
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { programs } = this.state
+        var proList = programs;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
+
+                        var f = 0
+                        for (var k = 0; k < this.state.programs.length; k++) {
+                            if (this.state.programs[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
+                        }
+                        if (f == 0) {
+                            proList.push(programData)
                         }
                     }
                 }
-            );
+                this.setState({
+                    programs: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+    }
+    filterVersion = () => {
+        let programId = document.getElementById("programId").value;
+        if (programId != 0) {
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (navigator.onLine) {
+                    this.setState({
+                        versions: [],
+                        planningUnits: [],
+                        // outPutList: []
+
+                    }, () => {
+                        this.setState({
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
+                    });
+                } else {
+                    this.setState({
+                        versions: []
+                    }, () => { this.consolidatedVersionList(programId) })
+                }
+            } else {
+
+                this.setState({
+                    versions: []
+                })
+            }
+        } else {
+            this.setState({
+                versions: []
+            })
+        }
     }
 
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
 
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+                    }
+                }
+                console.log(verList)
+                this.setState({
+                    versions: verList.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })
+                })
+
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        // let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: []
+        }, () => {
+            // if (versionId.includes('Local')) {
+            if (!navigator.onLine) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList[i] = myResult[i]
+                            }
+                        }
+                        this.setState({
+                            planningUnits: proList, message: ''
+                        }, () => {
+                            this.fetchData();
+                        })
+                    }.bind(this);
+                }.bind(this)
+
+
+            }
+            else {
+                AuthenticationService.setupAxiosInterceptors();
+
+                //let productCategoryId = document.getElementById("productCategoryId").value;
+                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    console.log('**' + JSON.stringify(response.data))
+                    this.setState({
+                        planningUnits: response.data, message: ''
+                    }, () => {
+                        this.fetchData();
+                    })
+                })
+                    .catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        });
+
+    }
+
+    getProcurementAgent = () => {
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors();
+            ProcurementAgentService.getProcurementAgentListAll()
+                .then(response => {
+                    // console.log(JSON.stringify(response.data))
+                    this.setState({
+                        procurementAgents: response.data
+                    }, () => { this.consolidatedProcurementAgentList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            procurementAgents: []
+                        }, () => { this.consolidatedProcurementAgentList() })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log('offline')
+            this.consolidatedProcurementAgentList()
+        }
+
+    }
+
+    consolidatedProcurementAgentList = () => {
+        const lan = 'en';
+        const { procurementAgents } = this.state
+        var proList = procurementAgents;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var procuremntAgent = transaction.objectStore('procurementAgent');
+            var getRequest = procuremntAgent.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // console.log("ProcurementAgentMyResult------>>>>", myResult);
+                for (var i = 0; i < myResult.length; i++) {
+
+                    var f = 0
+                    for (var k = 0; k < this.state.procurementAgents.length; k++) {
+                        if (this.state.procurementAgents[k].procurementAgentId == myResult[i].procurementAgentId) {
+                            f = 1;
+                            console.log('already exist')
+                        }
+                    }
+                    var programData = myResult[i];
+                    if (f == 0) {
+                        proList.push(programData)
+                    }
+
+                }
+
+                this.setState({
+                    procurementAgents: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+    }
+
+    fetchData = () => {
+        // let versionId = document.getElementById("versionId").value;
+        let programId = document.getElementById("programId").value;
+        // let plannedShipments = document.getElementById("shipmentStatusId").value;
+        let planningUnitIds = this.state.planningUnitValues;
+        let procurementAgentIds = this.state.procurementAgenttValues;
+        // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        if (programId > 0) {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var regionList = [];
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext')
+                })
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var programDataTransaction = db1.transaction(['program'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('program');
+                var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext')
+                    })
+                }.bind(this);
+
+                programRequest.onsuccess = function (e) {
+                    var result = programRequest.result;
+                    console.log("1------>", result);
+
+                    var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
+                    var ppuRequest = ppuOs.getAll();
+                    ppuRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+                    ppuRequest.onsuccess = function (e) {
+                        var result1 = (ppuRequest.result).filter(c => c.program.id == parseInt(programId));
+                        
+                        if (planningUnitIds.length > 0) {
+                            var planningUnitfilteredList = [];
+                            for (var i = 0; i < planningUnitIds.length; i++) {
+                                var l = result1.filter(c => c.planningUnit.id == planningUnitIds[i]);
+                                for (var j = 0; j < l.length; j++) {
+                                    // console.log("------status", l[j].shipmentStatus.id);
+                                    planningUnitfilteredList.push(l[j]);
+                                }
+                            }
+                            result1 = planningUnitfilteredList;
+                        }
+                        console.log("2------>", result1);
+
+                        var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                        var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                        var papuRequest = papuOs.getAll();
+                        papuRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext')
+                            })
+                        }.bind(this);
+
+                        papuRequest.onsuccess = function (e) {
+                            var result2 = papuRequest.result;
+                            console.log("3------>", result2);
+
+                            if (procurementAgentIds.length > 0) {
+                                var procurementAgentFilteredList = []
+                                for (var i = 0; i < procurementAgentIds.length; i++) {
+                                    var l = result2.filter(c => c.procurementAgent.id == procurementAgentIds[i]);
+                                    for (var j = 0; j < l.length; j++) {
+                                        procurementAgentFilteredList.push(l[j]);
+                                    }
+                                }
+                                result2 = procurementAgentFilteredList;
+                            }
+
+                            var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                            var paOs = paTransaction.objectStore('procurementAgent');
+                            var paRequest = paOs.getAll();
+                            paRequest.onerror = function (event) {
+                                this.setState({
+                                    message: i18n.t('static.program.errortext')
+                                })
+                            }.bind(this);
+
+                            paRequest.onsuccess = function (e) {
+                                var result3 = paRequest.result;
+                                console.log("4------>", result3);
+
+                                var outPutList = [];
+                                for (var i = 0; i < result1.length; i++) {
+                                    var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
+                                    var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
+                                    var program = result1[i].program;
+                                    for (var j = 0; j < filteredList.length; j++) {
+                                        var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).submittedToApprovedLeadTime;
+                                        var json = {
+                                            planningUnit: filteredList[j].planningUnit,
+                                            procurementAgent: filteredList[j].procurementAgent,
+                                            localProcurementLeadTime: localProcurementAgentLeadTime,
+                                            approvedToShippedLeadTime: result.approvedToShippedLeadTime,
+                                            program: program,
+                                            country: result.realmCountry.country,
+                                            plannedToDraftLeadTime: result.plannedToDraftLeadTime,
+                                            draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
+                                            shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
+                                            shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
+                                            arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
+                                            submittedToApprovedLeadTime: submittedToApprovedLeadTime,
+                                            totalAirLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedByAirLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
+                                            totalSeaLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedBySeaLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
+                                        }
+                                        outPutList.push(json);
+                                    }
+                                }
+                                console.log("outPutList------>", outPutList);
+                                this.setState({ outPutList: outPutList });
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+
+        } else if (programId == 0) {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+        }
+        else {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+        }
+    }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-        this.getPrograms()
+        // AuthenticationService.setupAxiosInterceptors();
+        this.getPrograms();
+        this.getProcurementAgent();
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -267,18 +791,204 @@ class SupplierLeadTimes extends Component {
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
     render() {
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
 
         const { programs } = this.state;
-        let programList = [];
-        programList = programs.length > 0
-            && programs.map((item, i) => {
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
                 return (
-
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
-
+                    <option key={i} value={item.versionId}>
+                        {item.versionId}
+                    </option>
                 )
             }, this);
-        let consumptiondata = [];
+
+        const { planningUnits } = this.state
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
+
+        const { procurementAgents } = this.state
+        let procurementAgentList = procurementAgents.length > 0
+            && procurementAgents.map((item, i) => {
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.procurementAgentId })
+
+            }, this);
+
+        const columns = [
+            {
+                dataField: 'country.label',
+                text: 'Country',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'program.label',
+                text: 'Program',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'planningUnit.label',
+                text: 'Planning Unit',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '180px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'procurementAgent.label',
+                text: 'Procurement Agent',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '180px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'plannedToDraftLeadTime',
+                text: 'Planned To Draft Lead Time',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'draftToSubmittedLeadTime',
+                text: 'Draft To Submitted Lead Time',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+
+            {
+                dataField: 'submittedToApprovedLeadTime',
+                text: 'Submitted To Approved Lead Time',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+
+            {
+                dataField: 'approvedToShippedLeadTime',
+                text: 'Approved To Shipped Lead Time',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'shippedToArrivedBySeaLeadTime',
+                text: 'Shipped To Arrived By Sea LeadTime',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'shippedToArrivedByAirLeadTime',
+                text: 'Shipped To Arrived By Air LeadTime',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'arrivedToDeliveredLeadTime',
+                text: 'Arrived To Delivered LeadTime',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'totalSeaLeadTime',
+                text: 'Total Sea Lead Time',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'totalAirLeadTime',
+                text: 'Total Air LeadTime',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'localProcurementLeadTime',
+                text: 'Local Procurement LeadTime',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+
+        ];
+
+        const tabelOptions = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.outPutList.length
+            }]
+        }
 
         return (
             <div className="animated fadeIn" >
@@ -289,164 +999,130 @@ class SupplierLeadTimes extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
+                        {/* <i className="icon-menu"></i><strong>Procurement Agent Lead Times</strong> */}
                         {/* {this.state.procurementAgents.length > 0 &&  */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                             </a>
                         </div>
                         {/* } */}
-                    </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    </div>
+                    <CardBody className="pt-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >
                             <Col md="6 pl-0">
                                 <div className="d-md-flex Selectdiv2">
-                                    <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Country</Label>
-                                        <div className="controls SelectGo">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                // onChange={this.filterData}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
+                                    <Online>
+                                        <FormGroup className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">Country</Label>
+                                            <div className="controls SelectGo">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="countryId"
+                                                        id="countryId"
+                                                        bsSize="sm"
+                                                    // onChange={this.filterData}
+                                                    >
+                                                        <option value="0">Please Select </option>
+                                                        <option value="0">Malawi </option>
+
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                    </Online>
                                     <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">Program</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
+                                                    name="programId"
+                                                    id="programId"
                                                     bsSize="sm"
-                                                // onChange={this.filterData}
+                                                    // onChange={this.filterVersion}
+                                                    onChange={(e) => { this.getPlanningUnit(); }}
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                                    <option value="0">Please Select</option>
+                                                    {programs.length > 0
+                                                        && programs.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.programId}>
+                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                </option>
+                                                            )
+                                                        }, this)}
                                                 </Input>
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                        <div className="controls SelectGo">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                // onChange={this.filterData}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                </Input>
+                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                        <div className="controls">
+                                            <InputGroup className="box">
+                                                <ReactMultiSelectCheckboxes
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="md"
+                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                />
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">Procurement Agent</Label>
                                         <div className="controls SelectGo">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                // onChange={this.filterData}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                </Input>
+                                            <InputGroup className="box">
+                                                <ReactMultiSelectCheckboxes
+                                                    name="procurementAgentId"
+                                                    id="procurementAgentId"
+                                                    bsSize="md"
+                                                    onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                                    options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                                />
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    {/* <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Shipping Method</Label>
-                                        <div className="controls SelectGo">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                // onChange={this.filterData}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup> */}
                                 </div>
                             </Col>
                         </Form><br /><br /><br />
-                        <Col md="12 pl-0">
+                        <ToolkitProvider
+                            keyField="id"
+                            data={this.state.outPutList}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                        >
+                            {
+                                props => (
 
-                            <div className="row">
-                                <div className="col-md-12">
-                                    {this.state.procurementAgents.length == 0 &&
-
-                                        <Table responsive className="table-striped  table-hover table-bordered text-center mt-2">
-
-                                            <thead>
-                                                <tr>
-                                                    <th colSpan="4" className="text-center "></th>
-                                                    <th colSpan="10" className="text-center ">Lead Time In Months</th>
-                                                </tr>
-                                                <tr>
-                                                    <th className="text-center " style={{ 'width': '2%' }}> Country </th>
-                                                    <th className="text-center "style={{ 'width': '2%' }}> Program </th>
-                                                    <th className="text-center " style={{ 'width': '2%' }}> Planning Unit </th>
-                                                    <th className="text-center" style={{ 'width': '2%' }}> Procurement Agent</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Plan to Draft</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Draft to Submitted</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Submitted to Approved</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Approved to Shipped</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Sea</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Shipped to Arrived by Air</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Arrived to Delivered</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Sea</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Total LT By Air</th>
-                                                    <th className="text-center" style={{ 'width': '6%' }}> Local Procurement</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-
-
-                                                <tr id="addr0" key={1} >
-                                                    <td>Malawi</td>
-                                                    <td>HIV/AIDS - Malawi - National</td>
-                                                    <td>Abacavir 20 mg/mL Solution, 240 mL</td>
-                                                    <td>PEPFAR</td>
-                                                    <td>0.5</td>
-                                                    <td>0.5</td>
-                                                    <td>1.25</td>
-                                                    <td>0.75</td>
-                                                    <td>1</td>
-                                                    <td>0.25</td>
-                                                    <td>0.75</td>
-                                                    <td>4.75</td>
-                                                    <td>4</td>
-                                                    <td>0.5</td>
-
-                                                </tr>
-                                            </tbody>
-                                        </Table>
-                                    }
-
-                                </div>
-                            </div>
-                        </Col>
+                                    <div className="TableCust">
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                            <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
+                                        </div>
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(tabelOptions)}
+                                            /* rowEvents={{
+                                                 onClick: (e, row, rowIndex) => {
+                                                     this.editRegion(row);
+                                                 }
+                                             }}*/
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
 
                         {/* </div> */}
 

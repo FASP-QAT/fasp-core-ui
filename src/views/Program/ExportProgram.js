@@ -204,7 +204,7 @@ export default class ExportProgram extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <Card>
+                <Card className="mt-2">
                     <Formik
                         initialValues={initialValues}
                         render={
@@ -215,9 +215,9 @@ export default class ExportProgram extends Component {
                                 handleBlur,
                             }) => (
                                     <Form noValidate name='simpleForm'>
-                                        <CardHeader>
+                                        {/* <CardHeader>
                                             <strong>{i18n.t('static.program.export')}</strong>
-                                        </CardHeader>
+                                        </CardHeader> */}
                                         <CardBody>
                                             <FormGroup className="col-md-4" >
                                                 <Label htmlFor="select">{i18n.t('static.program.program')}</Label>

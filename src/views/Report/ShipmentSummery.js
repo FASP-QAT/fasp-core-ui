@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -1048,8 +1048,9 @@ class Consumption extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong> */}
+                        {/* <i className="icon-menu"></i><strong>Shipment Details</strong> */}
                         {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                         <Online>
                             {/* {
@@ -1092,8 +1093,8 @@ class Consumption extends Component {
                                 </div>
                             }
                         </Offline>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="" >
                             <div ref={ref}>
                                 <Form >
@@ -1287,80 +1288,84 @@ class Consumption extends Component {
                                                     <thead>
                                                         <tr>
                                                             <th style={{ 'text-align': 'left' }}>Planning Unit/Forecasting Unit</th>
-                                                            <th>ID</th>
+                                                            <th style={{ 'width': '87px' }}>ID</th>
                                                             <th>Procurement Agent</th>
                                                             <th>Funder</th>
                                                             <th>Status</th>
-                                                            <th>Notes</th>
+                                                            
                                                             <th style={{ 'text-align': 'right' }}>Qty</th>
-                                                            <th style={{ 'width': '87px' }}>Order Date</th>
-                                                            <th>Date/Month Receipt Expected</th>
+                                                            {/* <th style={{ 'width': '87px' }}>Order Date</th> */}
+                                                            <th>Expected Receipt Date</th>
                                                             <th style={{ 'text-align': 'right' }}>Product Cost (USD)</th>
-                                                            <th style={{ 'text-align': 'right' }}>Freight(%)</th>
+                                                            {/* <th style={{ 'text-align': 'right' }}>Freight(%)</th> */}
                                                             <th style={{ 'text-align': 'right' }}>Freight Cost (USD)</th>
                                                             <th style={{ 'text-align': 'right' }}>Total Cost (USD)</th>
                                                             <th style={{ 'text-align': 'right' }}>Containers</th>
+                                                            <th>Notes</th>
                                                         </tr>
 
                                                     </thead>
 
                                                     <tbody>
-                                                        <tr>
+                                                        {/* <tr>
                                                             <th colSpan="14" style={{ 'text-align': 'left' }}>Feb 2020</th>
-                                                        </tr>
+                                                        </tr> */}
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>01</td>
+                                                            <td style={{ 'width': '87px' }}>01</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Received</td>
-                                                            <td></td>
+                                                            
                                                             <td style={{ 'text-align': 'right' }}>2,000</td>
-                                                            <td>Feb-03-2020</td>
+                                                            {/* <td>Feb-03-2020</td> */}
                                                             <td>Apr-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>3,400,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>340,000</td>
                                                             <td style={{ 'text-align': 'right' }}>3,740,000</td>
                                                             <td style={{ 'text-align': 'right' }}>1</td>
+                                                            <td></td>
                                                         </tr>
-                                                        <tr>
+                                                        {/* <tr>
                                                             <th colSpan="14" style={{ 'text-align': 'left' }}>May 2020</th>
-                                                        </tr>
+                                                        </tr> */}
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>02</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Ordered</td>
-                                                            <td></td>
+                                                            
                                                             <td style={{ 'text-align': 'right' }}>3,000</td>
-                                                            <td>May-07-2020</td>
+                                                            {/* <td>May-07-2020</td> */}
                                                             <td>Sep-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>5,100,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>510,000</td>
                                                             <td style={{ 'text-align': 'right' }}>5,610,000</td>
                                                             <td style={{ 'text-align': 'right' }}>1.5</td>
+                                                            <td></td>
                                                         </tr>
-                                                        <tr>
+                                                        {/* <tr>
                                                             <th colSpan="14" style={{ 'text-align': 'left' }}>Jun 2020</th>
-                                                        </tr>
+                                                        </tr> */}
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>03</td>
                                                             <td>PEPFAR</td>
                                                             <td>GHSC-PSM</td>
                                                             <td>Planned</td>
-                                                            <td></td>
+                                                            
                                                             <td style={{ 'text-align': 'right' }}>4,000</td>
-                                                            <td>Jun-03-2020</td>
+                                                            {/* <td>Jun-03-2020</td> */}
                                                             <td>Nov-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>6,800,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>10</td>
+                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>680,000</td>
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
+                                                            <td></td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>}

@@ -112,7 +112,7 @@ const optionsPie = {
 }
 
 const chartData = {
-    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Pieces', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Each', 'Female Condom (Nitrile) Lubricated, 17 cm, 20 Each'],
+    labels: ['Male Condom (Latex) Lubricated,Be Safe,53 mm,3000 Units', 'Female Condom (Nitrile) Lubricated, 17 cm,1000 Units', 'Female Condom (Nitrile) Lubricated, 17 cm, 20 Units'],
     datasets: [{
         label: 'Ordered Shipments',
         data: [20000, 10000, 2000],
@@ -1134,8 +1134,9 @@ class ShipmentGlobalDemandView extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>Shipment Global Demand View</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>Shipment Global Demand View</strong> */}
+                        {/* <i className="icon-menu"></i><strong>Shipment Overview</strong> */}
                         {/* {this.state.consumptions.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1145,8 +1146,8 @@ class ShipmentGlobalDemandView extends Component {
                             </a>
                         </div>
                         {/* } */}
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div ref={ref}>
 
                             <Form >
@@ -1320,7 +1321,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     <tbody>
                                                         <tr id="addr0" key={1} >
 
-                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Each</td>
+                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Units</td>
                                                             <td className="text-right" style={{ width: '100px' }}>3,000</td>
                                                             <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
                                                             <td className="text-right" style={{ width: '100px' }}>5,000</td>
@@ -1334,21 +1335,21 @@ class ShipmentGlobalDemandView extends Component {
                                                         </tr>
                                                         <tr id="addr0" key={2} >
 
-                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Each</td>
+                                                            <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Units</td>
                                                             <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>5,100,000 </td>
                                                             <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>8,500,000 </td>
                                                             <td className="text-right" style={{ width: '100px' }}></td>
                                                             <td className="text-right" style={{ width: '100px' }}></td>
                                                             <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
-                                                            <td className="text-right" style={{ width: '100px' }}>15,000</td>
+                                                            <td className="text-right" style={{ width: '100px' }}>11,900,000 </td>
+                                                            <td className="text-right" style={{ width: '100px' }}>15,000 </td>
                                                             <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
                                                         </tr>
                                                         <tr id="addr0" key={3} >
 
-                                                            <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Pieces</td>
+                                                            <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Units</td>
                                                             <td className="text-right" style={{ width: '100px' }}>3,000</td>
                                                             <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
                                                             <td className="text-right" style={{ width: '100px' }}>5,000</td>

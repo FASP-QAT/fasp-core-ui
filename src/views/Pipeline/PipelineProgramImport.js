@@ -96,9 +96,9 @@ export default class PipelineProgramImport extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <strong>{i18n.t('static.program.import')}</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody>
 
                                 <FormGroup id="fileImportDiv">

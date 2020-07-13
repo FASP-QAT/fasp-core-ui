@@ -364,12 +364,14 @@ export default class ProductCategoryTree extends Component {
             submitJson.push(json);
         }
         )
-        // console.log("submit json---->", submitJson);
+        console.log("submit json---->", submitJson);
+        console.log("submit json---->", JSON.stringify(submitJson));
         ProductCategoryService.addProductCategory(submitJson)
             .then(response => {
                 if (response.status == 200) {
                     // console.log("success-------------------------.");
-                    this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
+                    // this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
+                    this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.productCategory.success'))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -436,9 +438,9 @@ export default class ProductCategoryTree extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="mb-lg-0">
-                            <CardHeader className="pb-lg-1">
+                            {/* <CardHeader className="pb-lg-1">
                                 <strong>Product Category</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody className="pb-lg-0">
                                 <Col md="3 pl-0" >
                                     <FormGroup>

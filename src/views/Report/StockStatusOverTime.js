@@ -15,9 +15,13 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import CryptoJS from 'crypto-js'
+import { SECRET_KEY } from '../../Constants.js'
 import ReportService from '../../api/ReportService';
+import moment from "moment";
 import {
-    Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form,Table
+    Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Table
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 
@@ -57,14 +61,14 @@ const options = {
     legend: {
         display: true,
         position: 'bottom',
-       
+
         labels: {
             usePointStyle: true,
             fontColor: 'black',
             fontSize: 12,
             boxWidth: 9,
             boxHeight: 2
-           
+
         }
     }
 }
@@ -86,6 +90,7 @@ class StockStatusOverTime extends Component {
             planningUnits: [],
             countries: [],
             programs: [],
+            versions: [],
             planningUnitValues: [],
             planningUnitLabels: [],
             countryValues: [],
@@ -95,6 +100,8 @@ class StockStatusOverTime extends Component {
             planningUnitlines: [],
             lineData: [],
             lineDates: [],
+            monthsInPastForAmc:0,
+            monthsInFutureForAmc:0,
             planningUnitMatrix: {
                 date: []
             },
@@ -108,13 +115,7 @@ class StockStatusOverTime extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.getCountrylist = this.getCountrylist.bind(this);
-        this.getProductCategories = this.getProductCategories.bind(this)
-        this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.fetchData = this.fetchData.bind(this);
-        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
-        this.getPrograms = this.getPrograms.bind(this);
-        this.handleChangeProgram = this.handleChangeProgram.bind(this)
     }
 
     makeText = m => {
@@ -126,33 +127,25 @@ class StockStatusOverTime extends Component {
         return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
 
-  formatter = value => {
+    formatter = value => {
 
-    var cell1 = value
-    cell1 += '';
-    var x = cell1.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
     }
-    return x1 + x2;
-  }
- 
-    handlePlanningUnitChange(planningUnitIds) {
 
+    handlePlanningUnitChange = (planningUnitIds) => {
 
-        var planningUnitIdArray = [];
-        var planningUnitLabel = [];
-        planningUnitIdArray = planningUnitIds.map(ele => ele.value)
-        planningUnitLabel = planningUnitIds.map(ele => ele.label)
-        /* for (var i = 0; i < planningUnitIds.length; i++) {
-           planningUnitIdArray[i] = planningUnitIds[i].value;
-           planningUnitLabel[i] = planningUnitIds[i].label
-     
-         }*/
-
+        planningUnitIds=planningUnitIds.sort(function(a,b){
+            return parseInt(a.value)  - parseInt(b.value);
+           })
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele.value),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -160,7 +153,6 @@ class StockStatusOverTime extends Component {
 
             this.fetchData()
         })
-
 
     }
     handleChangeProgram(programIds) {
@@ -175,11 +167,7 @@ class StockStatusOverTime extends Component {
 
     }
 
-    componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-        this.getPrograms()
-        this.getProductCategories()
-    }
+
 
     show() {
     }
@@ -229,179 +217,21 @@ class StockStatusOverTime extends Component {
 
     }
 
-    getPrograms() {
-        AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProgramService.getProgramByRealmId(realmId)
-            .then(response => {
-                // console.log(JSON.stringify(response.data))
-                this.setState({
-                    programs: response.data
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        programs: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-    }
-
-    getProductCategories() {
-        AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                //  console.log(JSON.stringify(response.data))
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        productCategories: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-    }
-    getPlanningUnit() {
-        AuthenticationService.setupAxiosInterceptors();
-        let productCategoryId = document.getElementById("productCategoryId").value;
-        PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-            // console.log('**' + JSON.stringify(response.data))
-            this.setState({
-                planningUnits: response.data,
-            })
-        })
-            .catch(
-                error => {
-                    this.setState({
-                        planningUnits: [],
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-    }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    fetchData() {
-        let productCategoryId = document.getElementById("productCategoryId").value;
-        let planningUnitIds = this.state.planningUnitValues;
-        let programIds = this.state.programValues
-        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-
-        var programAndPlanningUnitList = (programIds.flatMap(d => planningUnitIds.map(v => ({ "programId": d, "planningUnitId": v }))));
-        if (planningUnitIds.length > 0 && programIds.length > 0) {
-
-            var input = {
-                "programAndPlanningUnitList": programAndPlanningUnitList,
-                "mosPast": document.getElementById("mosPast").selectedOptions[0].value == 0 ? null : document.getElementById("mosPast").selectedOptions[0].value,
-                "mosFuture": document.getElementById("mosFuture").selectedOptions[0].value == 0 ? null : document.getElementById("mosFuture").selectedOptions[0].value,
-                "startDate": startDate,
-                "stopDate": stopDate
-            }
-
-            /*var inputjson={
-            "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate
-           }*/
+    getPrograms = () => {
+        if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
-
-            ReportService.getStockOverTime(input)
+            let realmId = AuthenticationService.getRealmId();
+            ProgramService.getProgramByRealmId(realmId)
                 .then(response => {
-                    response.data = [[{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 54800, "consumptionQty": 0, "amc": 23122, "amcMonthCount": 4, "mos": 2.37 },
-                    { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 27203, "consumptionQty": 17475, "amc": 23533, "amcMonthCount": 5, "mos": 1.1559 },
-                    { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 6067, "consumptionQty": 25135, "amc": 22402, "amcMonthCount": 6, "mos": 0.2708 },
-                    { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 36137, "consumptionQty": 49880, "amc": 21202, "amcMonthCount": 7, "mos": 1.7044 },
-                    { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10960, "consumptionQty": 25177, "amc": 23631, "amcMonthCount": 7, "mos": 0.4638 },
-                    { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 0, "consumptionQty": 16750, "amc": 23706, "amcMonthCount": 7, "mos": 0.0 },
-                    { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 26000, "consumptionQty": 14000, "amc": 22401, "amcMonthCount": 7, "mos": 1.1607 }],
-                    [{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 28648, "consumptionQty": 0, "amc": 8604, "amcMonthCount": 4, "mos": 3.3293 },
-                    { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17103, "consumptionQty": 11522, "amc": 9351, "amcMonthCount": 5, "mos": 1.829 },
-                    { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 20500, "consumptionQty": 11513, "amc": 9709, "amcMonthCount": 6, "mos": 2.1114 },
-                    { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 9116, "consumptionQty": 11384, "amc": 9965, "amcMonthCount": 7, "mos": 0.9148 },
-                    { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 31757, "consumptionQty": 12336, "amc": 11607, "amcMonthCount": 7, "mos": 2.7358 },
-                    { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 20257, "consumptionQty": 11500, "amc": 11604, "amcMonthCount": 7, "mos": 1.7456 },
-                    { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 28757, "consumptionQty": 11500, "amc": 11602, "amcMonthCount": 7, "mos": 2.4784 }],
-                    [{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 15865, "consumptionQty": 0, "amc": 4608, "amcMonthCount": 4, "mos": 3.4427 },
-                    { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 9789, "consumptionQty": 6053, "amc": 4854, "amcMonthCount": 5, "mos": 2.0166 },
-                    { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 23393, "consumptionQty": 6398, "amc": 5070, "amcMonthCount": 6, "mos": 4.6139 },
-                    { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 15903, "consumptionQty": 5982, "amc": 5224, "amcMonthCount": 7, "mos": 3.044 },
-                    { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10063, "consumptionQty": 5838, "amc": 6103, "amcMonthCount": 7, "mos": 1.6489 },
-                    { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 3913, "consumptionQty": 6150, "amc": 6116, "amcMonthCount": 7, "mos": 0.6397 },
-                    { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17763, "consumptionQty": 6150, "amc": 6081, "amcMonthCount": 7, "mos": 2.9209 }]];
                     console.log(JSON.stringify(response.data))
-                    var lineData = [];
-                    var lineDates = [];
-                    var planningUnitlines = [];
-                    for (var i = 0; i < response.data.length; i++) {
-                        lineData[i] = response.data[i].map(ele => (ele.mos))
-                    }
-                    lineDates = response.data[0].map(ele => (ele.dt))
-                    planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
-
                     this.setState({
-                        matricsList: response.data,
-                        message: '',
-                        planningUnitlines: planningUnitlines,
-                        lineData: lineData,
-                        lineDates: lineDates
-                    })
+                        programs: response.data
+                    }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            consumptions: []
-                        })
-
+                            programs: []
+                        }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
                         } else {
@@ -411,7 +241,7 @@ class StockStatusOverTime extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
                                     this.setState({ message: 'static.unkownError' });
@@ -420,11 +250,699 @@ class StockStatusOverTime extends Component {
                         }
                     }
                 );
-        } else if (programIds.length == 0) {
+
+        } else {
+            console.log('offline')
+            this.consolidatedProgramList()
+        }
+
+    }
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { programs } = this.state
+        var proList = programs;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
+
+                        var f = 0
+                        for (var k = 0; k < this.state.programs.length; k++) {
+                            if (this.state.programs[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
+                        }
+                        if (f == 0) {
+                            proList.push(programData)
+                        }
+                    }
+
+
+                }
+
+                this.setState({
+                    programs: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+
+
+    }
+
+    updateMonthsforAMCCalculations=()=>{
+        let programId = document.getElementById("programId").value;
+        if (programId != 0) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+           this.setState({ monthsInPastForAmc:program[0].monthsInPastForAmc,
+            monthsInFutureForAmc:program[0].monthsInFutureForAmc})
+
+            }}
+    }
+    changeMonthsForamc=(event)=>{
+        if (event.target.name === "monthsInPastForAmc") {
+            this.setState({ monthsInPastForAmc:event.target.value},()=>{this.fetchData()})
+    
+                }
+        
+        if (event.target.name === "monthsInFutureForAmc") {
+            this.setState({ 
+                monthsInFutureForAmc:event.target.value},()=>{this.fetchData()})
+    
+                }
+        }
+        
+    
+    filterVersion = () => {
+        let programId = document.getElementById("programId").value;
+        if (programId != 0) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (navigator.onLine) {
+                    this.setState({
+                        versions: []
+                    }, () => {
+                        this.setState({
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
+                    });
+
+
+                } else {
+                    this.setState({
+                        versions: []
+                    }, () => { this.consolidatedVersionList(programId) })
+                }
+            } else {
+
+                this.setState({
+                    versions: []
+                })
+
+            }
+        } else {
+            this.setState({
+                versions: []
+            })
+        }
+    }
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+
+                    }
+
+
+                }
+
+                console.log(verList)
+                this.setState({
+                    versions: verList.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })
+                })
+
+            }.bind(this);
+
+
+
+        }.bind(this)
+
+
+    }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: []
+        }, () => {
+            if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                        console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList[i] = myResult[i]
+                            }
+                        }
+                        this.setState({
+                            planningUnits: proList, message: ''
+                        }, () => {
+                            this.fetchData();
+                        })
+                    }.bind(this);
+                }.bind(this)
+
+
+            }
+            else {
+                AuthenticationService.setupAxiosInterceptors();
+
+                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    console.log('**' + JSON.stringify(response.data))
+                    this.setState({
+                        planningUnits: response.data, message: ''
+                    }, () => {
+                        this.fetchData();
+                    })
+                })
+                    .catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        });
+
+    }
+
+    componentDidMount() {
+
+        this.getPrograms();
+
+
+    }
+    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+    fetchData() {
+        let planningUnitIds = this.state.planningUnitValues
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+        console.log(planningUnitIds.length > 0 )
+        if (planningUnitIds.length > 0 && versionId !=0 && programId > 0) {
+            if (versionId.includes('Local')) {
+              
+                let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+                let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+let monthsInFutureForAmc=this.state.monthsInFutureForAmc
+let monthsInPastForAmc=this.state.monthsInPastForAmc
+
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var version = (versionId.split('(')[0]).trim()
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var program = `${programId}_v${version}_uId_${userId}`
+                    var data = [];
+                    var programRequest = programTransaction.get(program);
+
+                    programRequest.onsuccess = function (event) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+console.log('in')
+planningUnitIds.map(planningUnitId => {
+
+                            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                        var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                        var shipmentList = []
+                        // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
+                        shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+                        // } else {
+                        //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
+
+                        // }
+                        // calculate openingBalance
+
+                        let invmin = moment.min(inventoryList.map(d => moment(d.inventoryDate)))
+                        let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+                        let conmin = moment.min(consumptionList.map(d => moment(d.consumptionDate)))
+                        var minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
+
+                        var openingBalance = 0;
+                        if (minDate.isBefore(startDate)) {
+                            var totalConsumption = 0;
+                            var totalAdjustments = 0;
+                            var totalShipments = 0;
+                            console.log('startDate', startDate)
+                            console.log('programJson', programJson)
+                            var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore(minDate));
+                            console.log('consumptionRemainingList', consumptionRemainingList)
+                            for (var j = 0; j < consumptionRemainingList.length; j++) {
+                                var count = 0;
+                                for (var k = 0; k < consumptionRemainingList.length; k++) {
+                                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                                        count++;
+                                    } else {
+
+                                    }
+                                }
+                                if (count == 0) {
+                                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                                } else {
+                                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                                        totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                                    }
+                                }
+                            }
+
+                            var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore(minDate));
+                            for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                                totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+                            }
+
+                            var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate).isBefore(minDate) && c.accountFlag == true);
+                            console.log('shipmentsRemainingList', shipmentsRemainingList)
+                            for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                                totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                            }
+                            openingBalance = totalAdjustments - totalConsumption + totalShipments;
+                            for (i = 1; ; i++) {
+                                var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
+                                var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
+                                console.log(dtstr, ' ', enddtStr)
+                                var dt = dtstr
+                                console.log(openingBalance)
+                                console.log(inventoryList)
+                                var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                                var adjustment = 0;
+                                invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                                console.log(consumptionList)
+                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                var consumption = 0;
+                                console.log(programJson.regionList)
+
+                                var actualFlag = false
+                                for (var i = 0; i < programJson.regionList.length; i++) {
+
+                                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                                    console.log(list)
+                                    if (list.length > 1) {
+                                        for (var l = 0; l < list.length; l++) {
+                                            if (list[l].actualFlag.toString() == 'true') {
+                                                actualFlag = true;
+                                                consumption = consumption + list[l].consumptionQty
+                                            }
+                                        }
+                                    } else {
+                                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                                    }
+                                }
+
+
+                                console.log(shipmentList)
+                                var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                                var shipment = 0;
+                                shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                                console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                                var endingBalance = openingBalance + adjustment + shipment - consumption
+                                console.log('endingBalance', endingBalance)
+
+                                endingBalance = endingBalance < 0 ? 0 : endingBalance
+                                openingBalance = endingBalance
+                                minDate = minDate.add(1, 'month')
+
+                                if (minDate.startOf('month').isAfter(startDate)) {
+                                    break;
+                                }
+                            }
+                        }
+                        var monthstartfrom = this.state.rangeValue.from.month
+                        for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                            var monthlydata = [];
+                            for (var month = monthstartfrom; month <= 12; month++) {
+                                var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                                var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                                console.log(dtstr, ' ', enddtStr)
+                                var dt = dtstr
+                                console.log(openingBalance)
+                                var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                                var adjustment = 0;
+                                invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                var consumption = 0;
+                                console.log(programJson.regionList)
+
+                                var actualFlag = false
+                                for (var i = 0; i < programJson.regionList.length; i++) {
+
+                                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                                    console.log(list)
+                                    if (list.length > 1) {
+                                        for (var l = 0; l < list.length; l++) {
+                                            if (list[l].actualFlag.toString() == 'true') {
+                                                actualFlag = true;
+                                                consumption = consumption + list[l].consumptionQty
+                                            }
+                                        }
+                                    } else {
+                                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                                    }
+                                }
+
+
+
+                                var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                                var shipment = 0;
+                                shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                                console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                                var endingBalance = openingBalance + adjustment + shipment - consumption
+                                console.log('endingBalance', endingBalance)
+
+                                endingBalance = endingBalance < 0 ? 0 : endingBalance
+                                openingBalance = endingBalance
+                                var amcBeforeArray = [];
+                                var amcAfterArray = [];
+
+
+                                for (var c = 0; c < monthsInPastForAmc; c++) {
+
+                                    var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
+                                    if (consumptionListForAMC.length > 0) {
+                                        var consumptionQty = 0;
+                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                            var count = 0;
+                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                    count++;
+                                                } else {
+
+                                                }
+                                            }
+
+                                            if (count == 0) {
+                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                            } else {
+                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                }
+                                            }
+                                        }
+                                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
+                                       
+                                    }
+                                }
+                                for (var c = 0; c < monthsInFutureForAmc; c++) {
+                                    var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
+                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
+                                    if (consumptionListForAMC.length > 0) {
+                                        var consumptionQty = 0;
+                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                            var count = 0;
+                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                    count++;
+                                                } else {
+
+                                                }
+                                            }
+
+                                            if (count == 0) {
+                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                            } else {
+                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                }
+                                            }
+                                        }
+                                        amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
+                                       
+                                    }
+
+                                }
+
+                                var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                                var countAMC = amcArrayFilteredForMonth.length;
+                                var sumOfConsumptions = 0;
+                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                }
+
+
+                                var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                                console.log('amcCalcualted', amcCalcualted)
+                                var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                console.log(pu)
+                             /*   var maxForMonths = 0;
+                                if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                                    maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                } else {
+                                    maxForMonths = pu.minMonthsOfStock
+                                }
+                                var minMOS = maxForMonths;
+                                var minForMonths = 0;
+                                if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                                    minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                } else {
+                                    minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                                }
+                                var maxMOS = minForMonths;*/
+                                var json = {
+                                    "dt":  moment(new Date(from, month - 1)).format('MMM YY'),
+                                    "program": pu.program,
+                                    "planningUnit": pu.planningUnit,
+                                    "stock": endingBalance,
+                                    "consumptionQty": consumption,
+                                    "amc": amcCalcualted,
+                                    "amcMonthCount": countAMC,
+                                    "mos": this.roundN(mos)
+                                }
+                               /* var json = {
+                                    transDate: moment(new Date(from, month - 1)).format('MMM YY'),
+                                    consumptionQty: consumption,
+                                    actual: actualFlag,
+                                    shipmentQty: shipment,
+                                    shipmentList: shiplist,
+                                    adjustmentQty: adjustment,
+                                    closingBalance: endingBalance,
+                                    mos: this.roundN(mos),
+                                    minMonths: minMOS,
+                                    maxMonths: maxMOS
+                                }*/
+                                data.push(json)
+                                console.log(data)
+
+
+
+                                if (month == this.state.rangeValue.to.month && from == to) {
+                                  
+                                // var lineData = [];
+                                // var lineDates = [];
+                                // var planningUnitlines = [];
+                                // for (var i = 0; i < data.length; i++) {
+                                //     lineData[i] = data.map(ele => (ele.mos))
+                                // }
+                                // lineDates =[new Set(data.map(ele => (ele.dt)))]
+                                // planningUnitlines = data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
+        
+                                this.setState({
+                                    matricsList: data,
+                                    message: '',
+                                    // planningUnitlines: planningUnitlines
+                                    // lineData: lineData,
+                                    // lineDates: lineDates
+                                })
+                                    return;
+                                }
+
+                            }
+                            monthstartfrom = 1
+
+                        }
+                    })
+                    }.bind(this)
+
+                }.bind(this)
+
+
+
+            } else {
+                var input = {
+                    "programId": programId,
+                    "versionId": versionId,
+                    "planningUnitIds": planningUnitIds,
+                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
+                    "mosFuture": document.getElementById("monthsInFutureForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInFutureForAmc").selectedOptions[0].value,
+                    "startDate": startDate,
+                    "stopDate": stopDate
+                }
+
+                /*var inputjson={
+                "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate
+               }*/
+                AuthenticationService.setupAxiosInterceptors();
+
+                ReportService.getStockOverTime(input)
+                    .then(response => {
+                        response.data = [[{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 54800, "consumptionQty": 0, "amc": 23122, "amcMonthCount": 4, "mos": 2.37 },
+                        { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 27203, "consumptionQty": 17475, "amc": 23533, "amcMonthCount": 5, "mos": 1.1559 },
+                        { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 6067, "consumptionQty": 25135, "amc": 22402, "amcMonthCount": 6, "mos": 0.2708 },
+                        { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 36137, "consumptionQty": 49880, "amc": 21202, "amcMonthCount": 7, "mos": 1.7044 },
+                        { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10960, "consumptionQty": 25177, "amc": 23631, "amcMonthCount": 7, "mos": 0.4638 },
+                        { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 0, "consumptionQty": 16750, "amc": 23706, "amcMonthCount": 7, "mos": 0.0 },
+                        { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 26000, "consumptionQty": 14000, "amc": 22401, "amcMonthCount": 7, "mos": 1.1607 }],
+                        [{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 28648, "consumptionQty": 0, "amc": 8604, "amcMonthCount": 4, "mos": 3.3293 },
+                        { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17103, "consumptionQty": 11522, "amc": 9351, "amcMonthCount": 5, "mos": 1.829 },
+                        { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 20500, "consumptionQty": 11513, "amc": 9709, "amcMonthCount": 6, "mos": 2.1114 },
+                        { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 9116, "consumptionQty": 11384, "amc": 9965, "amcMonthCount": 7, "mos": 0.9148 },
+                        { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 31757, "consumptionQty": 12336, "amc": 11607, "amcMonthCount": 7, "mos": 2.7358 },
+                        { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 20257, "consumptionQty": 11500, "amc": 11604, "amcMonthCount": 7, "mos": 1.7456 },
+                        { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 28757, "consumptionQty": 11500, "amc": 11602, "amcMonthCount": 7, "mos": 2.4784 }],
+                        [{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 15865, "consumptionQty": 0, "amc": 4608, "amcMonthCount": 4, "mos": 3.4427 },
+                        { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 9789, "consumptionQty": 6053, "amc": 4854, "amcMonthCount": 5, "mos": 2.0166 },
+                        { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 23393, "consumptionQty": 6398, "amc": 5070, "amcMonthCount": 6, "mos": 4.6139 },
+                        { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 15903, "consumptionQty": 5982, "amc": 5224, "amcMonthCount": 7, "mos": 3.044 },
+                        { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10063, "consumptionQty": 5838, "amc": 6103, "amcMonthCount": 7, "mos": 1.6489 },
+                        { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 3913, "consumptionQty": 6150, "amc": 6116, "amcMonthCount": 7, "mos": 0.6397 },
+                        { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17763, "consumptionQty": 6150, "amc": 6081, "amcMonthCount": 7, "mos": 2.9209 }]];
+                        console.log(JSON.stringify(response.data))
+                        var lineData = [];
+                        var lineDates = [];
+                        var planningUnitlines = [];
+                        for (var i = 0; i < response.data.length; i++) {
+                            lineData[i] = response.data[i].map(ele => (ele.mos))
+                        }
+                        lineDates = response.data[0].map(ele => (ele.dt))
+                        planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
+
+                        this.setState({
+                            matricsList: response.data,
+                            message: '',
+                            planningUnitlines: planningUnitlines,
+                            lineData: lineData,
+                            lineDates: lineDates
+                        })
+                    }).catch(
+                        error => {
+                            this.setState({
+                                consumptions: []
+                            })
+
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+        } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-        } else if (productCategoryId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
+        } else if (versionId == 0) {
+            this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
 
         } else {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
@@ -439,12 +957,11 @@ class StockStatusOverTime extends Component {
 
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-        this.state.programLabels.map(ele => csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("mosPast").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("mosFuture").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        this.state.planningUnitLabels.map(ele =>
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("monthsInPastForAmc").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("monthsInFutureForAmc").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         var re;
@@ -523,22 +1040,22 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    var planningText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString()), doc.internal.pageSize.width * 3 / 4);
-
-                    doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-
-                    doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("mosPast").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("mosFuture").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-                    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("monthsInPastForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("monthsInFutureForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+                        align: 'left'
+                    })
 
-                    doc.text(doc.internal.pageSize.width / 8, 190, planningText)
                 }
 
             }
@@ -598,28 +1115,29 @@ class StockStatusOverTime extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.planningUnitId })
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
         const { programs } = this.state;
-        let programList = [];
-        programList = programs.length > 0
+        let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
-
-                )
-            }, this);
-        const { productCategories } = this.state;
-        let productCategoryList = productCategories.length > 0
-            && productCategories.map((item, i) => {
-                return (
-                    <option key={i} value={item.payload.productCategoryId}>
-                        {getLabelText(item.payload.label, this.state.lang)}
+                    <option key={i} value={item.programId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
+                return (
+                    <option key={i} value={item.versionId}>
+                        {item.versionId}
+                    </option>
+                )
+            }, this);
+
+
         const getRandomColor = () => {
             var letters = '0123456789ABCDEF'.split('');
             var color = '#';
@@ -646,9 +1164,12 @@ class StockStatusOverTime extends Component {
             '#ffc107',
             '#f86c6b'
         ]
+        var v= this.state.planningUnitValues.map(pu=>this.state.matricsList.filter(c=>c.planningUnit.id==pu).map(ele=>(ele.mos)))
+       var dts=Array.from(new Set(this.state.matricsList.map(ele => (ele.dt))))
+console.log(dts)
         const bar = {
-            labels: this.state.lineDates,
-            datasets: this.state.planningUnitlines.map((item, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: item, data: this.state.lineData[index], borderColor: backgroundColor[index] }))
+            labels: dts,
+            datasets: this.state.planningUnitLabels.map((ele,index)=>({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele, data: v[index], borderColor: backgroundColor[index] }))
             /*  [
              {
                    type: "line",
@@ -707,8 +1228,8 @@ class StockStatusOverTime extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong> */}
                         {
                             this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
@@ -726,8 +1247,8 @@ class StockStatusOverTime extends Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
 
                         <div>
                             <Form >
@@ -753,62 +1274,73 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <ReactMultiSelectCheckboxes
-
-                                                    bsSize="sm"
-                                                    name="programIds"
-                                                    id="programIds"
-                                                    onChange={(e) => { this.handleChangeProgram(e) }}
-                                                    options={programList && programList.length > 0 ? programList : []}
-                                                />
-                                                {!!this.props.error &&
-                                                    this.props.touched && (
-                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                    )}
-                                            </InputGroup>
-                                        </FormGroup>
-
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="productCategoryId"
-                                                        id="productCategoryId"
+                                                        name="programId"
+                                                        id="programId"
                                                         bsSize="sm"
-                                                        onChange={this.getPlanningUnit}
+                                                        onChange={(e) => { this.filterVersion();this.updateMonthsforAMCCalculations() }}
+                                                    
+
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {productCategoryList}
+                                                        {programList}
                                                     </Input>
-                                                </InputGroup></div>
+
+                                                </InputGroup>
+                                            </div>
                                         </FormGroup>
-                                        <FormGroup className="col-sm-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">Version</Label>
                                             <div className="controls">
-                                                <InputGroup className="box">   
-                                                <ReactMultiSelectCheckboxes
-                                                    name="planningUnitId"
-                                                    id="planningUnitId"
-                                                    bsSize="md"
-                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                /> </InputGroup>    </div></FormGroup>
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="versionId"
+                                                        id="versionId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.getPlanningUnit(); }}
+                                                    >
+                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        {versionList}
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup className="box">
+                                                    <ReactMultiSelectCheckboxes
+                                                        name="planningUnitId"
+                                                        id="planningUnitId"
+                                                        bsSize="md"
+                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                    />
+                                                    {/* <InputGroupAddon addonType="append">
+                                  <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                </InputGroupAddon> */}
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
                                         <FormGroup className="col-sm-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.mospast')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="mosPast"
-                                                        id="mosPast"
+                                                        name="monthsInPastForAmc"
+                                                        id="monthsInPastForAmc"
                                                         bsSize="sm"
-                                                        onChange={this.fetchData}
+                                                        value={this.state.monthsInPastForAmc}
+                                                        onChange={(e) => {this.changeMonthsForamc(e)}}
                                                     >
                                                         <option value="0">-</option>
                                                         <option value="1">{1}</option>
@@ -832,10 +1364,11 @@ class StockStatusOverTime extends Component {
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="mosFuture"
-                                                        id="mosFuture"
+                                                        name="monthsInFutureForAmc"
+                                                        id="monthsInFutureForAmc"
                                                         bsSize="sm"
-                                                        onChange={this.fetchData}
+                                                        value={this.state.monthsInFutureForAmc}
+                                                        onChange={(e) => {this.changeMonthsForamc(e)}}
                                                     >
                                                         <option value="0">-</option>
                                                         <option value="1">{1}</option>
@@ -878,63 +1411,63 @@ class StockStatusOverTime extends Component {
 
                                 <br></br>
                             </div>}</div>
-                                
-                         <div className="row">
-                    <div className="col-md-12">
-                      {this.state.show && this.state.matricsList.length > 0 &&
-                       <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                        <thead>
-                          <tr>
-                            <th className="text-center" style={{width:'10%'}}> {i18n.t('static.report.month')} </th>
-                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.dashboard.program')} </th>
-                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.planningunit.planningunit')}</th>
-                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.stock')}</th>
-                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.consupmtionqty')}</th>
-                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.amc')}</th>
-                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.noofmonth')}</th>
-                            <th className="text-center" style={{width:'10%'}}>{i18n.t('static.report.mos')}</th>
-                            </tr>
-                        </thead>
-                       
-                          <tbody>
-                             { this.state.matricsList.length > 0
-                              &&
-                              this.state.matricsList.map(ele => ele.map(item => 
+                        <div className="row">
+                            <div className="col-md-12">
+                                {this.state.show && this.state.matricsList.length > 0 &&
+                                    <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                                <tr id="addr0" >    
-                                
-                                  <td>{item.dt}</td>
-                                  <td>
-                                    {getLabelText(item.program.label,this.state.lang)}
-                                  </td>
-                                  <td>
-                                    {getLabelText(item.planningUnit.label,this.state.lang)}
-                                  </td>
-                                  <td>
-                                    {this.formatter(item.stock)}
-                                  </td>
-                                  <td>
-                                    {this.formatter(item.consumptionQty)}
-                                  </td>
-                                  <td>
-                                    {this.formatter(item.amc)}
-                                  </td>
-                                  <td>
-                                    {this.formatter(item.amcMonthCount)}
-                                  </td>
-                                  <td>
-                                    {this.roundN(item.mos)}
-                                  </td>
+                                        <thead>
+                                            <tr>
+                                                <th className="text-center" style={{ width: '10%' }}> {i18n.t('static.report.month')} </th>
+                                                <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.dashboard.program')} </th>
+                                                <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.planningunit.planningunit')}</th>
+                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.stock')}</th>
+                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.consupmtionqty')}</th>
+                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.amc')}</th>
+                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.noofmonth')}</th>
+                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.mos')}</th>
+                                            </tr>
+                                        </thead>
 
-        </tr>))}
+                                        <tbody>
+                                            {this.state.matricsList.length > 0
+                                                &&
+                                                this.state.matricsList.map(item => 
 
-                            
-                          </tbody>
-                 </Table>}
+                                                    <tr id="addr0" >
 
-                   </div>
-                   </div>
+                                                        <td>{item.dt}</td>
+                                                        <td>
+                                                            {getLabelText(item.program.label, this.state.lang)}
+                                                        </td>
+                                                        <td>
+                                                            {getLabelText(item.planningUnit.label, this.state.lang)}
+                                                        </td>
+                                                        <td>
+                                                            {this.formatter(item.stock)}
+                                                        </td>
+                                                        <td>
+                                                            {this.formatter(item.consumptionQty)}
+                                                        </td>
+                                                        <td>
+                                                            {this.formatter(item.amc)}
+                                                        </td>
+                                                        <td>
+                                                            {this.formatter(item.amcMonthCount)}
+                                                        </td>
+                                                        <td>
+                                                            {this.roundN(item.mos)}
+                                                        </td>
+
+                                                    </tr>)}
+
+
+                                        </tbody>
+                                    </Table>}
+
+                            </div>
+                        </div>
                     </CardBody></Card>
             </div>
 

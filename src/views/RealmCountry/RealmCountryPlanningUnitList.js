@@ -206,14 +206,14 @@ export default class RealmCountryPlanningUnitList extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader className="mb-md-3 pb-lg-1">
+                    {/* <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
 
                         </div>
 
-                    </CardHeader>
-                    <CardBody className="">
+                    </CardHeader> */}
+                    <CardBody className="mt-3">
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.realmcountry')}</Label>

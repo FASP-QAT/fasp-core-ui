@@ -42,8 +42,8 @@ export default class CostOfInventory extends Component {
                 programId: '',
                 planningUnitIds: [],
                 regionIds: [],
-                versionId: -1,
-                dt: new Date(),
+                versionId: 0,
+                dt: moment(new Date()).endOf('month').format('YYYY-MM-DD'),
                 includePlanningShipments: true
             },
             programs: [],
@@ -165,6 +165,8 @@ export default class CostOfInventory extends Component {
 
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
+        let costOfInventoryInput = this.state.CostOfInventoryInput;
+        costOfInventoryInput.versionId=0
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
@@ -172,9 +174,11 @@ export default class CostOfInventory extends Component {
             if (program.length == 1) {
                 if (navigator.onLine) {
                     this.setState({
+                        costOfInventoryInput,
                         versions: []
                     }, () => {
                         this.setState({
+                            costOfInventoryInput,
                             versions: program[0].versionList.filter(function (x, i, a) {
                                 return a.indexOf(x) === i;
                             })
@@ -184,18 +188,22 @@ export default class CostOfInventory extends Component {
 
                 } else {
                     this.setState({
+                        costOfInventoryInput,
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
 
                 this.setState({
+                    costOfInventoryInput,
                     versions: []
                 })
 
             }
         } else {
+            
             this.setState({
+                costOfInventoryInput,
                 versions: []
             })
         }
@@ -258,6 +266,23 @@ export default class CostOfInventory extends Component {
         var dt = new Date(value)
         return moment(dt).format('MMM-DD-YYYY');
     }
+    roundN = num => {
+        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    }
+    formatterDouble = value => {
+
+        var cell1 = this.roundN(value)
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+    
     formatter = value => {
 
         var cell1 = value
@@ -289,7 +314,7 @@ export default class CostOfInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.batchNo, this.dateformatter(ele.expiryDate).replaceAll(' ', '%20'), ele.stock, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.rate, getLabelText(ele.currency.label, this.state.lang) + '%20' + ele.cost]));
+        this.state.costOfInventory.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),ele.stock,  ele.catalogPrice, ele.cost]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -298,7 +323,7 @@ export default class CostOfInventory extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Cost Of Inventory Report.csv"
+        a.download =  i18n.t('static.dashboard.costOfInventory') +".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -376,7 +401,7 @@ export default class CostOfInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label), ele.batchNo, this.dateformatter(ele.expiryDate), this.formatter(ele.stock), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.rate), getLabelText(ele.currency.label, this.state.lang) + " " + this.formatter(ele.cost)]);
+        const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label),  this.formatter(ele.stock), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
 
         let content = {
             margin: { top: 80 },
@@ -388,7 +413,7 @@ export default class CostOfInventory extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Cost Of Inventory Report.pdf")
+        doc.save( i18n.t('static.dashboard.costOfInventory') +".pdf")
     }
 
     handleClickMonthBox2 = (e) => {
@@ -400,8 +425,8 @@ export default class CostOfInventory extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
-        var dt = new Date(`${value.year}-${value.month}-01`)
-        costOfInventoryInput.dt = dt
+        var dt = new Date(`${value.year}`,`${value.month}`,1)
+        costOfInventoryInput.dt = moment(dt).endOf('month').format('YYYY-MM-DD')
         this.setState({ singleValue2: value, costOfInventoryInput }, () => {
             this.formSubmit();
         })
@@ -432,9 +457,10 @@ export default class CostOfInventory extends Component {
     }
 
     formSubmit() {
+        console.log('in form submit')
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
-        if (programId != 0 && versionId != -1) {
+        if (programId != 0 && versionId != 0) {
             if (versionId.includes('Local')) {
                 let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
                 let endDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-' + new Date(this.state.singleValue2.year, this.state.singleValue2.month + 1, 0).getDate();
@@ -490,22 +516,32 @@ export default class CostOfInventory extends Component {
                           proList.map(planningUnit=>{
                             console.log('planningunit',planningUnit.planningUnit.id)
                         var inventoryList = []
-                        var batchNos = programJson.batchInfoList.filter(c =>c.planningUnitId== planningUnit.planningUnit.id )
-                        console.log('batchNos',batchNos)
-                        batchNos.map(batch=>{    
-                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true  && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
-                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id  && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
-                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true && (c.batchInfoList.filter(b=>b.batch.batchId==batch.batchId).length>0));
-
+                      
+                     
+                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true );
+                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id  );
+                var shipmentList =[]
+                if(document.getElementById("includePlanningShipments").value.toString()=='true'){
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
+            }else{
+                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
+         
+            }
                 // calculate openingBalance
 
+                let invmin=moment.min(inventoryList.map(d => moment(d.inventoryDate)))
+                let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+                let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
+                var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
+    
                 var openingBalance = 0;
+                if(minDate.isBefore(startDate)){
                 var totalConsumption = 0;
                 var totalAdjustments = 0;
                 var totalShipments = 0;
                 console.log('startDate', startDate)
                 console.log('programJson', programJson)
-                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+                var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore( minDate));
                 console.log('consumptionRemainingList', consumptionRemainingList)
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                   var count = 0;
@@ -513,7 +549,7 @@ export default class CostOfInventory extends Component {
                     if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
                       count++;
                     } else {
-
+    
                     }
                   }
                   if (count == 0) {
@@ -524,90 +560,101 @@ export default class CostOfInventory extends Component {
                     }
                   }
                 }
-
-                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+    
+                var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore( minDate));
                 for (var j = 0; j < adjustmentsRemainingList.length; j++) {
                   totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
                 }
-
-                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+    
+                var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate ).isBefore( minDate) && c.accountFlag == true);
+                console.log('shipmentsRemainingList',shipmentsRemainingList)
                 for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                    console.log(shipmentsRemainingList[j].batchInfoList)
-                    for (var k = 0; k < (shipmentsRemainingList[j].batchInfoList).length; k++) {
-                    if(shipmentsRemainingList[j].batchInfoList[k].batch.batchId==batch.batchId)
-                  totalShipments += parseInt((shipmentsRemainingList[j].batchInfoList[k].shipmentQty));}
+                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
                 }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
-                var endingBalance
-              
-                    var dtstr = startDate
-                    var enddtStr = endDate
-                    console.log(dtstr, ' ', enddtStr)
-                    var dt = dtstr
-                    console.log(openingBalance)
-                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                    var adjustment = 0;
-                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                    var consumption = 0;
-                    console.log(programJson.regionList)
-
-
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-
+                for (i = 1; ; i++) {
+                  var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
+                  var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
+                  console.log(dtstr, ' ', enddtStr)
+                  var dt = dtstr
+                  console.log(openingBalance)
+                  console.log(inventoryList)
+                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                  var adjustment = 0;
+                  invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                  console.log(consumptionList)
+                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                  var consumption = 0;
+                  console.log(programJson.regionList)
+    
+                  var actualFlag = false
+                  for (var i = 0; i < programJson.regionList.length; i++) {
+    
                       var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
                       console.log(list)
                       if (list.length > 1) {
-                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                          for (var l = 0; l < list.length; l++) {
+                              if (list[l].actualFlag.toString() == 'true') {
+                                  actualFlag = true;
+                                  consumption = consumption + list[l].consumptionQty
+                              }
+                          }
                       } else {
-                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                          consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
                       }
-                    }
-
-
-
-                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                    var shipment = 0;
-                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                    console.log(shiplist.length ,'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                   endingBalance = openingBalance + adjustment + shipment - consumption
-                    console.log('endingBalance', endingBalance)
-
-                    //endingBalance = endingBalance < 0 ? 0 : endingBalance
-                   
+                  }
+    
+    
+                  console.log(shipmentList)
+                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                  var shipment = 0;
+                  shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+    
+                  console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                  var endingBalance = openingBalance + adjustment + shipment - consumption
+                  console.log('endingBalance', endingBalance)
+    
+                  endingBalance = endingBalance < 0 ? 0 : endingBalance
+                  openingBalance = endingBalance
+                  minDate=minDate.add(1,'month')
+                  
+                 if(minDate.startOf('month').isAfter(startDate)){
+                     break;
+                 }
+              }
+            }
+                
                var json={
                    planningUnit:planningUnit.planningUnit,
-                   batchNo:batch.batchNo,
-                   expiryDate:batch.expiryDate,
                    stock:endingBalance,
-                   rate:planningUnit.catalogPrice,
-                   cost:(endingBalance*planningUnit.catalogPrice)
+                   catalogPrice:planningUnit.catalogPrice,
+                   cost:this.roundN(endingBalance*planningUnit.catalogPrice)
                }
                   data.push(json)  
+                 
                 })
 
-                          })
-                        console.log(data)
-                        this.setState({
-                            costOfInventory: data
-                            , message: ''
-                        })
+                       
+                this.setState({
+                    costOfInventory: data
+                    , message: ''
+                })
+                        
                     }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
+                var inputjson={
+                    "programId":programId,
+                    "versionId":versionId,
+                    "dt":moment(new Date(this.state.singleValue2.year,(this.state.singleValue2.month-1),1)).startOf('month').format('YYYY-MM-DD'),
+                    "includePlannedShipments":document.getElementById("includePlanningShipments").value?1:0
+                }
                 AuthenticationService.setupAxiosInterceptors();
-                ReportService.costOfInventory(this.state.CostOfInventoryInput).then(response => {
+                ReportService.costOfInventory(inputjson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: [{ "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": "A1001", "expiryDate": "2020-04-01", "cost": 3800.0, "stock": 3800, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": "T2480", "expiryDate": "2020-04-01", "cost": 1000.0, "stock": 1000, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": "Z4051", "expiryDate": "2020-04-01", "cost": 50000.0, "stock": 50000, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": null, "expiryDate": "2099-12-31", "cost": 15865.0, "stock": 15865, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "Abacavir 60 mg Tablet, 1000 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": null, "expiryDate": "2099-12-31", "cost": 28648.0, "stock": 28648, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 },
-                        { "planningUnit": { "id": 157, "label": { "active": false, "labelId": 9103, "label_en": "Abacavir 60 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "batchNo": null, "expiryDate": "2099-12-31", "cost": 21653.0, "stock": 21653, currency: { "id": 156, "label": { "active": false, "labelId": 9102, "label_en": "USD", "label_sp": null, "label_fr": null, "label_pr": null } }, rate: 1.00 }], message: ''
-                    });
+                        costOfInventory: response.data });
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
@@ -665,7 +712,7 @@ export default class CostOfInventory extends Component {
                 style: { align: 'center' },
                 formatter: this.formatLabel
             },
-            {
+          /*  {
                 dataField: 'batchNo',
                 text: 'Batch No',
                 sort: true,
@@ -680,7 +727,7 @@ export default class CostOfInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.dateformatter
-            },
+            },*/
             {
                 dataField: 'stock',
                 text: 'Stock',
@@ -690,7 +737,7 @@ export default class CostOfInventory extends Component {
                 style: { align: 'center' },
                 formatter: this.formatter
             }, {
-                dataField: 'rate',
+                dataField: 'catalogPrice',
                 text: 'Rate (USD)',
                 sort: true,
                 align: 'center',
@@ -705,7 +752,7 @@ export default class CostOfInventory extends Component {
                 align: 'center',
                 style: { align: 'center' },
                 headerAlign: 'center',
-                formatter: this.formatter
+                formatter: this.formatterDouble
             }
         ];
         const options = {
@@ -740,8 +787,8 @@ export default class CostOfInventory extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -754,8 +801,8 @@ export default class CostOfInventory extends Component {
                                 </div>}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
 
@@ -791,7 +838,7 @@ export default class CostOfInventory extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
-                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
                                                         </Input>
 

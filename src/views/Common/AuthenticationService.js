@@ -997,6 +997,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/report/expiredInventory":
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/dashboard/:message":
                 case "/dashboard/:color/:message":
                     if (bfunction.includes("ROLE_BF_APPLICATION_DASHBOARD")) {
@@ -1044,6 +1049,11 @@ class AuthenticationService {
         }
         return false;
 
+    }
+    displayHeaderTitle(url) {
+        if (url.includes("/program/listProgram")) {
+            return "Programs";
+        }
     }
 
 }

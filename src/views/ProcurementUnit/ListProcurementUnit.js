@@ -223,14 +223,14 @@ hideSecondComponent() {
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <CardHeader className="mb-md-3 pb-lg-1">
-            <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+          <div className="Card-header-addicon">
+            {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
             <div className="card-header-actions">
               <div className="card-header-action">
               {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
-          </CardHeader>
+          </div>
           <CardBody className="pb-lg-0">
             <Col md="3 pl-0" >
               <FormGroup className="Selectdiv">

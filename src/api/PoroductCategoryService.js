@@ -9,6 +9,7 @@ class ProductCategoryService {
     }
 
     addProductCategory(json) {
+        console.log("category tree json---",json)
         return axios.put(`${API_URL}/api/productCategory/`, json, {}
         );
     }

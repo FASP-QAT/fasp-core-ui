@@ -58,7 +58,7 @@ class ReportService {
         );
     }
     stockAdjustmentList(json){
-        return axios.post(`${API_URL}/api/report/stockAdjustmentList`,json,{}
+        return axios.post(`${API_URL}/api/report/stockAdjustmentReport`,json,{}
         );
     }
     procurementAgentExporttList(json){
@@ -67,6 +67,22 @@ class ReportService {
     }
     fundingSourceExportList(json){
         return axios.post(`${API_URL}/api/report/fundingSourceShipmentReport`,json,{}
+        );
+    }
+    AggregateShipmentByProduct(json){
+        return axios.post(`${API_URL}/api/report/aggregateShipmentByProduct`,json,{}
+        );
+    }
+    wareHouseCapacityExporttList(json){
+        return axios.post(`${API_URL}/api/report/warehouseCapacityReport`,json,{}
+        );
+    }
+    stockStatusForProgram(json){
+        return axios.post(`${API_URL}/api/report/stockStatusForProgram`,json,{}
+        );
+    }
+    programProductCatalog(json){
+        return axios.post(`${API_URL}/api/report/programProductCatalog`,json,{}
         );
     }
 

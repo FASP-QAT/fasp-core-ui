@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -67,6 +67,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -77,7 +78,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.min ? i18n.t('static.report.low') : (ele.mos > ele.max ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), ele.mos, ele.min, ele.max, ele.stock, ele.amc, (ele.transDate).replaceAll(' ', '%20')]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc),(new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20')]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -86,7 +87,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.inventoryTurns') + ".csv"
+        a.download = i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -121,19 +122,22 @@ class StockStatusAcrossPlanningUnits extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.inventoryTurns'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.stockstatusacrossplanningunit'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
                 }
@@ -153,19 +157,22 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.min ? i18n.t('static.report.low') : (ele.mos > ele.max ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.formatterDouble(ele.mos), this.formatterDouble(ele.min), this.formatterDouble(ele.max), this.formatter(ele.stock), this.formatter(ele.amc), ele.transDate]);
+        const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc), new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)]);
 
         let content = {
             margin: { top: 80 },
             startY: 170,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
+            columnStyles: {
+                0: { cellWidth: 236.89 },
+              }
         };
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.inventoryTurns') + ".pdf")
+        doc.save(i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".pdf")
     }
 
 
@@ -360,6 +367,9 @@ class StockStatusAcrossPlanningUnits extends Component {
     roundN = num => {
         return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
+    round = num => {
+        return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    }
 
     formatLabel = (cell, row) => {
         // console.log("celll----", cell);
@@ -367,9 +377,16 @@ class StockStatusAcrossPlanningUnits extends Component {
             return getLabelText(cell, this.state.lang);
         }
     }
+
+    formatterDate = (cell, row) => {
+        // console.log("celll----", cell);
+        if (cell != null && cell != "") {
+            return moment(cell).format(`${DATE_FORMAT_CAP}`);
+        }
+    }
     formatter = value => {
 
-        var cell1 = value
+        var cell1 = this.round(value)
         cell1 += '';
         var x = cell1.split('.');
         var x1 = x[0];
@@ -424,9 +441,9 @@ class StockStatusAcrossPlanningUnits extends Component {
     fetchData = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
-        let startDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, 1));
+        let startDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month -1, 1));
         let endDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0).getDate()));
-
+let includePlanningShipments= document.getElementById("includePlanningShipments").value
         if (programId != 0 && versionId != 0) {
             if (versionId.includes('Local')) {
 
@@ -473,13 +490,14 @@ class StockStatusAcrossPlanningUnits extends Component {
                             proList.map(planningUnit => {
                                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true);
                                 var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
-                                var shipmentList = []
-                                // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
+                                var shipmentList = [];
+                                console.log(includePlanningShipments)
+                                 if (document.getElementById("includePlanningShipments").value.toString() == 'true') {
                                 shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
-                                // } else {
-                                //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
+                                 } else {
+                               shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 );
 
-                                // }
+                                 }
                                 // calculate openingBalance
                                 let moments = inventoryList.map(d => moment(d.inventoryDate))
                                 let invmin=moment.min(moments)
@@ -580,7 +598,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 var amcAfterArray = [];
 
 
-                                for (var c = 0; c < 12; c++) {
+                                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
 
                                     var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -606,12 +624,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         }
                                         amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
                                         var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
+                                        /*if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
                                             c = 12;
-                                        }
+                                        }*/
                                     }
                                 }
-                                for (var c = 0; c < 12; c++) {
+                                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
                                     var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                                     if (consumptionListForAMC.length > 0) {
@@ -636,15 +654,16 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         }
                                         amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
                                         amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
+                                       /* if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
                                             c = 12;
-                                        }
+                                        }*/
                                     }
 
                                 }
 
                                 var amcArray = amcBeforeArray.concat(amcAfterArray);
                                 var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                                console.log('amcArrayFilteredForMonth'+JSON.stringify(amcArrayFilteredForMonth))
                                 var countAMC = amcArrayFilteredForMonth.length;
                                 var sumOfConsumptions = 0;
                                 for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
@@ -652,7 +671,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 }
 
 
-                                var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                                var amcCalcualted = Math.round((sumOfConsumptions) / countAMC);
                                 console.log('amcCalcualted', amcCalcualted)
                                 var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
                                 console.log(planningUnit)
@@ -673,10 +692,10 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                                 var json = {
                                     planningUnit: planningUnit.planningUnit,
-                                    transDate: maxDate.format('YYYY-MM-DD'),
+                                    lastStockCount: maxDate.format('MMM-DD-YYYY'),
                                     mos: this.roundN(mos),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-                                    min: minMOS,
-                                    max: maxMOS,
+                                    minMos: minMOS,
+                                    maxMos: maxMOS,
                                     stock: endingBalance,
                                     amc: amcCalcualted
                                 }
@@ -688,7 +707,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             this.setState({
                                 data: data,
                                 message: ''
-                            })
+                            },()=>{console.log(this.state.data)})
                         }.bind(this)
 
                     }.bind(this)
@@ -712,10 +731,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                 var inputjson = {
                     "programId": programId,
                     "versionId": versionId,
-                    "dt": startDate,
+                    "dt": startDate.startOf('month').format('YYYY-MM-DD'),
+                    "includePlannedShipments":includePlanningShipments?1:0
 
                 }
-                this.setState({
+              /*  this.setState({
                     data: [{
                         planningUnit: {
                             id: 157, label: {
@@ -727,25 +747,25 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 label_pr: null
                             }
                         },
-                        transDate: moment(new Date()).format('YYYY-MM-DD'),
+                        transDate: moment(new Date()).format('MMM-DD-YYYY'),
                         mos: this.roundN(2),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
                         min: 3,
                         max: 5,
                         stock: 44103,
                         amc: 23957
                     }]
-                })
-                /*  AuthenticationService.setupAxiosInterceptors();
-                  ReportService.getStockStatusData(inputjson)
+                })*/
+                  AuthenticationService.setupAxiosInterceptors();
+                  ReportService.stockStatusForProgram(inputjson)
                     .then(response => {
                       console.log(JSON.stringify(response.data));
                       this.setState({
-                        stockStatusList: response.data
+                        data: response.data,message:''
                       })
                     }).catch(
                       error => {
                         this.setState({
-                          stockStatusList: []
+                            data: []
                         })
             
                         if (error.message === "Network Error") {
@@ -765,13 +785,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                           }
                         }
                       }
-                    );*/
+                    );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
         }
     }
@@ -829,9 +849,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: (cell, row) => {
-                    if (cell < row.min) {
+                    if (cell < row.minMos) {
                         return i18n.t('static.report.low')
-                    } else if (cell > row.max) {
+                    } else if (cell > row.maxMos) {
                         return i18n.t('static.report.excess')
                     } else {
                         return i18n.t('static.report.ok')
@@ -839,9 +859,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                 }
                 ,
                 style: function callback(cell, row, rowIndex, colIndex) {
-                    if (cell < row.min) {
+                    if (cell < row.minMos) {
                         return { backgroundColor: '#f48282', align: 'center', width: '100px' };
-                    } else if (cell > row.max) {
+                    } else if (cell > row.maxMos) {
                         return { backgroundColor: '#f3d679', align: 'center', width: '100px' };
                     } else {
                         return { backgroundColor: '#00c596', align: 'center', width: '100px' };
@@ -854,11 +874,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatter,
+                formatter: this.formatterDouble,
                 style: function callback(cell, row, rowIndex, colIndex) {
-                    if (cell < row.min) {
+                    if (cell < row.minMos) {
                         return { backgroundColor: '#f48282', align: 'center', width: '100px' };
-                    } else if (cell > row.max) {
+                    } else if (cell > row.maxMos) {
                         return { backgroundColor: '#f3d679', align: 'center', width: '100px' };
                     } else {
                         return { backgroundColor: '#00c596', align: 'center', width: '100px' };
@@ -866,7 +886,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 }
             },
             {
-                dataField: 'min',
+                dataField: 'minMos',
                 text: i18n.t('static.supplyPlan.minStockMos'),
                 sort: true,
                 align: 'center',
@@ -877,7 +897,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             },
             {
-                dataField: 'max',
+                dataField: 'maxMos',
                 text: i18n.t('static.supplyPlan.maxStockMos'),
                 sort: true,
                 align: 'center',
@@ -906,12 +926,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                 formatter: this.formatter
             },
             {
-                dataField: 'transDate',
+                dataField: 'lastStockCount',
                 text: i18n.t('static.supplyPlan.lastinventorydt'),
                 sort: true,
                 align: 'center',
                 style: { align: 'center', width: '100px' },
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatterDate
 
             }
         ];
@@ -947,8 +968,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong> */}
 
                         <div className="card-header-actions">
 
@@ -959,8 +980,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 </div>}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-2 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
 
@@ -1017,6 +1038,24 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="includePlanningShipments"
+                                                            id="includePlanningShipments"
+                                                            bsSize="sm"
+                                                            onChange={(e) => {  this.fetchData() }}
+                                                        >
+                                                            <option value="true">{i18n.t('static.program.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
                                                         </Input>
 
                                                     </InputGroup>

@@ -1403,8 +1403,110 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
+    this.getProductCategories = this.getProductCategories.bind(this);
+    this.storeProduct = this.storeProduct.bind(this);
+    this.toggleView = this.toggleView.bind(this);
     //this.pickRange = React.createRef()
+
+  }
+
+  toggleView() {
+    var tempConsumptionList = [];
+    var tempConsumptionList1 = [];
+    var multiplier = this.state.multiplier;
+    if (navigator.onLine) {
+      tempConsumptionList = this.state.consumptions;
+
+      for (let i = 0; i < tempConsumptionList.length; i++) {
+        let json = {
+          consumption_date: tempConsumptionList[i].consumption_date,
+          Actual: tempConsumptionList[i].Actual * multiplier,
+          forcast: tempConsumptionList[i].forcast * multiplier
+        }
+        tempConsumptionList1.push(json);
+      }
+      this.setState({
+        consumptions: tempConsumptionList1,
+      })
+
+    } else {
+      tempConsumptionList = this.state.offlineConsumptionList;
+      for (let i = 0; i < tempConsumptionList.length; i++) {
+        let json = {
+          consumption_date: tempConsumptionList[i].consumption_date,
+          Actual: tempConsumptionList[i].Actual * multiplier,
+          forcast: tempConsumptionList[i].forcast * multiplier
+        }
+        tempConsumptionList1.push(json);
+      }
+      this.setState({
+        offlineConsumptionList: tempConsumptionList1,
+      })
+    }
+
+  }
+
+  storeProduct(planningUnitId) {
+
+    let productId = planningUnitId;
+    // let productFilter = this.state.productList.filter(c => (c.planningUnit.id == productId));
+    // console.log("EEEEEEEEE--------", productId);
+    if (navigator.onLine) {
+      RealmService.getRealmListAll()
+        .then(response => {
+          if (response.status == 200) {
+            this.setState({
+              realmId: response.data[0].realmId,
+            })
+
+            PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
+              // console.log("RESP-----", response.data)
+              let productFilter = response.data.filter(c => (c.planningUnitId == productId));
+              this.setState({
+                multiplier: productFilter[0].multiplier,
+              },
+                () => {
+                  console.log("MULTIPLIER----", this.state.multiplier);
+                })
+            })
+
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            },
+              () => {
+                // this.hideSecondComponent();
+              })
+          }
+        })
+    } else {
+      const lan = 'en';
+      var db1;
+      var storeOS;
+      getDatabase();
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+        var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+        var planningunitRequest = planningunitOs.getAll();
+        var planningList = []
+        planningunitRequest.onerror = function (event) {
+          // Handle errors!
+        };
+        planningunitRequest.onsuccess = function (e) {
+          var myResult = [];
+          myResult = planningunitRequest.result;
+          let productFilter = myResult.filter(c => (c.planningUnitId == productId));
+          this.setState({
+            multiplier: productFilter[0].multiplier,
+          },
+            () => {
+              console.log("MULTIPLIER----", this.state.multiplier);
+            })
+        }.bind(this);
+      }.bind(this)
+    }
 
   }
 
@@ -1438,16 +1540,40 @@ class Consumption extends Component {
     csvRow.push('')
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.consumptionDate')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20')]]
+
     if (navigator.onLine) {
       re = this.state.consumptions
     } else {
       re = this.state.offlineConsumptionList
     }
 
-    for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumption_date, re[item].forcast, re[item].Actual])
+    // var A = [[(i18n.t('static.report.consumptionDate')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20')]]
+    // for (var item = 0; item < re.length; item++) {
+    //   A.push([re[item].consumption_date, re[item].forcast, re[item].Actual])
+    // }
+
+    let head = [];
+    let head1 = [];
+    let row1 = [];
+    let row2 = [];
+    let row3 = [];
+    if (navigator.onLine) {
+      let consumptionArray = this.state.consumptions;
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forcast);
+        row2.push(consumptionArray[i].Actual);
+      }
     }
+    var A = [];
+    A[0] = head;
+    A[1] = row1;
+    A[2] = row2;
+
+
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
     }
@@ -1521,6 +1647,10 @@ class Consumption extends Component {
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
+          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+            align: 'left'
+          })
+
         }
 
       }
@@ -1547,15 +1677,55 @@ class Consumption extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
     const headers = [[i18n.t('static.report.consumptionDate'),
-    i18n.t('static.report.forecastConsumption'),
-    i18n.t('static.report.actualConsumption')]];
+    i18n.t('static.report.forecasted'),
+    i18n.t('static.report.actual')]];
     const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
+    // let content = {
+    //   margin: { top: 80 },
+    //   startY: height,
+    //   head: headers,
+    //   body: data,
+    //   styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+    // };
+
+
+    let head = [];
+    let head1 = [];
+    let row1 = [];
+    let row2 = [];
+    let row3 = [];
+    if (navigator.onLine) {
+      let consumptionArray = this.state.consumptions;
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forcast);
+        row2.push(consumptionArray[i].Actual);
+      }
+    } else {
+      let consumptionArray = this.state.finalOfflineConsumption;
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forcast);
+        row2.push(consumptionArray[i].Actual);
+      }
+    }
+    head1[0] = head;
+    row3[0] = row1;
+    row3[1] = row2;
+
 
     let content = {
       margin: { top: 80 },
       startY: height,
-      head: headers,
-      body: data,
+      head: head1,
+      body: row3,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
@@ -1577,7 +1747,14 @@ class Consumption extends Component {
 
 
   filterData() {
-    let programId = document.getElementById("programId").value;
+    let programId = 0;
+    if (navigator.onLine) {
+      programId = document.getElementById("programId").value;
+    } else {
+      programId = (document.getElementById("programId").value).split("_")[0];
+    }
+
+    let viewById = document.getElementById("viewById").value;
     let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1589,11 +1766,17 @@ class Consumption extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
           .then(response => {
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
             this.setState({
               consumptions: response.data,
               message: ''
-            })
+            },
+              () => {
+                this.storeProduct(planningUnitId);
+                if (viewById == 2) {
+                  this.toggleView();
+                }
+              })
           }).catch(
             error => {
               this.setState({
@@ -1620,6 +1803,7 @@ class Consumption extends Component {
           );
       } else {
         // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+        programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
@@ -1689,7 +1873,13 @@ class Consumption extends Component {
             console.log("final consumption---", finalOfflineConsumption);
             this.setState({
               offlineConsumptionList: finalOfflineConsumption
-            });
+            },
+              () => {
+                this.storeProduct(planningUnitId);
+                if (viewById == 2) {
+                  this.toggleView();
+                }
+              });
 
           }.bind(this)
 
@@ -1790,9 +1980,9 @@ class Consumption extends Component {
       let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
       ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
-        console.log('**' + JSON.stringify(response.data))
+        // console.log('RESP----------', response.data);
         this.setState({
-          planningUnits: response.data,
+          planningUnits: response.data
         }, () => {
           this.filterData();
         })
@@ -1850,7 +2040,7 @@ class Consumption extends Component {
             }
           }
           this.setState({
-            offlinePlanningUnitList: proList
+            offlinePlanningUnitList: proList,
           })
         }.bind(this);
       }.bind(this)
@@ -2075,6 +2265,22 @@ class Consumption extends Component {
         labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
         datasets: [
           {
+            type: "line",
+            lineTension: 0,
+            label: i18n.t('static.report.forecastConsumption'),
+            backgroundColor: 'transparent',
+            borderColor: '#000',
+            borderDash: [10, 10],
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            showInLegend: true,
+            pointStyle: 'line',
+            pointBorderWidth: 5,
+            yValueFormatString: "$#,##0",
+            data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
+          }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
             borderColor: 'rgba(179,181,198,1)',
@@ -2083,20 +2289,6 @@ class Consumption extends Component {
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
             data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
-          }, {
-            type: "line",
-            label: i18n.t('static.report.forecastConsumption'),
-            backgroundColor: 'transparent',
-            borderColor: 'rgba(179,181,158,1)',
-            borderStyle: 'dotted',
-            ticks: {
-              fontSize: 2,
-              fontColor: 'transparent',
-            },
-            showInLegend: true,
-            yValueFormatString: "$#,##0",
-            lineTension: 0,
-            data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
           }
         ],
 
@@ -2122,8 +2314,8 @@ class Consumption extends Component {
         <h5>{i18n.t(this.state.message)}</h5>
 
         <Card>
-          <CardHeader className="pb-1">
-            <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
+          <div className="Card-header-reporticon">
+            {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong> */}
             {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
             <Online>
               {
@@ -2166,8 +2358,8 @@ class Consumption extends Component {
                 </div>
               }
             </Offline>
-          </CardHeader>
-          <CardBody>
+          </div>
+          <CardBody className="pb-lg-0 pt-lg-0">
             <div className="TableCust" >
               <div ref={ref}>
                 <Form >
@@ -2311,6 +2503,7 @@ class Consumption extends Component {
                                 id="planningUnitId"
                                 bsSize="sm"
                                 onChange={this.filterData}
+                              // onChange={(e) => { this.storeProduct(e); this.filterData(); }}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {planningUnits.length > 0
@@ -2359,17 +2552,18 @@ class Consumption extends Component {
 
 
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">Report View</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input
                               type="select"
-                              name="planningUnitId"
-                              id="planningUnitId"
+                              name="viewById"
+                              id="viewById"
                               bsSize="sm"
+                              onChange={this.filterData}
                             >
-                              <option value="1">Planning Unit</option>
-                              <option value="2">Forecasting Unit</option>
+                              <option value="1">{i18n.t('static.dashboard.product')}</option>
+                              <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
                             </Input>
                           </InputGroup>
                         </div>
@@ -2431,53 +2625,104 @@ class Consumption extends Component {
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                      {this.state.show &&
-                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                      <Online>
+                        {this.state.show &&
+                          <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
-                          <tbody>
-                            <>
-                              <tr>
-                                <th style={{ width: '140px' }}></th>
-                                {
-                                  this.state.consumptions.length > 0
-                                  &&
-                                  this.state.consumptions.map((item, idx) =>
-                                    <td id="addr0" key={idx}>
-                                      {moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
-                                    </td>
-                                  )
-                                }
-                              </tr>
+                            <tbody>
+                              <>
+                                <tr>
+                                  <th style={{ width: '140px' }}></th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
 
-                              <tr>
-                                <th style={{ width: '140px' }}>Forecasted</th>
-                                {
-                                  this.state.consumptions.length > 0
-                                  &&
-                                  this.state.consumptions.map((item, idx) =>
-                                    <td id="addr0" key={idx}>
-                                      {this.formatter(this.state.consumptions[idx].forcast)}
-                                    </td>
-                                  )
-                                }
-                              </tr>
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.consumptions[idx].forcast)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
 
-                              <tr>
-                                <th style={{ width: '140px' }}>Actual</th>
-                                {
-                                  this.state.consumptions.length > 0
-                                  &&
-                                  this.state.consumptions.map((item, idx) =>
-                                    <td id="addr0" key={idx}>
-                                      {this.formatter(this.state.consumptions[idx].Actual)}
-                                    </td>
-                                  )
-                                }
-                              </tr>
-                            </>
-                          </tbody>
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
+                                  {
+                                    this.state.consumptions.length > 0
+                                    &&
+                                    this.state.consumptions.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.consumptions[idx].Actual)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+                              </>
+                            </tbody>
 
-                        </Table>}
+                          </Table>}
+                      </Online>
+                      <Offline>
+                        {this.state.show &&
+                          <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
+
+                            <tbody>
+                              <>
+                                <tr>
+                                  <th style={{ width: '140px' }}></th>
+                                  {
+                                    this.state.offlineConsumptionList.length > 0
+                                    &&
+                                    this.state.offlineConsumptionList.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
+                                  {
+                                    this.state.offlineConsumptionList.length > 0
+                                    &&
+                                    this.state.offlineConsumptionList.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.offlineConsumptionList[idx].forcast)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+
+                                <tr>
+                                  <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
+                                  {
+                                    this.state.offlineConsumptionList.length > 0
+                                    &&
+                                    this.state.offlineConsumptionList.map((item, idx) =>
+                                      <td id="addr0" key={idx}>
+                                        {this.formatter(this.state.offlineConsumptionList[idx].Actual)}
+                                      </td>
+                                    )
+                                  }
+                                </tr>
+                              </>
+                            </tbody>
+
+                          </Table>}
+                      </Offline>
                     </div>
                   </div>
 
