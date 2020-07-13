@@ -2867,8 +2867,8 @@ class ProcurementAgentExport extends Component {
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>Shipment Cost Report</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>Shipment Cost Report</strong> */}
                         {/* <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
@@ -2895,8 +2895,8 @@ class ProcurementAgentExport extends Component {
                                 </div>
                             }
                         </Offline>
-                    </CardHeader>
-                    <CardBody >
+                    </div>
+                    <CardBody className="pt-lg-0">
 
                         <Col md="12 pl-0">
                             <div className="row ">

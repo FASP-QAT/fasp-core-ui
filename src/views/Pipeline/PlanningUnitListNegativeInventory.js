@@ -85,10 +85,10 @@ export default class PlanningUnitListNegativeInventory extends Component {
         return (
             <>
                 <Card>
-                    <CardHeader>
+                    {/* <CardHeader>
                         <strong>Planning Unit List</strong>
-                    </CardHeader>
-                    <CardBody>
+                    </CardHeader> */}
+                    <CardBody className="pt-lg-0">
                         <div className="table-responsive" >
                             <div id="planningUnitList">
                             </div>

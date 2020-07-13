@@ -13,6 +13,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from 'moment';
 
 
@@ -36,7 +37,7 @@ export default class PipelineProgramList extends Component {
 
     formatDate(cell, row) {
         if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format('MM-DD-YYYY');
+            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
             return modifiedDate;
         } else {
             return "";
@@ -126,7 +127,7 @@ export default class PipelineProgramList extends Component {
                 text: 'Status',
                 align: 'center',
                 headerAlign: 'center',
-                
+
             }
         ];
         const options = {
@@ -161,19 +162,19 @@ export default class PipelineProgramList extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                
+
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>Programs</strong>{' '}
+                    <div className="Card-header-addicon">
+                        {/* <i className="icon-menu"></i><strong>Programs</strong>{' '} */}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Import New program" onClick={this.importNewProgram}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
-                    </CardHeader>
+                    </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <ToolkitProvider
                             keyField="pipelineId"

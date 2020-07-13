@@ -1092,7 +1092,7 @@ class SupplierLeadTimes extends Component {
         }
 
         return (
-            <div className="animated fadeIn" >
+            <div className="animated" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
@@ -1100,9 +1100,9 @@ class SupplierLeadTimes extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
+                    <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
-                        <i className="icon-menu"></i><strong>Procurement Agent Lead Times</strong>
+                        {/* <i className="icon-menu"></i><strong>Procurement Agent Lead Times</strong> */}
                         {/* {this.state.procurementAgents.length > 0 &&  */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1111,8 +1111,8 @@ class SupplierLeadTimes extends Component {
                             </a>
                         </div>
                         {/* } */}
-                    </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    </div>
+                    <CardBody className="pt-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >

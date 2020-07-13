@@ -19,12 +19,14 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js';
 import {
     Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
-const entityname=""
+import moment from "moment";
+const entityname = ""
 const options = {
     title: {
         display: true,
@@ -75,8 +77,8 @@ class SupplyPlanVersionAndReview extends Component {
             statuses: [],
             programs: [],
             countries: [],
-            message:'',
-            programLst:[],
+            message: '',
+            programLst: [],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -131,8 +133,8 @@ class SupplyPlanVersionAndReview extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value },()=>{this.fetchData();})
-        
+        this.setState({ rangeValue: value }, () => { this.fetchData(); })
+
     }
 
     _handleClickRangeBox(e) {
@@ -172,20 +174,21 @@ class SupplyPlanVersionAndReview extends Component {
             );
 
     }
-    filterProgram=()=>{
+    filterProgram = () => {
         let countryId = document.getElementById("countryId").value;
-    if (countryId != 0 ) {
-         const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
-        if(programLst.length>0){
-            
-         this.setState({
-            programLst:programLst
-        },()=>{this.fetchData()});
-    }else{
-        this.setState({
-            programLst:[]
-        });
-    }}
+        if (countryId != 0) {
+            const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
+            if (programLst.length > 0) {
+
+                this.setState({
+                    programLst: programLst
+                }, () => { this.fetchData() });
+            } else {
+                this.setState({
+                    programLst: []
+                });
+            }
+        }
     }
 
     getPrograms() {
@@ -316,7 +319,7 @@ class SupplyPlanVersionAndReview extends Component {
 
         var A = [headers]
 
-        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId,(elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.createdDate.replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate.replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
+        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate.replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
         ]));
 
 
@@ -413,7 +416,7 @@ class SupplyPlanVersionAndReview extends Component {
         columns.map((item, idx) => { headers[idx] = item.text });
         const header = [headers];
         console.log(header);
-        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId,elt.versionType.label.label_en, elt.createdDate, elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate : '', elt.notes]);
+        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate : '', elt.notes]);
 
         let content = {
             startY: 200,
@@ -482,7 +485,7 @@ class SupplyPlanVersionAndReview extends Component {
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
-                    <option key={i} value={item.id} selected={item.id==1?'selected':''}>
+                    <option key={i} value={item.id} selected={item.id == 1 ? 'selected' : ''}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -560,7 +563,13 @@ class SupplyPlanVersionAndReview extends Component {
                 text: i18n.t('static.report.veruploaddate'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.createdDate ? moment(row.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
             }
             , {
                 dataField: 'createdBy.username',
@@ -644,15 +653,15 @@ class SupplyPlanVersionAndReview extends Component {
         }
         return (
             <div className="animated fadeIn" >
-              <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} />
-        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-       
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong> */}
                         {
                             this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
@@ -663,8 +672,8 @@ class SupplyPlanVersionAndReview extends Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                             </div>
                         }
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
 
                         <div>
                             <Form >
@@ -767,8 +776,8 @@ class SupplyPlanVersionAndReview extends Component {
                                                                 rowEvents={{
                                                                     onClick: (e, row, rowIndex) => {
                                                                         if (row.versionStatus.id == 1
-                                                                          //  && row.versionType.versionTypeId==1
-                                                                            )
+                                                                            //  && row.versionType.versionTypeId==1
+                                                                        )
                                                                             this.editprogramStatus(row);
                                                                     }
                                                                 }}

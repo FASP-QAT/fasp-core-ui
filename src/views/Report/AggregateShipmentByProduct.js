@@ -1297,8 +1297,8 @@ class AggregateShipmentByProduct extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>Aggregate Shipment By Product</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>Aggregate Shipment By Product</strong> */}
                         {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                         {/* <Online> */}
                         {/* {
@@ -1341,8 +1341,8 @@ class AggregateShipmentByProduct extends Component {
                                 </div>
                             }
                         </Offline> */}
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pt-lg-0 ">
                         <div className="" >
                             <div ref={ref}>
                                 <Form >

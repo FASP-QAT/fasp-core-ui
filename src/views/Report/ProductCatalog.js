@@ -23,6 +23,8 @@ import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHI
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import { BreadcrumbDivider } from "semantic-ui-react";
 
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -107,6 +109,8 @@ class ProductCatalog extends Component {
         // var re;
         // var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
         // re = this.state.procurementAgents
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
 
@@ -253,7 +257,7 @@ class ProductCatalog extends Component {
         ]);
 
         let content = {
-            margin: { top: 40 },
+            margin: { top: 90 },
             startY: 200,
             head: [headers],
             body: data,
@@ -1303,24 +1307,20 @@ class ProductCatalog extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
 
-                <Card>
-                    <CardHeader>
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.productCatalog')}</strong>
-                        {/* {this.state.procurementAgents.length > 0 &&  */}
-                        <div className="card-header-actions">
-                            <a className="card-header-action">
-                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />}
-                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />}
-                            </a>
-                        </div>
-                        {/* } */}
-                    </CardHeader>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '} */}
+                        {this.state.outPutList.length > 0 && <div className="card-header-actions">
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
+
+                        </div>}
+                    </div>
                     <CardBody className="pb-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >
-                            <Col md="6 pl-0">
+                            <Col md="12 pl-0">
                                 <div className="d-md-flex Selectdiv2">
                                     <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -1401,7 +1401,8 @@ class ProductCatalog extends Component {
                                     </FormGroup>
                                 </div>
                             </Col>
-                        </Form><br /><br /><br />
+                        </Form>
+                        {/* <br /><br /><br /> */}
                         <ToolkitProvider
                             keyField="id"
                             data={this.state.outPutList}

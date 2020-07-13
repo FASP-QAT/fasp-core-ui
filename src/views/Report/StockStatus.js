@@ -1268,8 +1268,8 @@ console.log(pu)
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5>{i18n.t(this.state.message)}</h5>
         <Card>
-          <CardHeader>
-            <i className="icon-menu"></i><strong>Stock Status Report</strong>
+          <div className="Card-header-reporticon">
+            {/* <i className="icon-menu"></i><strong>Stock Status Report</strong> */}
             <div className="card-header-actions">
               <a className="card-header-action">
                 {this.state.stockStatusList.length > 0 && <div className="card-header-actions">
@@ -1278,8 +1278,8 @@ console.log(pu)
                 </div>}
               </a>
             </div>
-          </CardHeader>
-          <CardBody>
+          </div>
+          <CardBody className="pb-lg-2 pt-lg-0">
             <div className="TableCust" >
               <div ref={ref}>
 

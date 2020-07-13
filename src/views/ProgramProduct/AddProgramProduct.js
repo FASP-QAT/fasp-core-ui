@@ -532,9 +532,9 @@ class AddprogramPlanningUnit extends Component {
                
                     <div style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody className="p-0">
                             <Col sm={12} md={12}>
                                 <h4 className="red">{this.props.message}</h4>
