@@ -122,7 +122,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.inventoryTurns'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.stockstatusacrossplanningunit'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -671,7 +671,7 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                 }
 
 
-                                var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                                var amcCalcualted = Math.round((sumOfConsumptions) / countAMC);
                                 console.log('amcCalcualted', amcCalcualted)
                                 var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
                                 console.log(planningUnit)
@@ -788,10 +788,10 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                     );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
         }
     }
