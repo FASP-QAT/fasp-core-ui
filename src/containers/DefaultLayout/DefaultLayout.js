@@ -736,6 +736,13 @@ class DefaultLayout extends Component {
                             url: '/report/supplierLeadTimes',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
+                          
                           },{
                             name: i18n.t('static.dashboard.costOfInventory'),
                             url: '/report/costOfInventory',
