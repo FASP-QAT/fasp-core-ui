@@ -2574,6 +2574,7 @@ input::placeholder {
 }
 .btn-transparent {
   color: #212121!important;
+  font-size:23px;
   background-color: transparent;
   border-color: transparent;
 }
@@ -2636,6 +2637,16 @@ input::placeholder {
   width: 8px!important;
   height: 8px!important;
   border-radius: 50%!important;
+}
+
+.carousel-item{
+  transition-duration: 1s;
+  transition: transform 1s ease-in-out!important;
+}
+.carousel-item.active, .carousel-item-next, .carousel-item-prev {
+  display: block;
+  // transition: transform 1s ease-in-out !important;
+  transition-duration: 1s;
 }
 @media (min-width: 1920px) {
   .ImgCont{

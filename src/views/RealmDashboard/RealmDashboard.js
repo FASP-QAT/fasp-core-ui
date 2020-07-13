@@ -377,6 +377,34 @@ class RealmDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
+                <i class="fa fa-list-alt icon-color"></i>
+              
+                <ButtonGroup className="float-right">
+                  <Dropdown id='card8' isOpen={this.state.card8} toggle={() => { this.setState({ card8: !this.state.card8 }); }}>
+                  <DropdownToggle caret className="p-0" color="transparent">
+                      {/* <i className="icon-settings"></i> */}
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <DropdownItem>View Total Program</DropdownItem>
+                      {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
+                     
+                    </DropdownMenu>
+                  </Dropdown>
+                </ButtonGroup>
+              </div>
+               
+                <div className="TextTittle ">Total Program </div>
+                <div className="text-count">07</div>
+                <div className="chart-wrapper mt-4 pb-2" >
+                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+              </div>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col xs="12" sm="6" lg="3">
+            <Card className=" CardHeight">
+              <CardBody className="box-p">
+              <div class="h1 text-muted text-left mb-2  ">
                 <i class="fa fa-file-text-o icon-color"></i>
               
                 <ButtonGroup className="float-right">
@@ -429,34 +457,7 @@ class RealmDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
-          <Col xs="12" sm="6" lg="3">
-            <Card className=" CardHeight">
-              <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-list-alt icon-color"></i>
-              
-                <ButtonGroup className="float-right">
-                  <Dropdown id='card8' isOpen={this.state.card8} toggle={() => { this.setState({ card8: !this.state.card8 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Total Program</DropdownItem>
-                      {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
-                <div className="TextTittle ">Total Program </div>
-                <div className="text-count">07</div>
-                <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
-              </CardBody>
-            </Card>
-          </Col>
+     
         </Row>
 
           {/* <Row>

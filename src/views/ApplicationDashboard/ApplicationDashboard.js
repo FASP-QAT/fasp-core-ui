@@ -340,7 +340,7 @@ class ApplicationDashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-              <Carousel className='trustedMechCarousel' activeIndex={activeIndex} next={this.next} previous={this.previous}>
+              <Carousel className='trustedMechCarousel'  activeIndex={activeIndex} next={this.next} previous={this.previous}>
           <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
           {slides}
           {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
@@ -440,17 +440,17 @@ class ApplicationDashboard extends Component {
             </Card>
           </Col>
         </Row>
-        <Row className="mt-2">
+        {/* <Row className="mt-2">
           <Col md="12">
             <Card>
-              {/* <CardHeader className="text-center">
+              <CardHeader className="text-center">
                 <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
                 <div className="card-header-actions">
                 <a className="card-header-action">
                   
                   </a>
                 </div>
-              </CardHeader> */}
+              </CardHeader> 
               <CardBody>
                 <div className="chart-wrapper chart-graph">
                   <Bar data={bar} options={options} />
@@ -458,7 +458,7 @@ class ApplicationDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
-        </Row>
+        </Row> */}
         {/* <Row>
         <Col md="8">
             <Card>
