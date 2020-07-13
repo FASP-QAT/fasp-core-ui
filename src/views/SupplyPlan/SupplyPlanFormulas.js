@@ -30,9 +30,9 @@ class SupplyPlanFormulas extends Component {
           <Col sm="12" xl="12">
             <h5></h5>
             <Card>
-              <CardHeader>
+              {/* <CardHeader>
                 <i className="fa fa-align-justify"></i><strong>Formulae</strong>
-              </CardHeader>
+              </CardHeader> */}
               <CardBody>
                 <ListGroup>
                 <ListGroupItem action>

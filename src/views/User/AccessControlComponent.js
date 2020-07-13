@@ -1819,9 +1819,9 @@ class AccessControlComponent extends Component {
 
                 <Card>
 
-                    <CardHeader>
+                    {/* <CardHeader>
                         <i className="icon-note"></i><strong>{i18n.t('static.user.accessControl')}</strong>{' '}
-                    </CardHeader>
+                    </CardHeader> */}
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">

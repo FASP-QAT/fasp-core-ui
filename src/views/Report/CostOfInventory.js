@@ -42,7 +42,7 @@ export default class CostOfInventory extends Component {
                 programId: '',
                 planningUnitIds: [],
                 regionIds: [],
-                versionId: -1,
+                versionId: 0,
                 dt: moment(new Date()).endOf('month').format('YYYY-MM-DD'),
                 includePlanningShipments: true
             },
@@ -165,6 +165,8 @@ export default class CostOfInventory extends Component {
 
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
+        let costOfInventoryInput = this.state.CostOfInventoryInput;
+        costOfInventoryInput.versionId=0
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
@@ -172,9 +174,11 @@ export default class CostOfInventory extends Component {
             if (program.length == 1) {
                 if (navigator.onLine) {
                     this.setState({
+                        costOfInventoryInput,
                         versions: []
                     }, () => {
                         this.setState({
+                            costOfInventoryInput,
                             versions: program[0].versionList.filter(function (x, i, a) {
                                 return a.indexOf(x) === i;
                             })
@@ -184,18 +188,22 @@ export default class CostOfInventory extends Component {
 
                 } else {
                     this.setState({
+                        costOfInventoryInput,
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
 
                 this.setState({
+                    costOfInventoryInput,
                     versions: []
                 })
 
             }
         } else {
+            
             this.setState({
+                costOfInventoryInput,
                 versions: []
             })
         }
@@ -452,7 +460,7 @@ export default class CostOfInventory extends Component {
         console.log('in form submit')
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
-        if (programId != 0 && versionId != -1) {
+        if (programId != 0 && versionId != 0) {
             if (versionId.includes('Local')) {
                 let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
                 let endDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-' + new Date(this.state.singleValue2.year, this.state.singleValue2.month + 1, 0).getDate();
@@ -779,8 +787,8 @@ export default class CostOfInventory extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -793,8 +801,8 @@ export default class CostOfInventory extends Component {
                                 </div>}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
 
@@ -830,7 +838,7 @@ export default class CostOfInventory extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
-                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
                                                         </Input>
 

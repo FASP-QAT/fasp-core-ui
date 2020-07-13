@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY } from '../../Constants.js';
+import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -252,7 +252,7 @@ class AnnualShipmentCost extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
-                alert("in else online version");
+                // alert("in else online version");
                 console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.getAnnualShipmentCost(json)
@@ -486,7 +486,7 @@ class AnnualShipmentCost extends Component {
                     var splittext = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
-                    splittext = doc.splitTextToSize('Run Date:' + moment(new Date()).format('DD-MMM-YY') + '\n Run Time:' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+                    splittext = doc.splitTextToSize('Run Date:' + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + '\n Run Time:' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width * 3 / 4, 80, splittext)
                     doc.setFontSize(8)
@@ -1236,8 +1236,8 @@ class AnnualShipmentCost extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
 
                             <a className="card-header-action">
@@ -1245,8 +1245,8 @@ class AnnualShipmentCost extends Component {
                                 {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
                                 <Form >

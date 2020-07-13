@@ -252,9 +252,9 @@ export default class AddCountryComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.country.countryadd')}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
@@ -313,7 +313,7 @@ export default class AddCountryComponent extends Component {
                                         handleReset
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='countryForm'>
-                                                <CardBody>
+                                                <CardBody className="pt-2 pb-0">
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}

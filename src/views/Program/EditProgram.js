@@ -448,9 +448,9 @@ export default class EditProgram extends Component {
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} noValidate name='programForm'>
-                                                <CardHeader>
+                                                {/* <CardHeader>
                                                     <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
-                                                </CardHeader>
+                                                </CardHeader> */}
                                                 <CardBody>
                                                     <FormGroup>
 

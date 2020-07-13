@@ -2253,8 +2253,8 @@ class FunderExport extends Component {
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.report.fundingSource')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.fundingSource')}</strong> */}
                         {/* <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
@@ -2281,8 +2281,8 @@ class FunderExport extends Component {
                                 </div>
                             }
                         </Offline>
-                    </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    </div>
+                    <CardBody className="pb-lg-2 mt-3">
 
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">

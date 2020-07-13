@@ -45,7 +45,6 @@ export default class StockStatusMatrix extends React.Component {
       data: [],
       programs: [],
       versions: [],
-      view: 1,
       includePlanningShipments: true,
       years: [],
       pulst: [],
@@ -53,18 +52,15 @@ export default class StockStatusMatrix extends React.Component {
       planningUnitValues: [],
       planningUnitLabels: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-startYear:new Date().getFullYear() - 1,
-endYear:new Date().getFullYear()
+      startYear: new Date().getFullYear() - 1,
+      endYear: new Date().getFullYear()
 
     }
     this.filterData = this.filterData.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
-    // this.getProductCategories = this.getProductCategories.bind(this)
-    //this.getPrograms = this.getPrograms.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    //this.getPlanningUnit = this.getPlanningUnit.bind(this);
 
   }
 
@@ -73,10 +69,7 @@ endYear:new Date().getFullYear()
     return '?'
   }
   show() {
-    /* if (!this.state.showed) {
-         setTimeout(() => {this.state.closeable = true}, 250)
-         this.setState({ showed: true })
-     }*/
+
   }
   handleRangeChange(value, text, listIndex) {
     //this.filterData();
@@ -87,10 +80,14 @@ endYear:new Date().getFullYear()
     })
 
   }
-  onYearChange=(value)=>{
-   this.setState({ startYear:value[0].format('YYYY'),
-endYear:value[1].format('YYYY')},()=>{console.log(this.state.startYear,' ',this.state.endYear )
-this.filterData()})
+  onYearChange = (value) => {
+    this.setState({
+      startYear: value[0].format('YYYY'),
+      endYear: value[1].format('YYYY')
+    }, () => {
+      console.log(this.state.startYear, ' ', this.state.endYear)
+      this.filterData()
+    })
   }
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
@@ -129,18 +126,6 @@ this.filterData()})
       this.filterData()
     })
   }
-  viewChange = (event) => {
-    this.setState({
-      view: event.target.value,
-      data: [],
-      planningUnitIds: []
-    })
-    if (event.target.value == 1) {
-      this.getPlanningUnit();
-    } else {
-      this.getProductCategories()
-    }
-  }
 
   filterData() {
     //console.log('In filter data---' + this.state.rangeValue.from.year)
@@ -148,7 +133,6 @@ this.filterData()})
     let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
     let programId = document.getElementById("programId").value;
     let planningUnitIds = this.state.planningUnitValues;
-    let view = document.getElementById("view").value;
     let versionId = document.getElementById("versionId").value;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
     if (planningUnitIds.length > 0 && programId > 0) {
@@ -163,21 +147,21 @@ this.filterData()})
           var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
           var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
           var planningunitRequest = planningUnitObjectStore.getAll();
-           planningunitRequest.onerror = function (event) {
+          planningunitRequest.onerror = function (event) {
             // Handle errors!
-        };
-        var plunit=[]
-        planningunitRequest.onsuccess = function (e) {
+          };
+          var plunit = []
+          planningunitRequest.onsuccess = function (e) {
             var myResult1 = [];
-            myResult1 =  e.target.result;
+            myResult1 = e.target.result;
             console.log(myResult1)
-            var plunit1=[]
-             planningUnitIds.map(planningUnitId => {
-              plunit=[... plunit,...(myResult1.filter(c=>c.planningUnitId==  planningUnitId))]
-             
+            var plunit1 = []
+            planningUnitIds.map(planningUnitId => {
+              plunit = [...plunit, ...(myResult1.filter(c => c.planningUnitId == planningUnitId))]
+
             })
-        console.log(plunit)
-        }.bind(this)
+            console.log(plunit)
+          }.bind(this)
           var transaction = db1.transaction(['programData'], 'readwrite');
           var programTransaction = transaction.objectStore('programData');
           var version = (versionId.split('(')[0]).trim()
@@ -191,408 +175,206 @@ this.filterData()})
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-            if (this.state.view == 1) {
-              planningUnitIds.map(planningUnitId => {
 
-                var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+            planningUnitIds.map(planningUnitId => {
 
-                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
-                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
-                var shipmentList =[]
-                if(document.getElementById("includePlanningShipments").selectedOptions[0].value.toString()=='true'){
-                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-            }else{
-                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
-         
-            }
-                // calculate openingBalance
+              var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
-                var openingBalance = 0;
-                var totalConsumption = 0;
-                var totalAdjustments = 0;
-                var totalShipments = 0;
-                console.log('startDate', startDate)
-                console.log('programJson', programJson)
-                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
-                console.log('consumptionRemainingList', consumptionRemainingList)
-                for (var j = 0; j < consumptionRemainingList.length; j++) {
-                  var count = 0;
-                  for (var k = 0; k < consumptionRemainingList.length; k++) {
-                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                      count++;
-                    } else {
+              var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+              var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+              var shipmentList = []
+              if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
+                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+              } else {
+                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
 
-                    }
-                  }
-                  if (count == 0) {
-                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+              }
+              // calculate openingBalance
+
+              var openingBalance = 0;
+              var totalConsumption = 0;
+              var totalAdjustments = 0;
+              var totalShipments = 0;
+              console.log('startDate', startDate)
+              console.log('programJson', programJson)
+              var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
+              console.log('consumptionRemainingList', consumptionRemainingList)
+              for (var j = 0; j < consumptionRemainingList.length; j++) {
+                var count = 0;
+                for (var k = 0; k < consumptionRemainingList.length; k++) {
+                  if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                    count++;
                   } else {
-                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
-                      totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                    }
+
                   }
                 }
-
-                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
-                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                  totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                }
-
-                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
-                for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                }
-                openingBalance = totalAdjustments - totalConsumption + totalShipments;
-
-                for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
-                  var monthlydata = [];
-                  for (var month = 1; month <= 12; month++) {
-                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                    console.log(dtstr, ' ', enddtStr)
-                    var dt = dtstr
-                    console.log(openingBalance)
-                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                    var adjustment = 0;
-                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                    var consumption = 0;
-                    console.log(programJson.regionList)
-
-
-                    for (var i = 0; i < programJson.regionList.length; i++) {
-
-                      var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                      console.log(list)
-                      if (list.length > 1) {
-                        list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
-                      } else {
-                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                      }
-                    }
-
-
-
-                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                    var shipment = 0;
-                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                    console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                    var endingBalance = openingBalance + adjustment + shipment - consumption
-                    console.log('endingBalance', endingBalance)
-
-                    endingBalance = endingBalance < 0 ? 0 : endingBalance
-                    openingBalance = endingBalance
-                    var amcBeforeArray = [];
-                    var amcAfterArray = [];
-
-
-                    for (var c = 0; c < 12; c++) {
-
-                      var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
-                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
-                      if (consumptionListForAMC.length > 0) {
-                        var consumptionQty = 0;
-                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                          var count = 0;
-                          for (var k = 0; k < consumptionListForAMC.length; k++) {
-                            if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                              count++;
-                            } else {
-
-                            }
-                          }
-
-                          if (count == 0) {
-                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                          } else {
-                            if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                              consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                            }
-                          }
-                        }
-                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
-                          c = 12;
-                        }
-                      }
-                    }
-                    for (var c = 0; c < 12; c++) {
-                      var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
-                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
-                      if (consumptionListForAMC.length > 0) {
-                        var consumptionQty = 0;
-                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                          var count = 0;
-                          for (var k = 0; k < consumptionListForAMC.length; k++) {
-                            if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                              count++;
-                            } else {
-
-                            }
-                          }
-
-                          if (count == 0) {
-                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                          } else {
-                            if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                              consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                            }
-                          }
-                        }
-                        amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
-                          c = 12;
-                        }
-                      }
-
-                    }
-
-                    var amcArray = amcBeforeArray.concat(amcAfterArray);
-                    var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
-                    var countAMC = amcArrayFilteredForMonth.length;
-                    var sumOfConsumptions = 0;
-                    for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
-                      sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
-                    }
-
-
-                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
-                    console.log('amcCalcualted', amcCalcualted)
-                    var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
-
-                    monthlydata.push(this.roundN(mos))
-
-                  }
-                 var json = {
-                    name: pu.planningUnit,
-                    units: plunit.filter(c=>c.planningUnitId==planningUnitId)[0].unit,
-                    reorderFrequency: pu.reorderFrequencyInMonths,
-                    year: from,
-                    min: pu.minMonthsOfStock,
-                    Jan: monthlydata[0],
-                    Feb: monthlydata[1],
-                    Mar: monthlydata[2],
-                    Apr: monthlydata[3],
-                    May: monthlydata[4],
-                    Jun: monthlydata[5],
-                    Jul: monthlydata[6],
-                    Aug: monthlydata[7],
-                    Sep: monthlydata[8],
-                    Oct: monthlydata[9],
-                    Nov: monthlydata[10],
-                    Dec: monthlydata[11],
-                  }
-                  data.push(json)
-
-                 
-               
-                }
-                this.setState({
-                  data: data,
-                  message: ''
-                })
-              })
-            } else {
-              planningUnitIds.map(productCategoryId => {
-                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.active == true);
-                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId);
-                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-                var shipmentList =[]
-                if(document.getElementById("includePlanningShipments").selectedOptions[0].value.toString()=='true'){
-                shipmentList= (programJson.shipmentList).filter(c => c.active == true &&  c.planningUnit.forecastingUnit.productCategory.id == productCategoryId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-            }else{
-                shipmentList= (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.forecastingUnit.productCategory.id == productCategoryId  && c.shipmentStatus.id != 8 &&c.shipmentStatus.id!=1 && c.shipmentStatus.id!=2 && c.shipmentStatus.id!=9 && c.accountFlag == true );
-         
-            }
-                var proList = []
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                planningunitRequest.onerror = function (event) {
-                  // Handle errors!
-                };
-                planningunitRequest.onsuccess = function (e) {
-                  var myResult = [];
-                  myResult = planningunitRequest.result;
-              
-                  for (var i = 0,j=0; i < myResult.length; i++) {
-                    if (myResult[i].program.id == programId) {
-                      console.log('equal')
-                      proList[j++]=myResult[i]
-                    }
-                  }
-
-                
-
-
-                // calculate openingBalance
-
-                var openingBalance = 0;
-                var totalConsumption = 0;
-                var totalAdjustments = 0;
-                var totalShipments = 0;
-                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
-                for (var j = 0; j < consumptionRemainingList.length; j++) {
-                  var count = 0;
-                  for (var k = 0; k < consumptionRemainingList.length; k++) {
-                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                      count++;
-                    } else {
-
-                    }
-                  }
-                  if (count == 0) {
+                if (count == 0) {
+                  totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                } else {
+                  if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
                     totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                  } else {
-                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
-                      totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                    }
                   }
                 }
+              }
 
-                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
-                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                  totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                }
+              var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
+              for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+              }
 
-                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
-                for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                }
-                openingBalance = totalAdjustments - totalConsumption + totalShipments;
+              var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
+              for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+              }
+              openingBalance = totalAdjustments - totalConsumption + totalShipments;
 
-                for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
-                  var monthlydata = [];
-                  for (var month = 1; month <= 12; month++) {
-                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                    console.log(dtstr, ' ', enddtStr)
-                    var dt = dtstr
-                    console.log(openingBalance)
-                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                    var adjustment = 0;
-                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                    var consumption = 0;
-                    for (var j = 0; j < proList.length; j++) {
-                      for (var i = 0; i < programJson.regionList.length; i++) {
-                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
-                        if (list.length > 1) {
-                          list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+              for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
+                var monthlydata = [];
+                for (var month = 1; month <= 12; month++) {
+                  var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                  var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                  console.log(dtstr, ' ', enddtStr)
+                  var dt = dtstr
+                  console.log(openingBalance)
+                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                  var adjustment = 0;
+                  invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                  var consumption = 0;
+                  console.log(programJson.regionList)
+
+
+                  for (var i = 0; i < programJson.regionList.length; i++) {
+
+                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                    console.log(list)
+                    if (list.length > 1) {
+                      list.map(ele => ele.actualFlag.toString() == 'true' ? consumption = consumption + ele.consumptionQty : consumption)
+                    } else {
+                      consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                    }
+                  }
+
+
+
+                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                  var shipment = 0;
+                  shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                  console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                  var endingBalance = openingBalance + adjustment + shipment - consumption
+                  console.log('endingBalance', endingBalance)
+
+                  endingBalance = endingBalance < 0 ? 0 : endingBalance
+                  openingBalance = endingBalance
+                  var amcBeforeArray = [];
+                  var amcAfterArray = [];
+
+
+                  for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+
+                    var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
+                    if (consumptionListForAMC.length > 0) {
+                      var consumptionQty = 0;
+                      for (var j = 0; j < consumptionListForAMC.length; j++) {
+                        var count = 0;
+                        for (var k = 0; k < consumptionListForAMC.length; k++) {
+                          if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                            count++;
+                          } else {
+
+                          }
+                        }
+
+                        if (count == 0) {
+                          consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
                         } else {
-                          consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                        }
-                      }
-                    }
-
-
-                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                    var shipment = 0;
-                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                    console.log('adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                    var endingBalance = openingBalance + adjustment + shipment - consumption
-                    console.log('endingBalance', endingBalance)
-
-                    endingBalance = endingBalance < 0 ? 0 : endingBalance
-                    openingBalance = endingBalance
-                    var amcBeforeArray = [];
-                    var amcAfterArray = [];
-
-
-                    for (var c = 0; c < 12; c++) {
-
-                      var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
-                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
-                      if (consumptionListForAMC.length > 0) {
-                        var consumptionQty = 0;
-
-                        for (var j = 0; j < proList.length; j++) {
-                          for (var i = 0; i < programJson.regionList.length; i++) {
-                            var list = consumptionListForAMC.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
-                            if (list.length > 1) {
-                              list.map(ele => ele.actualFlag.toString() == 'true' ? consumptionQty = consumptionQty + ele.consumptionQty : consumptionQty)
-                            } else {
-                              consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
-                            }
+                          if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
                           }
                         }
-                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                        if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
-                          c = 12;
-                        }
                       }
-                    }
-                    for (var c = 0; c < 12; c++) {
-                      var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
-                      var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
-                      if (consumptionListForAMC.length > 0) {
-                        var consumptionQty = 0;
+                      amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                      var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
 
-                        for (var j = 0; j < proList.length; j++) {
-                          for (var i = 0; i < programJson.regionList.length; i++) {
-                            var list = consumptionListForAMC.filter(c => c.region.id == programJson.regionList[i].regionId && c.planningUnit.id == proList[j].planningUnit.id)
-                            if (list.length > 1) {
-                              list.map(ele => ele.actualFlag.toString() == 'true' ? consumptionQty = consumptionQty + ele.consumptionQty : consumptionQty)
-                            } else {
-                              consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
-                            }
+                    }
+                  }
+                  for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                    var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
+                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
+                    if (consumptionListForAMC.length > 0) {
+                      var consumptionQty = 0;
+                      for (var j = 0; j < consumptionListForAMC.length; j++) {
+                        var count = 0;
+                        for (var k = 0; k < consumptionListForAMC.length; k++) {
+                          if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                            count++;
+                          } else {
+
                           }
                         }
-                       amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                        if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
-                          c = 12;
+
+                        if (count == 0) {
+                          consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                        } else {
+                          if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                          }
                         }
                       }
+                      amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                      amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
 
                     }
 
-                    var amcArray = amcBeforeArray.concat(amcAfterArray);
-                    var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
-                    var countAMC = amcArrayFilteredForMonth.length;
-                    var sumOfConsumptions = 0;
-                    for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
-                      sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
-                    }
+                  }
 
-
-                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                  var amcArray = amcBeforeArray.concat(amcAfterArray);
+                  var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                  var countAMC = amcArrayFilteredForMonth.length;
+                  var sumOfConsumptions = 0;
+                  for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                  }
+                  var amcCalcualted = 0
+                  var mos = 0
+                  if (countAMC != 0) {
+                    amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
                     console.log('amcCalcualted', amcCalcualted)
-                    var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
-
-                    monthlydata.push(this.roundN(mos))
-
+                    mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
                   }
-                  var json = {
-                    name: inventoryList[0].planningUnit.forecastingUnit.productCategory,
-                    year: from,
-                    Jan: monthlydata[0],
-                    Feb: monthlydata[1],
-                    Mar: monthlydata[2],
-                    Apr: monthlydata[3],
-                    May: monthlydata[4],
-                    Jun: monthlydata[5],
-                    Jul: monthlydata[6],
-                    Aug: monthlydata[7],
-                    Sep: monthlydata[8],
-                    Oct: monthlydata[9],
-                    Nov: monthlydata[10],
-                    Dec: monthlydata[11],
-                  }
-                  data.push(json)
+                  monthlydata.push(mos)
+
                 }
-                this.setState({
-                  data: data,
-                  message: ''
-                })
-              }.bind(this);}
-              )
-            }
+                console.log(monthlydata)
+                var json = {
+                  planningUnit: pu.planningUnit,
+                  unit: plunit.filter(c => c.planningUnitId == planningUnitId)[0].unit,
+                  reorderFrequency: pu.reorderFrequencyInMonths,
+                  year: from,
+                  minMonthsOfStock: pu.minMonthsOfStock,
+                  jan: monthlydata[0] == 'NaN' || monthlydata[0] == '0' ? '' : monthlydata[0],
+                  feb: monthlydata[1] == 'NaN' || monthlydata[1] == '0' ? '' : monthlydata[1],
+                  mar: monthlydata[2] == 'NaN' || monthlydata[2] == '0' ? '' : monthlydata[2],
+                  apr: monthlydata[3] == 'NaN' || monthlydata[3] == '0' ? '' : monthlydata[3],
+                  may: monthlydata[4] == 'NaN' || monthlydata[4] == '0' ? '' : monthlydata[4],
+                  jun: monthlydata[5] == 'NaN' || monthlydata[5] == '0' ? '' : monthlydata[5],
+                  jul: monthlydata[6] == 'NaN' || monthlydata[6] == '0' ? '' : monthlydata[6],
+                  aug: monthlydata[7] == 'NaN' || monthlydata[7] == '0' ? '' : monthlydata[7],
+                  sep: monthlydata[8] == 'NaN' || monthlydata[8] == '0' ? '' : monthlydata[8],
+                  oct: monthlydata[9] == 'NaN' || monthlydata[9] == '0' ? '' : monthlydata[9],
+                  nov: monthlydata[10] == 'NaN' || monthlydata[10] == '0' ? '' : monthlydata[10],
+                  dec: monthlydata[11] == 'NaN' || monthlydata[11] == '0' ? '' : monthlydata[11],
+                }
+                data.push(json)
+
+              }
+              this.setState({
+                data: data,
+                message: ''
+              }, () => { console.log(this.state.data) })
+            })
           }.bind(this)
 
 
@@ -625,60 +407,46 @@ this.filterData()})
           "stopDate": endDate,
           "planningUnitIds": planningUnitIds,
           "includePlannedShipments": includePlannedShipments,
-          "view": view
+
         }
 
-      
-          let realmId = AuthenticationService.getRealmId();
-          AuthenticationService.setupAxiosInterceptors();
-          ProductService.getStockStatusMatrixData(inputjson)
-            .then(response => {
-              console.log("data---", response.data)
-              if (view == 2) {
-                this.setState({
-                  data: [{
-                    name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 1.0, year: 2019, reorderFrequency: 3,
-                    units: { id: 1, label: { label_en: "" } }, Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 1.78
-                  },
-                  {
-                    name: { id: 1, label: { label_en: "HIV/AIDS Pharmaceuticals" } }, unit: { id: 1, label: { label_en: "abacavir 20 mg/ml solution 240" } }, min: 5.0, year: 2020, reorderFrequency: 3,
-                    units: { id: 1, label: { label_en: "" } }, Jan: 0.88, Feb: 0.21, Mar: 1.34, Apr: 0.44, May: 0, Jun: 4.11, Jul: 4.46, Aug: 6.81, Sep: 8.27, Oct: 7.06, Nov: 9.11, Dec: 8.27
-                  }],
-                  view: view, message: ''
-                })
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProductService.getStockStatusMatrixData(inputjson)
+          .then(response => {
+            console.log("data---", response.data)
+
+            this.setState({
+              data: response.data,
+              message: ''
+            })
+
+
+          }).catch(
+            error => {
+              this.setState({
+                data: []
+              })
+
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
               } else {
-
-                this.setState({
-                  data: response.data,
-                  view: view, message: ''
-                })
-              }
-
-            }).catch(
-              error => {
-                this.setState({
-                  data: []
-                })
-
-                if (error.message === "Network Error") {
-                  this.setState({ message: error.message });
-                } else {
-                  switch (error.response ? error.response.status : "") {
-                    case 500:
-                    case 401:
-                    case 404:
-                    case 406:
-                    case 412:
-                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                      break;
-                    default:
-                      this.setState({ message: 'static.unkownError' });
-                      break;
-                  }
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
                 }
               }
-            );
-        
+            }
+          );
+
 
 
 
@@ -688,9 +456,6 @@ this.filterData()})
       }
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
-
-    } else if (view == 2 && planningUnitIds.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), data: [] });
 
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
@@ -981,13 +746,7 @@ this.filterData()})
 
   }
 
-  getPlanningUnitOrProductCategory = () => {
-    if (this.state.view == 1) {
-      this.getPlanningUnit()
-    } else {
-      this.getProductCategories()
-    }
-  }
+
 
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
@@ -1077,18 +836,28 @@ this.filterData()})
     this.getPrograms();
 
   }
-  formatter = value => {
-
-    var cell1 = value
-    cell1 += '';
-    var x = cell1.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+  roundN = num => {
+    if (num != '') {
+      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    } else {
+      return ''
     }
-    return x1 + x2;
+  }
+  formatter = value => {
+    if (value != '') {
+      var cell1 = this.roundN(value)
+      cell1 += '';
+      var x = cell1.split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    } else {
+      return ''
+    }
   }
 
   exportCSV(columns) {
@@ -1096,14 +865,8 @@ this.filterData()})
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' + (this.state.startYear + ' ~ ' + this.state.endYear)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    if (this.state.view == 1) {
-      this.state.planningUnitLabels.map(ele =>
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    } else {
-      this.state.planningUnitLabels.map(ele =>
-        csvRow.push((i18n.t('static.productcategory.productcategory')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-
-    }
+    this.state.planningUnitLabels.map(ele =>
+      csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
 
     csvRow.push('')
@@ -1116,14 +879,7 @@ this.filterData()})
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
     var A = [headers]
     var re = this.state.data
-    if (this.state.view == 1) {
-      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.units.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.min, ele.reorderFrequency, ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
-        , ele.Dec]));
-    }
-    else {
-      this.state.data.map(ele => A.push([(getLabelText(ele.name.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.year, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
-        , ele.Dec]));
-    }
+    this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)]));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -1135,7 +891,7 @@ this.filterData()})
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.startYear+'~'+this.state.endYear + ".csv"
+    a.download = i18n.t('static.dashboard.stockstatusmatrix') + "-" + this.state.startYear + '~' + this.state.endYear + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -1169,9 +925,7 @@ this.filterData()})
         doc.setFont('helvetica', 'bold')
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-        /*doc.addImage(data, 10, 30, {
-          align: 'justify'
-        });*/
+
         doc.setTextColor("#002f6c");
         doc.text(i18n.t('static.dashboard.stockstatusmatrix'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
@@ -1185,20 +939,12 @@ this.filterData()})
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          if (this.state.view == 1) {
-            doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-              align: 'left'
-            })
+          doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
 
-            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-          } else {
-            doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-              align: 'left'
-            })
-            var planningText = doc.splitTextToSize((i18n.t('static.productcategory.productcategory') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-          }
+          var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, 150, planningText)
 
         }
 
@@ -1217,55 +963,31 @@ this.filterData()})
 
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     let header = []
-    if (this.state.view == 1) {
 
-      header = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
-        , [
-        { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
-      ]
-    } else {
-      header = [[{ content: (this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
-      { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
-        , [
-        { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
-        { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
-      ]
-    }
+    header = [[{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
+    { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
+    { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
+    { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
+    { content: i18n.t('static.common.year'), rowSpan: 2, styles: { halign: 'center' } },
+    { content: i18n.t('static.report.monthsOfStock'), colSpan: 12, styles: { halign: 'center' } }]
+      , [
+      { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.mar'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.apr'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.may'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.jun'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.jul'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.aug'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.sep'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.oct'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.nov'), styles: { halign: 'center' } },
+      { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
+    ]
     let data;
-    if (this.state.view == 1) {
-      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), getLabelText(ele.units.label, this.state.lang), ele.min, ele.reorderFrequency, ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
-        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
-    } else {
-      data = this.state.data.map(ele => [getLabelText(ele.name.label, this.state.lang), ele.year, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
-        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
-    }
+    data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
+    
+   
     let content = {
       margin: { top: 40 },
       startY: 200,
@@ -1288,12 +1010,23 @@ this.filterData()})
     return getLabelText(cell, this.state.lang);
   }
   roundN = num => {
-    if(num==NaN){
-      return ''}else{
-    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    if (num == '') {
+      return ''
+    } else {
+      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
   }
-
+  cellStyle = (min, value) => {
+    if (value != '')
+      if (min > value) {
+        return { backgroundColor: '#f48282' }
+      } else {
+        return {}
+      }
+      else{
+        return { backgroundColor: '#f48282' }
+      }
+  }
   render() {
 
 
@@ -1373,7 +1106,7 @@ this.filterData()})
 
     let columns = [
       {
-        dataField: 'name.label',
+        dataField: 'planningUnit.label',
         text: i18n.t('static.planningunit.planningunit'),
         sort: true,
         align: 'center',
@@ -1383,7 +1116,7 @@ this.filterData()})
       },
 
       {
-        dataField: 'units.label',
+        dataField: 'unit.label',
         text: i18n.t('static.dashboard.unit'),
         sort: true,
         align: 'center',
@@ -1391,7 +1124,7 @@ this.filterData()})
         formatter: this.formatLabel
       },
       {
-        dataField: 'min',
+        dataField: 'minMonthsOfStock',
         text: i18n.t('static.common.min'),
         sort: true,
         align: 'center',
@@ -1410,200 +1143,95 @@ this.filterData()})
         headerAlign: 'center'
       },
       {
-        dataField: 'Jan',
+        dataField: 'jan',
         text: i18n.t('static.month.jan'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Feb',
+        dataField: 'feb',
         text: i18n.t('static.month.feb'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Mar',
+        dataField: 'mar',
         text: i18n.t('static.month.mar'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Apr',
+        dataField: 'apr',
         text: i18n.t('static.month.apr'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'May',
+        dataField: 'may',
         text: i18n.t('static.month.may'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Jun',
+        dataField: 'jun',
         text: i18n.t('static.month.jun'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Jul',
+        dataField: 'jul',
         text: i18n.t('static.month.jul'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Aug',
+        dataField: 'aug',
         text: i18n.t('static.month.aug'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Sep',
+        dataField: 'sep',
         text: i18n.t('static.month.sep'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Oct',
+        dataField: 'oct',
         text: i18n.t('static.month.oct'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Nov',
+        dataField: 'nov',
         text: i18n.t('static.month.nov'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }, {
-        dataField: 'Dec',
+        dataField: 'dec',
         text: i18n.t('static.month.dec'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: formatter
+        formatter: this.formatter
       }
 
 
     ];
 
-    let columns1 = [
-      {
-        dataField: 'name.label',
-        text: i18n.t('static.productcategory.productcategory'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { width: '350px' },
-        formatter: this.formatLabel
-      },
 
-      {
-        dataField: 'year',
-        text: i18n.t('static.common.year'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center'
-      },
-      {
-        dataField: 'Jan',
-        text: i18n.t('static.month.jan'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Feb',
-        text: i18n.t('static.month.feb'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Mar',
-        text: i18n.t('static.month.mar'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Apr',
-        text: i18n.t('static.month.apr'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'May',
-        text: i18n.t('static.month.may'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Jun',
-        text: i18n.t('static.month.jun'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Jul',
-        text: i18n.t('static.month.jul'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Aug',
-        text: i18n.t('static.month.aug'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Sep',
-        text: i18n.t('static.month.sep'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Oct',
-        text: i18n.t('static.month.oct'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Nov',
-        text: i18n.t('static.month.nov'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }, {
-        dataField: 'Dec',
-        text: i18n.t('static.month.dec'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: formatter
-      }
-
-
-    ];
     const options = {
       hidePageListOnlyOnePage: true,
       firstPageText: i18n.t('static.common.first'),
@@ -1653,46 +1281,28 @@ this.filterData()})
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <CardHeader className="pb-1">
-            <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
+          <div className="Card-header-reporticon">
+            {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
             {this.state.data.length > 0 && <div className="card-header-actions">
-              <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(this.state.view == 1 ? columns : columns1)} />
-              <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(this.state.view == 1 ? columns : columns1)} />
+              <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+              <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
             </div>}
-          </CardHeader>
-          <CardBody className="pb-md-3">
+          </div>
+          <CardBody className="pb-md-3 pb-lg-0 pt-lg-0">
             <Col md="12 pl-0">
               <div className="row">
-                {/*<FormGroup className="col-md-3" title="click here to select period">
+                <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                  <div className="controls">
-
-                    <Picker
-                      ref="pickRange"
-                      years={{ min: 2013 }}
-                      value={rangeValue}
-                      lang={pickerLang}
-                      //theme="light"
-                      onChange={this.handleRangeChange}
-                      onDismiss={this.handleRangeDi ssmis}
-                    >
-                      <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                    </Picker>
-                  </div>
-
-                </FormGroup>*/}
-               <FormGroup className="col-md-3">
-                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                <div className="controls box">
-                  <RangePicker 
-                         picker="year"  
-                        allowClear={false}
-                        id="date" name= "date"
+                  <div className="controls box">
+                    <RangePicker
+                      picker="year"
+                      allowClear={false}
+                      id="date" name="date"
                       //  style={{ width: '450px', marginLeft:'20px'}} 
-                        onChange={this.onYearChange} 
-                        value={[moment(this.state.startYear.toString()),moment(this.state.endYear.toString())]}  />
- 
-                </div>
+                      onChange={this.onYearChange}
+                      value={[moment(this.state.startYear.toString()), moment(this.state.endYear.toString())]} />
+
+                  </div>
                 </FormGroup>
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -1723,7 +1333,7 @@ this.filterData()})
                         name="versionId"
                         id="versionId"
                         bsSize="sm"
-                        onChange={(e) => { this.getPlanningUnitOrProductCategory(); }}
+                        onChange={(e) => { this.getPlanningUnit(); }}
                       >
                         <option value="-1">{i18n.t('static.common.select')}</option>
                         {versionList}
@@ -1734,40 +1344,6 @@ this.filterData()})
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
-                  <div className="controls">
-                    <InputGroup>
-                      <Input
-                        type="select"
-                        name="view"
-                        id="view"
-                        bsSize="sm"
-                        onChange={(e) => { this.viewChange(e); }}
-                      >
-                        <option value="1">{i18n.t('static.common.product')}</option>
-                        <option value="2">{i18n.t('static.productcategory.productcategory')}</option>
-
-                      </Input>
-
-                    </InputGroup>
-                  </div>
-                </FormGroup>
-
-                {this.state.view == 2 && <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                  <InputGroup className="box">
-                    <ReactMultiSelectCheckboxes
-                      name="productCategoryId"
-                      id="productCategoryId"
-                      bsSize="md"
-                      onChange={(e) => { this.handleProductCategoryChange(e) }}
-                      options={productCategoryListcheck && productCategoryListcheck.length > 0 ? productCategoryListcheck : []}
-                    /> </InputGroup>
-
-
-                </FormGroup>}
-                {this.state.view == 1 && <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                   <div className="controls">
@@ -1778,7 +1354,7 @@ this.filterData()})
                         bsSize="md"
                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                      /> </InputGroup>    </div></FormGroup>}
+                      /> </InputGroup>    </div></FormGroup>
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                   <div className="controls ">
@@ -1797,15 +1373,15 @@ this.filterData()})
                     </InputGroup>
                   </div>
                 </FormGroup>
-               
+
               </div>
             </Col>
             <div class="TableCust">
-              {this.state.data.length > 0 && this.state.view == 1 &&
+              {this.state.data.length > 0 &&
                 <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
                   <thead>
                     <tr>
-                      <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{this.state.view == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.productcategory.productcategory')}</th>
+                      <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>
                       <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.dashboard.unit')}</th>
                       <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.common.min')}</th>
                       <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.program.reorderFrequencyInMonths')}</th>
@@ -1830,23 +1406,23 @@ this.filterData()})
 
                     {this.state.data.map(ele => {
                       return (<tr>
-                        <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
-                        <td className="text-center"> {getLabelText(ele.units.label, this.state.lang)}</td>
-                        <td className="text-center">{ele.min}</td>
+                        <td className="text-center"> {getLabelText(ele.planningUnit.label, this.state.lang)}</td>
+                        <td className="text-center"> {getLabelText(ele.unit.label, this.state.lang)}</td>
+                        <td className="text-center">{ele.minMonthsOfStock}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center">{ele.Jan}</td>
-                        <td className="text-center">{ele.Feb}</td>
-                        <td className="text-center">{ele.Mar}</td>
-                        <td className="text-center">{ele.Apr}</td>
-                        <td className="text-center">{ele.May}</td>
-                        <td className="text-center">{ele.Jun}</td>
-                        <td className="text-center">{ele.Jul}</td>
-                        <td className="text-center">{ele.Aug}</td>
-                        <td className="text-center">{ele.Sep}</td>
-                        <td className="text-center">{ele.Oct}</td>
-                        <td className="text-center">{ele.Nov}</td>
-                        <td className="text-center">{ele.Dec}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.jan)}>{this.formatter(ele.jan)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.feb)} > {this.formatter(ele.feb)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.mar)} > {this.formatter(ele.mar)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.apr)}> {this.formatter(ele.apr)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.may)}> {this.formatter(ele.may)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.jun)}> {this.formatter(ele.jun)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.jul)}> {this.formatter(ele.jul)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.aug)}> {this.formatter(ele.aug)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.sep)}> {this.formatter(ele.sep)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.oct)}> {this.formatter(ele.oct)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.nov)}> {this.formatter(ele.nov)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.dec)}> {this.formatter(ele.dec)}</td></tr>)
                     })}
 
                   </tbody>
@@ -1854,51 +1430,7 @@ this.filterData()})
               }
 
 
-              {this.state.data.length > 0 && this.state.view == 2 &&
-                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
-                  <thead>
-                    <tr>
-                      <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.productcategory.productcategory')}</th>
-                      <th rowSpan="2" className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
-                      <th colSpan="12" className="text-center">{i18n.t('static.report.monthsOfStock')}</th>
 
-                    </tr>
-                    <tr> <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.mar')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.apr')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.may')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jun')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jul')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.aug')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.sep')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.oct')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.nov')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.dec')}</th></tr>
-                  </thead>
-                  <tbody>
-
-                    {this.state.data.map(ele => {
-                      return (<tr>
-                        <td className="text-center"> {getLabelText(ele.name.label, this.state.lang)}</td>
-                        <td className="text-center">{ele.year}</td>
-                        <td className="text-center">{ele.Jan}</td>
-                        <td className="text-center">{ele.Feb}</td>
-                        <td className="text-center">{ele.Mar}</td>
-                        <td className="text-center">{ele.Apr}</td>
-                        <td className="text-center">{ele.May}</td>
-                        <td className="text-center">{ele.Jun}</td>
-                        <td className="text-center">{ele.Jul}</td>
-                        <td className="text-center">{ele.Aug}</td>
-                        <td className="text-center">{ele.Sep}</td>
-                        <td className="text-center">{ele.Oct}</td>
-                        <td className="text-center">{ele.Nov}</td>
-                        <td className="text-center">{ele.Dec}</td></tr>)
-                    })}
-
-                  </tbody>
-                </Table>
-              }
             </div>
           </CardBody>
         </Card>

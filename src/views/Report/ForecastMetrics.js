@@ -866,8 +866,8 @@ class ForecastMetrics extends Component {
         <h5>{i18n.t(this.state.message)}</h5>
 
         <Card>
-          <CardHeader>
-            <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong>
+          <div className="Card-header-reporticon">
+            {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong> */}
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
@@ -875,8 +875,8 @@ class ForecastMetrics extends Component {
 
               </a>
             </div>}
-          </CardHeader>
-          <CardBody>
+          </div>
+          <CardBody className="pb-lg-0 pt-lg-0">
             <div ref={ref}>
 
               <Form >
