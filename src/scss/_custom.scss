@@ -2341,6 +2341,11 @@ input::placeholder {
     word-wrap: break-word!important;
     border:none!important;
   }
+
+  .supplyplanTdWidthForMonths{
+    overflow: hidden!important;
+    min-width: 56px!important;
+  }
   .BorderNoneSupplyPlan{
     border:none!important;
     background: #fff!important;
