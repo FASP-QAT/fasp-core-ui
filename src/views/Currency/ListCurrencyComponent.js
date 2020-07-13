@@ -53,10 +53,13 @@ export default class CurrencyListComponent extends Component {
         }, 8000);
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     componentDidMount() {
         this.hideFirstComponent();
