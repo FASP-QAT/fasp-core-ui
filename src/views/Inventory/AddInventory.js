@@ -807,9 +807,9 @@ export default class AddInventory extends Component {
 
                 <Card>
 
-                    <CardHeader>
+                    {/* <CardHeader>
                         <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                    </CardHeader>
+                    </CardHeader> */}
                     <CardBody>
                         <Formik
                             render={

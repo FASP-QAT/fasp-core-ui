@@ -1639,9 +1639,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
 
-                        <CardHeader>
+                        {/* <CardHeader>
                             <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                        </CardHeader>
+                        </CardHeader> */}
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">

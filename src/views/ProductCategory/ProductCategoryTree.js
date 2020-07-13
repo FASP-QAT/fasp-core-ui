@@ -438,9 +438,9 @@ export default class ProductCategoryTree extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="mb-lg-0">
-                            <CardHeader className="pb-lg-1">
+                            {/* <CardHeader className="pb-lg-1">
                                 <strong>Product Category</strong>
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody className="pb-lg-0">
                                 <Col md="3 pl-0" >
                                     <FormGroup>

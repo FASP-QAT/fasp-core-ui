@@ -384,9 +384,9 @@ export default class AddProcurementUnit extends Component {
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm'>
-                                                <CardHeader>
+                                                {/* <CardHeader>
                                                     <strong>{i18n.t('static.procurementUnit.procurementUnit')}</strong>
-                                                </CardHeader>
+                                                </CardHeader> */}
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
