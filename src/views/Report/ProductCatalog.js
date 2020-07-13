@@ -1322,7 +1322,7 @@ class ProductCatalog extends Component {
                         <Form >
                             <Col md="12 pl-0">
                                 <div className="d-md-flex Selectdiv2">
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
