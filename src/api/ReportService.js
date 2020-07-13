@@ -85,6 +85,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/programProductCatalog`,json,{}
         );
     }
+    programLeadTimes(json){
+        return axios.post(`${API_URL}/api/report/programLeadTimes`,json,{}
+        );
+    }
 
 }
 export default new ReportService();
