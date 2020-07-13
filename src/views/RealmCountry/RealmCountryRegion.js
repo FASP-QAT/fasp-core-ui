@@ -356,9 +356,9 @@ class RealmCountryRegion extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
-                        <CardHeader>
+                        {/* <CardHeader>
                             <strong>{i18n.t('static.dashboad.regioncountry')}</strong>
-                        </CardHeader>
+                        </CardHeader> */}
                         <CardBody>
                             <Formik
                                 enableReinitialize={true}

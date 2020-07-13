@@ -306,7 +306,7 @@ export default class ImportProgram extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <Card>
+                <Card className="mt-2">
                     <Formik
                         initialValues={initialValues}
                         render={
@@ -317,9 +317,9 @@ export default class ImportProgram extends Component {
                                 handleBlur,
                             }) => (
                                     <Form noValidate name='simpleForm'>
-                                        <CardHeader>
+                                        {/* <CardHeader>
                                             <strong>{i18n.t('static.program.import')}</strong>
-                                        </CardHeader>
+                                        </CardHeader> */}
                                         <CardBody>
                                             <FormGroup id="fileImportDiv">
                                                 <Col md="3">

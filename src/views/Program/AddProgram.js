@@ -491,9 +491,9 @@ export default class AddProgram extends Component {
                                     }) => (
 
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm'>
-                                                <CardHeader>
+                                                {/* <CardHeader>
                                                     <strong>{i18n.t('static.program.programadd')}</strong>
-                                                </CardHeader>
+                                                </CardHeader> */}
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
