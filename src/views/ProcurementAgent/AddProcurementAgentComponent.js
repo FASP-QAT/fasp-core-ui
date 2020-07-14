@@ -17,7 +17,9 @@ const initialValues = {
     realmId: [],
     procurementAgentCode: "",
     procurementAgentName: "",
+    draftToSubmittedLeadTime: "",
     submittedToApprovedLeadTime: "",
+    approvedToShippedLeadTime: "",
     colorHtmlCode: "",
 
 }
@@ -33,8 +35,12 @@ const validationSchema = function (values) {
         // submittedToApprovedLeadTime: Yup.string()
         //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
+        draftToSubmittedLeadTime: Yup.string()
+            .required(i18n.t('static.procurementagent.draftToSubmittedLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+        approvedToShippedLeadTime: Yup.string()
+            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         // submittedToApprovedLeadTime: Yup.number()
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
@@ -82,9 +88,11 @@ class AddProcurementAgentComponent extends Component {
 
                 },
                 procurementAgentCode: '',
+                draftToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
+                approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
-                colorHtmlCode:'',
+                colorHtmlCode: '',
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -125,8 +133,14 @@ class AddProcurementAgentComponent extends Component {
         if (event.target.name == "procurementAgentName") {
             procurementAgent.label.label_en = event.target.value;
         }
+        if (event.target.name == "draftToSubmittedLeadTime") {
+            procurementAgent.draftToSubmittedLeadTime = event.target.value;
+        }
         if (event.target.name == "submittedToApprovedLeadTime") {
             procurementAgent.submittedToApprovedLeadTime = event.target.value;
+        }
+        if (event.target.name == "approvedToShippedLeadTime") {
+            procurementAgent.approvedToShippedLeadTime = event.target.value;
         }
         if (event.target.name === "localProcurementAgent") {
             procurementAgent.localProcurementAgent = event.target.id === "localProcurementAgent2" ? false : true
@@ -144,8 +158,10 @@ class AddProcurementAgentComponent extends Component {
             realmId: true,
             procurementAgentCode: true,
             procurementAgentName: true,
+            draftToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
-            colorHtmlCode:true,
+            approvedToShippedLeadTime: true,
+            colorHtmlCode: true,
         }
         )
         this.validateForm(errors)
@@ -313,7 +329,26 @@ class AddProcurementAgentComponent extends Component {
                                                             value={this.Capitalize(this.state.procurementAgent.label.label_en)}
                                                         />
                                                         {/* </InputGroupAddon> */}
-                                                        {/* <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback> */}
+                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="draftToSubmittedLeadTime">{i18n.t('static.procurementagent.procurementagentdrafttosubmittime')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
+                                                        <Input type="number"
+                                                            bsSize="sm"
+                                                            name="draftToSubmittedLeadTime"
+                                                            id="draftToSubmittedLeadTime"
+                                                            valid={!errors.draftToSubmittedLeadTime && this.state.procurementAgent.draftToSubmittedLeadTime != ''}
+                                                            invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.procurementAgent.draftToSubmittedLeadTime}
+                                                            min="0"
+                                                        />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.draftToSubmittedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
@@ -333,6 +368,25 @@ class AddProcurementAgentComponent extends Component {
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtime')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
+                                                        <Input type="number"
+                                                            bsSize="sm"
+                                                            name="approvedToShippedLeadTime"
+                                                            id="approvedToShippedLeadTime"
+                                                            valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
+                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.procurementAgent.approvedToShippedLeadTime}
+                                                            min="0"
+                                                        />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
@@ -398,7 +452,9 @@ class AddProcurementAgentComponent extends Component {
         procurementAgent.realm.id = ''
         procurementAgent.procurementAgentCode = ''
         procurementAgent.label.label_en = ''
+        procurementAgent.draftToSubmittedLeadTime = ''
         procurementAgent.submittedToApprovedLeadTime = ''
+        procurementAgent.approvedToShippedLeadTime = ''
         procurementAgent.colorHtmlCode = ''
 
         this.setState({
