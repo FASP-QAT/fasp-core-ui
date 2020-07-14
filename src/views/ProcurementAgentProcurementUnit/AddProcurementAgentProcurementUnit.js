@@ -11,6 +11,7 @@ import {
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
 
 export default class AddProcurementAgentProcurementUnit extends Component {
@@ -489,6 +490,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             show: '',
                                             entries: '',
                                         },
+                                        onload: this.loaded,
 
                                     };
                                     var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
@@ -585,6 +587,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     }
                 }
             );
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
 
     render() {

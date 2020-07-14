@@ -242,8 +242,14 @@ export default class PipelineProgramConsumption extends Component {
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
                                     copyCompatibility: true,
-                                    // paginationOptions: [10, 25, 50, 100],
-                                    position: 'top'
+                                    paginationOptions: [10, 25, 50, 100],
+                                    position: 'top',
+                                    text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        show: '',
+                                        entries: '',
+                                    },
+                                    onload: this.loadedJexcelCommonFunction,
                                 };
 
                                 this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
@@ -363,6 +369,11 @@ export default class PipelineProgramConsumption extends Component {
 
         });
     }
+
+    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+    
     render() {
         return (
             <>

@@ -6168,12 +6168,16 @@ export default class SupplyPlanComponent extends React.Component {
 
     filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[2];
+        var value = (instance.jexcel.getJson()[r])[3];
+        var date = moment((instance.jexcel.getJson()[r])[0]).format("YYYY-MM-DD");
+        mylist=mylist.filter(c.id==-1);
+        console.log("Value", value);
         if (value != 0) {
             mylist = this.state.batchInfoList.filter(c => c.id != -1);
         } else {
             mylist = this.state.batchInfoList;
         }
+        
         return mylist;
     }.bind(this)
 
@@ -6651,7 +6655,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             }
                                                         }
 
-                                                        if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                        if (procurementAgentPlanningUnit.unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
                                                             userQty = shipmentList[i].shipmentQty;
                                                         }
                                                     }

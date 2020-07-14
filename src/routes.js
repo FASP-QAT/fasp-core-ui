@@ -410,7 +410,7 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name:  i18n.t('static.dashboard.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlan', name:  i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/supplyPlanFormulas', name:  i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 
