@@ -170,7 +170,11 @@ class StockStatus extends Component {
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   roundN = num => {
+    if (num != '') {
     return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+  } else {
+    return ''
+  }
   }
 
   formatter = value => {
@@ -354,14 +358,14 @@ class StockStatus extends Component {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let versionId = document.getElementById("versionId").value;
-    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    let endDate =moment(new Date( this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
 
     if (programId != 0 && versionId != 0 && planningUnitId != 0) {
       if (versionId.includes('Local')) {
 
-        let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-        let endDate =moment(new Date( this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+       // let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+        //let endDate =moment(new Date( this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
     
 
         var db1;
@@ -402,7 +406,8 @@ class StockStatus extends Component {
             var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
 
             var openingBalance = 0;
-            if(minDate.isBefore(startDate)){
+            console.log('minDate',minDate, 'startDate',startDate)
+            if(minDate.isBefore(startDate.format('YYYY-MM-DD')) && ! minDate.isSame(startDate.format('YYYY-MM-DD'))){
             var totalConsumption = 0;
             var totalAdjustments = 0;
             var totalShipments = 0;
@@ -539,7 +544,7 @@ class StockStatus extends Component {
                 var amcAfterArray = [];
 
 
-                for (var c = 0; c < 12; c++) {
+                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
 
                   var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                   var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -565,12 +570,10 @@ class StockStatus extends Component {
                     }
                     amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
                     var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                    if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
-                      c = 12;
-                    }
+                   
                   }
                 }
-                for (var c = 0; c < 12; c++) {
+                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
                   var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                   var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                   if (consumptionListForAMC.length > 0) {
@@ -595,9 +598,7 @@ class StockStatus extends Component {
                     }
                     amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
                     amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                    if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
-                      c = 12;
-                    }
+                    
                   }
 
                 }
@@ -610,10 +611,12 @@ class StockStatus extends Component {
                   sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
                 }
 
-
+                var mos = 0
+                if (countAMC != 0) {
                 var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
                 console.log('amcCalcualted', amcCalcualted)
-                var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                }
 console.log(pu)
                 var maxForMonths = 0;
                 if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
@@ -638,7 +641,7 @@ console.log(pu)
                   shipmentList: shiplist,
                   adjustmentQty: adjustment,
                   closingBalance: endingBalance,
-                  mos: this.roundN(mos),
+                  mos: this.roundN(mos=='NaN'||mos== '0'?'':mos),
                   minMonths: minMOS,
                   maxMonths: maxMOS
                 }
@@ -681,12 +684,12 @@ console.log(pu)
         var inputjson = {
           "programId": programId,
           "versionId": versionId,
-          "startDate": startDate,
-          "stopDate": endDate,
+          "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
+          "stopDate": endDate.endOf('month').format('YYYY-MM-DD'),
           "planningUnitId": planningUnitId,
 
         }
-        this.setState({
+/*        this.setState({
           stockStatusList: [{
             transDate: 'Jan 20', consumptionQty: 17475, actual: true, shipmentQty: 0, shipmentList: [
             ], adjustmentQty: -10122, closingBalance: 27203, mos: 1.28, minMonths: 1.2, maxMonths: 2.5
@@ -709,13 +712,14 @@ console.log(pu)
             ], adjustmentQty: 0, closingBalance: 26000, mos: 2.1, minMonths: 2.0, maxMonths: 3.5
           }
           ]
-        })
-        /*  AuthenticationService.setupAxiosInterceptors();
+        })*/
+          AuthenticationService.setupAxiosInterceptors();
           ReportService.getStockStatusData(inputjson)
             .then(response => {
               console.log(JSON.stringify(response.data));
               this.setState({
-                stockStatusList: response.data
+                stockStatusList: response.data,
+                message:''
               })
             }).catch(
               error => {
@@ -740,7 +744,7 @@ console.log(pu)
                   }
                 }
               }
-            );*/
+            );
       }
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
@@ -1292,7 +1296,7 @@ console.log(pu)
 
                           <Picker
                             ref="pickRange"
-                            years={{ min: 2013 }}
+                            years={{ min: 2013 ,max:2022}}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"
