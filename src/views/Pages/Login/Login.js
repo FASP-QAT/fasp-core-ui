@@ -142,7 +142,7 @@ class Login extends Component {
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
     console.log("htnl content....... ", htmlContent);
-    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') )  {
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum') )  {
       logoutMessage.style.color = 'red';
     }
     else if (htmlContent.includes('Access Denied')) {

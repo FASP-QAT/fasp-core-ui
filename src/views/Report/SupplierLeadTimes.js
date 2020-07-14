@@ -1138,7 +1138,7 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="">
                                         <Label htmlFor="appendedInputButton">Program</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
