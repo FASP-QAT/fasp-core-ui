@@ -83,15 +83,28 @@ class SupplierLeadTimes extends Component {
     exportCSV(columns) {
         var csvRow = [];
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
-        // this.state.programLabels.map(ele =>
-        // csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        // csvRow.push('')
+        csvRow.push("");
+        // csvRow.push(i18n.t('static.planningunit.planningunit') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        // csvRow.push("");
+        // csvRow.push(i18n.t('static.report.procurementAgentName') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        // csvRow.push("");
+        this.state.planningUnitLabels.map(ele =>
+            csvRow.push(i18n.t('static.planningunit.planningunit') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push('');
+
+        this.state.procurementAgentLabels.map(ele =>
+            csvRow.push(i18n.t('static.report.procurementAgentName') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push('')
+
+
         // csvRow.push('')
         // csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         // csvRow.push('')
         // var re;
         // var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
         // re = this.state.procurementAgents
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [headers];
@@ -101,6 +114,7 @@ class SupplierLeadTimes extends Component {
                 (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedToDraftLeadTime,
                 ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
@@ -110,7 +124,7 @@ class SupplierLeadTimes extends Component {
                 ele.arrivedToDeliveredLeadTime,
                 ele.totalSeaLeadTime,
                 ele.totalAirLeadTime,
-                ele.localProcurementLeadTime
+                ele.localProcurementAgentLeadTime
 
                 // (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'),
                 // ele.stockAdjustemntQty,
@@ -124,7 +138,7 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Procurement Agent Report.csv"
+        a.download = "Procurement Agent Lead Times.csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -158,10 +172,20 @@ class SupplierLeadTimes extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFontSize(8)
-                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 90, planningText)
 
+                    // doc.setFontSize(8)
+                    // var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+                    // doc.text(doc.internal.pageSize.width / 8, 90, planningText);
+
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                    var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                    planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
                 }
 
             }
@@ -190,6 +214,7 @@ class SupplierLeadTimes extends Component {
             getLabelText(ele.country.label, this.state.lang),
             getLabelText(ele.program.label, this.state.lang),
             getLabelText(ele.planningUnit.label, this.state.lang),
+            getLabelText(ele.procurementAgent.label, this.state.lang),
             ele.plannedToDraftLeadTime,
             ele.draftToSubmittedLeadTime,
             ele.submittedToApprovedLeadTime,
@@ -199,15 +224,15 @@ class SupplierLeadTimes extends Component {
             ele.arrivedToDeliveredLeadTime,
             ele.totalSeaLeadTime,
             ele.totalAirLeadTime,
-            ele.localProcurementLeadTime
+            ele.localProcurementAgentLeadTime
         ]);
 
         let content = {
-            margin: { top: 40 },
-            startY: 200,
+            margin: { top: 90 },
+            startY: 165,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 60, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
             // columnStyles: {
             //     0: { cellWidth: 170 },
             //     1: { cellWidth: 171.89 },
@@ -217,7 +242,7 @@ class SupplierLeadTimes extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Procurement Agent Report.pdf")
+        doc.save("Procurement Agent Lead Times.pdf")
     }
     handleChangeProgram(programIds) {
 
@@ -469,85 +494,88 @@ class SupplierLeadTimes extends Component {
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         // let versionId = document.getElementById("versionId").value;
-        this.setState({
-            planningUnits: []
-        }, () => {
-            // if (versionId.includes('Local')) {
-            if (!navigator.onLine) {
-                const lan = 'en';
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
-                        var proList = []
-                        console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+        if (programId > 0) {
+            this.setState({
+                planningUnits: []
+            }, () => {
+                // if (versionId.includes('Local')) {
+                if (!navigator.onLine) {
+                    const lan = 'en';
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var openRequest = indexedDB.open('fasp', 1);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            var programId = (document.getElementById("programId").value).split("_")[0];
+                            var proList = []
+                            console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId) {
 
-                                proList[i] = myResult[i]
+                                    proList[i] = myResult[i]
+                                }
                             }
-                        }
+                            this.setState({
+                                planningUnits: proList, message: ''
+                            }, () => {
+                                this.fetchData();
+                            })
+                        }.bind(this);
+                    }.bind(this)
+
+
+                }
+                else {
+                    AuthenticationService.setupAxiosInterceptors();
+
+                    //let productCategoryId = document.getElementById("productCategoryId").value;
+                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                        console.log('**' + JSON.stringify(response.data))
                         this.setState({
-                            planningUnits: proList, message: ''
+                            planningUnits: response.data, message: ''
                         }, () => {
                             this.fetchData();
                         })
-                    }.bind(this);
-                }.bind(this)
-
-
-            }
-            else {
-                AuthenticationService.setupAxiosInterceptors();
-
-                //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    console.log('**' + JSON.stringify(response.data))
-                    this.setState({
-                        planningUnits: response.data, message: ''
-                    }, () => {
-                        this.fetchData();
                     })
-                })
-                    .catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 500:
-                                    case 401:
-                                    case 404:
-                                    case 406:
-                                    case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                        break;
-                                    default:
-                                        this.setState({ message: 'static.unkownError' });
-                                        break;
+                        .catch(
+                            error => {
+                                this.setState({
+                                    planningUnits: [],
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
-            }
-        });
-
+                        );
+                }
+            });
+        } else {
+            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] });
+        }
     }
 
     getProcurementAgent = () => {
@@ -647,132 +675,203 @@ class SupplierLeadTimes extends Component {
         // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
+
         if (programId > 0) {
-            var db1;
-            var storeOS;
-            getDatabase();
-            var regionList = [];
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['program'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('program');
-                var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
-                programRequest.onerror = function (event) {
+            if (navigator.onLine) {
+                var json = {
+                    programId: parseInt(document.getElementById("programId").value),
+                    planningUnitIds: planningUnitIds,
+                    procurementAgentIds: procurementAgentIds
+                }
+                console.log("json---", json);
+                // alert("in");
+                AuthenticationService.setupAxiosInterceptors();
+                ReportService.programLeadTimes(json)
+                    .then(response => {
+                        console.log("-----response", JSON.stringify(response.data));
+                        var outPutList = response.data;
+                        // var responseData = response.data;
+                        this.setState({
+                            outPutList: outPutList
+                        })
+                    }).catch(
+                        error => {
+                            this.setState({
+                                outPutList: []
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+            } else {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var regionList = [];
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
                     })
                 }.bind(this);
-
-                programRequest.onsuccess = function (e) {
-                    var result = programRequest.result;
-                    console.log("1------>", result);
-
-                    var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
-                    var ppuRequest = ppuOs.getAll();
-                    ppuRequest.onerror = function (event) {
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['program'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('program');
+                    var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    ppuRequest.onsuccess = function (e) {
-                        var result1 = (ppuRequest.result).filter(c => c.program.id == parseInt(programId));
-                        
-                        if (planningUnitIds.length > 0) {
-                            var planningUnitfilteredList = [];
-                            for (var i = 0; i < planningUnitIds.length; i++) {
-                                var l = result1.filter(c => c.planningUnit.id == planningUnitIds[i]);
-                                for (var j = 0; j < l.length; j++) {
-                                    // console.log("------status", l[j].shipmentStatus.id);
-                                    planningUnitfilteredList.push(l[j]);
-                                }
-                            }
-                            result1 = planningUnitfilteredList;
-                        }
-                        console.log("2------>", result1);
 
-                        var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                        var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
-                        var papuRequest = papuOs.getAll();
-                        papuRequest.onerror = function (event) {
+                    programRequest.onsuccess = function (e) {
+                        var result = programRequest.result;
+                        console.log("1------>", result);
+
+                        var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
+                        var ppuRequest = ppuOs.getAll();
+                        ppuRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext')
                             })
                         }.bind(this);
+                        ppuRequest.onsuccess = function (e) {
+                            var result1 = (ppuRequest.result).filter(c => c.program.id == parseInt(programId));
 
-                        papuRequest.onsuccess = function (e) {
-                            var result2 = papuRequest.result;
-                            console.log("3------>", result2);
-
-                            if (procurementAgentIds.length > 0) {
-                                var procurementAgentFilteredList = []
-                                for (var i = 0; i < procurementAgentIds.length; i++) {
-                                    var l = result2.filter(c => c.procurementAgent.id == procurementAgentIds[i]);
+                            if (planningUnitIds.length > 0) {
+                                var planningUnitfilteredList = [];
+                                for (var i = 0; i < planningUnitIds.length; i++) {
+                                    var l = result1.filter(c => c.planningUnit.id == planningUnitIds[i]);
                                     for (var j = 0; j < l.length; j++) {
-                                        procurementAgentFilteredList.push(l[j]);
+                                        // console.log("------status", l[j].shipmentStatus.id);
+                                        planningUnitfilteredList.push(l[j]);
                                     }
                                 }
-                                result2 = procurementAgentFilteredList;
+                                result1 = planningUnitfilteredList;
                             }
+                            console.log("2------>", result1);
 
-                            var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                            var paOs = paTransaction.objectStore('procurementAgent');
-                            var paRequest = paOs.getAll();
-                            paRequest.onerror = function (event) {
+                            var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                            var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                            var papuRequest = papuOs.getAll();
+                            papuRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 })
                             }.bind(this);
 
-                            paRequest.onsuccess = function (e) {
-                                var result3 = paRequest.result;
-                                console.log("4------>", result3);
+                            papuRequest.onsuccess = function (e) {
+                                var result2 = papuRequest.result;
+                                console.log("3------>", result2);
 
-                                var outPutList = [];
-                                for (var i = 0; i < result1.length; i++) {
-                                    var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
-                                    var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
-                                    var program = result1[i].program;
-                                    for (var j = 0; j < filteredList.length; j++) {
-                                        var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).submittedToApprovedLeadTime;
-                                        var json = {
-                                            planningUnit: filteredList[j].planningUnit,
-                                            procurementAgent: filteredList[j].procurementAgent,
-                                            localProcurementLeadTime: localProcurementAgentLeadTime,
-                                            approvedToShippedLeadTime: result.approvedToShippedLeadTime,
-                                            program: program,
-                                            country: result.realmCountry.country,
-                                            plannedToDraftLeadTime: result.plannedToDraftLeadTime,
-                                            draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
-                                            shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
-                                            shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
-                                            arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
-                                            submittedToApprovedLeadTime: submittedToApprovedLeadTime,
-                                            totalAirLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedByAirLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
-                                            totalSeaLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedBySeaLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
+                                if (procurementAgentIds.length > 0) {
+                                    var procurementAgentFilteredList = []
+                                    for (var i = 0; i < procurementAgentIds.length; i++) {
+                                        var l = result2.filter(c => c.procurementAgent.id == procurementAgentIds[i]);
+                                        for (var j = 0; j < l.length; j++) {
+                                            procurementAgentFilteredList.push(l[j]);
                                         }
-                                        outPutList.push(json);
                                     }
+                                    result2 = procurementAgentFilteredList;
                                 }
-                                console.log("outPutList------>", outPutList);
-                                this.setState({ outPutList: outPutList });
+
+                                var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                                var paOs = paTransaction.objectStore('procurementAgent');
+                                var paRequest = paOs.getAll();
+                                paRequest.onerror = function (event) {
+                                    this.setState({
+                                        message: i18n.t('static.program.errortext')
+                                    })
+                                }.bind(this);
+
+                                paRequest.onsuccess = function (e) {
+                                    var result3 = paRequest.result;
+                                    console.log("4------>", result3);
+
+                                    var outPutList = [];
+                                    for (var i = 0; i < result1.length; i++) {
+                                        var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
+                                        var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
+                                        var program = result1[i].program;
+                                        for (var j = 0; j < filteredList.length; j++) {
+                                            var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).submittedToApprovedLeadTime;
+                                            var approvedToShippedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).approvedToShippedLeadTime;
+                                            var draftToSubmittedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).draftToSubmittedLeadTime;
+
+                                            var json = {
+                                                planningUnit: filteredList[j].planningUnit,
+                                                procurementAgent: filteredList[j].procurementAgent,
+                                                localProcurementAgentLeadTime: localProcurementAgentLeadTime,
+                                                approvedToShippedLeadTime: approvedToShippedLeadTime,
+                                                program: program,
+                                                country: result.realmCountry.country,
+                                                plannedToDraftLeadTime: result.plannedToDraftLeadTime,
+                                                draftToSubmittedLeadTime: draftToSubmittedLeadTime,
+                                                shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
+                                                shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
+                                                arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
+                                                submittedToApprovedLeadTime: submittedToApprovedLeadTime,
+                                                totalAirLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                                totalSeaLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                            }
+                                            var noProcurmentAgentJson = {
+                                                planningUnit: filteredList[j].planningUnit,
+                                                procurementAgent: {
+                                                    label: {
+                                                        label_en: '',
+                                                        label_fr: '',
+                                                        label_sp: '',
+                                                        label_pr: ''
+                                                    }
+                                                },
+                                                localProcurementAgentLeadTime: localProcurementAgentLeadTime,
+                                                approvedToShippedLeadTime: result.approvedToShippedLeadTime,
+                                                program: program,
+                                                country: result.realmCountry.country,
+                                                plannedToDraftLeadTime: result.plannedToDraftLeadTime,
+                                                draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
+                                                shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
+                                                shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
+                                                arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
+                                                submittedToApprovedLeadTime: result.submittedToApprovedLeadTime,
+                                                totalAirLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                                totalSeaLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                            }
+                                            outPutList.push(noProcurmentAgentJson);
+                                            outPutList.push(json);
+                                        }
+                                    }
+                                    console.log("outPutList------>", outPutList);
+                                    this.setState({ outPutList: outPutList });
+                                }.bind(this)
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
-            }.bind(this)
+            }
 
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] });
         }
         else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), outPutList: [] });
 
         }
     }
@@ -830,7 +929,7 @@ class SupplierLeadTimes extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '150px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -841,7 +940,7 @@ class SupplierLeadTimes extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '200px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -852,7 +951,7 @@ class SupplierLeadTimes extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '180px' },
+                style: { width: '200px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -863,7 +962,7 @@ class SupplierLeadTimes extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '180px' },
+                style: { width: '300px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -942,6 +1041,8 @@ class SupplierLeadTimes extends Component {
                 style: { width: '80px' },
 
             },
+            // totalAirLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedByAirLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
+            // totalSeaLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedBySeaLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
             {
                 dataField: 'totalAirLeadTime',
                 text: 'Total Air LeadTime',
@@ -952,7 +1053,7 @@ class SupplierLeadTimes extends Component {
 
             },
             {
-                dataField: 'localProcurementLeadTime',
+                dataField: 'localProcurementAgentLeadTime',
                 text: 'Local Procurement LeadTime',
                 sort: true,
                 align: 'center',
@@ -991,7 +1092,7 @@ class SupplierLeadTimes extends Component {
         }
 
         return (
-            <div className="animated fadeIn" >
+            <div className="animated" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
@@ -1005,8 +1106,8 @@ class SupplierLeadTimes extends Component {
                         {/* {this.state.procurementAgents.length > 0 &&  */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />}
+                                {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />}
                             </a>
                         </div>
                         {/* } */}
@@ -1015,9 +1116,9 @@ class SupplierLeadTimes extends Component {
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >
-                            <Col md="6 pl-0">
+                            <Col md="12 pl-0">
                                 <div className="d-md-flex Selectdiv2">
-                                    <Online>
+                                    {/* <Online>
                                         <FormGroup className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">Country</Label>
                                             <div className="controls SelectGo">
@@ -1036,8 +1137,8 @@ class SupplierLeadTimes extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                    </Online>
-                                    <FormGroup className="tab-ml-1">
+                                    </Online> */}
+                                    <FormGroup className="">
                                         <Label htmlFor="appendedInputButton">Program</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
@@ -1062,10 +1163,9 @@ class SupplierLeadTimes extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                        <div className="controls">
+                                        <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
                                                     name="planningUnitId"
@@ -1093,7 +1193,8 @@ class SupplierLeadTimes extends Component {
                                     </FormGroup>
                                 </div>
                             </Col>
-                        </Form><br /><br /><br />
+                        </Form>
+                        {/* <br /><br /><br /> */}
                         <ToolkitProvider
                             keyField="id"
                             data={this.state.outPutList}

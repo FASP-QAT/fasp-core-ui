@@ -37,12 +37,16 @@ class ListUserComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
