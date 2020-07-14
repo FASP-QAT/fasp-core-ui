@@ -1315,6 +1315,7 @@ console.log(dts)
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes

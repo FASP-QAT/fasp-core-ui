@@ -1164,7 +1164,8 @@ class SupplierLeadTimes extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                        <Label htmlFor="appendedInputButton">Planning Unit <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                       
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
@@ -1178,7 +1179,8 @@ class SupplierLeadTimes extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Procurement Agent</Label>
+                                        <Label htmlFor="appendedInputButton">Procurement Agent <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
+                                        
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes

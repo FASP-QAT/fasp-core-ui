@@ -1963,7 +1963,7 @@ input::placeholder {
 ///////Report react mutiselect checkbox 
 .css-1r4vtzz {
   padding: 0px 8px 5px 10px !important;
-  margin: -4px 0px 0px -8px!important;
+  margin: -2px 0px 0px -8px!important;
   background-color: transparent!important;
    box-shadow: none !important;
   color: #515151;
@@ -1996,7 +1996,7 @@ input::placeholder {
     .css-48ayfv
     {
       padding: 0px 8px 5px 10px !important;
-      margin: -4px 0px 0px -8px!important;
+      margin: -2px 0px 0px -8px!important;
       background-color: transparent!important;
        box-shadow: none !important;
       color: #515151;
@@ -2052,7 +2052,12 @@ input::placeholder {
     right: 23px;
     color: 697069;
   }
-  
+  .reportsmalldropdown-box-icon {
+  position: absolute;
+    top: 32px;
+    left: 363px;
+    color: 697069;
+  }
   
   .css-1hwfws3
   {
@@ -2540,6 +2545,26 @@ input::placeholder {
   border: 1px solid #c8ced3;
   border-radius: 0.25rem;
 }
+.carousel-item
+{
+  -webkit-transition: 0.6s ease-in-out left;
+  -moz-transition: 0.6s ease-in-out left;
+  -o-transition: 0.6s ease-in-out left;
+  transition: 0.6s ease-in-out left !important;
+  // transition: 0.8s !important;
+  // -webkit-backface-visibility: hidden;
+  //   backface-visibility: hidden;
+  //    -webkit-perspective: 1000px; 
+  //   perspective: 1000px;
+}
+.carousel-item-next, .carousel-item-prev, .carousel-item.active {
+  display: block;
+  // -webkit-transition: -webkit-transform .6s ease;
+  // transition: -webkit-transform .6s ease;
+  // transition: transform .6s ease;
+  // transition: transform .6s ease,-webkit-transform .6s ease;
+  transition: 0.6s ease-in-out left !important;
+}
 
 @media (min-width: 576px){
 
@@ -2574,6 +2599,7 @@ input::placeholder {
 .carousel-indicators {
   position: absolute;
   right: 0;
+  // bottom: 17px!important;
   bottom: 17px!important;
   z-index: 0!important;
 }
@@ -2582,6 +2608,10 @@ input::placeholder {
   background-color: transparent;
   border-color: transparent;
   font-size: 23px;
+}
+.btn:focus, .btn.focus {
+  outline: 0;
+  box-shadow: none!important;
 }
 // .RealmDashboardTextCont {
 //   margin-top: 42%;
