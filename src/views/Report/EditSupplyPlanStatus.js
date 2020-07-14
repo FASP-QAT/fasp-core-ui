@@ -11,10 +11,11 @@ import moment from "moment";
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import Select from 'react-select';
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID,FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import "../../../node_modules/jexcel/dist/jexcel.css";
 const entityname = i18n.t('static.program.program');
 const chartOptions = {
     title: {
@@ -177,6 +178,7 @@ class EditSupplyPlanStatus extends Component {
             showTotalShipment: false,
             showManualShipment: false,
             showErpShipment: false,
+            expiredStockArr:[],
 
             program: {
                 programId: this.props.match.params.programId,
@@ -1212,8 +1214,8 @@ class EditSupplyPlanStatus extends Component {
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                             show: '',
                             entries: '',
-                        },
-                        onload: this.loadedSuggestedShipements
+                        }//,
+                       // onload: this.loadedSuggestedShipements
                     };
                     myVar = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), options);
                     this.el = myVar;
@@ -1937,6 +1939,7 @@ class EditSupplyPlanStatus extends Component {
         var shippedErpShipmentsTotalData = [];
         var orderedErpShipmentsTotalData = [];
         var plannedErpShipmentsTotalData = [];
+        var totalExpiredStockArr = [];
 
         var consumptionDataForAllMonths = [];
         var amcTotalData = [];
@@ -2257,8 +2260,7 @@ class EditSupplyPlanStatus extends Component {
 
         // Shipments updated part
         var db1;
-        var storeOS;
-        getDatabase();
+       getDatabase();
         var regionList = [];
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onerror = function (event) {
@@ -2513,6 +2515,189 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                             plannedErpShipmentsTotalData.push("");
                         }
                     }
+                    var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
+                    var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                    for (var ma = 0; ma < myArray.length; ma++) {
+                        var shipmentList = programJson.shipmentList;
+                        var shipmentBatchArray = [];
+                        for (var ship = 0; ship < shipmentList.length; ship++) {
+                            var batchInfoList = shipmentList[ship].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                            }
+                        }
+                        var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                        var totalStockForBatchNumber = stockForBatchNumber.qty;
+                        var consumptionList = programJson.consumptionList;
+                        var consumptionBatchArray = [];
+
+                        for (var con = 0; con < consumptionList.length; con++) {
+                            var batchInfoList = consumptionList[con].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                            }
+                        }
+                        var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                        if (consumptionForBatchNumber == undefined) {
+                            consumptionForBatchNumber = [];
+                        }
+                        var consumptionQty = 0;
+                        for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                            consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                        }
+                        var inventoryList = programJson.inventoryList;
+                        var inventoryBatchArray = [];
+                        for (var inv = 0; inv < inventoryList.length; inv++) {
+                            var batchInfoList = inventoryList[inv].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                            }
+                        }
+                        var inventoryForBatchNumber = [];
+                        if (inventoryBatchArray.length > 0) {
+                            inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                        }
+                        if (inventoryForBatchNumber == undefined) {
+                            inventoryForBatchNumber = [];
+                        }
+                        var adjustmentQty = 0;
+                        for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                            adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                        }
+                        var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                        myArray[ma].remainingQty = remainingBatchQty;
+                    }
+                    console.log("MyArray", myArray);
+
+                    var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                    var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                    var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
+                    var firstDataEntryDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
+                    var curDate = moment(this.state.monthsArray[TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN - 1].startDate).subtract(1, 'months').format("YYYY-MM-DD");
+                    for (var i = 0; createdDate < curDate; i++) {
+                        createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                        var consumptionQty = 0;
+                        var unallocatedConsumptionQty = 0;
+                        var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                        var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                        for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                            var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].id);
+                            for (var j = 0; j < c.length; j++) {
+                                var count = 0;
+                                for (var k = 0; k < c.length; k++) {
+                                    if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                        count++;
+                                    } else {
+
+                                    }
+                                }
+                                if (count == 0) {
+                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                    unallocatedConsumptionQty = unallocatedConsumptionQty + parseInt((c[j].consumptionQty));
+                                } else {
+                                    if (c[j].actualFlag.toString() == 'true') {
+                                        consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                        var qty = 0;
+                                        if (c[j].batchInfoList.length > 0) {
+                                            for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                            }
+                                        }
+                                        var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                        unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                    }
+                                }
+                            }
+                        }
+
+                        var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                        console.log("--------------------------------------------------------------");
+                        console.log("Start date", startDate);
+                        for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
+                            console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
+                            console.log("Unallocated consumption", unallocatedConsumptionQty);
+                            var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
+                            if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                unallocatedConsumptionQty = 0
+                            } else {
+                                var rq = batchDetailsForParticularPeriod[ua].remainingQty;
+                                myArray[index].remainingQty = 0;
+                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                            }
+                        }
+                        var adjustmentQty = 0;
+                        var unallocatedAdjustmentQty = 0;
+                        for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                            var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].id);
+                            for (var j = 0; j < c.length; j++) {
+                                adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                var qty1 = 0;
+                                if (c[j].batchInfoList.length > 0) {
+                                    for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                        qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                    }
+                                }
+                                var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                if (unallocatedAdjustmentQty < 0) {
+                                    for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
+                                        console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                        console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                        if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                            unallocatedAdjustmentQty = 0
+                                        } else {
+                                            var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                            myArray[index].remainingQty = 0;
+                                            unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                        }
+                                    }
+                                } else {
+                                    if (batchDetailsForParticularPeriod.length > 0) {
+                                        console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                        console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                        batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                        unallocatedAdjustmentQty = 0;
+                                    }
+                                }
+
+                            }
+                        }
+                        var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                        for (var j = 0; j < c1.length; j++) {
+                            adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                            unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                            if (unallocatedAdjustmentQty < 0) {
+                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
+                                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                    console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                        unallocatedAdjustmentQty = 0
+                                    } else {
+                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                        myArray[index].remainingQty = 0;
+                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                    }
+                                }
+                            } else {
+                                if (batchDetailsForParticularPeriod.length > 0) {
+                                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                    console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                    unallocatedAdjustmentQty = 0;
+                                }
+                            }
+                        }
+
+                    }
+
+                    console.log("My array after accounting all the calcuklations", myArray);
+                    var expiredStockArr = myArray;
+
                     // Calculation of opening and closing balance
                     var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                     var createdDate = moment('2018-12-01').format("YYYY-MM-DD");
@@ -2523,6 +2708,7 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                         console.log("Created date", createdDate);
                         console.log("i", i)
                         var consumptionQty = 0;
+                        var expiredStockQty = 0;
                         var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
                         var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
                         console.log("startDate", startDate);
@@ -2573,8 +2759,13 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                             shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
                         }
                         console.log("Shipment Qty", shipmentTotalQty, " Start date", startDate);
+                        var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(endDate).format("YYYY-MM-DD"))));
+                        expiredStockQty = 0;
+                        for (var j = 0; j < expiredStock.length; j++) {
+                            expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                        }
 
-                        var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty);
+                        var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty) - parseInt(expiredStockQty);
                         if (closingBalance < 0) {
                             closingBalance = 0;
                         }
@@ -2595,7 +2786,13 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                         if (shipmentsTotalData[i - 1] != "") {
                             shipmentsQtyForCB = shipmentsTotalData[i - 1];
                         }
-
+                        var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(m[i - 1].startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(m[i - 1].endDate).format("YYYY-MM-DD"))));
+                        console.log('expiredStock',expiredStock)
+                        var expiredStockQty = 0;
+                        for (var j = 0; j < expiredStock.length; j++) {
+                            expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                        }
+                        totalExpiredStockArr.push(expiredStockQty);
                         // Suggested shipments part
                         var s = i - 1;
                         var month = m[s].startDate;
@@ -2647,7 +2844,8 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                         if (suggestedShipmentsTotalData[i - 1].suggestedOrderQty != "") {
                             suggestedShipmentQtyForCB = suggestedShipmentsTotalData[i - 1].suggestedOrderQty;
                         }
-                        var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB + shipmentsQtyForCB;
+                        var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB + shipmentsQtyForCB- parseInt(expiredStockQty);
+                        console.log('expiredStockQty',expiredStockQty)
                         if (closingBalance >= 0) {
                             unmetDemand.push("");
                             closingBalance = closingBalance;
@@ -2848,7 +3046,8 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                         jsonArrForGraph: jsonArrForGraph,
                         lastActualConsumptionDate: lastActualConsumptionDate,
                         lastActualConsumptionDateArr: lastActualConsumptionDateArr,
-                        unmetDemand: unmetDemand
+                        unmetDemand: unmetDemand,
+                        expiredStockArr: totalExpiredStockArr
                     })
                 }.bind(this)
             }.bind(this)
@@ -2924,7 +3123,20 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                     regionList: program.regionList
                 }, () => {
                     this.getPlanningUnit()
-
+                    var fields = document.getElementsByClassName("totalShipments");
+                    for (var i = 0; i < fields.length; i++) {
+                    fields[i].style.display = "none";
+                    }
+                    
+                    fields = document.getElementsByClassName("manualShipments");
+                    for (var i = 0; i < fields.length; i++) {
+                    fields[i].style.display = "none";
+                    }
+                    
+                    fields = document.getElementsByClassName("erpShipments");
+                    for (var i = 0; i < fields.length; i++) {
+                    fields[i].style.display = "none";
+                    }
                 })
 
             })
@@ -3412,6 +3624,15 @@ console.log('plannedShipmentsTotalData',plannedShipmentsTotalData)
                                             ))
                                         }
                                     </tr>
+                                    <tr>
+                                    <td className="BorderNoneSupplyPlan"></td>
+                                    <td align="left"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
+                                    {
+                                        this.state.expiredStockArr.map(item1 => (
+                                            <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                        ))
+                                    }
+                                </tr>
                                     <tr bgcolor='#d9d9d9'>
                                         <td className="BorderNoneSupplyPlan"></td>
                                         <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
