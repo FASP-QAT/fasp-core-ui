@@ -373,6 +373,7 @@ class RealmDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
+
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
@@ -385,7 +386,7 @@ class RealmDashboard extends Component {
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
                     <DropdownMenu right>
-                      <DropdownItem>View Total Program</DropdownItem>
+                      <DropdownItem>View Total Programs</DropdownItem>
                       {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
                      
                     </DropdownMenu>
@@ -429,7 +430,6 @@ class RealmDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
-
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
@@ -458,6 +458,8 @@ class RealmDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
+
+
         </Row>
 
         {/* <Row>

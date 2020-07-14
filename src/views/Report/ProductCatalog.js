@@ -109,6 +109,8 @@ class ProductCatalog extends Component {
         // var re;
         // var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
         // re = this.state.procurementAgents
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
 
@@ -255,7 +257,7 @@ class ProductCatalog extends Component {
         ]);
 
         let content = {
-            margin: { top: 40 },
+            margin: { top: 90 },
             startY: 200,
             head: [headers],
             body: data,
@@ -1318,9 +1320,9 @@ class ProductCatalog extends Component {
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >
-                            <Col md="6 pl-0">
+                            <Col md="12 pl-0">
                                 <div className="d-md-flex Selectdiv2">
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
@@ -1399,7 +1401,8 @@ class ProductCatalog extends Component {
                                     </FormGroup>
                                 </div>
                             </Col>
-                        </Form><br /><br /><br />
+                        </Form>
+                        {/* <br /><br /><br /> */}
                         <ToolkitProvider
                             keyField="id"
                             data={this.state.outPutList}

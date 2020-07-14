@@ -43,7 +43,7 @@ class Widget04 extends Component {
     progress.style = classNames('progress-xs mt-3 mb-0', progress.style);
 
     return (
-      <Card className={classes} {...attributes}>
+      <Card className={classes} {...attributes} >
         <CardBody>
           <div className="h1 text-right mb-2 icon-color">
             <i className={card.icon} ></i>
