@@ -2373,29 +2373,10 @@ class ShipmentGlobalView extends Component {
                                             </div>
 
                                         </FormGroup>
-<<<<<<< HEAD
 
                                         <FormGroup className="col-sm-3" id="hideDiv">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <div className="controls">
-=======
-                                        <FormGroup className="col-sm-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            {/* <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span> */}
-                                            {/* <div className="controls">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
-
-                                                        name="planningUnitId"
-                                                        id="planningUnitId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                    />
-                                                </InputGroup>
-                                            </div> */}
-                                            <div className="controls ">
->>>>>>> dev
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
