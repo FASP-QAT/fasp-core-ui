@@ -328,7 +328,7 @@ class ApplicationDashboard extends Component {
               <CardBody className="p-0">
               <div class="h1 text-muted text-left mb-0 m-3">
                 <i class="icon-people icon-color"></i>
-                <ButtonGroup className="float-right">
+                <ButtonGroup className="float-right BtnZindex">
                   <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
@@ -360,7 +360,7 @@ class ApplicationDashboard extends Component {
               <div class="h1 text-muted text-left mb-2  ">
                 <i class="icon-grid icon-color"></i>
               
-                <ButtonGroup className="float-right">
+                <ButtonGroup className="float-right BtnZindex">
                   <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                       {/* <i className="icon-settings"></i> */}
@@ -383,7 +383,7 @@ class ApplicationDashboard extends Component {
             </Card>
           </Col>
 
-          <Col xs="12" sm="6" lg="3">
+           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
@@ -392,50 +392,42 @@ class ApplicationDashboard extends Component {
                 <ButtonGroup className="float-right">
                   <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
                     <DropdownMenu right>
                       <DropdownItem>View Setup Program</DropdownItem>
-                      {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
-                     
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
               </div>
                
                 <div className="TextTittle ">Setup Program </div>
-                {/* <div className="text-count">01</div> */}
-                <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+               <div className="chart-wrapper mt-4 pb-2" >
               </div>
               </CardBody>
             </Card>
-          </Col>
-          <Col xs="12" sm="6" lg="3">
+          </Col> 
+         <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
-                <i class="icon-list  icon-color"></i>
+                <i class="fa fa-calculator  icon-color"></i>
               
                 <ButtonGroup className="float-right">
                   <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
                     <DropdownMenu right>
-                      <DropdownItem>View Pipeline Program Import</DropdownItem>
-                      {/* <DropdownItem>Add Product Catlog</DropdownItem> */}
+                      <DropdownItem>View Supply Plans Waiting for Approval</DropdownItem>
                      
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
               </div>
                
-                <div className="TextTittle ">Pipeline Program Import </div>
-                {/* <div className="text-count">01</div> */}
-                <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                <div className="TextTittle ">Supply Plans Waiting for Approval </div>
+                <div className="text-count">05</div>
+               <div className="chart-wrapper mt-4 pb-2" >
+               </div>
               </CardBody>
             </Card>
           </Col>

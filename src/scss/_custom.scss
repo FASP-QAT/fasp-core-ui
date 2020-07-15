@@ -2545,6 +2545,9 @@ input::placeholder {
   border: 1px solid #c8ced3;
   border-radius: 0.25rem;
 }
+.BtnZindex{
+  z-index: 4;
+}
 .carousel-item
 {
   -webkit-transition: 0.6s ease-in-out left;
@@ -2601,7 +2604,7 @@ input::placeholder {
   right: 0;
   // bottom: 17px!important;
   bottom: 17px!important;
-  z-index: 0!important;
+  z-index: 1!important;
 }
 .btn-transparent {
   color: #212121!important;
@@ -2715,4 +2718,10 @@ input::placeholder {
     font-weight: 700;
     
   }
+}
+///sidebar text
+.sidebar .nav-dropdown.open .nav-link {
+  color: #fff;
+  border-left: 0;
+  display: flex;
 }
