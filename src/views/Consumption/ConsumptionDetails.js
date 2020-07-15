@@ -1140,9 +1140,9 @@ export default class ConsumptionDetails extends React.Component {
 
                 <Card>
 
-                    <CardHeader>
+                    {/* <CardHeader>
                         <strong>{i18n.t('static.consumption.consumptionadd')}</strong>
-                    </CardHeader>
+                    </CardHeader> */}
                     <CardBody >
                         <Formik
                             render={

@@ -1134,9 +1134,9 @@ class ShipmentGlobalDemandView extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
+                    <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Shipment Global Demand View</strong> */}
-                        <i className="icon-menu"></i><strong>Shipment Overview</strong>
+                        {/* <i className="icon-menu"></i><strong>Shipment Overview</strong> */}
                         {/* {this.state.consumptions.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1146,17 +1146,17 @@ class ShipmentGlobalDemandView extends Component {
                             </a>
                         </div>
                         {/* } */}
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div ref={ref}>
 
                             <Form >
                                 <Col md="12 pl-0">
                                     <div className="row">
                                         <FormGroup  className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
-                                            <div className="controls  Regioncalender">
-                                                <InputGroup>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                            <div className="controls ">
+                                              
                                                     <Picker
                                                         ref="pickRange"
                                                         years={{ min: 2013 }}
@@ -1169,7 +1169,6 @@ class ShipmentGlobalDemandView extends Component {
                                                         <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                     </Picker>
 
-                                                </InputGroup>
                                             </div>
                                         </FormGroup>
 

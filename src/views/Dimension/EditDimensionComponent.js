@@ -143,9 +143,9 @@ export default class UpdateDimensionComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{ label: this.state.dimension.label.label_en }}

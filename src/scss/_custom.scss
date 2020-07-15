@@ -1217,7 +1217,7 @@ h5,
 }
 
 .bg-warning {
-  background-color: #f48521 !important;
+  background-color: #ffc107 !important;
 }
 
 .bg-danger {
@@ -1225,7 +1225,7 @@ h5,
 }
 
 .bg-success {
-  background-color: #118b70 !important;
+  background-color: #4dbd74 !important;
 }
 
 .app-body {
@@ -1536,7 +1536,7 @@ h5,
 
 .card {
   // margin-top: -2%;
-  margin: 0px -2% 1.5em -2%!important;
+  margin: 0px -2% 1.5em -2%;
 }
 
 ///avtar icon
@@ -1963,7 +1963,7 @@ input::placeholder {
 ///////Report react mutiselect checkbox 
 .css-1r4vtzz {
   padding: 0px 8px 5px 10px !important;
-  margin: -4px 0px 0px -8px!important;
+  margin: -2px 0px 0px -8px!important;
   background-color: transparent!important;
    box-shadow: none !important;
   color: #515151;
@@ -1996,7 +1996,7 @@ input::placeholder {
     .css-48ayfv
     {
       padding: 0px 8px 5px 10px !important;
-      margin: -4px 0px 0px -8px!important;
+      margin: -2px 0px 0px -8px!important;
       background-color: transparent!important;
        box-shadow: none !important;
       color: #515151;
@@ -2052,7 +2052,12 @@ input::placeholder {
     right: 23px;
     color: 697069;
   }
-  
+  .reportsmalldropdown-box-icon {
+  position: absolute;
+    top: 32px;
+    left: 363px;
+    color: 697069;
+  }
   
   .css-1hwfws3
   {
@@ -2456,4 +2461,267 @@ input::placeholder {
 .textrealmdashboard {
     color: #73818f !important;
     font-size: 13px!important;
+}
+
+.Card-header-addicon
+{
+  padding:10px 20px 10px 20px;
+}
+.Card-header-reporticon{
+  padding: 8px 20px 0px 20px;
+}
+
+/////application dashboard card css
+.ImgCont{
+  // float: left !important;
+  // width: 50%;
+  visibility: hidden;
+  height:108px;
+  // margin-top: -17%;
+}
+ .TextCont{
+   margin-top: 1%;
+ }
+.card-info{
+ background-color:  #20a8d8;
+ border-color: #2196f3;
+}
+.text-count{
+  font-size: 16px;
+ 
+  font-weight: 500;
+  color:#212721
+}
+.carousel-caption {
+  position: absolute;
+  right: 0%!important;
+  bottom: 20px;
+  left: 0%!important;
+  z-index: 0!important;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  color: #fff;
+  text-align: left;
+}
+.TextCont p{
+  // color: black !important;
+  font-size: 16px;
+ 
+  font-weight: 500;
+  color:#212721
+  // margin-bottom: 0;
+}
+
+.TextCont h3{
+  // color: black !important;
+  color: #73818f !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+  
+}
+.TextTittle{
+  
+  color: #73818f !important;
+    font-size: 13px !important;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+.CardHeight{
+  height: 137px;
+}
+.box-p{
+  padding-bottom: 0.25rem !important;
+}
+.cardRealmDashboard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  // margin: 0px!important;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #c8ced3;
+  border-radius: 0.25rem;
+}
+.BtnZindex{
+  z-index: 4;
+}
+.carousel-item
+{
+  -webkit-transition: 0.6s ease-in-out left;
+  -moz-transition: 0.6s ease-in-out left;
+  -o-transition: 0.6s ease-in-out left;
+  transition: 0.6s ease-in-out left !important;
+  // transition: 0.8s !important;
+  // -webkit-backface-visibility: hidden;
+  //   backface-visibility: hidden;
+  //    -webkit-perspective: 1000px; 
+  //   perspective: 1000px;
+}
+.carousel-item-next, .carousel-item-prev, .carousel-item.active {
+  display: block;
+  // -webkit-transition: -webkit-transform .6s ease;
+  // transition: -webkit-transform .6s ease;
+  // transition: transform .6s ease;
+  // transition: transform .6s ease,-webkit-transform .6s ease;
+  transition: 0.6s ease-in-out left !important;
+}
+
+@media (min-width: 576px){
+
+.card-group > .cardRealmDashboard:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+}
+
+.cardRealmDashboard.bg-info {
+    border-color: #2eadd3;
+}
+@media (min-width: 576px){
+
+.card-group > .cardRealmDashboard {
+    flex: 1 0 0%;
+    margin-bottom: 0;
+}
+}
+
+.card-group > .cardRealmDashboard {
+    margin-bottom: 15px;
+}
+
+
+.cardRealmDashboard {
+    margin-bottom: 1.5rem;
+}
+.carousel-indicators li{
+  background-color: #212721!important;
+}
+.carousel-indicators {
+  position: absolute;
+  right: 0;
+  // bottom: 17px!important;
+  bottom: 17px!important;
+  z-index: 1!important;
+}
+.btn-transparent {
+  color: #212121!important;
+  font-size:23px;
+  background-color: transparent;
+  border-color: transparent;
+  font-size: 23px;
+}
+.btn:focus, .btn.focus {
+  outline: 0;
+  box-shadow: none!important;
+}
+// .RealmDashboardTextCont {
+//   margin-top: 42%;
+  
+// }
+.RealmDashboardTextCont p{
+  // color: black !important;
+  font-size: 16px;
+ 
+  font-weight: 500;
+  color:#212721
+  // margin-bottom: 0;
+}
+
+.RealmDashboardTextCont h3{
+  // color: black !important;
+  color: #73818f !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+  
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 50px;
+  width: 50px;
+  outline: black;
+  // background-size: 100%, 100%;
+  // background-image: none;
+}
+
+.carousel-control-next-icon:after{
+  content: '>';
+  font-size: 20px;
+  color: black;
+}
+
+.carousel-control-prev-icon:after {
+  content: '<';
+  font-size: 20px;
+  color: #000;
+}
+.carousel-indicators li {
+  box-sizing: content-box;
+  flex: 0 1 auto;
+  // width: 30px;
+  // height: 3px;
+  margin-right: 3px;
+  margin-left: 3px;
+  text-indent: 0!important;
+  cursor: pointer;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  opacity: .5;
+  transition: opacity 0;
+  width: 8px!important;
+  height: 8px!important;
+  border-radius: 50%!important;
+}
+
+.carousel-item{
+  transition-duration: 1s;
+  transition: transform 1s ease-in-out!important;
+}
+.carousel-item.active, .carousel-item-next, .carousel-item-prev {
+  display: block;
+  // transition: transform 1s ease-in-out !important;
+  transition-duration: 1s;
+}
+@media (min-width: 1920px) {
+  .ImgCont{
+    // float: left !important;
+     width: 50%;
+    visibility: hidden;
+    // margin-top: -42px;
+  }
+  .box-p{
+    padding-bottom: 15px !important;
+  }
+  .RealmDashboardTextCont {
+    margin-top: 1%;
+    
+  }
+  .RealmDashboardTextCont p{
+    // color: black !important;
+    font-size: 16px;
+   
+    font-weight: 500;
+    color:#212721
+    // margin-bottom: 0;
+  }
+  
+  .RealmDashboardTextCont h3{
+    // color: black !important;
+    color: #73818f !important;
+    font-size: 12px !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    
+  }
+}
+///sidebar text
+.sidebar .nav-dropdown.open .nav-link {
+  color: #fff;
+  border-left: 0;
+  display: flex;
 }

@@ -1281,14 +1281,14 @@ export default class StockStatusMatrix extends React.Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <CardHeader className="pb-1">
-            <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
+          <div className="Card-header-reporticon">
+            {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
             {this.state.data.length > 0 && <div className="card-header-actions">
               <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
               <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
             </div>}
-          </CardHeader>
-          <CardBody className="pb-md-3">
+          </div>
+          <CardBody className="pb-md-3 pb-lg-0 pt-lg-0">
             <Col md="12 pl-0">
               <div className="row">
                 <FormGroup className="col-md-3">

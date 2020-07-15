@@ -787,8 +787,8 @@ export default class CostOfInventory extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -801,8 +801,8 @@ export default class CostOfInventory extends Component {
                                 </div>}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
 

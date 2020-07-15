@@ -9,7 +9,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import {
-    SECRET_KEY,
+    SECRET_KEY,DATE_FORMAT_CAP,
     MONTHS_IN_PAST_FOR_SUPPLY_PLAN,
     TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
     PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE
@@ -22,7 +22,6 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-// import { SECRET_KEY } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png'
 import {
@@ -755,6 +754,12 @@ export default class ExpiredInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.expDate ? moment(row.expDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
                 // formatter: (cell, row) => {
                 //     var decimalFixedValue = cell.toFixed(2);
                 //     decimalFixedValue += '';
@@ -810,16 +815,16 @@ export default class ExpiredInventory extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <CardHeader className="pb-1">
-                        <i className="icon-menu"></i><strong>Expired Inventory</strong>
+                    <div className="Card-header-reporticon">
+                        {/* <i className="icon-menu"></i><strong>Expired Inventory</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 {true && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
                                 {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             </a>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
                                 {/* <Form > */}

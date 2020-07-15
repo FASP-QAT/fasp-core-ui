@@ -186,13 +186,13 @@ class ProgramDashboard extends Component {
                  <td>
                    <div className="clearfix">
                      <div className="float-left">
-                       <strong>60%</strong>
+                       <strong>20%</strong>
                      </div>
                      <div className="float-right">
                        <small className="text-muted">Inventory Below Threshold</small>
                      </div>
                    </div>
-                   <Progress className="progress-xs" color="info" value="50" />
+                   <Progress className="progress-xs" color="info" value="20" />
                  </td>
                 
                </tr>
@@ -206,13 +206,13 @@ class ProgramDashboard extends Component {
                  <td>
                    <div className="clearfix">
                      <div className="float-left">
-                       <strong>25%</strong>
+                       <strong>40%</strong>
                      </div>
                      <div className="float-right">
                        <small className="text-muted">Inventory Above Threshold</small>
                      </div>
                    </div>
-                   <Progress className="progress-xs" color="warning" value="30" />
+                   <Progress className="progress-xs" color="warning" value="40" />
                  </td>
                 
                </tr>

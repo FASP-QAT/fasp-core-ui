@@ -153,9 +153,9 @@ export default class AddDataSourceTypeComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}

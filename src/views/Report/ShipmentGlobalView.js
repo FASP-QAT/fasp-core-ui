@@ -2292,9 +2292,9 @@ class ShipmentGlobalView extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <CardHeader>
+                    <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Shipment Global View</strong> */}
-                        <i className="icon-menu"></i><strong>Global Demand - Single Product</strong>
+                        {/* <i className="icon-menu"></i><strong>Global Demand - Single Product</strong> */}
                         {/* {this.state.consumptions.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -2304,8 +2304,8 @@ class ShipmentGlobalView extends Component {
                             </a>
                         </div>
                         {/* } */}
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div ref={ref}>
 
                             <Form >
@@ -2373,10 +2373,29 @@ class ShipmentGlobalView extends Component {
                                             </div>
 
                                         </FormGroup>
+<<<<<<< HEAD
 
                                         <FormGroup className="col-sm-3" id="hideDiv">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <div className="controls">
+=======
+                                        <FormGroup className="col-sm-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            {/* <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span> */}
+                                            {/* <div className="controls">
+                                                <InputGroup className="box">
+                                                    <ReactMultiSelectCheckboxes
+
+                                                        name="planningUnitId"
+                                                        id="planningUnitId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                    />
+                                                </InputGroup>
+                                            </div> */}
+                                            <div className="controls ">
+>>>>>>> dev
                                                 <InputGroup>
                                                     <Input
                                                         type="select"

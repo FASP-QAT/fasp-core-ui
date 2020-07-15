@@ -44,10 +44,13 @@ class ListRealmCountryComponent extends Component {
 
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -336,14 +339,14 @@ class ListRealmCountryComponent extends Component {
                   <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
+                    {/* <CardHeader className="mb-md-3 pb-lg-1">
 
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.realmcountrylist')}</strong>{' '}
+                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.realmcountrylist')}</strong>{' '} 
                         <div className="card-header-actions">
 
                         </div>
-                    </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    </CardHeader> */}
+                    <CardBody className="pb-lg-0 mt-3">
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>

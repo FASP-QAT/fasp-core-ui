@@ -517,9 +517,9 @@ export default class ProgramOnboarding extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>Setup Program</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <CardBody>
 
                                 <ProgressBar

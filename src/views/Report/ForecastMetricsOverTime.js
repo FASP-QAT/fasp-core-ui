@@ -245,8 +245,8 @@ class ForcastMatrixOverTime extends Component {
 
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.dashboard.country') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.version')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("versionId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
@@ -317,10 +317,10 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
@@ -912,24 +912,24 @@ class ForcastMatrixOverTime extends Component {
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-        <h5>{i18n.t(this.state.message)}</h5>
+        <h5 className="red">{i18n.t(this.state.message)}</h5>
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader>
-                <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong>
-
-                {
-                  this.state.matricsList.length > 0 &&
-                  <div className="card-header-actions">
-                    <a className="card-header-action">
-                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                    </a> </div>
-                }
-
-              </CardHeader>
-              <CardBody>
+              <div className="Card-header-reporticon">
+                {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong> */}
+                
+                  {
+                    this.state.matricsList.length > 0 &&
+                    <div className="card-header-actions">
+                      <a className="card-header-action">
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      </a> </div>
+                  }
+              
+                </div>
+              <CardBody className="pb-lg-0 pt-lg-0">
                 <div className="TableCust" >
                   <div ref={ref}>
                     <Form >

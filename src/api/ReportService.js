@@ -32,7 +32,11 @@ class ReportService {
     }
 
     getStockOverTime(json) {
+<<<<<<< HEAD
         return axios.post(`${API_URL}/api/report/stockOverTime`, json, {}
+=======
+        return axios.post(`${API_URL}/api/report/stockStatusOverTime`,json,{}
+>>>>>>> dev
         );
     }
     getProgramVersionList(programId, realmCountryId, versionStatusId, startDate, stopDate) {
@@ -40,17 +44,26 @@ class ReportService {
         );
     }
 
+<<<<<<< HEAD
     getStockOverTime(json) {
         return axios.post(`${API_URL}/api/report/stockOverTime`, json, {}
         );
     }
     costOfInventory(json) {
         return axios.post(`${API_URL}/api/report/costOfInventory`, json, {}
+=======
+    costOfInventory(json){
+        return axios.post(`${API_URL}/api/report/costOfInventory`,json,{}
+>>>>>>> dev
         );
     }
 
     getStockStatusData(json) {
+<<<<<<< HEAD
         return axios.post(`${API_URL}/api/report/stockStatus`, json, {}
+=======
+        return axios.post(`${API_URL}/api/report/stockStatusVertical`,json,{}
+>>>>>>> dev
         );
     }
     inventoryTurns(json) {
@@ -88,6 +101,10 @@ class ReportService {
 
     ShipmentGlobalView(json) {
         return axios.post(`${API_URL}/api/report/shipmentGlobalDemand`, json, {}
+        );
+    }
+    programLeadTimes(json){
+        return axios.post(`${API_URL}/api/report/programLeadTimes`,json,{}
         );
     }
 

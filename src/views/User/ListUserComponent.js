@@ -13,6 +13,7 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
+import { DATE_FORMAT_CAP } from '../../Constants.js';
 const entityname = i18n.t('static.user.user')
 class ListUserComponent extends Component {
     constructor(props) {
@@ -36,12 +37,16 @@ class ListUserComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -261,7 +266,8 @@ class ListUserComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.lastLoginDate ? moment(row.lastLoginDate).format('MM-DD-YYYY hh:mm A') : null)
+                    (row.lastLoginDate ? moment(row.lastLoginDate).format(`${DATE_FORMAT_CAP}`) : null)
+                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                 );
             }
         }, {
@@ -317,15 +323,16 @@ class ListUserComponent extends Component {
                  <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                    <div className="Card-header-addicon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
-                    </CardHeader>
+                    </div>
                     <CardBody className="pb-lg-0">
+                   
                         <Col md="3" className="pl-0">
                             <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>

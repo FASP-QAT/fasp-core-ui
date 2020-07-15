@@ -35,10 +35,13 @@ export default class CountryListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -213,9 +216,9 @@ export default class CountryListComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
+                    <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '}
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '} */}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -223,8 +226,8 @@ export default class CountryListComponent extends Component {
                             </div>
                         </div>
 
-                    </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    </div>
+                    <CardBody className="">
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>

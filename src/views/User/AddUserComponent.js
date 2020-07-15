@@ -114,6 +114,7 @@ class AddUserComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -240,7 +241,7 @@ class AddUserComponent extends Component {
                     this.setState({
                         realms: response.data
                     })
-                }else{
+                } else {
                     this.setState({
                         message: response.data.messageCode
                     },
@@ -248,7 +249,7 @@ class AddUserComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-                
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -280,7 +281,7 @@ class AddUserComponent extends Component {
                     this.setState({
                         roleList
                     })
-                }else{
+                } else {
                     this.setState({
                         message: response.data.messageCode
                     },
@@ -288,7 +289,7 @@ class AddUserComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-               
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -336,14 +337,14 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                 <h5 style={{ color: "red" }} id="div2">
-                     {i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">
+                    {i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
@@ -351,11 +352,14 @@ class AddUserComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("user object---",this.state.user)
+                                    console.log("user object---", this.state.user)
+                                    this.setState({
+                                        message: ''
+                                    })
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -404,7 +408,7 @@ class AddUserComponent extends Component {
                                         handleReset
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
-                                                <CardBody>
+                                                <CardBody className="pt-2 pb-0">
                                                     <Input
                                                         type="hidden"
                                                         name="showRealm"

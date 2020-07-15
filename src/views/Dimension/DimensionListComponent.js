@@ -47,10 +47,13 @@ export default class DimensionListComponent extends Component {
         }, 8000);
     }
     hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
     componentDidMount() {
         this.hideFirstComponent();
         AuthenticationService.setupAxiosInterceptors();
@@ -168,16 +171,16 @@ export default class DimensionListComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
+                    <div className="Card-header-addicon">
+                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
-                    </CardHeader>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    </div>
+                    <CardBody className="pb-lg-0 ">
                         <ToolkitProvider
                             keyField="dimensionId"
                             data={this.state.selSource}
