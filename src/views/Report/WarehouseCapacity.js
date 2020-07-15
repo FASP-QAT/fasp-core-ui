@@ -548,6 +548,7 @@ import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ReportService from '../../api/ReportService';
 import RealmCountryService from '../../api/RealmCountryService';
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
 class warehouseCapacity extends Component {
     constructor(props) {
@@ -566,6 +567,7 @@ class warehouseCapacity extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.handleChangeProgram = this.handleChangeProgram.bind(this);
 
     }
 
@@ -589,7 +591,9 @@ class warehouseCapacity extends Component {
 
         if (navigator.onLine) {
             csvRow.push(i18n.t('static.program.realmcountry') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-            csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            // csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            this.state.programLabels.map(ele =>
+                csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         } else {
             csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programIdOffline").selectedOptions[0].text).replaceAll(' ', '%20'))
         }
@@ -609,7 +613,7 @@ class warehouseCapacity extends Component {
             // A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(re[item].programList.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),re[item].gln, re[item].capacityCbm])
             A.push([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].programList[0].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].gln, re[item].capacityCbm])
             for (var item1 = 1; item1 < re[item].programList.length; item1++) {
-                A.push(['','',(getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),'',''])
+                A.push(['', '', (getLabelText(re[item].programList[item1].label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), '', ''])
             }
         }
 
@@ -691,9 +695,12 @@ class warehouseCapacity extends Component {
                             align: 'left'
                         })
 
-                        doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                            align: 'left'
-                        })
+                        // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        //     align: 'left'
+                        // })
+
+                        var programText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 110, programText)
 
                     } else {
                         doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programIdOffline").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
@@ -814,6 +821,18 @@ class warehouseCapacity extends Component {
         }
     }
 
+    handleChangeProgram(programIds) {
+
+        this.setState({
+            programValues: programIds.map(ele => ele.value),
+            programLabels: programIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData();
+        })
+
+    }
+
     getPrograms() {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
@@ -891,15 +910,15 @@ class warehouseCapacity extends Component {
         }.bind(this);
     }
 
-    fetchData() {
+    fetchData(e) {
         if (navigator.onLine) {
-            let programId = document.getElementById("programId").value;
+            let programId = this.state.programValues;
             let countryId = document.getElementById("countryId").value;
 
             AuthenticationService.setupAxiosInterceptors();
             let inputjson = {
                 realmCountryId: countryId,
-                programId: programId
+                programIds: programId
             }
             ReportService.wareHouseCapacityExporttList(inputjson)
                 .then(response => {
@@ -948,58 +967,38 @@ class warehouseCapacity extends Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var regionList = (programJson.regionList);
+                    var realmCountry = (programJson.realmCountry);
+                    var programName = (document.getElementById("programIdOffline").selectedOptions[0].text);
                     let offlineData = [];
 
                     for (var i = 0; i < regionList.length; i++) {
                         let json = {
-                            "realmCountry": regionList[i].realmCountry,
+                            "realmCountry": realmCountry.country,
                             "programList": [
                                 {
                                     "id": 3,
                                     "label": {
                                         "active": false,
                                         "labelId": 136,
-                                        "label_en": "HIV/AIDS - Malawi - National",
-                                        "label_sp": "",
-                                        "label_fr": "",
-                                        "label_pr": ""
+                                        "label_en": programName,
+                                        "label_sp": programName,
+                                        "label_fr": programName,
+                                        "label_pr": programName,
                                     },
                                     "code": "MWI-FRH-MOH"
                                 },
-                                {
-                                    "id": 4,
-                                    "label": {
-                                        "active": false,
-                                        "labelId": 136,
-                                        "label_en": "HIV/AIDS - Kenya - National",
-                                        "label_sp": "",
-                                        "label_fr": "",
-                                        "label_pr": ""
-                                    },
-                                    "code": "MWI-FRH-MOH"
-                                }
                             ],
-                            "region": {
-                                "id": 2,
-                                "label": {
-                                    "active": false,
-                                    "labelId": 42,
-                                    "label_en": "North",
-                                    "label_sp": "",
-                                    "label_fr": "",
-                                    "label_pr": ""
-                                }
-                            },
-                            "gln": null,
-                            "capacityCbm": 18000
+                            "region": regionList[i],
+                            "gln": regionList[i].gln,
+                            "capacityCbm": regionList[i].capacityCbm,
                         }
                         offlineData.push(json);
                     }
 
-
+                    console.log("offlineData--4-", offlineData);
                     console.log("final wareHouseCapacity Report---", regionList);
                     this.setState({
-                        data: regionList
+                        data: offlineData
                     });
 
                 }.bind(this)
@@ -1011,13 +1010,23 @@ class warehouseCapacity extends Component {
     }
 
     render() {
+        // const { programLst } = this.state;
+        // let programList = programLst.length > 0
+        //     && programLst.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.programId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
         const { programLst } = this.state;
-        let programList = programLst.length > 0
+        let programList = [];
+        programList = programLst.length > 0
             && programLst.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
+
+                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+
                 )
             }, this);
         const { offlinePrograms } = this.state;
@@ -1096,7 +1105,7 @@ class warehouseCapacity extends Component {
                                             </Online>
                                             <Online>
 
-                                                <FormGroup className="col-md-3">
+                                                {/* <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
                                                         <InputGroup>
@@ -1115,6 +1124,25 @@ class warehouseCapacity extends Component {
 
                                                         </InputGroup>
                                                     </div>
+                                                </FormGroup> */}
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                    <InputGroup className="box">
+                                                        <ReactMultiSelectCheckboxes
+
+                                                            bsSize="sm"
+                                                            name="programId"
+                                                            id="programId"
+                                                            onChange={(e) => { this.handleChangeProgram(e) }}
+                                                            options={programList && programList.length > 0 ? programList : []}
+
+                                                        />
+                                                        {!!this.props.error &&
+                                                            this.props.touched && (
+                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                            )}
+                                                    </InputGroup>
                                                 </FormGroup>
                                             </Online>
 
@@ -1179,7 +1207,7 @@ class warehouseCapacity extends Component {
                                                                     {
                                                                         this.state.data[idx].programList.map((item, idx1) =>
                                                                             <>
-                                                                                <span id="addr1" key={idx1}>{this.state.data[idx].programList[idx1].label.label_en}</span> <br />
+                                                                                <span id="addr1" key={idx1}>{getLabelText(this.state.data[idx].programList[idx1].label, this.state.lang)}</span> <br />
                                                                             </>
                                                                         )
                                                                     }

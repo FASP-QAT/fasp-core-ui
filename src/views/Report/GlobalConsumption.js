@@ -2007,6 +2007,26 @@ class GlobalConsumption extends Component {
                       </InputGroup>
                     </FormGroup>
 
+
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <InputGroup className="box">
+                        <ReactMultiSelectCheckboxes
+
+                          bsSize="sm"
+                          name="programIds"
+                          id="programIds"
+                          onChange={(e) => { this.handleChangeProgram(e) }}
+                          options={programList && programList.length > 0 ? programList : []}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </InputGroup>
+                    </FormGroup>
+
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                       <div className="controls ">
@@ -2030,26 +2050,6 @@ class GlobalConsumption extends Component {
                           </Input>
                         </InputGroup>
                       </div>
-
-                    </FormGroup>
-
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <InputGroup className="box">
-                        <ReactMultiSelectCheckboxes
-
-                          bsSize="sm"
-                          name="programIds"
-                          id="programIds"
-                          onChange={(e) => { this.handleChangeProgram(e) }}
-                          options={programList && programList.length > 0 ? programList : []}
-                        />
-                        {!!this.props.error &&
-                          this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                          )}
-                      </InputGroup>
                     </FormGroup>
 
                     <FormGroup className="col-sm-3" id="hideDiv">
