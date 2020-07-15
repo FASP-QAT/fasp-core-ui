@@ -2723,10 +2723,5 @@ input::placeholder {
 .sidebar .nav-dropdown.open .nav-link {
   color: #fff;
   border-left: 0;
-  display: inline-flex;
-}
-.sidebar .nav-link:hover {
-  width: 100%;
-  color: #fff;
-  background: #20a8d8;
+  display: flex;
 }
