@@ -170,7 +170,11 @@ class StockStatus extends Component {
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   roundN = num => {
+    if (num != '') {
     return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+  } else {
+    return ''
+  }
   }
 
   formatter = value => {
@@ -190,7 +194,9 @@ class StockStatus extends Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
-
+dateFormatter=value=>{
+  return moment(value).format('MMM YY')
+}
   exportCSV() {
 
     var csvRow = [];
@@ -217,13 +223,13 @@ class StockStatus extends Component {
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push([ele.transDate.replaceAll(' ', '%20'), ele.consumptionQty, ele.actual ? 'Yes' : '', ele.shipmentQty,
-    ((ele.shipmentList.map(item => {
+    this.state.stockStatusList.map(ele => A.push([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.consumptionQty, ele.actualConsumption ? 'Yes' : '', ele.shipmentQty,
+    ((ele.shipmentInfo.map(item => {
       return (
         " [ " + getLabelText(item.fundingSource.label, this.state.lang) + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
       )
     }).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')
-      , ele.adjustmentQty, ele.closingBalance, ele.mos, ele.minMonths, ele.maxMonths]));
+      , ele.adjustment, ele.closingBalance, this.roundN(ele.mos), ele.minMos, ele.maxMos]));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -325,13 +331,13 @@ class StockStatus extends Component {
     i18n.t('static.report.maxmonth')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [ele.transDate, this.formatter(ele.consumptionQty), ele.actual ? 'Yes' : '', this.formatter(ele.shipmentQty),
-      ele.shipmentList.map(item => {
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.consumptionQty), ele.actualConsumption ? 'Yes' : '', this.formatter(ele.shipmentQty),
+      ele.shipmentInfo.map(item => {
         return (
           " [ " + getLabelText(item.fundingSource.label, this.state.lang) + " : " + getLabelText(item.shipmentStatus.label, this.state.lang) + " ] "
         )
       })
-        , this.formatter(ele.adjustmentQty), this.formatter(ele.closingBalance), this.formatter(ele.mos), this.formatter(ele.minMonths), this.formatter(ele.maxMonths)]);
+        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.roundN(ele.mos)), this.formatter(ele.minMos), this.formatter(ele.maxMos)]);
 
     let content = {
       margin: { top: 80 },
@@ -354,14 +360,14 @@ class StockStatus extends Component {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let versionId = document.getElementById("versionId").value;
-    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    let endDate =moment(new Date( this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
 
     if (programId != 0 && versionId != 0 && planningUnitId != 0) {
       if (versionId.includes('Local')) {
 
-        let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-        let endDate =moment(new Date( this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+       // let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+        //let endDate =moment(new Date( this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
     
 
         var db1;
@@ -389,7 +395,7 @@ class StockStatus extends Component {
             var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
             var shipmentList = []
             // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
-            shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+              shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
             // } else {
             //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
 
@@ -402,7 +408,8 @@ class StockStatus extends Component {
             var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
 
             var openingBalance = 0;
-            if(minDate.isBefore(startDate)){
+            console.log('minDate',minDate, 'startDate',startDate)
+            if(minDate.isBefore(startDate.format('YYYY-MM-DD')) && ! minDate.isSame(startDate.format('YYYY-MM-DD'))){
             var totalConsumption = 0;
             var totalAdjustments = 0;
             var totalShipments = 0;
@@ -539,7 +546,7 @@ class StockStatus extends Component {
                 var amcAfterArray = [];
 
 
-                for (var c = 0; c < 12; c++) {
+                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
 
                   var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                   var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -565,12 +572,10 @@ class StockStatus extends Component {
                     }
                     amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
                     var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                    if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
-                      c = 12;
-                    }
+                   
                   }
                 }
-                for (var c = 0; c < 12; c++) {
+                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
                   var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                   var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                   if (consumptionListForAMC.length > 0) {
@@ -595,9 +600,7 @@ class StockStatus extends Component {
                     }
                     amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
                     amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                    if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
-                      c = 12;
-                    }
+                    
                   }
 
                 }
@@ -610,10 +613,12 @@ class StockStatus extends Component {
                   sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
                 }
 
-
+                var mos = 0
+                if (countAMC != 0) {
                 var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
                 console.log('amcCalcualted', amcCalcualted)
-                var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                }
 console.log(pu)
                 var maxForMonths = 0;
                 if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
@@ -631,16 +636,16 @@ console.log(pu)
                 var maxMOS = minForMonths;
 
                 var json = {
-                  transDate: moment(new Date(from, month-1)).format('MMM YY'),
+                  dt: new Date(from, month-1),
                   consumptionQty: consumption,
-                  actual: actualFlag,
+                  actualConsumption: actualFlag,
                   shipmentQty: shipment,
-                  shipmentList: shiplist,
-                  adjustmentQty: adjustment,
+                  shipmentInfo: shiplist,
+                  adjustment: adjustment,
                   closingBalance: endingBalance,
-                  mos: this.roundN(mos),
-                  minMonths: minMOS,
-                  maxMonths: maxMOS
+                  mos: mos=='NaN'||mos== '0'?'':mos,
+                  minMos: minMOS,
+                  maxMos: maxMOS
                 }
                 data.push(json)
                 console.log(data)
@@ -681,41 +686,42 @@ console.log(pu)
         var inputjson = {
           "programId": programId,
           "versionId": versionId,
-          "startDate": startDate,
-          "stopDate": endDate,
+          "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
+          "stopDate": endDate.endOf('month').format('YYYY-MM-DD'),
           "planningUnitId": planningUnitId,
 
         }
-        this.setState({
+/*        this.setState({
           stockStatusList: [{
-            transDate: 'Jan 20', consumptionQty: 17475, actual: true, shipmentQty: 0, shipmentList: [
-            ], adjustmentQty: -10122, closingBalance: 27203, mos: 1.28, minMonths: 1.2, maxMonths: 2.5
+            dt: 'Jan 20', consumptionQty: 17475, actual: true, shipmentQty: 0, shipmentInfo: [
+            ], adjustmentQty: -10122, closingBalance: 27203, mos: 1.28, minMos: 1.2, maxMos: 2.5
           },
           {
-            transDate: 'Feb 20', consumptionQty: 25135, actual: false, shipmentQty: 0, shipmentList: [], adjustmentQty: 3999
-            , closingBalance: 6067, mos: 1.21, minMonths: 1.0, maxMonths: 1.5
+            dt: 'Feb 20', consumptionQty: 25135, actual: false, shipmentQty: 0, shipmentInfo: [], adjustmentQty: 3999
+            , closingBalance: 6067, mos: 1.21, minMos: 1.0, maxMos: 1.5
           },
           {
-            transDate: 'Mar 20', consumptionQty: 49880, actual: true, shipmentQty: 78900, shipmentList: [
+            dt: 'Mar 20', consumptionQty: 49880, actual: true, shipmentQty: 78900, shipmentInfo: [
               { shipmentQty: 78900, fundingSource: { id: 1, label: { label_en: 'PEPFAR' } }, shipmentStatus: { id: 1, label: { label_en: 'Delivered' } } }
-            ], adjustmentQty: 105, closingBalance: 36137, mos: 1.34, minMonths: 1.0, maxMonths: 2.0
+            ], adjustmentQty: 105, closingBalance: 36137, mos: 1.34, minMos: 1.0, maxMos: 2.0
           }
-            , { transDate: 'Apr 20', consumptionQty: 25177, actual: false, shipmentQty: 0, shipmentList: [], adjustmentQty: -135, closingBalance: 10960, mos: 0.54, minMonths: 0.5, maxMonths: 2.5 },
-          { transDate: 'May 20', consumptionQty: 16750, actual: false, shipmentQty: 0, shipmentList: [], adjustmentQty: -579, closingBalance: 0, mos: 1.2, minMonths: 1.0, maxMonths: 1.5 },
+            , { dt: 'Apr 20', consumptionQty: 25177, actual: false, shipmentQty: 0, shipmentInfo: [], adjustmentQty: -135, closingBalance: 10960, mos: 0.54, minMos: 0.5, maxMos: 2.5 },
+          { dt: 'May 20', consumptionQty: 16750, actual: false, shipmentQty: 0, shipmentInfo: [], adjustmentQty: -579, closingBalance: 0, mos: 1.2, minMos: 1.0, maxMos: 1.5 },
           {
-            transDate: 'Jun 20', consumptionQty: 14000, actual: false, shipmentQty: 40000, shipmentList: [
+            dt: 'Jun 20', consumptionQty: 14000, actual: false, shipmentQty: 40000, shipmentInfo: [
               { shipmentQty: 40000, fundingSource: { id: 1, label: { label_en: 'PEPFAR' } }, shipmentStatus: { id: 1, label: { label_en: 'Planned' } } }
 
-            ], adjustmentQty: 0, closingBalance: 26000, mos: 2.1, minMonths: 2.0, maxMonths: 3.5
+            ], adjustmentQty: 0, closingBalance: 26000, mos: 2.1, minMos: 2.0, maxMos: 3.5
           }
           ]
-        })
-        /*  AuthenticationService.setupAxiosInterceptors();
+        })*/
+          AuthenticationService.setupAxiosInterceptors();
           ReportService.getStockStatusData(inputjson)
             .then(response => {
               console.log(JSON.stringify(response.data));
               this.setState({
-                stockStatusList: response.data
+                stockStatusList: response.data,
+                message:''
               })
             }).catch(
               error => {
@@ -740,7 +746,7 @@ console.log(pu)
                   }
                 }
               }
-            );*/
+            );
       }
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
@@ -1094,7 +1100,7 @@ console.log(pu)
 
     const bar = {
 
-      labels: this.state.stockStatusList.map((item, index) => (item.transDate)),
+      labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
       datasets: [
         {
           type: "line",
@@ -1113,7 +1119,7 @@ console.log(pu)
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
           lineTension: 0,
-          data: this.state.stockStatusList.map((item, index) => (item.minMonths))
+          data: this.state.stockStatusList.map((item, index) => (item.minMos))
         }
         , {
           type: "line",
@@ -1132,7 +1138,7 @@ console.log(pu)
           pointStyle: 'line',
           showInLegend: true,
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.maxMonths))
+          data: this.state.stockStatusList.map((item, index) => (item.maxMos))
         }
         , {
           type: "line",
@@ -1178,7 +1184,7 @@ console.log(pu)
           pointHoverBorderColor: 'rgba(179,181,198,1)',
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
-            count = +(item.shipmentList.map((ele, index) => {
+            count = +(item.shipmentInfo.map((ele, index) => {
               return (ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count)
             }))
             return count
@@ -1196,7 +1202,7 @@ console.log(pu)
           pointHoverBorderColor: 'rgba(179,181,198,1)',
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
-            count = +(item.shipmentList.map((ele, index) => {
+            count = +(item.shipmentInfo.map((ele, index) => {
               return ((ele.shipmentStatus.id==5||ele.shipmentStatus.id==6) ? count = count + ele.shipmentQty : count)
             }))
             return count
@@ -1215,7 +1221,7 @@ console.log(pu)
           pointHoverBorderColor: 'rgba(179,181,198,1)',
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
-            count = +(item.shipmentList.map((ele, index) => {
+            count = +(item.shipmentInfo.map((ele, index) => {
               return ((ele.shipmentStatus.id==3||ele.shipmentStatus.id==4) ? count = count + ele.shipmentQty : count)
             }))
             return count
@@ -1233,7 +1239,7 @@ console.log(pu)
           stack: 1,
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
-            count = +(item.shipmentList.map((ele, index) => {
+            count = +(item.shipmentInfo.map((ele, index) => {
               return ((ele.shipmentStatus.id==1||ele.shipmentStatus.id==2 ||ele.shipmentStatus.id==9) ? count = count + ele.shipmentQty : count)
             }))
             return count
@@ -1292,7 +1298,7 @@ console.log(pu)
 
                           <Picker
                             ref="pickRange"
-                            years={{ min: 2013 }}
+                            years={{ min: 2013 ,max:2022}}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"
@@ -1392,7 +1398,7 @@ console.log(pu)
 
 
 
-                  {this.state.show && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                  {this.state.show && this.state.stockStatusList.length>0 && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
                       <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th> <th className="text-center" colSpan="2"> {i18n.t('static.dashboard.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="5"> {i18n.t('static.report.stock')} </th> </tr><tr>
@@ -1416,38 +1422,38 @@ console.log(pu)
 
                           <tr id="addr0" key={idx} >
                             <td>
-                              {this.state.stockStatusList[idx].transDate}
+                              {this.dateFormatter(this.state.stockStatusList[idx].dt)}
                             </td>
                             <td>
 
                               {this.formatter(this.state.stockStatusList[idx].consumptionQty)}
                             </td>
                             <td>
-                              {this.state.stockStatusList[idx].actual ? <img src={actualIcon} /> : ''}
+                              {this.state.stockStatusList[idx].actualConsumption ? <img src={actualIcon} /> : ''}
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
                             </td>
                             <td align="center">
-                              {this.state.stockStatusList[idx].shipmentList.map((item, index) => {
+                              {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
                                 return (`[ ${item.fundingSource.label.label_en} : ${item.shipmentStatus.label.label_en} ]  `)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}
                             </td>
                             <td>
-                              {this.formatter(this.state.stockStatusList[idx].adjustmentQty)}
+                              {this.formatter(this.state.stockStatusList[idx].adjustment)}
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].closingBalance)}
                             </td>
                             <td>
-                              {this.state.stockStatusList[idx].mos}
+                              {this.roundN(this.state.stockStatusList[idx].mos)}
                             </td>
                             <td>
-                              {this.state.stockStatusList[idx].minMonths}
+                              {this.state.stockStatusList[idx].minMos}
                             </td>
                             <td>
-                              {this.state.stockStatusList[idx].maxMonths}
+                              {this.state.stockStatusList[idx].maxMos}
                             </td>
                           </tr>)
 

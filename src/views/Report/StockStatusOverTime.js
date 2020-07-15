@@ -100,8 +100,8 @@ class StockStatusOverTime extends Component {
             planningUnitlines: [],
             lineData: [],
             lineDates: [],
-            monthsInPastForAmc:0,
-            monthsInFutureForAmc:0,
+            monthsInPastForAmc: 0,
+            monthsInFutureForAmc: 0,
             planningUnitMatrix: {
                 date: []
             },
@@ -124,9 +124,14 @@ class StockStatusOverTime extends Component {
     }
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
-
+    formatAmc=value=>{
+      return  Math.ceil(value)
+    }
+    dateFormatter=value=>{
+        return moment(value).format('MMM YY')
+      }
     formatter = value => {
 
         var cell1 = value
@@ -143,9 +148,9 @@ class StockStatusOverTime extends Component {
 
     handlePlanningUnitChange = (planningUnitIds) => {
 
-        planningUnitIds=planningUnitIds.sort(function(a,b){
-            return parseInt(a.value)  - parseInt(b.value);
-           })
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele.value),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -313,32 +318,36 @@ class StockStatusOverTime extends Component {
 
     }
 
-    updateMonthsforAMCCalculations=()=>{
+    updateMonthsforAMCCalculations = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-           this.setState({ monthsInPastForAmc:program[0].monthsInPastForAmc,
-            monthsInFutureForAmc:program[0].monthsInFutureForAmc})
+                this.setState({
+                    monthsInPastForAmc: program[0].monthsInPastForAmc,
+                    monthsInFutureForAmc: program[0].monthsInFutureForAmc
+                })
 
-            }}
-    }
-    changeMonthsForamc=(event)=>{
-        if (event.target.name === "monthsInPastForAmc") {
-            this.setState({ monthsInPastForAmc:event.target.value},()=>{this.fetchData()})
-    
-                }
-        
-        if (event.target.name === "monthsInFutureForAmc") {
-            this.setState({ 
-                monthsInFutureForAmc:event.target.value},()=>{this.fetchData()})
-    
-                }
+            }
         }
-        
-    
+    }
+    changeMonthsForamc = (event) => {
+        if (event.target.name === "monthsInPastForAmc") {
+            this.setState({ monthsInPastForAmc: event.target.value }, () => { this.fetchData() })
+
+        }
+
+        if (event.target.name === "monthsInFutureForAmc") {
+            this.setState({
+                monthsInFutureForAmc: event.target.value
+            }, () => { this.fetchData() })
+
+        }
+    }
+
+
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
@@ -525,14 +534,14 @@ class StockStatusOverTime extends Component {
         let versionId = document.getElementById("versionId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log(planningUnitIds.length > 0 )
-        if (planningUnitIds.length > 0 && versionId !=0 && programId > 0) {
+        console.log(planningUnitIds.length > 0)
+        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0) {
             if (versionId.includes('Local')) {
-              
+
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                 let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-let monthsInFutureForAmc=this.state.monthsInFutureForAmc
-let monthsInPastForAmc=this.state.monthsInPastForAmc
+                let monthsInFutureForAmc = this.state.monthsInFutureForAmc
+                let monthsInPastForAmc = this.state.monthsInPastForAmc
 
                 var db1;
                 getDatabase();
@@ -553,304 +562,305 @@ let monthsInPastForAmc=this.state.monthsInPastForAmc
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-console.log('in')
-planningUnitIds.map(planningUnitId => {
+                        console.log('in')
+                        planningUnitIds.map(planningUnitId => {
 
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
-                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
-                        var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
-                        var shipmentList = []
-                        // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
-                        shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-                        // } else {
-                        //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
+                            var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                            var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                            var shipmentList = []
+                            // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
+                            shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+                            // } else {
+                            //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
 
-                        // }
-                        // calculate openingBalance
+                            // }
+                            // calculate openingBalance
 
-                        let invmin = moment.min(inventoryList.map(d => moment(d.inventoryDate)))
-                        let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
-                        let conmin = moment.min(consumptionList.map(d => moment(d.consumptionDate)))
-                        var minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
+                            let invmin = moment.min(inventoryList.map(d => moment(d.inventoryDate)))
+                            let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+                            let conmin = moment.min(consumptionList.map(d => moment(d.consumptionDate)))
+                            var minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
 
-                        var openingBalance = 0;
-                        if (minDate.isBefore(startDate)) {
-                            var totalConsumption = 0;
-                            var totalAdjustments = 0;
-                            var totalShipments = 0;
-                            console.log('startDate', startDate)
-                            console.log('programJson', programJson)
-                            var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore(minDate));
-                            console.log('consumptionRemainingList', consumptionRemainingList)
-                            for (var j = 0; j < consumptionRemainingList.length; j++) {
-                                var count = 0;
-                                for (var k = 0; k < consumptionRemainingList.length; k++) {
-                                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                                        count++;
-                                    } else {
+                            var openingBalance = 0;
+                            console.log('minDate',minDate, 'startDate',startDate)
+                            if (minDate.isBefore(startDate.format('YYYY-MM-DD')) && ! minDate.isSame(startDate.format('YYYY-MM-DD'))) {
+                                var totalConsumption = 0;
+                                var totalAdjustments = 0;
+                                var totalShipments = 0;
+                                console.log('startDate', startDate)
+                                console.log('programJson', programJson)
+                                var consumptionRemainingList = consumptionList.filter(c => moment(c.consumptionDate).isBefore(minDate));
+                                console.log('consumptionRemainingList', consumptionRemainingList)
+                                for (var j = 0; j < consumptionRemainingList.length; j++) {
+                                    var count = 0;
+                                    for (var k = 0; k < consumptionRemainingList.length; k++) {
+                                        if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                                            count++;
+                                        } else {
 
+                                        }
                                     }
-                                }
-                                if (count == 0) {
-                                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                                } else {
-                                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                                    if (count == 0) {
                                         totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                                    }
-                                }
-                            }
-
-                            var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore(minDate));
-                            for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                                totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                            }
-
-                            var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate).isBefore(minDate) && c.accountFlag == true);
-                            console.log('shipmentsRemainingList', shipmentsRemainingList)
-                            for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                                totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                            }
-                            openingBalance = totalAdjustments - totalConsumption + totalShipments;
-                            for (i = 1; ; i++) {
-                                var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
-                                var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
-                                console.log(dtstr, ' ', enddtStr)
-                                var dt = dtstr
-                                console.log(openingBalance)
-                                console.log(inventoryList)
-                                var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                                var adjustment = 0;
-                                invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                                console.log(consumptionList)
-                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                var consumption = 0;
-                                console.log(programJson.regionList)
-
-                                var actualFlag = false
-                                for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                    console.log(list)
-                                    if (list.length > 1) {
-                                        for (var l = 0; l < list.length; l++) {
-                                            if (list[l].actualFlag.toString() == 'true') {
-                                                actualFlag = true;
-                                                consumption = consumption + list[l].consumptionQty
-                                            }
-                                        }
                                     } else {
-                                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                                        if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                                            totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                                        }
                                     }
                                 }
 
+                                var adjustmentsRemainingList = inventoryList.filter(c => moment(c.inventoryDate).isBefore(minDate));
+                                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                                    totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+                                }
 
-                                console.log(shipmentList)
-                                var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                                var shipment = 0;
-                                shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+                                var shipmentsRemainingList = shipmentList.filter(c => moment(c.expectedDeliveryDate).isBefore(minDate) && c.accountFlag == true);
+                                console.log('shipmentsRemainingList', shipmentsRemainingList)
+                                for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                                    totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
+                                }
+                                openingBalance = totalAdjustments - totalConsumption + totalShipments;
+                                for (i = 1; ; i++) {
+                                    var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
+                                    var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
+                                    console.log(dtstr, ' ', enddtStr)
+                                    var dt = dtstr
+                                    console.log(openingBalance)
+                                    console.log(inventoryList)
+                                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                                    var adjustment = 0;
+                                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                                    console.log(consumptionList)
+                                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                    var consumption = 0;
+                                    console.log(programJson.regionList)
 
-                                console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                                var endingBalance = openingBalance + adjustment + shipment - consumption
-                                console.log('endingBalance', endingBalance)
+                                    var actualFlag = false
+                                    for (var i = 0; i < programJson.regionList.length; i++) {
 
-                                endingBalance = endingBalance < 0 ? 0 : endingBalance
-                                openingBalance = endingBalance
-                                minDate = minDate.add(1, 'month')
+                                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                                        console.log(list)
+                                        if (list.length > 1) {
+                                            for (var l = 0; l < list.length; l++) {
+                                                if (list[l].actualFlag.toString() == 'true') {
+                                                    actualFlag = true;
+                                                    consumption = consumption + list[l].consumptionQty
+                                                }
+                                            }
+                                        } else {
+                                            consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                                        }
+                                    }
 
-                                if (minDate.startOf('month').isAfter(startDate)) {
-                                    break;
+
+                                    console.log(shipmentList)
+                                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                                    var shipment = 0;
+                                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                                    console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                                    var endingBalance = openingBalance + adjustment + shipment - consumption
+                                    console.log('endingBalance', endingBalance)
+
+                                    endingBalance = endingBalance < 0 ? 0 : endingBalance
+                                    openingBalance = endingBalance
+                                    minDate = minDate.add(1, 'month')
+
+                                    if (minDate.startOf('month').isSame(startDate)) {
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        var monthstartfrom = this.state.rangeValue.from.month
-                        for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                            var monthlydata = [];
-                            for (var month = monthstartfrom; month <= 12; month++) {
-                                var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                                var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                                console.log(dtstr, ' ', enddtStr)
-                                var dt = dtstr
-                                console.log(openingBalance)
-                                var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                                var adjustment = 0;
-                                invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                var consumption = 0;
-                                console.log(programJson.regionList)
+                            var monthstartfrom = this.state.rangeValue.from.month
+                            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                var monthlydata = [];
+                                for (var month = monthstartfrom; month <= 12; month++) {
+                                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                                    console.log(dtstr, ' ', enddtStr)
+                                    var dt = dtstr
+                                    console.log(openingBalance)
+                                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
+                                    var adjustment = 0;
+                                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
+                                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                    var consumption = 0;
+                                    console.log(programJson.regionList)
 
-                                var actualFlag = false
-                                for (var i = 0; i < programJson.regionList.length; i++) {
+                                    var actualFlag = false
+                                    for (var i = 0; i < programJson.regionList.length; i++) {
 
-                                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                    console.log(list)
-                                    if (list.length > 1) {
-                                        for (var l = 0; l < list.length; l++) {
-                                            if (list[l].actualFlag.toString() == 'true') {
-                                                actualFlag = true;
-                                                consumption = consumption + list[l].consumptionQty
-                                            }
-                                        }
-                                    } else {
-                                        consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                                    }
-                                }
-
-
-
-                                var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                                var shipment = 0;
-                                shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-                                console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                                var endingBalance = openingBalance + adjustment + shipment - consumption
-                                console.log('endingBalance', endingBalance)
-
-                                endingBalance = endingBalance < 0 ? 0 : endingBalance
-                                openingBalance = endingBalance
-                                var amcBeforeArray = [];
-                                var amcAfterArray = [];
-
-
-                                for (var c = 0; c < monthsInPastForAmc; c++) {
-
-                                    var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
-                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
-                                    if (consumptionListForAMC.length > 0) {
-                                        var consumptionQty = 0;
-                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                                            var count = 0;
-                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
-                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                                                    count++;
-                                                } else {
-
+                                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+                                        console.log(list)
+                                        if (list.length > 1) {
+                                            for (var l = 0; l < list.length; l++) {
+                                                if (list[l].actualFlag.toString() == 'true') {
+                                                    actualFlag = true;
+                                                    consumption = consumption + list[l].consumptionQty
                                                 }
                                             }
+                                        } else {
+                                            consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
+                                        }
+                                    }
 
-                                            if (count == 0) {
-                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                            } else {
-                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+
+
+                                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
+                                    var shipment = 0;
+                                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
+
+                                    console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
+                                    var endingBalance = openingBalance + adjustment + shipment - consumption
+                                    console.log('endingBalance', endingBalance)
+
+                                    endingBalance = endingBalance < 0 ? 0 : endingBalance
+                                    openingBalance = endingBalance
+                                    var amcBeforeArray = [];
+                                    var amcAfterArray = [];
+
+
+                                    for (var c = 0; c < monthsInPastForAmc; c++) {
+
+                                        var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                        var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
+                                        if (consumptionListForAMC.length > 0) {
+                                            var consumptionQty = 0;
+                                            for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                var count = 0;
+                                                for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                    if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                        count++;
+                                                    } else {
+
+                                                    }
+                                                }
+
+                                                if (count == 0) {
                                                     consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                                }
-                                            }
-                                        }
-                                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                                       
-                                    }
-                                }
-                                for (var c = 0; c < monthsInFutureForAmc; c++) {
-                                    var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
-                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
-                                    if (consumptionListForAMC.length > 0) {
-                                        var consumptionQty = 0;
-                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                                            var count = 0;
-                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
-                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                                                    count++;
                                                 } else {
-
+                                                    if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                        consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                    }
                                                 }
                                             }
+                                            amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                                            var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
 
-                                            if (count == 0) {
-                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                            } else {
-                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                                }
-                                            }
                                         }
-                                        amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                                       
+                                    }
+                                    for (var c = 0; c < monthsInFutureForAmc; c++) {
+                                        var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
+                                        var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
+                                        if (consumptionListForAMC.length > 0) {
+                                            var consumptionQty = 0;
+                                            for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                var count = 0;
+                                                for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                    if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                        count++;
+                                                    } else {
+
+                                                    }
+                                                }
+
+                                                if (count == 0) {
+                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                } else {
+                                                    if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                        consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                    }
+                                                }
+                                            }
+                                            amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
+                                            amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
+
+                                        }
+
+                                    }
+
+                                    var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                    var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
+                                    var countAMC = amcArrayFilteredForMonth.length;
+                                    var sumOfConsumptions = 0;
+                                    for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                        sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                    }
+
+
+                                    var amcCalcualted =(sumOfConsumptions) / countAMC;
+                                    console.log('amcCalcualted', amcCalcualted,' endingBalance',endingBalance)
+                                    var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                    console.log(pu)
+                                    /*   var maxForMonths = 0;
+                                       if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                                           maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                       } else {
+                                           maxForMonths = pu.minMonthsOfStock
+                                       }
+                                       var minMOS = maxForMonths;
+                                       var minForMonths = 0;
+                                       if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                                           minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                       } else {
+                                           minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                                       }
+                                       var maxMOS = minForMonths;*/
+                                    var json = {
+                                        "dt": new Date(from, month - 1),
+                                        "program": pu.program,
+                                        "planningUnit": pu.planningUnit,
+                                        "stock": endingBalance,
+                                        "consumptionQty": consumption,
+                                        "amc": amcCalcualted,
+                                        "amcMonthCount": countAMC,
+                                        "mos": this.roundN(mos)
+                                    }
+                                    /* var json = {
+                                         transDate: moment(new Date(from, month - 1)).format('MMM YY'),
+                                         consumptionQty: consumption,
+                                         actual: actualFlag,
+                                         shipmentQty: shipment,
+                                         shipmentList: shiplist,
+                                         adjustmentQty: adjustment,
+                                         closingBalance: endingBalance,
+                                         mos: this.roundN(mos),
+                                         minMonths: minMOS,
+                                         maxMonths: maxMOS
+                                     }*/
+                                    data.push(json)
+                                    console.log(data)
+
+
+
+                                    if (month == this.state.rangeValue.to.month && from == to) {
+
+                                        // var lineData = [];
+                                        // var lineDates = [];
+                                        // var planningUnitlines = [];
+                                        // for (var i = 0; i < data.length; i++) {
+                                        //     lineData[i] = data.map(ele => (ele.mos))
+                                        // }
+                                        // lineDates =[new Set(data.map(ele => (ele.dt)))]
+                                        // planningUnitlines = data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
+
+                                        this.setState({
+                                            matricsList: data,
+                                            message: '',
+                                            // planningUnitlines: planningUnitlines
+                                            // lineData: lineData,
+                                            // lineDates: lineDates
+                                        })
+                                        return;
                                     }
 
                                 }
-
-                                var amcArray = amcBeforeArray.concat(amcAfterArray);
-                                var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
-                                var countAMC = amcArrayFilteredForMonth.length;
-                                var sumOfConsumptions = 0;
-                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
-                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
-                                }
-
-
-                                var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
-                                console.log('amcCalcualted', amcCalcualted)
-                                var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
-                                console.log(pu)
-                             /*   var maxForMonths = 0;
-                                if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
-                                    maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                                } else {
-                                    maxForMonths = pu.minMonthsOfStock
-                                }
-                                var minMOS = maxForMonths;
-                                var minForMonths = 0;
-                                if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                                    minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                                } else {
-                                    minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
-                                }
-                                var maxMOS = minForMonths;*/
-                                var json = {
-                                    "dt":  moment(new Date(from, month - 1)).format('MMM YY'),
-                                    "program": pu.program,
-                                    "planningUnit": pu.planningUnit,
-                                    "stock": endingBalance,
-                                    "consumptionQty": consumption,
-                                    "amc": amcCalcualted,
-                                    "amcMonthCount": countAMC,
-                                    "mos": this.roundN(mos)
-                                }
-                               /* var json = {
-                                    transDate: moment(new Date(from, month - 1)).format('MMM YY'),
-                                    consumptionQty: consumption,
-                                    actual: actualFlag,
-                                    shipmentQty: shipment,
-                                    shipmentList: shiplist,
-                                    adjustmentQty: adjustment,
-                                    closingBalance: endingBalance,
-                                    mos: this.roundN(mos),
-                                    minMonths: minMOS,
-                                    maxMonths: maxMOS
-                                }*/
-                                data.push(json)
-                                console.log(data)
-
-
-
-                                if (month == this.state.rangeValue.to.month && from == to) {
-                                  
-                                // var lineData = [];
-                                // var lineDates = [];
-                                // var planningUnitlines = [];
-                                // for (var i = 0; i < data.length; i++) {
-                                //     lineData[i] = data.map(ele => (ele.mos))
-                                // }
-                                // lineDates =[new Set(data.map(ele => (ele.dt)))]
-                                // planningUnitlines = data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
-        
-                                this.setState({
-                                    matricsList: data,
-                                    message: '',
-                                    // planningUnitlines: planningUnitlines
-                                    // lineData: lineData,
-                                    // lineDates: lineDates
-                                })
-                                    return;
-                                }
+                                monthstartfrom = 1
 
                             }
-                            monthstartfrom = 1
-
-                        }
-                    })
+                        })
                     }.bind(this)
 
                 }.bind(this)
@@ -875,7 +885,7 @@ planningUnitIds.map(planningUnitId => {
 
                 ReportService.getStockOverTime(input)
                     .then(response => {
-                        response.data = [[{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 54800, "consumptionQty": 0, "amc": 23122, "amcMonthCount": 4, "mos": 2.37 },
+                    /*    response.data = [[{ "dt": "Dec 19", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 54800, "consumptionQty": 0, "amc": 23122, "amcMonthCount": 4, "mos": 2.37 },
                         { "dt": "Jan 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 27203, "consumptionQty": 17475, "amc": 23533, "amcMonthCount": 5, "mos": 1.1559 },
                         { "dt": "Feb 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 6067, "consumptionQty": 25135, "amc": 22402, "amcMonthCount": 6, "mos": 0.2708 },
                         { "dt": "Mar 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 152, "label": { "active": false, "labelId": 9098, "label_en": "Abacavir 20 mg/mL Solution, 240 mL", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 36137, "consumptionQty": 49880, "amc": 21202, "amcMonthCount": 7, "mos": 1.7044 },
@@ -896,22 +906,22 @@ planningUnitIds.map(planningUnitId => {
                         { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10063, "consumptionQty": 5838, "amc": 6103, "amcMonthCount": 7, "mos": 1.6489 },
                         { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 3913, "consumptionQty": 6150, "amc": 6116, "amcMonthCount": 7, "mos": 0.6397 },
                         { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17763, "consumptionQty": 6150, "amc": 6081, "amcMonthCount": 7, "mos": 2.9209 }]];
-                        console.log(JSON.stringify(response.data))
-                        var lineData = [];
-                        var lineDates = [];
-                        var planningUnitlines = [];
-                        for (var i = 0; i < response.data.length; i++) {
-                            lineData[i] = response.data[i].map(ele => (ele.mos))
-                        }
-                        lineDates = response.data[0].map(ele => (ele.dt))
-                        planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
+                        console.log(JSON.stringify(response.data))*/
+                        // var lineData = [];
+                        // var lineDates = [];
+                        // var planningUnitlines = [];
+                        // for (var i = 0; i < response.data.length; i++) {
+                        //     lineData[i] = response.data[i].map(ele => (ele.mos))
+                        // }
+                        // lineDates = response.data[0].map(ele => (ele.dt))
+                        // planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
 
                         this.setState({
                             matricsList: response.data,
                             message: '',
-                            planningUnitlines: planningUnitlines,
-                            lineData: lineData,
-                            lineDates: lineDates
+                            // planningUnitlines: planningUnitlines,
+                            // lineData: lineData,
+                            // lineDates: lineDates
                         })
                     }).catch(
                         error => {
@@ -959,7 +969,8 @@ planningUnitIds.map(planningUnitId => {
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        this.state.planningUnitLabels.map(ele =>
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("monthsInPastForAmc").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("monthsInFutureForAmc").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
@@ -969,7 +980,7 @@ planningUnitIds.map(planningUnitId => {
         var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]]
 
 
-        this.state.matricsList.map(ele => ele.map(elt => A.push([elt.dt, ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, elt.amc, elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(elt => A.push([this.dateFormatter(elt.dt).replaceAll(' ','%20'), ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)]));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1046,15 +1057,16 @@ planningUnitIds.map(planningUnitId => {
                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("monthsInPastForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("monthsInPastForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("monthsInFutureForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("monthsInFutureForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
-                        align: 'left'
-                    })
+                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+          
+                   
 
                 }
 
@@ -1085,15 +1097,18 @@ planningUnitIds.map(planningUnitId => {
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(ele => ele.map(elt => data.push([elt.dt, getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
 
         let content = {
             margin: { top: 80 },
             startY: height,
             head: headers,
             body: data,
-            styles: { lineWidth: 1, fontSize: 8 }
-
+            styles: { lineWidth: 1, fontSize: 8 ,cellWidth: 75 },
+            columnStyles: {
+                1: { cellWidth: 151 },
+                2: { cellWidth: 160.89 },
+              }
         };
 
 
@@ -1164,12 +1179,13 @@ planningUnitIds.map(planningUnitId => {
             '#ffc107',
             '#f86c6b'
         ]
-        var v= this.state.planningUnitValues.map(pu=>this.state.matricsList.filter(c=>c.planningUnit.id==pu).map(ele=>(ele.mos)))
-       var dts=Array.from(new Set(this.state.matricsList.map(ele => (ele.dt))))
-console.log(dts)
+        console.log(this.state.matricsList)
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu).map(ele => (ele.mos)))
+        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
+        console.log(dts)
         const bar = {
             labels: dts,
-            datasets: this.state.planningUnitLabels.map((ele,index)=>({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele, data: v[index], borderColor: backgroundColor[index] }))
+            datasets: this.state.planningUnitLabels.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele, data: v[index], borderColor: backgroundColor[index] }))
             /*  [
              {
                    type: "line",
@@ -1282,8 +1298,8 @@ console.log(dts)
                                                         name="programId"
                                                         id="programId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.filterVersion();this.updateMonthsforAMCCalculations() }}
-                                                    
+                                                        onChange={(e) => { this.filterVersion(); this.updateMonthsforAMCCalculations() }}
+
 
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
@@ -1341,7 +1357,7 @@ console.log(dts)
                                                         id="monthsInPastForAmc"
                                                         bsSize="sm"
                                                         value={this.state.monthsInPastForAmc}
-                                                        onChange={(e) => {this.changeMonthsForamc(e)}}
+                                                        onChange={(e) => { this.changeMonthsForamc(e) }}
                                                     >
                                                         <option value="0">-</option>
                                                         <option value="1">{1}</option>
@@ -1369,7 +1385,7 @@ console.log(dts)
                                                         id="monthsInFutureForAmc"
                                                         bsSize="sm"
                                                         value={this.state.monthsInFutureForAmc}
-                                                        onChange={(e) => {this.changeMonthsForamc(e)}}
+                                                        onChange={(e) => { this.changeMonthsForamc(e) }}
                                                     >
                                                         <option value="0">-</option>
                                                         <option value="1">{1}</option>
@@ -1434,11 +1450,11 @@ console.log(dts)
                                         <tbody>
                                             {this.state.matricsList.length > 0
                                                 &&
-                                                this.state.matricsList.map(item => 
+                                                this.state.matricsList.map(item =>
 
                                                     <tr id="addr0" >
 
-                                                        <td>{item.dt}</td>
+                                                        <td>{this.dateFormatter(item.dt)}</td>
                                                         <td>
                                                             {getLabelText(item.program.label, this.state.lang)}
                                                         </td>
@@ -1452,7 +1468,7 @@ console.log(dts)
                                                             {this.formatter(item.consumptionQty)}
                                                         </td>
                                                         <td>
-                                                            {this.formatter(item.amc)}
+                                                            {this.formatter(this.formatAmc(item.amc))}
                                                         </td>
                                                         <td>
                                                             {this.formatter(item.amcMonthCount)}

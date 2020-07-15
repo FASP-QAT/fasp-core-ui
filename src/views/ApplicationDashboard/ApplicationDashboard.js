@@ -340,7 +340,7 @@ class ApplicationDashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-              <Carousel className='trustedMechCarousel' activeIndex={activeIndex} next={this.next} previous={this.previous}>
+              <Carousel className='trustedMechCarousel'  activeIndex={activeIndex} next={this.next} previous={this.previous}>
           <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
           {slides}
           {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
@@ -366,15 +366,15 @@ class ApplicationDashboard extends Component {
                       {/* <i className="icon-settings"></i> */}
                     </DropdownToggle>
                     <DropdownMenu right>
-                    <DropdownItem>View Realm List</DropdownItem>
-                      <DropdownItem>Add Realm List</DropdownItem>
+                    <DropdownItem>Realm List</DropdownItem>
+                      <DropdownItem>Add Realm</DropdownItem>
                      
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
               </div>
                
-                <div className="TextTittle ">TOTAL REALM </div>
+                <div className="TextTittle ">TOTAL REALMS </div>
                 <div className="text-count">03</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
