@@ -229,7 +229,7 @@ const routes = [
   { path: '/report/inventoryTurns',name: ' Inventory Turns',component: InventoryTurnsReport },
   { path: '/report/costOfInventory',name: ' Cost Of Inventory',component: CostOfInventoryReport },
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'Planning Unit List',component: PlanningUnitListNegativeInventory },
-  { path: '/pipeline/pieplineProgramList/:color/:message', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramList/:color/:message',name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramList',exact: true ,name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },

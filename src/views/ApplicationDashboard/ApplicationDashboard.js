@@ -383,7 +383,7 @@ class ApplicationDashboard extends Component {
             </Card>
           </Col>
 
-           <Col xs="12" sm="6" lg="3">
+           {/* <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
@@ -405,7 +405,7 @@ class ApplicationDashboard extends Component {
               </div>
               </CardBody>
             </Card>
-          </Col> 
+          </Col>  */}
          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">

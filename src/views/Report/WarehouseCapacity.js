@@ -1155,7 +1155,7 @@ class warehouseCapacity extends Component {
                                 <Col md="12 pl-0">
 
                                     <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
+                                        <div className="col-md-12">
 
                                             <Table id="mytable" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                 <thead>
