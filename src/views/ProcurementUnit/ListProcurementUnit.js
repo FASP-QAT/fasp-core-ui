@@ -35,16 +35,20 @@ export default class ListProcurementUnit extends Component {
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
   hideFirstComponent() {
-    setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+    this.timeout = setTimeout(function () {
+      document.getElementById('div1').style.display = 'none';
     }, 8000);
-}
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
+  }
 
-hideSecondComponent() {
+
+  hideSecondComponent() {
     setTimeout(function () {
-        document.getElementById('div2').style.display = 'none';
+      document.getElementById('div2').style.display = 'none';
     }, 8000);
-}
+  }
 
   filterData() {
     let planningUnitId = document.getElementById("planningUnitId").value;
@@ -73,7 +77,7 @@ hideSecondComponent() {
     this.hideFirstComponent();
     ProcurementUnitService.getProcurementUnitList().then(response => {
       if (response.status == 200) {
-        console.log("LIST-------",response.data);
+        console.log("LIST-------", response.data);
         this.setState({
           procurementUnitList: response.data,
           selProcurementUnit: response.data,
@@ -82,9 +86,9 @@ hideSecondComponent() {
       } else {
         this.setState({
           message: response.data.messageCode
-      },
+        },
           () => {
-              this.hideSecondComponent();
+            this.hideSecondComponent();
           })
       }
     })
@@ -221,13 +225,13 @@ hideSecondComponent() {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
             <div className="card-header-actions">
               <div className="card-header-action">
-              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
@@ -267,19 +271,19 @@ hideSecondComponent() {
                 props => (
                   <div>
                     <div className="TableCust listprocurementUnitAlignThtd" >
-                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                          <SearchBar {...props.searchProps} />
-                          <ClearSearchButton {...props.searchProps} />
-                        </div>
-                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                          pagination={paginationFactory(options)}
-                          rowEvents={{
-                            onClick: (e, row, rowIndex) => {
-                              this.editProcurementUnit(row);
-                            }
-                          }}
-                          {...props.baseProps}
-                        />
+                      <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                        <SearchBar {...props.searchProps} />
+                        <ClearSearchButton {...props.searchProps} />
+                      </div>
+                      <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                        pagination={paginationFactory(options)}
+                        rowEvents={{
+                          onClick: (e, row, rowIndex) => {
+                            this.editProcurementUnit(row);
+                          }
+                        }}
+                        {...props.baseProps}
+                      />
                     </div>
 
                   </div>

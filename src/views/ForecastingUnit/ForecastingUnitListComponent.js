@@ -44,10 +44,14 @@ export default class ForecastingUnitListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -197,7 +201,7 @@ export default class ForecastingUnitListComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         tracerCategories: response.data,
-                          loading: false
+                        loading: false
                     })
                 } else {
                     this.setState({
@@ -375,10 +379,10 @@ export default class ForecastingUnitListComponent extends Component {
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-addicon">
-                  {/* <i className="icon-menu"></i><strong> {i18n.t('static.common.listEntity', { entityname })}</strong> */}
+                        {/* <i className="icon-menu"></i><strong> {i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -484,7 +488,7 @@ export default class ForecastingUnitListComponent extends Component {
                         <div class="align-items-center">
                             <div ><h4> <strong>Loading...</strong></h4></div>
                             <div class="spinner-border blue ml-4" role="status">
-                         </div>
+                            </div>
                         </div>
                     </div>
                 </div>
