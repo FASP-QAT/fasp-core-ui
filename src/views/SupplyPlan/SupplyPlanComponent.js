@@ -2309,7 +2309,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     isEmergencyOrder = 0;
                                 } else {
                                     isEmergencyOrder = 1;
-                           
                                 }
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": m[s].startDate, "isEmergencyOrder": isEmergencyOrder });
                             }
@@ -2332,10 +2331,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 openingBalanceArray.push(closingBalance);
                             }
                         }
-                      
+                        console.log("totalExpiredStockArr", totalExpiredStockArr);
                         // Calculations for monthsOfStock
                         for (var s = 0; s < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; s++) {
-                      
                             if (closingBalanceArray[s] != 0 && amcTotalData[s] != 0 && closingBalanceArray[s] != "" && amcTotalData[s] != "") {
                                 var mos = parseFloat(closingBalanceArray[s] / amcTotalData[s]).toFixed(2);
                                 monthsOfStockArray.push(mos);
@@ -6297,8 +6295,8 @@ export default class SupplyPlanComponent extends React.Component {
                 <h5 className="red">{this.state.supplyPlanError}</h5>
 
                 <Card>
-                    <div className="Card-header-reporticon">
-                        {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
+                    <CardHeader>
+                        <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
                         <div className="card-header-actions">
 
                             <a className="card-header-action">
@@ -6306,8 +6304,8 @@ export default class SupplyPlanComponent extends React.Component {
                             </a>
 
                         </div>
-                    </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    </CardHeader>
+                    <CardBody>
                         <Formik
                             render={
                                 ({

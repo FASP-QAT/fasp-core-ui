@@ -223,6 +223,7 @@ const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('./view
 const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory= React.lazy(() => import('./views/Report/ExpiredInventory'));
+const Budgets= React.lazy(() => import('./views/Report/Budgets'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -467,6 +468,8 @@ const routes = [
   { path: '/report/shipmentSummery', exact: true, name:  i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name:  i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
+  { path: '/report/budgets', name:  i18n.t('static.dashboard.budgetheader'), component: Budgets },
+  
   
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
