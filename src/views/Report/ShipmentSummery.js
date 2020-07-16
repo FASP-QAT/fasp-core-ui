@@ -1037,7 +1037,6 @@ class ShipmentSummery extends Component {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
         this.state = {
             planningUnitValues: [],
@@ -1056,6 +1055,7 @@ class ShipmentSummery extends Component {
             productCategories: [],
             offlineProductCategoryList: [],
             show: false,
+            data: [],
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
