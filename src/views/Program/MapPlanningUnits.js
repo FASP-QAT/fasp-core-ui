@@ -5,6 +5,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class MapPlanningUnits extends Component {
     constructor(props) {
@@ -423,7 +424,13 @@ export default class MapPlanningUnits extends Component {
                                     allowDeleteRow: false,
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
-                                    copyCompatibility: true
+                                    copyCompatibility: true,
+                                    text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                        show: '',
+                                        entries: '',
+                                    },
+                                    onload: this.loaded,
 
                                 };
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
@@ -445,6 +452,11 @@ export default class MapPlanningUnits extends Component {
             });
 
     }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionWithoutPagination(instance);
+    }
+    
     myFunction() {
         var json = this.el.getJson();
         var planningUnitArray = []

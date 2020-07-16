@@ -824,10 +824,10 @@ export default class ExpiredInventory extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0">
-                        {/* <div className="TableCust" > */}
-                        {/* <div ref={ref}> */}
-                        <Form >
+                    {/* <CardBody className="pb-lg-0"> */}
+                    {/* <div className="TableCust" > */}
+                    {/* <div ref={ref}> */}
+                    {/* <Form >
                             <Col md="12 pl-0">
                                 <div className="d-md-flex Selectdiv2">
                                     <FormGroup className="tab-ml-1">
@@ -841,88 +841,106 @@ export default class ExpiredInventory extends Component {
                                                 lang={pickerLang}
                                                 //theme="light"
                                                 onChange={this.handleRangeChange}
-                                                onDismiss={this.handleRangeDissmis}
-                                            >
-                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                            </Picker>
-                                        </div>
+                                                onDismiss={this.handleRangeDissmis} */}
+                    <CardBody className="pb-lg-2 pt-lg-0">
+                        <div className="TableCust" >
+                            <div ref={ref}>
+                                {/* <Form > */}
+                                <Col md="12 pl-0">
+                                    <div className="row">
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                            <div className="controls edit">
 
-                                    </FormGroup>
-                                    <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls ">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    // onChange={this.getProductCategories}
-                                                    onChange={this.filterVersion}
-
+                                                <Picker
+                                                    ref="pickRange"
+                                                    years={{ min: 2013 }}
+                                                    value={rangeValue}
+                                                    lang={pickerLang}
+                                                    //theme="light"
+                                                    onChange={this.handleRangeChange}
+                                                    onDismiss={this.handleRangeDissmis}
                                                 >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {programList}
-                                                </Input>
+                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                </Picker>
+                                            </div>
 
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                        <div className="controls ">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="versionId"
-                                                    id="versionId"
-                                                    bsSize="sm"
-                                                    onChange={(e) => { this.fetchData(); }}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {versionList}
-                                                </Input>
+                                        </FormGroup>
+                                        <FormGroup className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="programId"
+                                                        id="programId"
+                                                        bsSize="sm"
+                                                        // onChange={this.getProductCategories}
+                                                        onChange={this.filterVersion}
 
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                            </Col>
-                        </Form>
-                        <ToolkitProvider
-                            keyField="id"
-                            data={this.state.outPutList}
-                            columns={columns}
-                            search={{ searchFormatted: true }}
-                            hover
-                            filter={filterFactory()}
-                        >
-                            {
-                                props => (
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {programList}
+                                                    </Input>
 
-                                    <div className="TableCust">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
-                                        </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(tabelOptions)}
-                                            /* rowEvents={{
-                                                 onClick: (e, row, rowIndex) => {
-                                                     this.editRegion(row);
-                                                 }
-                                             }}*/
-                                            {...props.baseProps}
-                                        />
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="tab-ml-1">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="versionId"
+                                                        id="versionId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData(); }}
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {versionList}
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
                                     </div>
-                                )
-                            }
-                        </ToolkitProvider>
-                        {/* </div> */}
-                        {/* </div> */}
+                                </Col>
+                        {/* </Form> */}
+                            <ToolkitProvider
+                                keyField="id"
+                                data={this.state.outPutList}
+                                columns={columns}
+                                search={{ searchFormatted: true }}
+                                hover
+                                filter={filterFactory()}
+                            >
+                                {
+                                    props => (
+
+                                        <div className="TableCust">
+                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                                <SearchBar {...props.searchProps} />
+                                                <ClearSearchButton {...props.searchProps} />
+                                            </div>
+                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                pagination={paginationFactory(tabelOptions)}
+                                                /* rowEvents={{
+                                                     onClick: (e, row, rowIndex) => {
+                                                         this.editRegion(row);
+                                                     }
+                                                 }}*/
+                                                {...props.baseProps}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            </ToolkitProvider>
+                             </div> 
+                             </div> 
                     </CardBody>
                 </Card>
             </div>
-        );
-    }
+                );
+            }
 }

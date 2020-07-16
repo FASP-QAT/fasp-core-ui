@@ -38,10 +38,14 @@ export default class DataSourceListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -114,9 +118,11 @@ export default class DataSourceListComponent extends Component {
         this.hideFirstComponent();
         ProgramService.getProgramList()
             .then(response => {
-                if (response.status == 200) { this.setState({
-                    programs: response.data, loading: false 
-                })}
+                if (response.status == 200) {
+                    this.setState({
+                        programs: response.data, loading: false
+                    })
+                }
 
                 else {
 
@@ -377,7 +383,7 @@ export default class DataSourceListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

@@ -245,8 +245,8 @@ class ForcastMatrixOverTime extends Component {
 
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.dashboard.country') + ' , ' + (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.version')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("versionId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
@@ -259,7 +259,7 @@ class ForcastMatrixOverTime extends Component {
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumptionDateString.replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError * 100) + '%'])
+      A.push([re[item].month.replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError * 100) + '%'])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -317,10 +317,10 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
@@ -351,7 +351,7 @@ class ForcastMatrixOverTime extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
     const headers = [[i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
-    const data = this.state.matricsList.map(elt => [elt.consumptionDateString, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.roundN(elt.forecastError * 100) + '%']);
+    const data = this.state.matricsList.map(elt => [elt.month, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.roundN(elt.forecastError * 100) + '%']);
 
     let content = {
       margin: { top: 80 },
@@ -734,7 +734,7 @@ class ForcastMatrixOverTime extends Component {
                 }
                 console.log('absvalue',absvalue,' actualconsumption',actualconsumption)
                 var json = {
-                  consumptionDateString: moment(new Date(from, month - 1)).format('MMM YY'),
+                  month: moment(new Date(from, month - 1)).format('MMM YY'),
                   actualConsumption: actualconsumption,
                   forecastedConsumption: forcastConsumption,
                   forecastError: absvalue / actualconsumption
@@ -876,7 +876,7 @@ class ForcastMatrixOverTime extends Component {
 
     const bar = {
 
-      labels: this.state.matricsList.map((item, index) => (item.consumptionDateString)),
+      labels: this.state.matricsList.map((item, index) => (item.month)),
       datasets: [
         {
           type: "line",
@@ -929,7 +929,7 @@ class ForcastMatrixOverTime extends Component {
                   }
               
                 </div>
-              <CardBody className="pb-lg-0 pt-lg-0">
+              <CardBody className="pb-lg-2 pt-lg-0">
                 <div className="TableCust" >
                   <div ref={ref}>
                     <Form >
@@ -1101,7 +1101,7 @@ class ForcastMatrixOverTime extends Component {
 
                                     <tr id="addr0" key={idx} >
 
-                                      <td>{this.state.matricsList[idx].consumptionDateString}</td>
+                                      <td>{this.state.matricsList[idx].month}</td>
                                       <td>
 
                                         {this.formatter(this.state.matricsList[idx].forecastedConsumption)}

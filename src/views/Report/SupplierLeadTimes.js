@@ -1165,7 +1165,9 @@ class SupplierLeadTimes extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                       
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
@@ -1179,7 +1181,9 @@ class SupplierLeadTimes extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
+                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
+                                        
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
