@@ -1295,6 +1295,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1706,18 +1707,14 @@ class ShipmentGlobalView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        doc.addImage(canvasImg, 'png', 50, 240, 400, 300, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 240, 200, 150, 'CANVAS');
 
         //creates image2
-        // var canvas = document.getElementById("cool-canvas2");
+        canvas = document.getElementById("cool-canvas2");
 
-        // var canvasImg = canvas.toDataURL("image/png", 1.0);
-        // var width = doc.internal.pageSize.width;
-        // var height = doc.internal.pageSize.height;
-        // var h1 = 50;
-        // var aspectwidth1 = (width - h1);
-        // doc.addImage(canvasImg, 'png', 100, 1000, 400, 300, 'CANVAS');
-        console.log("HEIGHT-1-", height);
+        canvasImg = canvas.toDataURL("image/png", 1.0);
+        doc.addImage(canvasImg, 'png', width / 2, 240, 200, 150, 'CANVAS');
+
         let content1 = {
             margin: { top: 40 },
             margin: { left: 100 },
@@ -1928,7 +1925,9 @@ class ShipmentGlobalView extends Component {
             PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
                 this.setState({
                     planningUnits: response.data,
-                })
+                }, () => {
+                    this.fetchData()
+                });
             })
                 .catch(
                     error => {
@@ -1984,7 +1983,7 @@ class ShipmentGlobalView extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+
         this.getCountrys();
         this.getProductCategories();
         this.getProcurementAgent();
@@ -2163,7 +2162,7 @@ class ShipmentGlobalView extends Component {
             })
             let realmId = AuthenticationService.getRealmId();
             var inputjson = {
-                realmId: realmId,
+                realmId: 1,
                 startDate: new moment(startDate),
                 stopDate: new moment(endDate),
                 realmCountryIds: CountryIds,
@@ -2226,43 +2225,78 @@ class ShipmentGlobalView extends Component {
                         // console.log("DATA--1---", this.state.table1Headers);
                         // console.log("DATA---2--", this.state.table1Body);
                     })
-                }).catch(
-                    error => {
-                        this.setState({
-                            data: ''
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
+                })
 
 
 
         } else if (CountryIds.length == 0) {
-            this.setState({ message: i18n.t('static.program.validcountrytext'), data: '' });
+            this.setState({
+                message: i18n.t('static.program.validcountrytext'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
 
         } else if (productCategoryId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProductCategory'), data: '' });
+            this.setState({
+                message: i18n.t('static.common.selectProductCategory'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
 
         } else if (planningUnitId == 0) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: '' });
+            this.setState({
+                message: i18n.t('static.procurementUnit.validPlanningUnitText'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
 
-        } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: '' });
+        } else if (viewby == 1 && fundingSourceIds.length == 0) {
+            this.setState({
+                message: i18n.t('static.fundingSource.selectFundingSource'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
+        } else if (viewby == 2 && procurementAgentIds.length == 0) {
+            this.setState({
+                message: i18n.t('static.report.procurementAgent'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
 
         }
 
@@ -2424,6 +2458,9 @@ class ShipmentGlobalView extends Component {
 
         return (
             <div className="animated fadeIn" >
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
 
@@ -2597,20 +2634,24 @@ class ShipmentGlobalView extends Component {
                             <Col md="12 pl-0">
                                 <div className="row grid-divider">
                                     {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                    <div className="col-md-6">
-                                        <div className="chart-wrapper chart-graph-report">
-                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                            <Bar id="cool-canvas1" data={bar} options={options} />
+                                    {this.state.countryShipmentSplitList.length > 0 &&
+                                        <div className="col-md-6">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                <Bar id="cool-canvas1" data={bar} options={options} />
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                     {/* </div> */}
                                     {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                    <div className="col-md-6">
-                                        <div className="chart-wrapper chart-graph-report">
-                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                            <Bar id="cool-canvas2" data={bar1} options={options1} />
+                                    {this.state.dateSplitList.length > 0 &&
+                                        <div className="col-md-6">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                <Bar id="cool-canvas2" data={bar1} options={options1} />
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                     {/* </div> */}
                                     {/* <Col md="12 pl-0"> */}
                                     {/* <div className="chart-wrapper">
