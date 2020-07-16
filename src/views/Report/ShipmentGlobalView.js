@@ -1707,18 +1707,17 @@ class ShipmentGlobalView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        doc.addImage(canvasImg, 'png', 50, 240, 200, 150, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 240, 300, 200, 'a', 'CANVAS');
 
         //creates image2
         canvas = document.getElementById("cool-canvas2");
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg, 'png', width / 2, 240, 200, 150, 'CANVAS');
+        doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
 
         let content1 = {
-            margin: { top: 40 },
-            margin: { left: 100 },
-            startY: height,
+            margin: { top: 80, left: 100 },
+            startY: height + 90,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
@@ -1739,13 +1738,12 @@ class ShipmentGlobalView extends Component {
                 }
             }
         };
-        var height = doc.internal.pageSize.height;
-        console.log("HEIGHT-2-", height);
+        doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 40 },
-            margin: { left: 100 },
-            startY: height,
+            margin: { top: 80, left: 100 },
+            startY: doc.autoTableEndPosY() + 50,
+            pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
@@ -1768,7 +1766,7 @@ class ShipmentGlobalView extends Component {
         };
 
         //doc.text(title, marginLeft, 40);
-        doc.autoTable(content1);
+
         doc.autoTable(content2);
         addHeaders(doc)
         addFooters(doc)
