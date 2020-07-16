@@ -955,7 +955,8 @@
     "static.report.min": "Min",
     "static.report.reorderFrequencyInMonths": "Reorder Frequency",
     "static.report.shelfLife":"Shelf Life (Months)",
-    "static.report.procurementAgentName":"Procurement Agent"
+    "static.report.procurementAgentName":"Procurement Agent",
+    "static.dataEntry.batchDetails":"Batch Details"
 
     
 }

@@ -6,6 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
 
 export default class PipelineProgramConsumption extends Component {
 

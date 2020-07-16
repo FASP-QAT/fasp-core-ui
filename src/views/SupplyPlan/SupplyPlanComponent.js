@@ -11,7 +11,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -28,6 +28,7 @@ import "jspdf-autotable";
 import csvicon from '../../assets/img/csv.png'
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationService from "../Common/AuthenticationService";
+import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -1072,7 +1073,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.region.id == -1).map(item1 => {
                                                 if (item1.adjustmentQty.toString() != '') {
-                                                    return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
+                                                    return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
                                                 } else {
                                                     return (<td align="right"></td>)
                                                 }
@@ -1231,7 +1232,6 @@ export default class SupplyPlanComponent extends React.Component {
         var regionList = [];
         var dataSourceList = [];
         var dataSourceListAll = [];
-        var programPlanningUnitListAll = []
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onerror = function (event) {
             this.setState({
@@ -1326,7 +1326,6 @@ export default class SupplyPlanComponent extends React.Component {
                                 regionList: regionList,
                                 programJson: programJson,
                                 dataSourceListAll: dataSourceListAll,
-                                programPlanningUnitListAll: planningList,
                                 planningUnitListForConsumption: planningUnitListForConsumption
                             })
                         }.bind(this);
@@ -1452,9 +1451,9 @@ export default class SupplyPlanComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 console.log("ProgramJson", programJson);
-                var monthsInPastForAMC = programJson.monthsInPastForAmc;
-                var monthsInFutureForAMC = programJson.monthsInFutureForAmc;
-                var shelfLife = this.state.programPlanningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].shelfLife;
+                var shelfLife = programPlanningUnit.shelfLife;
+                var monthsInPastForAMC = programPlanningUnit.monthsInPastForAmc;
+                var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
                 this.setState({
                     shelfLife: shelfLife,
                     versionId: programJson.currentVersion.versionId
@@ -2520,7 +2519,15 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentBatchInfoDuplicateError: '',
             inventoryNoStockError: '',
             consumptionNoStockError: '',
-            noFundsBudgetError: ''
+            noFundsBudgetError: '',
+            consumptionBatchInfoChangedFlag: 0,
+            inventoryBatchInfoChangedFlag: 0,
+            consumptionChangedFlag: 0,
+            inventoryChangedFlag: 0,
+            budgetChangedFlag: 0,
+            shipmentBatchInfoChangedFlag: 0,
+            shipmentChangedFlag: 0,
+            suggestedShipmentChangedFlag: 0
 
         })
         if (supplyPlanType == 'Consumption') {
@@ -3267,6 +3274,7 @@ export default class SupplyPlanComponent extends React.Component {
         })
     }.bind(this)
 
+
     checkValidationConsumptionBatchInfo() {
         var valid = true;
         var elInstance = this.state.consumptionBatchInfoTableEl;
@@ -3828,11 +3836,23 @@ export default class SupplyPlanComponent extends React.Component {
                         this.setState({
                             inventoryListUnFiltered: inventoryListUnFiltered
                         })
-                        var inventoryList = (programJson.inventoryList).filter(c =>
-                            c.planningUnit.id == planningUnitId &&
-                            c.region != null &&
-                            c.region.id == region &&
-                            moment(c.inventoryDate).format("MMM YY") == month);
+                        var inventoryList = [];
+                        var isInventoryEditable = true;
+                        // Region null calculation
+                        if (region != -1) {
+                            inventoryList = (programJson.inventoryList).filter(c =>
+                                c.planningUnit.id == planningUnitId &&
+                                c.region != null &&
+                                c.region.id == region &&
+                                moment(c.inventoryDate).format("MMM YY") == month);
+                            isInventoryEditable = true;
+                        } else {
+                            inventoryList = (programJson.inventoryList).filter(c =>
+                                c.planningUnit.id == planningUnitId &&
+                                c.region == null &&
+                                moment(c.inventoryDate).format("MMM YY") == month);
+                            isInventoryEditable = false;
+                        }
                         this.el = jexcel(document.getElementById("adjustmentsTable"), '');
                         this.el.destroy();
                         var data = [];
@@ -3866,7 +3886,11 @@ export default class SupplyPlanComponent extends React.Component {
 
                             data = [];
                             data[0] = month; //A
-                            data[1] = inventoryList[j].region.id; //B
+                            if (region != -1) {
+                                data[1] = inventoryList[j].region.id; //B
+                            } else {
+                                data[1] = "";
+                            }
                             data[2] = inventoryList[j].dataSource.id; //C
                             data[3] = inventoryList[j].realmCountryPlanningUnit.id; //D
                             data[4] = inventoryList[j].multiplier; //E
@@ -3884,7 +3908,11 @@ export default class SupplyPlanComponent extends React.Component {
                             } else {
                                 data[11] = inventoryList[j].notes;
                             }
-                            data[12] = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == region && moment(c.inventoryDate).format("MMM YY") == month && c.inventoryDate == inventoryList[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id);
+                            if (region != -1) {
+                                data[12] = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == region && moment(c.inventoryDate).format("MMM YY") == month && c.inventoryDate == inventoryList[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id);
+                            } else {
+                                data[12] = 0;
+                            }
                             data[13] = inventoryList[j].active;
                             data[14] = endDate;
                             data[15] = inventoryList[j].batchInfoList;
@@ -3948,6 +3976,7 @@ export default class SupplyPlanComponent extends React.Component {
                             allowManualInsertRow: false,
                             onchange: this.inventoryChanged,
                             oneditionend: this.inventoryOnedit,
+                            editable: isInventoryEditable,
                             text: {
                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                 show: '',
@@ -3965,22 +3994,18 @@ export default class SupplyPlanComponent extends React.Component {
                                     var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
                                     cell.classList.add('readonly');
                                 } else {
-                                    var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
-                                    cell.classList.remove('readonly');
-                                    var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                    cell.classList.remove('readonly');
-                                }
-                                var adjustmentType = rowData[5];
-                                if (adjustmentType == 1) {
-                                    var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
-                                    cell.classList.add('readonly');
-                                    var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                    cell.classList.remove('readonly');
-                                } else {
-                                    var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                    cell.classList.add('readonly');
-                                    var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
-                                    cell.classList.remove('readonly');
+                                    var adjustmentType = rowData[5];
+                                    if (adjustmentType == 1) {
+                                        var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
+                                        cell.classList.add('readonly');
+                                        var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                        cell.classList.remove('readonly');
+                                    } else {
+                                        var cell = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                        cell.classList.add('readonly');
+                                        var cell = elInstance.getCell(`H${parseInt(y) + 1}`)
+                                        cell.classList.remove('readonly');
+                                    }
                                 }
                             }.bind(this),
                             contextMenu: function (obj, x, y, e) {
@@ -5185,7 +5210,7 @@ export default class SupplyPlanComponent extends React.Component {
                         for (var i = 0; i < invList.length; i++) {
                             regionWiseInventoryCount += 1;
                             if (invList[i].actualQty != "" && invList[i].actualQty != null) {
-                                actualQty += parseFloat(invList[i].actualQty);
+                                actualQty += parseFloat(invList[i].actualQty) * parseFloat(invList[i].multiplier);
                                 actualQtyCount += 1;
                             }
                             if (invList[i].adjustmentQty != "" && invList[i].adjustmentQty != null) {
@@ -5197,6 +5222,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var index = this.state.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
                             var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]);
                             var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
+                            nationalAdjustment = Math.round(parseFloat(nationalAdjustment) / parseFloat(map.get("4")));
                             if (nationalAdjustment != 0) {
                                 var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
                                 if (nationAdjustmentIndex == -1) {
@@ -5217,7 +5243,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         planningUnit: {
                                             id: planningUnitId
                                         },
-                                        notes: "",
+                                        notes: NOTES_FOR_QAT_ADJUSTMENTS,
                                         batchInfoList: []
                                     }
                                     inventoryDataList.push(inventoryJson);
@@ -6169,15 +6195,13 @@ export default class SupplyPlanComponent extends React.Component {
     filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[3];
-        var date = moment((instance.jexcel.getJson()[r])[0]).format("YYYY-MM-DD");
-        mylist=mylist.filter(c.id==-1);
         console.log("Value", value);
         if (value != 0) {
             mylist = this.state.batchInfoList.filter(c => c.id != -1);
         } else {
             mylist = this.state.batchInfoList;
         }
-        
+
         return mylist;
     }.bind(this)
 
@@ -6904,7 +6928,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         // Add shipment batch info
                                                         var rowData = obj.getRowData(y);
                                                         var expectedDeliveryDate = moment(rowData[0]).format("YYYY-MM-DD");
-                                                        var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').format("YYYY-MM-DD");
+                                                        var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                         var readOnlyBatchInfo = false;
                                                         if (rowData[38] != DELIVERED_SHIPMENT_STATUS) {
                                                             readOnlyBatchInfo = true
@@ -7436,7 +7460,12 @@ export default class SupplyPlanComponent extends React.Component {
                 if (map.get("0") != "") {
                     batchNo = map.get("0");
                 } else {
-                    batchNo = "QAT".concat(rowData[34]).concat(this.state.versionId).concat(AuthenticationService.getLoggedInUserId());
+                    var programId = (document.getElementById("programId").value).split("_")[0];
+                    var planningUnitId = document.getElementById("planningUnitId").value;
+                    programId = paddingZero(programId, 0, 6);
+                    planningUnitId = paddingZero(planningUnitId, 0, 8);
+                    batchNo = (programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                    console.log("BatchNo", batchNo);
                 }
                 var batchInfoJson = {
                     shipmentTransBatchInfoId: map.get("3"),
@@ -8130,9 +8159,11 @@ export default class SupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("37"))].deliveredDate = moment(Date.now()).format("YYYY-MM-DD");
                             var shipmentBatchInfoList = map.get("43");
                             if (shipmentBatchInfoList.length == 0) {
-                                var batchNo = "QAT".concat(map.get("37")).concat(this.state.versionId).concat(AuthenticationService.getLoggedInUserId());
+                                var programId = (document.getElementById("programId").value).split("_")[0];
+                                var planningUnitId = document.getElementById("planningUnitId").value;
+                                var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                 var expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
-                                var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').format("YYYY-MM-DD");
+                                var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                 var batchInfoJson = {
                                     shipmentTransBatchInfoId: 0,
                                     batch: {
