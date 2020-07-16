@@ -2,7 +2,8 @@ import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
 import jexcel from 'jexcel';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, 
+    InputGroup, InputGroupAddon, Label,Modal,ModalBody,ModalFooter,ModalHeader } from 'reactstrap';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
