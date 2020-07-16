@@ -34,10 +34,14 @@ class FundingSourceListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -115,7 +119,7 @@ class FundingSourceListComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("RESP----",response.data);
+                    console.log("RESP----", response.data);
                     this.setState({
                         fundingSourceList: response.data,
                         selSource: response.data
@@ -188,13 +192,13 @@ class FundingSourceListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'fundingSourceCode',
             text: i18n.t('static.fundingsource.fundingsourceCode'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
-        },{
+        }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,
@@ -244,7 +248,7 @@ class FundingSourceListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>

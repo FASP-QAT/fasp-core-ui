@@ -34,10 +34,14 @@ export default class HealthAreaListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -165,7 +169,7 @@ export default class HealthAreaListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        }, 
+        },
         {
             dataField: 'label',
             text: i18n.t('static.healthArea.healthAreaName'),
@@ -173,14 +177,14 @@ export default class HealthAreaListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        }, 
+        },
         {
             dataField: 'healthAreaCode',
             text: 'Technical Area Code',
             sort: true,
             align: 'center',
             headerAlign: 'center',
-        }, 
+        },
         {
             dataField: 'active',
             text: i18n.t('static.common.status'),

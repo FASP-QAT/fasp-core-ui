@@ -39,16 +39,19 @@ export default class ProgramList extends Component {
 
   }
   hideFirstComponent() {
-    setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+    this.timeout = setTimeout(function () {
+      document.getElementById('div1').style.display = 'none';
     }, 8000);
-}
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
+  }
 
-hideSecondComponent() {
+  hideSecondComponent() {
     setTimeout(function () {
-        document.getElementById('div2').style.display = 'none';
+      document.getElementById('div2').style.display = 'none';
     }, 8000);
-}
+  }
 
 
   filterData() {
@@ -74,7 +77,7 @@ hideSecondComponent() {
     }
   }
   componentDidMount() {
-    console.log("props--------------------",this.props);
+    console.log("props--------------------", this.props);
     AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
     ProgramService.getProgramList().then(response => {
@@ -86,11 +89,11 @@ hideSecondComponent() {
         })
       } else {
         this.setState({
-            message: response.data.messageCode
+          message: response.data.messageCode
         },
-            () => {
-                this.hideSecondComponent();
-            })
+          () => {
+            this.hideSecondComponent();
+          })
       }
     })
 
@@ -247,9 +250,9 @@ hideSecondComponent() {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-       <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-        <Card  style={{ display: this.state.loading ? "none" : "block" }}>
+        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
             <div className="card-header-actions">
