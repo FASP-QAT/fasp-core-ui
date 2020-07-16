@@ -1577,9 +1577,9 @@ class ShipmentGlobalView extends Component {
 
         if (this.state.shipmentList.length > 0) {
             let tempLabel = '';
-            if(viewby == 1){
+            if (viewby == 1) {
                 tempLabel = i18n.t('static.budget.fundingsource');
-            }else{
+            } else {
                 tempLabel = i18n.t('static.procurementagent.procurementagent');
             }
             var B = [[i18n.t('static.dashboard.months'), i18n.t('static.program.realmcountry'), i18n.t('static.supplyPlan.amountInUSD'), tempLabel, i18n.t('static.common.status')]];
@@ -2161,9 +2161,9 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: ''
             })
-
+            let realmId = AuthenticationService.getRealmId();
             var inputjson = {
-                realmId: 1,
+                realmId: realmId,
                 startDate: new moment(startDate),
                 stopDate: new moment(endDate),
                 realmCountryIds: CountryIds,
