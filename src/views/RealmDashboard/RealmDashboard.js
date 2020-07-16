@@ -250,7 +250,7 @@ class RealmDashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-              <Carousel className='trustedMechCarousel' activeIndex={activeIndex} next={this.next} previous={this.previous}>
+              <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
           <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
           {slides}
           {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> */}
@@ -447,7 +447,7 @@ class RealmDashboard extends Component {
             </Card>
           </Col> 
 
-          <Col xs="12" sm="6" lg="3">
+          {/* <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
@@ -470,7 +470,7 @@ class RealmDashboard extends Component {
                 </div>
               </CardBody>
             </Card>
-          </Col> 
+          </Col>  */}
 
 
         </Row>

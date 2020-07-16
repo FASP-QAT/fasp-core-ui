@@ -1316,7 +1316,7 @@ class ProductCatalog extends Component {
 
                         </div>}
                     </div>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-2">
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >

@@ -876,7 +876,7 @@ class ForecastMetrics extends Component {
               </a>
             </div>}
           </div>
-          <CardBody className="pb-lg-0 pt-lg-0">
+          <CardBody className="pb-lg-2 pt-lg-0">
             <div ref={ref}>
 
               <Form >
