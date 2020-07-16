@@ -259,7 +259,7 @@ class ForcastMatrixOverTime extends Component {
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumptionDateString.replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError * 100) + '%'])
+      A.push([re[item].month.replaceAll(' ', '%20'), re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError * 100) + '%'])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -351,7 +351,7 @@ class ForcastMatrixOverTime extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
     const headers = [[i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
-    const data = this.state.matricsList.map(elt => [elt.consumptionDateString, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.roundN(elt.forecastError * 100) + '%']);
+    const data = this.state.matricsList.map(elt => [elt.month, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.roundN(elt.forecastError * 100) + '%']);
 
     let content = {
       margin: { top: 80 },
@@ -734,7 +734,7 @@ class ForcastMatrixOverTime extends Component {
                 }
                 console.log('absvalue',absvalue,' actualconsumption',actualconsumption)
                 var json = {
-                  consumptionDateString: moment(new Date(from, month - 1)).format('MMM YY'),
+                  month: moment(new Date(from, month - 1)).format('MMM YY'),
                   actualConsumption: actualconsumption,
                   forecastedConsumption: forcastConsumption,
                   forecastError: absvalue / actualconsumption
@@ -876,7 +876,7 @@ class ForcastMatrixOverTime extends Component {
 
     const bar = {
 
-      labels: this.state.matricsList.map((item, index) => (item.consumptionDateString)),
+      labels: this.state.matricsList.map((item, index) => (item.month)),
       datasets: [
         {
           type: "line",
@@ -1101,7 +1101,7 @@ class ForcastMatrixOverTime extends Component {
 
                                     <tr id="addr0" key={idx} >
 
-                                      <td>{this.state.matricsList[idx].consumptionDateString}</td>
+                                      <td>{this.state.matricsList[idx].month}</td>
                                       <td>
 
                                         {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
