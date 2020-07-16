@@ -1496,14 +1496,22 @@ class ShipmentGlobalView extends Component {
             message: '',
             fundingSourceValues: [],
             procurementAgentValues: [],
-            data: [
-                {
-                    shipmentList: [],
-                    dateSplitList: [],
-                    countrySplitList: [],
-                    countryShipmentSplitList: []
-                }
-            ],
+            shipmentList: [],
+            dateSplitList: [],
+            countrySplitList: [],
+            countryShipmentSplitList: [],
+            data:
+            {
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: []
+            },
+            lab: [],
+            val: [],
+            table1Body: [],
+            table1Headers: [],
+            viewby: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -1533,32 +1541,62 @@ class ShipmentGlobalView extends Component {
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
         this.state.countryLabels.map(ele =>
             csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        this.state.programLabels.map(ele =>
-            csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        this.state.planningUnitLabels.map(ele =>
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        var viewby = document.getElementById("viewById").value;
+        csvRow.push((i18n.t('static.common.display')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+
+        if (viewby == 1) {
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push((i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        } else {
+            this.state.procurementAgentLabels.map(ele =>
+                csvRow.push((i18n.t('static.procurementagent.procurementagent')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        }
+
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
         var re;
 
-        var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
-
-        re = this.state.consumptions
-
-        for (var item = 0; item < re.length; item++) {
-            A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
+        if (this.state.table1Body.length > 0) {
+            var A = [];
+            A[0] = this.state.table1Headers;
+            re = this.state.table1Body
+            for (var item = 0; item < re.length; item++) {
+                A.push([[getLabelText(re[item].country.label, this.state.lang), re[item].amount]])
+            }
+            for (var i = 0; i < A.length; i++) {
+                csvRow.push(A[i].join(","))
+            }
         }
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('')
+
+        if (this.state.shipmentList.length > 0) {
+            let tempLabel = '';
+            if(viewby == 1){
+                tempLabel = i18n.t('static.budget.fundingsource');
+            }else{
+                tempLabel = i18n.t('static.procurementagent.procurementagent');
+            }
+            var B = [[i18n.t('static.dashboard.months'), i18n.t('static.program.realmcountry'), i18n.t('static.supplyPlan.amountInUSD'), tempLabel, i18n.t('static.common.status')]];
+            re = this.state.shipmentList;
+            for (var item = 0; item < re.length; item++) {
+                B.push([[moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY'), getLabelText(re[item].country.label, this.state.lang), re[item].amount, getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang), getLabelText(re[item].shipmentStatus.label, this.state.lang)]])
+            }
+            for (var i = 0; i < B.length; i++) {
+                csvRow.push(B[i].join(","))
+            }
         }
+
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.globalconsumption') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.dashboard.shipmentGlobalViewheader') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1578,7 +1616,6 @@ class ShipmentGlobalView extends Component {
         }
         return x1 + x2;
     }
-
 
 
     exportPDF = () => {
@@ -1606,44 +1643,47 @@ class ShipmentGlobalView extends Component {
 
             const pageCount = doc.internal.getNumberOfPages()
 
-
-            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-            // var reader = new FileReader();
-
-            //var data='';
-            // Use fs.readFile() method to read the file 
-            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-            //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-                /*doc.addImage(data, 10, 30, {
-                  align: 'justify'
-                });*/
+
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.globalconsumption'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.shipmentGlobalViewheader'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
+
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 110, planningText)
 
-                    planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
 
-                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
+                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
-                    doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
+                    var viewby = document.getElementById("viewById").value;
+                    if (viewby == 1) {
+                        var planningText = doc.splitTextToSize(i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+                    } else {
+                        var planningText = doc.splitTextToSize(i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+                    }
+
                 }
 
             }
@@ -1657,42 +1697,92 @@ class ShipmentGlobalView extends Component {
 
         doc.setFontSize(10);
 
-        const title = "Consumption Report";
-        var canvas = document.getElementById("cool-canvas");
-        //creates image
+        //creates image1
+        const title = "Global Demand - Single Product";
+        var canvas = document.getElementById("cool-canvas1");
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
+        doc.addImage(canvasImg, 'png', 50, 240, 400, 300, 'CANVAS');
 
-        doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
+        //creates image2
+        // var canvas = document.getElementById("cool-canvas2");
 
-        const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
-        const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
-
-        let content = {
-            margin: { top: 80 },
+        // var canvasImg = canvas.toDataURL("image/png", 1.0);
+        // var width = doc.internal.pageSize.width;
+        // var height = doc.internal.pageSize.height;
+        // var h1 = 50;
+        // var aspectwidth1 = (width - h1);
+        // doc.addImage(canvasImg, 'png', 100, 1000, 400, 300, 'CANVAS');
+        console.log("HEIGHT-1-", height);
+        let content1 = {
+            margin: { top: 40 },
+            margin: { left: 100 },
             startY: height,
-            head: headers,
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 100 },
+                // 1: { cellWidth: 100 },
+                // 2: { cellWidth: 200 },
+                // 3: { cellWidth: 100 },
+                // 4: { cellWidth: 100 },
+            },
+            html: '#mytable1',
 
+            didDrawCell: function (data) {
+                if (data.column.index === 9 && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var img = td.getElementsByTagName('img')[0];
+                    var dim = data.cell.height - data.cell.padding('vertical');
+                    var textPos = data.cell.textPos;
+                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+                }
+            }
+        };
+        var height = doc.internal.pageSize.height;
+        console.log("HEIGHT-2-", height);
+
+        let content2 = {
+            margin: { top: 40 },
+            margin: { left: 100 },
+            startY: height,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 100 },
+                // 1: { cellWidth: 100 },
+                // 2: { cellWidth: 200 },
+                // 3: { cellWidth: 100 },
+                // 4: { cellWidth: 100 },
+            },
+            html: '#mytable2',
+
+            didDrawCell: function (data) {
+                if (data.column.index === 5 && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var img = td.getElementsByTagName('img')[0];
+                    var dim = data.cell.height - data.cell.padding('vertical');
+                    var textPos = data.cell.textPos;
+                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+                }
+            }
         };
 
-
         //doc.text(title, marginLeft, 40);
-        doc.autoTable(content);
+        doc.autoTable(content1);
+        doc.autoTable(content2);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("GlobalConsumption.pdf")
+        doc.save("GlobalDemandSingleProduct.pdf")
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
           doc.text(15, 15, "Cool Chart");
           doc.save('canvas.pdf');*/
     }
+
 
     handleChange(countrysId) {
 
@@ -2058,13 +2148,13 @@ class ShipmentGlobalView extends Component {
         } else {
             fundingSourceProcurementAgentIds = fundingSourceIds;
         }
-        console.log("planningUnitId-------", planningUnitId);
-        console.log("productCategoryId------", productCategoryId);
-        console.log("CountryIds-----", CountryIds);
-        console.log("procurementAgentIds----", procurementAgentIds);
-        console.log("viewby-----", viewby);
-        console.log("startDate-----", startDate);
-        console.log("endDate-----", endDate);
+        // console.log("planningUnitId-------", planningUnitId);
+        // console.log("productCategoryId------", productCategoryId);
+        // console.log("CountryIds-----", CountryIds);
+        // console.log("procurementAgentIds----", procurementAgentIds);
+        // console.log("viewby-----", viewby);
+        // console.log("startDate-----", startDate);
+        // console.log("endDate-----", endDate);
 
         if (planningUnitId != 0 && productCategoryId != -1 && CountryIds.length > 0 && ((viewby == 2 && procurementAgentIds.length > 0) || (viewby == 1 && fundingSourceIds.length > 0))) {
 
@@ -2088,40 +2178,58 @@ class ShipmentGlobalView extends Component {
                     console.log("RESP------", response.data);
 
                     var table1Headers = [];
+                    var lab = [];
+                    var val = [];
                     var table1Body = [];
 
                     table1Headers = Object.keys(response.data.countrySplitList[0].amount);
+                    lab = Object.keys(response.data.dateSplitList[0].amount);
                     table1Headers.unshift("Country");
+
+
+                    for (var i = 0; i < response.data.dateSplitList.length; i++) {
+                        let temp = Object.values(response.data.dateSplitList[i].amount)
+                        val.push(temp);
+                    }
+
 
                     for (var item = 0; item < response.data.countrySplitList.length; item++) {
                         let obj = {
                             country: response.data.countrySplitList[item].country,
-                            amount: Object.values(response.data.countrySplitList[item].amount)
+                            amount: Object.values(response.data.countrySplitList[item].amount),
                         }
                         table1Body.push(obj);
                     }
 
-                    var temp = [];
-                    temp[0] = response.data;
+
+
+
+
                     this.setState({
-                        data: temp,
-                        table1Headers: table1Headers,
-                        table1Body: table1Body,
+                        data: response.data,
                         shipmentList: response.data.shipmentList,
                         dateSplitList: response.data.dateSplitList,
                         countrySplitList: response.data.countrySplitList,
                         countryShipmentSplitList: response.data.countryShipmentSplitList,
-
-
+                        table1Headers: table1Headers,
+                        table1Body: table1Body,
+                        lab: lab,
+                        val: val
                     }, () => {
-                        console.log("TEMP-----", temp);
+                        console.log("shipmentList-----", this.state.shipmentList);
+                        console.log("dateSplitList-----", this.state.dateSplitList);
+                        console.log("countrySplitList-----", this.state.countrySplitList);
+                        console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
+
+                        // console.log("labels---", this.state.labels);
+                        // console.log("values---", this.state.values);
                         // console.log("DATA--1---", this.state.table1Headers);
                         // console.log("DATA---2--", this.state.table1Body);
                     })
                 }).catch(
                     error => {
                         this.setState({
-                            data: []
+                            data: ''
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -2145,16 +2253,16 @@ class ShipmentGlobalView extends Component {
 
 
         } else if (CountryIds.length == 0) {
-            this.setState({ message: i18n.t('static.program.validcountrytext'), data: [] });
+            this.setState({ message: i18n.t('static.program.validcountrytext'), data: '' });
 
         } else if (productCategoryId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProductCategory'), data: [] });
+            this.setState({ message: i18n.t('static.common.selectProductCategory'), data: '' });
 
         } else if (planningUnitId == 0) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: '' });
 
         } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: '' });
 
         }
 
@@ -2254,36 +2362,64 @@ class ShipmentGlobalView extends Component {
             return '?'
         }
 
-        let bar = "";
-        console.log(this.state.data[0].countrySplitList);
-        if (this.state.data[0].countrySplitList.length > 0) {
-            bar = {
 
-                // labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
-                // datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
+        const bar = {
 
-                labels: this.state.data.countryShipmentSplitList.map(ele => (ele.country.label.label_en)),
-                datasets: [{
-                    label: 'Ordered Shipments',
-                    data: this.state.data.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
-                    backgroundColor: '#6a82a8',
-                    borderWidth: 0
-                },
-                {
-                    label: 'Planned Shipments',
-                    data: this.state.data.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
-                    backgroundColor: '#dee7f8',
-                    borderWidth: 0,
-                }
-                ]
+            // labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
+            // datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
+
+            labels: this.state.countryShipmentSplitList.map(ele => (ele.country.label.label_en)),
+            datasets: [{
+                label: 'Ordered Shipments',
+                data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
+                backgroundColor: '#6a82a8',
+                borderWidth: 0
+            },
+            {
+                label: 'Planned Shipments',
+                data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
+                backgroundColor: '#dee7f8',
+                borderWidth: 0,
             }
-        } else {
-
-            bar = {
-                labels: [],
-                datasets: []
-            }
+            ]
         }
+
+        const bar1 = {
+
+            // labels: ["Jan 2019", "Feb 2019", "Mar 2019", "Apr 2019", "May 19", "Jun 19", "Jul 19", "Aug 2019", "Sep 2019", "Oct 2019", "Nov 2019", "Dec 2019"],
+            // datasets: [
+            //     {
+            //         label: 'PSM',
+            //         data: [3000, 40000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            //         backgroundColor: '#4dbd74',
+            //         borderWidth: 0,
+            //     }, {
+            //         label: 'GF',
+            //         data: [3000, 0, 4000, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            //         backgroundColor: '#f86c6b',
+            //         borderWidth: 0
+            //     },
+            //     {
+            //         label: 'Local',
+            //         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            //         backgroundColor: '#8aa9e6',
+            //         borderWidth: 0,
+            //     },
+            //     {
+            //         label: 'Govt',
+            //         data: [0, 0, 0, 30000, 0, 0, 0, 0, 0, 0, 0, 0],
+            //         backgroundColor: '#EDB944',
+            //         borderWidth: 0,
+            //     }
+            // ]
+
+
+            labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
+            datasets: this.state.dateSplitList.map((item, index) => ({ label: this.state.lab[index], data: this.state.val[index], borderWidth: 0, backgroundColor: backgroundColor[index] })),
+
+        }
+
+        let viewby = this.state.viewby;
 
 
         return (
@@ -2293,17 +2429,18 @@ class ShipmentGlobalView extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>Shipment Global View</strong> */}
-                        {/* <i className="icon-menu"></i><strong>Global Demand - Single Product</strong> */}
-                        {/* {this.state.consumptions.length > 0 && */}
-                        <div className="card-header-actions">
-                            <a className="card-header-action">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
 
-                            </a>
-                        </div>
-                        {/* } */}
+                        {(this.state.shipmentList.length > 0 || this.state.dateSplitList.length > 0 || this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    {(this.state.shipmentList.length > 0 || this.state.countrySplitList.length > 0) &&
+                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                                    }
+
+                                </a>
+                            </div>
+                        }
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <div ref={ref}>
@@ -2463,7 +2600,7 @@ class ShipmentGlobalView extends Component {
                                     <div className="col-md-6">
                                         <div className="chart-wrapper chart-graph-report">
                                             {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                            <Bar id="cool-canvas" data={bar} options={options} />
+                                            <Bar id="cool-canvas1" data={bar} options={options} />
                                         </div>
                                     </div>
                                     {/* </div> */}
@@ -2471,7 +2608,7 @@ class ShipmentGlobalView extends Component {
                                     <div className="col-md-6">
                                         <div className="chart-wrapper chart-graph-report">
                                             {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                            <Bar id="cool-canvas" data={chartData1} options={options1} />
+                                            <Bar id="cool-canvas2" data={bar1} options={options1} />
                                         </div>
                                     </div>
                                     {/* </div> */}
@@ -2489,9 +2626,9 @@ class ShipmentGlobalView extends Component {
                                         <div className="col-md-12">
 
                                             {/* table1 */}
-                                            {this.state.data[0].countrySplitList.length > 0 &&
+                                            {this.state.table1Body.length > 0 &&
                                                 <div className="table-responsive ">
-                                                    <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
                                                         <thead>
                                                             <tr>
@@ -2528,29 +2665,38 @@ class ShipmentGlobalView extends Component {
                                             }
 
                                             {/* table2 */}
-                                            {this.state.data[0].shipmentList.length > 0 &&
+
+                                            {this.state.shipmentList.length > 0 &&
                                                 <div className="table-responsive ">
-                                                    <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                    <Table id="mytable2" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
                                                         <thead>
                                                             <tr>
-                                                                <th className="text-center" style={{ width: '350px' }}> Month </th>
-                                                                <th className="text-center " style={{ width: '350px' }}> Country </th>
-                                                                <th className="text-center" style={{ width: '350px' }}>Amount (USD)</th>
-                                                                <th className="text-center" style={{ width: '350px' }}>Funder</th>
-                                                                <th className="text-center" style={{ width: '350px' }}>Status</th>
+                                                                <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
+                                                                <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
+                                                                <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.supplyPlan.amountInUSD')}</th>
+                                                                {
+                                                                    this.state.viewby == 1 &&
+                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                }
+                                                                {
+                                                                    this.state.viewby != 1 &&
+                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
+                                                                }
+
+                                                                <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>
                                                             </tr>
                                                         </thead>
 
                                                         <tbody>
                                                             {
-                                                                this.state.data[0].shipmentList.map((item, idx) =>
+                                                                this.state.shipmentList.map((item, idx) =>
                                                                     <tr id="addr0" key={idx} >
-                                                                        <td>{moment(this.state.data[0].shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
-                                                                        <td>{getLabelText(this.state.data[0].shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                        <td>{this.state.data[0].shipmentList[idx].amount}</td>
-                                                                        <td>{getLabelText(this.state.data[0].shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
-                                                                        <td>{getLabelText(this.state.data[0].shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
+                                                                        <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
+                                                                        <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
+                                                                        <td>{this.state.shipmentList[idx].amount}</td>
+                                                                        <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
+                                                                        <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
                                                                     </tr>
                                                                 )}
 

@@ -3020,9 +3020,9 @@ class ProcurementAgentExport extends Component {
                                                 onChange={this.toggleView}
                                             >
                                                 {/* <option value="-1">{i18n.t('static.common.select')}</option> */}
-                                                <option value="1">Procurement Agent</option>
-                                                <option value="2">Funding Source</option>
-                                                <option value="3">Product</option>
+                                                <option value="1">{i18n.t('static.procurementagent.procurementagent')}</option>
+                                                <option value="2">{i18n.t('static.dashboard.fundingsource')}</option>
+                                                <option value="3">{i18n.t('static.planningunit.planningunit')}</option>
                                             </Input>
 
                                         </InputGroup>
