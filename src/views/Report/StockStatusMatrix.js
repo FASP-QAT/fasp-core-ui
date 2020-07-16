@@ -1288,7 +1288,7 @@ export default class StockStatusMatrix extends React.Component {
               <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
             </div>}
           </div>
-          <CardBody className="pb-md-3 pb-lg-0 pt-lg-0">
+          <CardBody className="pb-md-3 pb-lg-2 pt-lg-0">
             <Col md="12 pl-0">
               <div className="row">
                 <FormGroup className="col-md-3">

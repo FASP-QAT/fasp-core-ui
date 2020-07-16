@@ -794,7 +794,7 @@ console.log(endingBalanceArray)
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pt-lg-0 pb-lg-0">
+                    <CardBody className="pt-lg-0 pb-lg-2">
                         <div className="TableCust" >
                             <div ref={ref}>
 

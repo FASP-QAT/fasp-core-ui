@@ -126,7 +126,12 @@ class StockStatusOverTime extends Component {
     roundN = num => {
         return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
-
+    formatAmc=value=>{
+      return  Math.ceil(value)
+    }
+    dateFormatter=value=>{
+        return moment(value).format('MMM YY')
+      }
     formatter = value => {
 
         var cell1 = value
@@ -785,7 +790,7 @@ class StockStatusOverTime extends Component {
                                     }
 
 
-                                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+                                    var amcCalcualted =(sumOfConsumptions) / countAMC;
                                     console.log('amcCalcualted', amcCalcualted,' endingBalance',endingBalance)
                                     var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
                                     console.log(pu)
@@ -804,7 +809,7 @@ class StockStatusOverTime extends Component {
                                        }
                                        var maxMOS = minForMonths;*/
                                     var json = {
-                                        "dt": moment(new Date(from, month - 1)).format('MMM YY'),
+                                        "dt": new Date(from, month - 1),
                                         "program": pu.program,
                                         "planningUnit": pu.planningUnit,
                                         "stock": endingBalance,
@@ -975,7 +980,7 @@ class StockStatusOverTime extends Component {
         var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]]
 
 
-        this.state.matricsList.map(elt => A.push([elt.dt, ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, elt.amc, elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => A.push([this.dateFormatter(elt.dt).replaceAll(' ','%20'), ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)]));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1092,15 +1097,18 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([elt.dt, getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
 
         let content = {
             margin: { top: 80 },
             startY: height,
             head: headers,
             body: data,
-            styles: { lineWidth: 1, fontSize: 8 }
-
+            styles: { lineWidth: 1, fontSize: 8 ,cellWidth: 75 },
+            columnStyles: {
+                1: { cellWidth: 151 },
+                2: { cellWidth: 160.89 },
+              }
         };
 
 
@@ -1173,7 +1181,7 @@ class StockStatusOverTime extends Component {
         ]
         console.log(this.state.matricsList)
         var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu).map(ele => (ele.mos)))
-        var dts = Array.from(new Set(this.state.matricsList.map(ele => (ele.dt))))
+        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
         console.log(dts)
         const bar = {
             labels: dts,
@@ -1256,7 +1264,7 @@ class StockStatusOverTime extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0">
 
                         <div>
                             <Form >
@@ -1446,7 +1454,7 @@ class StockStatusOverTime extends Component {
 
                                                     <tr id="addr0" >
 
-                                                        <td>{item.dt}</td>
+                                                        <td>{this.dateFormatter(item.dt)}</td>
                                                         <td>
                                                             {getLabelText(item.program.label, this.state.lang)}
                                                         </td>
@@ -1460,7 +1468,7 @@ class StockStatusOverTime extends Component {
                                                             {this.formatter(item.consumptionQty)}
                                                         </td>
                                                         <td>
-                                                            {this.formatter(item.amc)}
+                                                            {this.formatter(this.formatAmc(item.amc))}
                                                         </td>
                                                         <td>
                                                             {this.formatter(item.amcMonthCount)}

@@ -36,10 +36,14 @@ export default class DataSourceTypeListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -68,7 +72,7 @@ export default class DataSourceTypeListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false 
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({

@@ -70,7 +70,7 @@ class StockAdjustmentComponent extends Component {
             let realmId = AuthenticationService.getRealmId();
             ProgramService.getProgramByRealmId(realmId)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     this.setState({
                         programs: response.data
                     }, () => { this.consolidatedProgramList() })
@@ -132,7 +132,7 @@ class StockAdjustmentComponent extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
@@ -166,7 +166,7 @@ class StockAdjustmentComponent extends Component {
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (navigator.onLine) {
                     this.setState({
@@ -236,7 +236,7 @@ class StockAdjustmentComponent extends Component {
 
                 }
 
-                console.log(verList)
+                // console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
@@ -278,7 +278,7 @@ class StockAdjustmentComponent extends Component {
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
-                        console.log(myResult)
+                        // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId) {
 
@@ -300,7 +300,7 @@ class StockAdjustmentComponent extends Component {
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
-                    console.log('**' + JSON.stringify(response.data))
+                    // console.log('**' + JSON.stringify(response.data))
                     this.setState({
                         planningUnits: response.data, message: ''
                     }, () => {
@@ -393,13 +393,13 @@ class StockAdjustmentComponent extends Component {
         var A = [headers]
         this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]));
         for (var i = 0; i < A.length; i++) {
-            console.log(A[i])
+            // console.log(A[i])
             csvRow.push(A[i].join(","))
 
         }
 
         var csvString = csvRow.join("%0A")
-        console.log('csvString' + csvString)
+        // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -506,7 +506,13 @@ class StockAdjustmentComponent extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
+        console.log("versionId----", versionId);
+        console.log("programId----", programId);
+        console.log("planningUnitIds---", planningUnitIds);
+
+
         if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
                 var db1;
                 var storeOS;
@@ -526,7 +532,7 @@ class StockAdjustmentComponent extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log("1----",program)
+                    console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -534,34 +540,34 @@ class StockAdjustmentComponent extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        console.log("2----",programRequest)
+                        console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var inventoryList = []
                         // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
                         planningUnitIds.map(planningUnitId =>
-                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId &&( c.inventoryDate>=startDate && c.inventoryDate<=endDate)))]);
+                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)))]);
                         var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
                         var data = []
                         planningUnitIds.map(planningUnitId => {
                             dates.map(dt => {
 
                                 var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
-                                console.log("3--->",list)
+                                console.log("3--->", list)
                                 if (list.length > 0) {
                                     var adjustment = 0;
                                     list.map(ele => adjustment = adjustment + ele.adjustmentQty);
 
                                     var json = {
                                         program: programJson,
-                                        inventoryDate:moment(dt).format('MMM YYYY'),
+                                        inventoryDate: moment(dt).format('MMM YYYY'),
                                         planningUnit: list[0].planningUnit,
                                         stockAdjustemntQty: adjustment,
                                         lastModifiedBy: programJson.currentVersion.lastModifiedBy,
                                         lastModifiedDate: programJson.currentVersion.lastModifiedDate,
                                         notes: list[0].notes,
-                                        dataSource:list[0].dataSource
+                                        dataSource: list[0].dataSource
                                     }
                                     data.push(json)
                                 } else {
@@ -585,13 +591,14 @@ class StockAdjustmentComponent extends Component {
                     planningUnitIds: planningUnitIds
                 }
                 AuthenticationService.setupAxiosInterceptors();
-                console.log("inputJson---->",inputjson);
+                console.log("inputJson---->", inputjson);
                 ReportService.stockAdjustmentList(inputjson)
                     .then(response => {
-                        console.log("-------->");
-                        console.log(JSON.stringify(response.data))
+
+                        console.log("RESP-------->", response.data);
                         this.setState({
-                            data: response.data
+                            data: response.data,
+                            message: ''
                         }
                         )
                     }).catch(
@@ -650,7 +657,7 @@ class StockAdjustmentComponent extends Component {
             </span>
         );
         const { programs } = this.state
-        console.log(programs)
+        // console.log(programs)
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -881,7 +888,7 @@ class StockAdjustmentComponent extends Component {
                                             />
 
                                         </InputGroup>
-                                        </div> 
+                                    </div>
                                 </FormGroup>
                             </div>
                         </Col>

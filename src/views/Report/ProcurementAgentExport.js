@@ -1646,8 +1646,6 @@ class ProcurementAgentExport extends Component {
                         verList.push(version)
 
                     }
-
-
                 }
 
                 console.log(verList)
@@ -1658,12 +1656,7 @@ class ProcurementAgentExport extends Component {
                 })
 
             }.bind(this);
-
-
-
         }.bind(this)
-
-
     }
 
     getPlanningUnit = () => {
@@ -1810,7 +1803,14 @@ class ProcurementAgentExport extends Component {
         csvRow.push('')
 
         const headers = [];
-        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        if (viewby == 3) {
+            columns.splice(0, 2);
+            columns.map((item, idx) => { headers[idx] = ((item.text)) });
+        } else {
+            columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        }
+
+
 
 
         var A = [headers]
@@ -1925,13 +1925,17 @@ class ProcurementAgentExport extends Component {
 
 
         const headers = [];
-        columns.map((item, idx) => { headers[idx] = (item.text) });
+
         let data = [];
         if (viewby == 1) {
+            columns.map((item, idx) => { headers[idx] = (item.text) });
             data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]);
         } else if (viewby == 2) {
+            columns.map((item, idx) => { headers[idx] = (item.text) });
             data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]);
         } else {
+            columns.splice(0, 2);
+            columns.map((item, idx) => { headers[idx] = (item.text) });
             data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]);
         }
 
@@ -2098,6 +2102,7 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
+                    console.log("inputjson-------", inputjson);
                     AuthenticationService.setupAxiosInterceptors();
                     ReportService.procurementAgentExporttList(inputjson)
                         .then(response => {
@@ -3015,9 +3020,9 @@ class ProcurementAgentExport extends Component {
                                                 onChange={this.toggleView}
                                             >
                                                 {/* <option value="-1">{i18n.t('static.common.select')}</option> */}
-                                                <option value="1">Procurement Agent</option>
-                                                <option value="2">Funding Source</option>
-                                                <option value="3">Product</option>
+                                                <option value="1">{i18n.t('static.procurementagent.procurementagent')}</option>
+                                                <option value="2">{i18n.t('static.dashboard.fundingsource')}</option>
+                                                <option value="3">{i18n.t('static.planningunit.planningunit')}</option>
                                             </Input>
 
                                         </InputGroup>
