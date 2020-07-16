@@ -446,7 +446,7 @@
     "static.procurementUnit.validProcurementUnitText": "Please enter procurement unit name.",
     "static.procurementUnit.procurementUnitText": "Enter procurement unit name",
     "static.procurementUnit.procurementUnit": "Procurement Unit",
-    "static.procurementUnit.validPlanningUnitText": "Please select product.",
+    "static.procurementUnit.validPlanningUnitText": "Please select Planning Unit.",
     "static.procurementUnit.planningUnit": "Planning unit",
     "static.procurementUnit.validMultiplierText": "Please enter multiplier.",
     "static.procurementUnit.validValueText": "Please enter value greater than 0",
@@ -956,7 +956,6 @@
     "static.report.reorderFrequencyInMonths": "Reorder Frequency",
     "static.report.shelfLife":"Shelf Life (Months)",
     "static.report.procurementAgentName":"Procurement Agent",
-    "static.dataEntry.batchDetails":"Batch Details"
-
-    
+    "static.dataEntry.batchDetails":"Batch Details",
+    "static.report.timeWindow":"Time Window"
 }
