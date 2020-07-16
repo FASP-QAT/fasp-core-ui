@@ -1342,7 +1342,7 @@ class GlobalConsumption extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
 
     let content = {
       margin: { top: 80 },

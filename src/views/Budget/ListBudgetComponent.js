@@ -59,10 +59,14 @@ class ListBudgetComponent extends Component {
   }
 
   hideFirstComponent() {
-    setTimeout(function () {
+    this.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 8000);
   }
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
+  }
+
 
   hideSecondComponent() {
     setTimeout(function () {
@@ -397,7 +401,7 @@ class ListBudgetComponent extends Component {
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
             <div className="card-header-actions">
               <div className="card-header-action">
-              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
