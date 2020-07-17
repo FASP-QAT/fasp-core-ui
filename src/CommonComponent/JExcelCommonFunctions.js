@@ -23,6 +23,10 @@ export function jExcelLoadedFunction(instance) {
 
     var clarText = document.createTextNode('Clear');
     clearBtn.setAttribute("id", "clearBtnID");
+    clearBtn.onclick = function () {
+        document.getElementsByClassName("jexcel_search")[0].value = "";
+        elInstance.resetSearch();
+    };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
 
@@ -80,6 +84,10 @@ export function jExcelLoadedFunctionWithoutPagination(instance) {
     console.log('searchContainer', searchContainer);
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
+    clearBtn.onclick = function () {
+        document.getElementsByClassName("jexcel_search")[0].value = "";
+        elInstance.resetSearch();
+    };
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
@@ -90,7 +98,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance) {
     searchContainer.appendChild(clearBtn);
 }
 
-export function jExcelLoadedFunctionOnlyHideRow(instance){
+export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
 }

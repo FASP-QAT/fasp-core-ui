@@ -223,13 +223,14 @@ const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('./view
 const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory= React.lazy(() => import('./views/Report/ExpiredInventory'));
+const Budgets= React.lazy(() => import('./views/Report/Budgets'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/report/inventoryTurns',name: ' Inventory Turns',component: InventoryTurnsReport },
   { path: '/report/costOfInventory',name: ' Cost Of Inventory',component: CostOfInventoryReport },
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'Planning Unit List',component: PlanningUnitListNegativeInventory },
-  { path: '/pipeline/pieplineProgramList/:color/:message', component: PipelineProgramList },
+  { path: '/pipeline/pieplineProgramList/:color/:message',name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramList',exact: true ,name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
@@ -410,7 +411,7 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name:  i18n.t('static.dashboard.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlan', name:  i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/supplyPlanFormulas', name:  i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 
@@ -467,6 +468,8 @@ const routes = [
   { path: '/report/shipmentSummery', exact: true, name:  i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name:  i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
+  { path: '/report/budgets', name:  i18n.t('static.dashboard.budgetheader'), component: Budgets },
+  
   
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

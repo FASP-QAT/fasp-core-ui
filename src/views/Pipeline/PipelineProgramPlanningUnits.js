@@ -7,7 +7,7 @@ import PlanningUnitService from '../../api/PlanningUnitService'
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
@@ -523,7 +523,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true, 
-                                                // paginationOptions: [10, 25, 50, 100],
+                                                paginationOptions: [10, 25, 50, 100],
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,

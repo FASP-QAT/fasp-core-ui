@@ -35,3 +35,4 @@ export const DATE_FORMAT_CAP = "DD-MMM-YY"
 export const DATE_PLACEHOLDER_TEXT = "dd-mmm-yy"
 export const QAT_DATA_SOURCE_ID = 13
 export const FIRST_DATA_ENTRY_DATE='2017-01-01'
+export const NOTES_FOR_QAT_ADJUSTMENTS='Adjustment calculated by the system due to an actual stock count'
