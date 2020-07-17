@@ -1076,7 +1076,7 @@ class warehouseCapacity extends Component {
                         </Offline>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div>
                                 <Form >
                                     <Col md="12 pl-0">
