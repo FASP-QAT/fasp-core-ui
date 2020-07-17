@@ -147,9 +147,11 @@ class SupplierLeadTimes extends Component {
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(6)
+            // doc.setFont('helvetica', 'bold')
+            // doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(6)
                 doc.setPage(i)
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
@@ -162,7 +164,7 @@ class SupplierLeadTimes extends Component {
         }
         const addHeaders = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            
+
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFont('helvetica', 'bold')
                 doc.setFontSize(12)
@@ -1167,7 +1169,7 @@ class SupplierLeadTimes extends Component {
                                     <FormGroup className="tab-ml-1">
                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                       
+
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes
@@ -1183,7 +1185,7 @@ class SupplierLeadTimes extends Component {
                                     <FormGroup className="tab-ml-1">
                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
-                                        
+
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
                                                 <ReactMultiSelectCheckboxes

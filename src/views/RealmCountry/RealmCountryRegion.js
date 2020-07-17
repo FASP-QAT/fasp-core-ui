@@ -1,15 +1,16 @@
 import React, { Component } from "react";
 import {
-    Card, CardBody, CardHeader,
+    Card, CardBody,
     Label, Input, FormGroup,
     CardFooter, Button, Table, Col, Row, FormFeedback, Form
 
 } from 'reactstrap';
-import { Date } from 'core-js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
-import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -24,38 +25,7 @@ let initialValues = {
 
 }
 const entityname = i18n.t('static.dashboad.regioncountry')
-const validationSchema = function (values, t) {
-    return Yup.object().shape({
-        label: Yup.string()
-            .required(i18n.t('static.region.validregion')),
-        capacityCBM: Yup.number().typeError("Must be a number")
-            .min(0, i18n.t('static.program.validvaluetext')),
-        gln: Yup.string().matches(/^$|^[0-9X]{13}$/, i18n.t('static.region.glnvalue'))
-            
-    })
-}
 
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values, i18n.t)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 
 class RealmCountryRegion extends Component {
     constructor(props) {
@@ -87,226 +57,166 @@ class RealmCountryRegion extends Component {
             capacityCbm: '',
             gln: '',
             rows: [], isNew: true,
-            updateRowStatus: 0
+            updateRowStatus: 0,
+            loading: true
 
         }
-        this.setTextAndValue = this.setTextAndValue.bind(this);
-        this.disableRow = this.disableRow.bind(this);
-        this.submitForm = this.submitForm.bind(this);
-        this.enableRow = this.enableRow.bind(this);
+        // this.setTextAndValue = this.setTextAndValue.bind(this);
+        // this.disableRow = this.disableRow.bind(this);
+        // this.submitForm = this.submitForm.bind(this);
+        // this.enableRow = this.enableRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
-        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
-        this.CapitalizeFull = this.CapitalizeFull.bind(this);
-        this.updateRow = this.updateRow.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
+        this.checkDuplicateRegion = this.checkDuplicateRegion.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
+        // this.Capitalize = this.Capitalize.bind(this);
+        // this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
+        // this.CapitalizeFull = this.CapitalizeFull.bind(this);
+        // this.updateRow = this.updateRow.bind(this);
+        this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-    updateRow(idx) {
-        if (this.state.updateRowStatus == 1) {
-            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
-        } else {
-            //   document.getElementById('planningUnitId').disabled = true;
-            console.log(JSON.stringify(this.state.rows[idx]))
-            initialValues = {
-                regionId: this.state.rows[idx].regionId,
-                label: this.state.rows[idx].label.label_en,
-                gln: this.state.rows[idx].gln,
-                capacityCbm: this.state.rows[idx].capacityCbm,
-                active: this.state.rows[idx].active
-            }
-            const rows = [...this.state.rows]
-            this.setState({
-                regionId: this.state.rows[idx].regionId,
-                label: { label_en: this.state.rows[idx].label.label_en },
-                gln: this.state.rows[idx].gln,
-                capacityCbm: this.state.rows[idx].capacityCbm,
-                isNew: false,
-                updateRowStatus: 1
-            }
-            );
-
-            rows.splice(idx, 1);
-            this.setState({ rows });
-        }
-    }
-
-
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            label: true,
-            capacityCBM: true,
-            gln: true,
-
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('countryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-    setTextAndValue = (event) => {
-        // let { budget } = this.state;
-
-        if (event.target.name === "label") {
-            this.state.label.label_en = event.target.value;
-        }
-
-        if (event.target.name === "capacityCBM") {
-            this.state.capacityCbm = event.target.value;
-
-        }
-        if (event.target.name === "gln") {
-            this.state.gln = event.target.value;
-
-        }
-    }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
-    CapitalizeFull(str) {
-        if (str != null && str != "") {
-            return str.toUpperCase()
-        } else {
-            return "";
-        }
-    }
-
-
-    disableRow(idx) {
-        const rows = [...this.state.rows]
-        rows[idx].active = false
-
-        // rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-    enableRow(idx) {
-        const rows = [...this.state.rows]
-        rows[idx].active = true
-
-        // rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-    handleRemoveSpecificRow(idx) {
-        const rows = [...this.state.rows]
-        rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-
-    submitForm() {
-        console.log(JSON.stringify(this.state.rows))
-        var regionCountry = this.state.rows
-
-
-        AuthenticationService.setupAxiosInterceptors();
-        RegionService.editRegionsForcountry(regionCountry)
-            .then(response => {
-                if (response.status == 200) {
-                    this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-
-
-    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
-            if (response.status == 200) {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    realmCountry: response.data,
-                    //  rows:response.data
-                })
-            }else{
-                this.setState({
-                    message: response.data.messageCode
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-       
-        }).catch(
-            error => {
-                console.log(JSON.stringify(error))
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
         RegionService.getRegionForCountryId(this.props.match.params.realmCountryId).then(response => {
             if (response.status == 200) {
                 console.log(response.data);
-                this.setState({
-                    regionCountry: response.data,
-                    rows: response.data
+                let myResponse = response.data;
+                if (myResponse.length > 0) {
+                    this.setState({ rows: myResponse });
+                }
+                RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
+                    if (response.status == 200) {
+                        console.log(JSON.stringify(response.data))
+                        this.setState({
+                            realmCountry: response.data
+                        })
+                        var papuList = this.state.rows;
+                        var data = [];
+                        var papuDataArr = [];
+
+                        var count = 0;
+                        if (papuList.length != 0) {
+                            for (var j = 0; j < papuList.length; j++) {
+
+                                data = [];
+                                data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
+                                data[1] = papuList[j].label.label_en;
+                                data[2] = papuList[j].capacityCbm;
+                                data[3] = papuList[j].gln;
+                                data[4] = papuList[j].active;
+                                data[5] = this.props.match.params.realmCountryId;
+                                data[6] = papuList[j].regionId;
+                                data[7] = 0;
+                                papuDataArr[count] = data;
+                                count++;
+                            }
+                        }
+
+                        if (papuDataArr.length == 0) {
+                            data = [];
+                            data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
+                            data[1] = "";
+                            data[2] = "";
+                            data[3] = "";
+                            data[4] = true;
+                            data[5] = this.props.match.params.realmCountryId;
+                            data[6] = 0;
+                            data[7] = 1;
+                            papuDataArr[0] = data;
+                        }
+
+                        this.el = jexcel(document.getElementById("paputableDiv"), '');
+                        this.el.destroy();
+                        var json = [];
+                        var data = papuDataArr;
+
+                        var options = {
+                            data: data,
+                            columnDrag: true,
+                            colWidths: [100, 100, 100, 100, 100],
+                            columns: [
+
+                                {
+                                    title: "Realm Country",
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: "Region",
+                                    type: 'text',
+
+                                },
+                                {
+                                    title: "Capacity (CBM)",
+                                    type: 'numeric',
+                                },
+                                {
+                                    title: "GLN",
+                                    type: 'number',
+                                },
+                                {
+                                    title: "Is Active",
+                                    type: 'checkbox'
+                                },
+                                {
+                                    title: 'realmCountryId',
+                                    type: 'hidden'
+                                },
+                                {
+                                    title: 'regionId',
+                                    type: 'hidden'
+                                },
+                                {
+                                    title: 'isChange',
+                                    type: 'hidden'
+                                }
+
+                            ],
+                            pagination: 10,
+                            search: true,
+                            columnSorting: true,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            paginationOptions: [10, 25, 50, 100],
+                            position: 'top',
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            allowDeleteRow: false,
+                            onchange: this.changed,
+                            oneditionend: this.onedit,
+                            copyCompatibility: true,
+                            text: {
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                show: '',
+                                entries: '',
+                            },
+                            // onload: this.loaded,
+
+                        };
+
+                        this.el = jexcel(document.getElementById("paputableDiv"), options);
+                        this.setState({
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
                 })
-            }else{
+            } else {
                 this.setState({
                     message: response.data.messageCode
                 },
@@ -315,243 +225,279 @@ class RealmCountryRegion extends Component {
                     })
             }
 
-    
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+
+        })
 
     }
+    addRow = function () {
+        var json = this.el.getJson();
+        var data = [];
+        data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = true;
+        data[5] = this.props.match.params.realmCountryId;
+        data[6] = 0;
+        data[7] = 1;
+
+        this.el.insertRow(
+            data, 0, 1
+        );
+    };
+
+    formSubmit = function () {
+        var duplicateValidation = this.checkDuplicateRegion();
+        var validation = this.checkValidation();
+        if (validation == true && duplicateValidation == true) {
+            var tableJson = this.el.getJson();
+            console.log("tableJson---", tableJson);
+            let changedpapuList = [];
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("7 map---" + map1.get("7"))
+                if (parseInt(map1.get("7")) === 1) {
+                    let json = {
+                        label: {
+                            label_en: map1.get("1"),
+                        },
+                        capacityCbm: map1.get("2"),
+                        gln: map1.get("3"),
+                        active: map1.get("4"),
+                        realmCountry: {
+                            realmCountryId: parseInt(map1.get("5"))
+                        },
+                        regionId: parseInt(map1.get("6"))
+                    }
+                    changedpapuList.push(json);
+                }
+            }
+            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            RegionService.editRegionsForcountry(changedpapuList)
+                .then(response => {
+                    console.log(response.data);
+                    if (response.status == "200") {
+                        console.log(response);
+                        this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
+                })
+        } else {
+            console.log("Something went wrong");
+        }
+    }
+    checkDuplicateRegion = function () {
+        var tableJson = this.el.getJson();
+        let count = 0;
+
+        let tempArray = tableJson;
+        console.log('hasDuplicate------', tempArray);
+
+        var hasDuplicate = false;
+        tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
+            if (a === b) hasDuplicate = true
+        })
+        console.log('hasDuplicate', hasDuplicate);
+        if (hasDuplicate) {
+            this.setState({
+                message: 'Duplicate Region Found',
+                changedFlag: 0,
+
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+            return false;
+        } else {
+            return true;
+        }
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+    // -----------start of changed function
+    changed = function (instance, cell, x, y, value) {
+
+        //Region
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //Capacity
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+        }
+        //GLN
+        if (x == 3) {
+            console.log("value.length---" + value.length);
+            var col = ("D").concat(parseInt(y) + 1);
+            var reg = /^[0-9\b]+$/;
+            if (this.el.getValueFromCoords(x, y) != "") {
+                if (value.length > 0 && (isNaN(parseInt(value)) || !(reg.test(value)) || value.length != 13)) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    if (value.length != 13) {
+                        this.el.setComments(col, i18n.t('static.region.glnvalue'));
+                    } else {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    }
+                }
+                else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Active
+        if (x == 4) {
+            this.el.setValueFromCoords(7, y, 1, true);
+        }
+
+
+
+    }.bind(this);
+    // -----end of changed function
+
+    onedit = function (instance, cell, x, y, value) {
+        console.log("------------onedit called")
+        this.el.setValueFromCoords(7, y, 1, true);
+    }.bind(this);
+
+    checkValidation = function () {
+        var valid = true;
+        var json = this.el.getJson();
+        console.log("json.length-------", json.length);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(7, y);
+            if (parseInt(value) == 1) {
+                //Region
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Capacity
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //GLN
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("---------VAL----------", value);
+                if (value != "" && (isNaN(Number.parseFloat(value)) || value < 0 || value.length != 13)) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    }
+                    else if (value.length != 13) {
+                        this.el.setComments(col, i18n.t('static.region.glnvalue'));
+                    }
+                }
+                // else if (value.length != 13) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, "Should be 13 digit");
+                // }
+                else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
+
+
     render() {
-        const { units } = this.state;
-        let unitList = units.length > 0
-            && units.map((item, i) => {
-                return (
-                    <option key={i} value={item.unitId}>
-                        {item.label.label_en}
-                    </option>
-                )
-            }, this);
-
-
-        return (<div className="animated fadeIn">
-              <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-            <Row>
-                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+        return (
+            <div className="animated fadeIn">
+                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} /> */}
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
-                        {/* <CardHeader>
-                            <strong>{i18n.t('static.dashboad.regioncountry')}</strong>
-                        </CardHeader> */}
-                        <CardBody>
-                            <Formik
-                                enableReinitialize={true}
-                                initialValues={initialValues}
-                                validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                                    if (this.state.label.label_en != "") {
-                                        var json =
-                                        {
-                                            regionId: this.state.regionId,
-                                            realmCountry: {
-                                                realmCountryId: this.props.match.params.realmCountryId
-                                            }
-                                            , label: { label_en: this.state.label.label_en },
+                        <CardBody className="p-0">
 
-                                            capacityCbm: this.state.capacityCbm,
-
-                                            gln: this.state.gln,
-                                            isNew: this.state.isNew,
-                                            active: true
-
-                                        }
-                                        this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows, updateRowStatus: 0 })
-                                        this.setState({
-                                            regionId: '',
-                                            label: { label_en: '' },
-
-                                            capacityCbm: '',
-
-                                            gln: '',
-                                            active: true
-                                        });
-                                    }
-                                    resetForm({
-                                        realmCountry: {
-                                            id: this.props.match.params.realmCountryId
-                                        }
-                                        , label: { label_en: '' },
-
-                                        capacityCbm: '',
-
-                                        gln: '',
-                                        active: true
-                                    });
-                                }}
-                                render={
-                                    ({
-                                        values,
-                                        errors,
-                                        touched,
-                                        handleChange,
-                                        handleBlur,
-                                        handleSubmit,
-                                        isSubmitting,
-                                        isValid,
-                                        setTouched
-                                    }) => (<Form onSubmit={handleSubmit} noValidate name='countryForm'>
-                                        <Row>
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="select">{i18n.t('static.dashboard.realmcountry')}</Label>
-                                                <Input
-                                                    type="text"
-                                                    name="realmCountry"
-                                                    id="realmCountry"
-                                                    bsSize="sm"
-                                                    readOnly
-                                                    valid={!errors.realmCountry && this.state.realmCountry.realm.label != ''}
-                                                    invalid={touched.realmCountry && !!errors.realmCountry}
-                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                    onBlur={handleBlur}
-                                                    value={getLabelText(this.state.realmCountry.realm.label, this.state.lang) + "-" + getLabelText(this.state.realmCountry.country.label, this.state.lang)}
-                                                >
-                                                </Input>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-6">
-                                                <Label for="label">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
-                                                <Input type="text"
-                                                    name="label"
-                                                    id="label"
-                                                    bsSize="sm"
-                                                    valid={!errors.label && this.state.label.label_en != ''}
-                                                    invalid={touched.label && !!errors.label}
-                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                    onBlur={handleBlur}
-                                                    value={this.Capitalize(this.state.label.label_en)}
-                                                    required />
-                                                <FormFeedback className="red">{errors.label}</FormFeedback>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-6">
-                                                <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}<span className="red Reqasterisk">*</span></Label>
-                                                <Input type="number"
-                                                    name="capacityCBM"
-                                                    id="capacityCBM"
-                                                    bsSize="sm"
-                                                    valid={!errors.capacityCBM && this.state.capacityCbm != ''}
-                                                    invalid={touched.capacityCBM && !!errors.capacityCBM}
-                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                    value={this.state.capacityCbm}
-                                                    onBlur={handleBlur}
-                                                    // placeholder={i18n.t('static.region.capacitycbmtext')}
-                                                />
-                                                <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-6">
-                                                <Label for="gln">{i18n.t('static.region.gln')}</Label>
-                                                <Input
-                                                    type="text"
-                                                    maxlength="13"
-                                                    name="gln"
-                                                    id="gln"
-                                                    bsSize="sm"
-                                                    valid={!errors.gln && this.state.gln != ''}
-                                                    invalid={touched.gln && !!errors.gln}
-                                                    onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                    value={this.CapitalizeFull(this.state.gln)}
-                                                    // placeholder={i18n.t('static.region.glntext')}
-                                                />
-                                                <FormFeedback className="red">{errors.gln}</FormFeedback>
-                                            </FormGroup>
-
-                                            <FormGroup className="col-md-12">
-                                                <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                &nbsp;
-
-                </FormGroup></Row></Form>)} />
-                            <h5 className="red">{this.state.rowErrorMessage}</h5>
-                            <Table responsive className="table-striped table-hover table-bordered text-center ">
-
-                                <thead>
-                                    <tr>
-                                        <th className="text-left"> {i18n.t('static.dashboard.region')} </th>
-                                        <th className="text-center">{i18n.t('static.region.capacitycbm')}</th>
-                                        <th className="text-center">{i18n.t('static.region.gln')}</th>
-                                        <th className="text-center">{i18n.t('static.common.status')}</th>
-                                        <th className="text-center">{i18n.t('static.common.action')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.rows.length > 0
-                                        &&
-                                        this.state.rows.map((item, idx) =>
-
-                                            <tr id="addr0" key={idx} >
-                                                <td className="text-left">
-
-                                                    {this.state.rows[idx].label.label_en}
-                                                </td>
-                                                <td className="text-right">
-                                                    {this.state.rows[idx].capacityCbm}
-                                                </td>
-                                                <td>
-                                                    {this.state.rows[idx].gln}
-                                                </td>
-                                                <td>
-                                                    {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
-                                                </td>
-                                                <td>
-                                                    {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
-                                                    <div className="forInlinebtnMapping">
-                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-
-                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
-                                                    </div>
-                                                </td>
-
-                                            </tr>)
-
-                                    }
-                                </tbody>
-
-                            </Table>
+                            <Col xs="12" sm="12">
+                                <div className="table-responsive">
+                                    <div id="paputableDiv" >
+                                    </div>
+                                </div>
+                            </Col>
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {<Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
                                 &nbsp;
-                        </FormGroup>
-
+</FormGroup>
                         </CardFooter>
                     </Card>
-                </Col>
-            </Row>
-        </div>
-
-        );
+                </div>
+            </div>
+        )
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realmCountry/listRealmCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+
 }
 
 export default RealmCountryRegion

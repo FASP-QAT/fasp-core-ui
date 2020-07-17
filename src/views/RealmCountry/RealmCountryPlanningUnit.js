@@ -14,6 +14,9 @@ import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
 let initialValues = {
@@ -25,7 +28,7 @@ let initialValues = {
         }
     }
     , label: { label_en: '' },
-   skuCode: '',
+    skuCode: '',
     unit: {
         unitId: '',
         label: {
@@ -40,46 +43,6 @@ let initialValues = {
 
 }
 const entityname = i18n.t('static.dashboad.planningunitcountry')
-const validationSchema = function (values, t) {
-    return Yup.object().shape({
-        planningUnitId: Yup.string()
-            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-            countrysku: Yup.string()
-            .required(i18n.t('static.planningunit.Countrytext')),
-        skuCode: Yup.string()
-            .required(i18n.t('static.procurementAgentProcurementUnit.skuCodeText')),
-        multiplier: Yup.string()
-            .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
-        unitId: Yup.string()
-            .required(i18n.t('static.product.productunittext')),
-            // gtin: Yup.string()
-            // .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
-            // .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
-    })
-}
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        console.log(values)
-        const validationSchema = getValidationSchema(values, i18n.t)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 
 class PlanningUnitCountry extends Component {
     constructor(props) {
@@ -89,7 +52,7 @@ class PlanningUnitCountry extends Component {
             lang: localStorage.getItem('lang'),
             planningUnitCountry: {},
             planningUnits: [],
-realmCountryPlanningUnitId:'',
+            realmCountryPlanningUnitId: '',
             realmCountry: {
                 realmCountryId: '',
                 country: {
@@ -124,320 +87,226 @@ realmCountryPlanningUnitId:'',
                 }
             }, isNew: true,
             updateRowStatus: 0,
+            loading: true
             // gtin:''
         }
-        this.setTextAndValue = this.setTextAndValue.bind(this);
-        this.disableRow = this.disableRow.bind(this);
-        this.submitForm = this.submitForm.bind(this);
-        this.enableRow = this.enableRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
-        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
-        this.CapitalizeFull = this.CapitalizeFull.bind(this);
-        this.updateRow = this.updateRow.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
+        this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
+        this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-
-    updateRow(idx) {
-        if (this.state.updateRowStatus == 1) {
-            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
-        } else {
-         //   document.getElementById('planningUnitId').disabled = true;
-         console.log(JSON.stringify(this.state.rows[idx]))
-            initialValues = {
-                realmCountryPlanningUnitId:this.state.rows[idx].realmCountryPlanningUnitId,
-                planningUnitId: this.state.rows[idx].planningUnit.id,
-                planningUnit: {
-                    id: this.state.rows[idx].planningUnit.id,
-                    label: {
-                        label_en: this.state.rows[idx].planningUnit.label.label_en
-                    }
-                },
-                label: this.state.rows[idx].label.label_en,
-                countrysku: this.state.rows[idx].label.label_en,
-                // , label: { label_en: this.state.rows[idx].label.label_en },
-                skuCode: this.state.rows[idx].skuCode,
-                unit: {
-                    unitId: this.state.rows[idx].unit.unitId,
-                    label: {
-                        label_en: this.state.rows[idx].unit.label.label_en
-                    }
-                },
-                unitId: this.state.rows[idx].unit.unitId,
-                multiplier: this.state.rows[idx].multiplier,
-                // gtin: this.state.rows[idx].gtin==null?'':this.state.rows[idx].gtin,
-                active: this.state.rows[idx].active
-            }
-            const rows = [...this.state.rows]
-            this.setState({
-                realmCountryPlanningUnitId:this.state.rows[idx].realmCountryPlanningUnitId,
-                planningUnit: {
-                    planningUnitId: this.state.rows[idx].planningUnit.id,
-                    label: {
-                        label_en: this.state.rows[idx].planningUnit.label.label_en
-                    }
-                }
-                , label: { label_en: this.state.rows[idx].label.label_en },
-                skuCode: this.state.rows[idx].skuCode,
-                unit: {
-                    unitId: this.state.rows[idx].unit.unitId,
-                    label: {
-                        label_en: this.state.rows[idx].unit.label.label_en
-                    }
-                },
-                multiplier: this.state.rows[idx].multiplier,
-
-                // gtin: this.state.rows[idx].gtin,
-                // active: this.state.rows[idx].active,
-                isNew: false,
-                updateRowStatus: 1
-            }
-            );
-console.log(initialValues)
-            rows.splice(idx, 1);
-            this.setState({ rows });
-        }
-    }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            planningUnitId: true,
-            label: true,
-            skuCode: true,
-            multiplier: true,
-            unitId: true,
-            // gtin: true
-
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('countryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-    setTextAndValue = (event) => {
-         let { budget } = this.state;
-        console.log(event.target.name)
-        console.log(event.target.value)
-        if (event.target.name === "planningUnitId") {
-         let   {planningUnit}= this.state
-         planningUnit.planningUnitId = event.target.value;
-         planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
-         this.setState({
-            planningUnit
-        })
-        }
-        if (event.target.name === "countrysku") {
-            this.setState({
-                label:{label_en : event.target.value}
-            })
-           // this.state.label.label_en = event.target.value;
-        }
-        if (event.target.name === "skuCode") {
-            this.setState({
-            skuCode : event.target.value
-            })
-        }
-        if (event.target.name === "unitId") {
-            let   {unit}= this.state
-            unit.unitId = event.target.value;
-          unit.label.label_en = event.target[event.target.selectedIndex].text;
-          this.setState({
-            unit
-        })
-        }
-       
-        if (event.target.name === "multiplier") {
-            this.setState({
-                multiplier : event.target.value
-                })
-            
-        }
-        // if (event.target.name === "gtin") {
-        //     this.setState({
-        //         gtin : event.target.value
-        //         })
-           
-        // }
-    }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
-    CapitalizeFull(str) {
-        if (str != null && str != "") {
-            return str.toUpperCase()
-        } else {
-            return "";
-        }
-    }
-
-
-    disableRow(idx) {
-        const rows = [...this.state.rows]
-        rows[idx].active = false
-
-        // rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-    enableRow(idx) {
-        const rows = [...this.state.rows]
-        rows[idx].active = true
-
-        // rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-    handleRemoveSpecificRow(idx) {
-        const rows = [...this.state.rows]
-        rows.splice(idx, 1);
-        this.setState({ rows })
-    }
-
-    submitForm() {
-        console.log(JSON.stringify(this.state.rows))
-        var planningUnitCountry = this.state.rows
-
-
-        AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.editPlanningUnitCountry(planningUnitCountry)
-            .then(response => {
-                if (response.status == 200) {
-                    this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
-
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-
-
-    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        UnitService.getUnitListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        units: response.data
-                    })
-                }else{
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-                
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-        RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    realmCountry: response.data,
-                    // rows:response.data
-                })
-            }else{
-                this.setState({
-                    message: response.data.messageCode
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-      
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
-                }
-            }
-        );
         RealmCountryService.getPlanningUnitCountryForId(this.props.match.params.realmCountryId).then(response => {
             if (response.status == 200) {
-                this.setState({
-                    planningUnitCountry: response.data,
-                    rows: response.data
+                let myResponse = response.data;
+                if (myResponse.length > 0) {
+                    this.setState({ rows: myResponse });
+                }
+                RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            realmCountry: response.data
+                        })
+                        UnitService.getUnitListAll()
+                            .then(response => {
+                                if (response.status == 200) {
+                                    this.setState({
+                                        units: response.data
+                                    })
+                                    PlanningUnitService.getAllPlanningUnitList()
+                                        .then(response => {
+                                            if (response.status == 200) {
+                                                this.setState({
+                                                    planningUnits: response.data
+                                                })
+                                            }
+                                            const { planningUnits } = this.state;
+                                            const { units } = this.state;
+
+                                            let planningUnitArr = [];
+                                            let unitArr = [];
+
+                                            if (planningUnits.length > 0) {
+                                                for (var i = 0; i < planningUnits.length; i++) {
+                                                    var paJson = {
+                                                        name: getLabelText(planningUnits[i].label, this.state.lang),
+                                                        id: parseInt(planningUnits[i].planningUnitId)
+                                                    }
+                                                    planningUnitArr[i] = paJson
+                                                }
+                                            }
+                                            if (units.length > 0) {
+                                                for (var i = 0; i < units.length; i++) {
+                                                    var paJson = {
+                                                        name: getLabelText(units[i].label, this.state.lang),
+                                                        id: parseInt(units[i].unitId)
+                                                    }
+                                                    unitArr[i] = paJson
+                                                }
+                                            }
+
+                                            // Jexcel starts
+                                            var papuList = this.state.rows;
+                                            var data = [];
+                                            var papuDataArr = [];
+
+                                            var count = 0;
+                                            if (papuList.length != 0) {
+                                                for (var j = 0; j < papuList.length; j++) {
+
+                                                    data = [];
+                                                    data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
+                                                    data[1] = parseInt(papuList[j].planningUnit.id);
+                                                    data[2] = papuList[j].label.label_en;
+                                                    data[3] = papuList[j].skuCode;
+                                                    data[4] = parseInt(papuList[j].unit.id);
+                                                    data[5] = papuList[j].multiplier;
+                                                    data[6] = papuList[j].active;
+                                                    data[7] = this.props.match.params.realmCountryId;
+                                                    data[8] = papuList[j].realmCountryPlanningUnitId;
+                                                    data[9] = 0;
+                                                    papuDataArr[count] = data;
+                                                    count++;
+                                                }
+                                            }
+                                            if (papuDataArr.length == 0) {
+                                                data = [];
+                                                data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
+                                                data[1] = "";
+                                                data[2] = "";
+                                                data[3] = "";
+                                                data[4] = "";
+                                                data[5] = "";
+                                                data[6] = true;
+                                                data[7] = this.props.match.params.realmCountryId;
+                                                data[8] = 0;
+                                                data[9] = 1;
+                                                papuDataArr[0] = data;
+                                            }
+
+
+                                            this.el = jexcel(document.getElementById("paputableDiv"), '');
+                                            this.el.destroy();
+                                            var json = [];
+                                            var data = papuDataArr;
+                                            var options = {
+                                                data: data,
+                                                columnDrag: true,
+                                                colWidths: [100, 100, 100, 100, 100, 100, 100],
+                                                columns: [
+
+                                                    {
+                                                        title: i18n.t('static.dashboard.realmcountry'),
+                                                        type: 'text',
+                                                        readOnly: true
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.planningunit.planningunit'),
+                                                        type: 'autocomplete',
+                                                        source: planningUnitArr
+
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.planningunit.countrysku'),
+                                                        type: 'text',
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
+                                                        type: 'text',
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.unit.unit'),
+                                                        type: 'autocomplete',
+                                                        source: unitArr
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.unit.multiplier'),
+                                                        type: 'number',
+
+                                                    },
+
+                                                    {
+                                                        title: "Is Active",
+                                                        type: 'checkbox'
+                                                    },
+                                                    {
+                                                        title: 'realmCountryId',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'realmCountryPlanningUnitId',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'isChange',
+                                                        type: 'hidden'
+                                                    }
+
+                                                ],
+                                                pagination: 10,
+                                                search: true,
+                                                columnSorting: true,
+                                                tableOverflow: true,
+                                                wordWrap: true,
+                                                paginationOptions: [10, 25, 50, 100],
+                                                position: 'top',
+                                                allowInsertColumn: false,
+                                                allowManualInsertColumn: false,
+                                                allowDeleteRow: false,
+                                                onchange: this.changed,
+                                                onblur: this.blur,
+                                                onfocus: this.focus,
+                                                oneditionend: this.onedit,
+                                                copyCompatibility: true,
+                                                text: {
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    show: '',
+                                                    entries: '',
+                                                },
+                                                // onload: this.loaded,
+
+                                            };
+
+                                            this.el = jexcel(document.getElementById("paputableDiv"), options);
+                                            this.setState({
+                                                loading: false
+                                            })
+
+
+
+                                        })
+                                } else {
+                                    this.setState({
+                                        message: response.data.messageCode
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
+
+                            })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
                 })
             }
-            else{
+            else {
                 this.setState({
                     message: response.data.messageCode
                 },
@@ -445,384 +314,326 @@ console.log(initialValues)
                         this.hideSecondComponent();
                     })
             }
-            
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
+
+        })
+    }
+    addRow = function () {
+        var json = this.el.getJson();
+        var data = [];
+        data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = true;
+        data[7] = this.props.match.params.realmCountryId;
+        data[8] = 0;
+        data[9] = 1;
+
+        this.el.insertRow(
+            data, 0, 1
+        );
+    };
+
+    formSubmit = function () {
+        var duplicateValidation = this.checkDuplicatePlanningUnit();
+        var validation = this.checkValidation();
+        if (validation == true && duplicateValidation == true) {
+            var tableJson = this.el.getJson();
+            console.log("tableJson---", tableJson);
+            let changedpapuList = [];
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("9 map---" + map1.get("9"))
+                if (parseInt(map1.get("9")) === 1) {
+                    let json = {
+                        planningUnit: {
+                            id: parseInt(map1.get("1"))
+                        },
+                        label: {
+                            label_en: map1.get("2"),
+                        },
+                        skuCode: map1.get("3"),
+                        unit: {
+                            unitId: parseInt(map1.get("4"))
+                        },
+                        multiplier: map1.get("5"),
+                        active: map1.get("6"),
+                        realmCountry: {
+                            id: parseInt(map1.get("7"))
+                        },
+                        realmCountryPlanningUnitId: parseInt(map1.get("8"))
                     }
+                    changedpapuList.push(json);
                 }
             }
-        );
-        PlanningUnitService.getAllPlanningUnitList()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        planningUnits: response.data
-                    })
-                }
-               
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            RealmCountryService.editPlanningUnitCountry(changedpapuList)
+                .then(response => {
+                    console.log(response.data);
+                    if (response.status == "200") {
+                        console.log(response);
+                        this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     }
-                }
-            );
 
+                })
+        } else {
+            console.log("Something went wrong");
+        }
+    }
+    checkDuplicatePlanningUnit = function () {
+        var tableJson = this.el.getJson();
+        let count = 0;
+
+        let tempArray = tableJson;
+        console.log('hasDuplicate------', tempArray);
+
+        var hasDuplicate = false;
+        tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
+            if (a === b) hasDuplicate = true
+        })
+        console.log('hasDuplicate', hasDuplicate);
+        if (hasDuplicate) {
+            this.setState({
+                message: 'Duplicate Planning Unit Found',
+                changedFlag: 0,
+
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+            return false;
+        } else {
+            return true;
+        }
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+
+    blur = function (instance) {
+        console.log('on blur called');
+    }
+
+    focus = function (instance) {
+        console.log('on focus called');
+    }
+    // -----------start of changed function
+    changed = function (instance, cell, x, y, value) {
+
+        //Planning Unit
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //Country sku code
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+
+        //Sku code
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //Unit
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //Multiplier
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            var reg = /^[0-9\b]+$/;
+            if (value == "" || isNaN(parseInt(value)) || !(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+            }
+            else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        //Active
+        if (x == 6) {
+            this.el.setValueFromCoords(9, y, 1, true);
+        }
+
+
+
+    }.bind(this);
+    // -----end of changed function
+
+    onedit = function (instance, cell, x, y, value) {
+        console.log("------------onedit called")
+        this.el.setValueFromCoords(9, y, 1, true);
+    }.bind(this);
+
+    checkValidation = function () {
+        var valid = true;
+        var json = this.el.getJson();
+        console.log("json.length-------", json.length);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(9, y);
+            if (parseInt(value) == 1) {
+
+                //Planning Unit
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Country Planning Unit
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Sku Code
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                // Unit
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Multiplier
+                var col = ("F").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(5, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("---------VAL----------", value);
+                if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    }
+                    else {
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+
+
+            }
+        }
+        return valid;
     }
     render() {
-        const { units } = this.state;
-        let unitList = units.length > 0
-            && units.map((item, i) => {
-                return (
-                    <option key={i} value={item.unitId}>
-                        {item.label.label_en}
-                    </option>
-                )
-            }, this);
-        const { planningUnits } = this.state;
-        let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.planningUnitId}>
-                        {item.label.label_en}
-                    </option>
-                )
-            }, this);
-
-        return (<div className="animated fadeIn">
-             <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-            <Row>
-                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+        return (
+            <div className="animated fadeIn">
+                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} /> */}
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
-                        {/* <CardHeader>
-                            <strong>{i18n.t('static.dashboad.planningunitcountry')}</strong>
-                        </CardHeader> */}
-                        <CardBody>
-                            <Formik 
-                                enableReinitialize={true}
-                                initialValues={initialValues}
-                                validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                                    console.log("values", values)
-                                    console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
-                                    if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != ""  && this.state.unit.unitId != "" && this.state.multiplier != "") {
-                                        var json =
-                                        {realmCountryPlanningUnitId:this.state.realmCountryPlanningUnitId,
-                                            realmCountry: {
-                                                id: this.props.match.params.realmCountryId
-                                            }
-                                            ,
-                                            planningUnit: {
-                                                id: this.state.planningUnit.planningUnitId,
-                                                label: {
-                                                    label_en: this.state.planningUnit.label.label_en
-                                                }
-                                            }
-                                            , label: { label_en: this.state.label.label_en },
-                                             skuCode: this.state.skuCode,
-                                            unit: {
-                                                unitId: this.state.unit.unitId,
-                                                label: {
-                                                    label_en: this.state.unit.label.label_en
-                                                }
-                                            },
-                                            multiplier: this.state.multiplier,
+                        <CardBody className="p-0">
 
-                                            // gtin: this.state.gtin,
-                                            isNew: this.state.isNew,
-                                            active: true
-
-                                        }
-                                        this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows,updateRowStatus:0 })
-                                        
-                                        this.setState({
-                                            realmCountryPlanningUnitId:'',
-                                            planningUnit: {
-                                                planningUnitId: '',
-                                                label: {
-                                                    label_en: ''
-                                                }
-                                            }
-                                            , label: { label_en: '' },
-                                             skuCode: '',
-                                            unit: {
-                                                unitId: '',
-                                                label: {
-                                                    label_en: ''
-                                                }
-                                            },
-                                            multiplier: '',
-    
-                                            // gtin: '',
-                                            active: true
-    
-                                        });
-                                        
-                                    };
-                                    resetForm({
-                                        realmCountry: {
-                                            id: this.props.match.params.realmCountryId
-                                        }
-                                        ,
-                                        planningUnit: {
-                                            id: '',
-                                            label: {
-                                                label_en: ''
-                                            }
-                                        }
-                                        , label: { label_en: '' },
-                                         skuCode: '',
-                                        unit: {
-                                            unitId: '',
-                                            label: {
-                                                label_en: ''
-                                            }
-                                        },
-                                        multiplier: '',
-
-                                        // gtin: '',
-                                        active: true
-
-                                    });
-                                }}
-                                render={
-                                    ({
-                                        values,
-                                        errors,
-                                        touched,
-                                        handleChange,
-                                        handleBlur,
-                                        handleSubmit,
-                                        isSubmitting,
-                                        isValid,
-                                        setTouched
-                                    }) => (<Form onSubmit={handleSubmit} noValidate name='countryForm'>
-                                        <Row>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.dashboard.realmcountry')}</Label>
-                                            <Input
-                                                type="text"
-                                                name="realmCountry"
-                                                id="realmCountry"
-                                                bsSize="sm"
-                                                readOnly
-                                                valid={!errors.realmCountry && this.state.realmCountry.realm.label != ''}
-                                                invalid={touched.realmCountry && !!errors.realmCountry}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                onBlur={handleBlur}
-
-                                                value={getLabelText(this.state.realmCountry.realm.label, this.state.lang) + "-" + getLabelText(this.state.realmCountry.country.label, this.state.lang)}
-                                            >
-                                            </Input>
-                                        </FormGroup><FormGroup>
-                                        <Input type="hidden" name="realmCountryPlanningUnitId" id="realmCountryPlanningUnitId" value={this.state.realmCountryPlanningUnitId}>
-                                       </Input></FormGroup> 
-                                       <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
-                                                valid={!errors.planningUnitId && this.state.planningUnit.planningUnitId != ''}
-                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                value={this.state.planningUnit.planningUnitId} required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {planningUnitList}
-                                            </Input> <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="label">{i18n.t('static.planningunit.countrysku')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="countrysku"
-                                                id="countrysku"
-                                                bsSize="sm"
-                                                valid={!errors.countrysku && this.state.label.label_en != ''}
-                                                invalid={touched.countrysku && !!errors.countrysku}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.Capitalize(this.state.label.label_en)}
-                                                required />
-                                            <FormFeedback className="red">{errors.countrysku}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="skuCode"
-                                                id="skuCode" bsSize="sm"
-                                                valid={!errors.skuCode && this.state.skuCode != ''}
-                                                invalid={touched.skuCode && !!errors.skuCode}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                onBlur={handleBlur}
-                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
-                                                value={this.CapitalizeFull(this.state.skuCode)}
-                                                required />
-                                            <FormFeedback className="red">{errors.skuCode}</FormFeedback>
-
-                                </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                type="select"
-                                                name="unitId"
-                                                id="unitId"
-                                                bsSize="sm"
-                                                value={this.state.unit.unitId}
-                                                valid={!errors.unitId && this.state.unit.unitId != ''}
-                                                invalid={touched.unitId && !!errors.unitId}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                onBlur={handleBlur}
-                                                required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {unitList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.unitId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
-                                            <InputGroup>
-                                            <Input type="number"
-                                                name="multiplier"
-                                                id="multiplier"
-                                                bsSize="sm"
-                                                valid={!errors.multiplier && this.state.multiplier != ''}
-                                                invalid={touched.multiplier && !!errors.multiplier}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.multiplier}
-                                                required />
-                                                  <InputGroupAddon addonType="append">
-                                                                <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" title="Country planning unit is a multiple of the planning unit"></i></InputGroupText>
-                                                            </InputGroupAddon>
-                                                            <FormFeedback className="red">{errors.multiplier}</FormFeedback>
-                                                        </InputGroup>
-                                            
-                                        </FormGroup>
-                                       {/* <FormGroup className="col-md-6">
-                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-
-                                                type="text"
-                                                min="0"
-                                                name="gtin"
-                                                id="gtin"
-                                                bsSize="sm"
-                                                valid={!errors.gtin && this.state.gtin != ''}
-                                                invalid={touched.gtin && !!errors.gtin}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                value={this.CapitalizeFull(this.state.gtin)}
-                                                // placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
-                                            />
-                                            <FormFeedback className="red">{errors.gtin}</FormFeedback>
-                            </FormGroup>*/}
-
-                                        <FormGroup className="col-md-12 mt-md-0">
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                            &nbsp;
-                                           
- </FormGroup></Row></Form>)} />
- <h5 className="red">{this.state.rowErrorMessage}</h5>
-                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
-
-                                <thead>
-                                    <tr>
-                                        <th className="text-left pl-1"> {i18n.t('static.dashboard.planningunit')} </th>
-                                       <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
-                                        <th className="text-center"> {i18n.t('static.procurementAgentProcurementUnit.skuCode')} </th>
-                                        <th className="text-center">{i18n.t('static.unit.unit')}</th>
-                                        <th className="text-center">{i18n.t('static.unit.multiplier')}</th>
-                                      {/*  <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>*/}
-                                        <th className="text-center">{i18n.t('static.common.status')}</th>
-                                        <th className="text-center">{i18n.t('static.common.action')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.rows.length > 0
-                                        &&
-                                        this.state.rows.map((item, idx) =>
-
-                                            <tr id="addr0" className="realmcountrypUnitTd" key={idx}  >
-                                                <td className="text-left">
-                                                    {this.state.rows[idx].planningUnit.label.label_en}
-                                                </td>
-                                                <td >
-
-                                                    {this.state.rows[idx].label.label_en}
-                                                </td>
-                                                <td>
-                                                    {this.state.rows[idx].skuCode}
-                                              </td><td>
-                                                    {this.state.rows[idx].unit.label.label_en}
-                                                </td>
-                                                <td className="text-right">
-                                                    {this.state.rows[idx].multiplier}
-                                                </td>
-                                               {/* <td>
-                                                    {this.state.rows[idx].gtin}
-                                               </td>*/}
-                                                <td>
-                                                    {this.state.rows[idx].active==true ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
-                                                </td>
-                                                <td><div className="forInlinebtnMapping">
-                                                     {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
-                                                     <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-
-                                                <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
-                                                </div>
-                                                   
-                                                </td>
-                                            </tr>)
-
-                                    }
-                                </tbody>
-
-                            </Table>
+                            <Col xs="12" sm="12">
+                                <div className="table-responsive">
+                                    <div id="paputableDiv" >
+                                    </div>
+                                </div>
+                            </Col>
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {<Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> Add Row</Button>
                                 &nbsp;
- </FormGroup>
-
+</FormGroup>
                         </CardFooter>
                     </Card>
-                </Col>
-            </Row>
-        </div>
-
-        );
+                </div>
+            </div>
+        )
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realmCountry/listRealmCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 
