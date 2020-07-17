@@ -1342,7 +1342,7 @@ class AggregateShipmentByProduct extends Component {
                             }
                         </Offline> */}
                     </div>
-                    <CardBody className="pt-lg-0 ">
+                    <CardBody className="pt-lg-0 CardBodyMargin">
                         <div className="" >
                             <div ref={ref}>
                                 <Form >

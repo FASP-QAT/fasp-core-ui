@@ -2465,7 +2465,7 @@ input::placeholder {
     color: #73818f !important;
     font-size: 13px!important;
 }
-
+/////card header css
 .Card-header-addicon
 {
   padding:10px 20px 10px 20px;
@@ -2473,6 +2473,13 @@ input::placeholder {
 .Card-header-reporticon{
   padding: 8px 20px 0px 20px;
 }
+.CardBodyMargin{
+  margin-top: -1%;
+}
+.CardBodySupplyplanMargin{
+  margin-top: -2%;
+}
+
 
 /////application dashboard card css
 .ImgCont{

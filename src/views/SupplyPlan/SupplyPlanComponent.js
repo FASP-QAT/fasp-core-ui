@@ -6295,7 +6295,17 @@ export default class SupplyPlanComponent extends React.Component {
                 <h5 className="red">{this.state.supplyPlanError}</h5>
 
                 <Card>
-                    <CardHeader>
+                <div className="Card-header-reporticon">
+                        {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
+                        <div className="card-header-actions">
+
+                            <a className="card-header-action">
+                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                            </a>
+
+                        </div>
+                    </div>
+                    {/* <CardHeader>
                         <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
                         <div className="card-header-actions">
 
@@ -6304,8 +6314,9 @@ export default class SupplyPlanComponent extends React.Component {
                             </a>
 
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </CardHeader> */}
+                    <CardBody className="CardBodySupplyplanMargin pb-lg-0">
+                   
                         <Formik
                             render={
                                 ({
