@@ -138,7 +138,7 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Procurement Agent Lead Times.csv"
+        a.download = "Procurement Agent Lead Times Report.csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -148,7 +148,7 @@ class SupplierLeadTimes extends Component {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+            doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
                 doc.setPage(i)
@@ -162,13 +162,14 @@ class SupplierLeadTimes extends Component {
         }
         const addHeaders = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
+            
             for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
                 doc.setFontSize(12)
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text("Procurement Agent Report", doc.internal.pageSize.width / 2, 60, {
+                doc.text("Procurement Agent Lead Times Report", doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -196,7 +197,7 @@ class SupplierLeadTimes extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Procurement Agent Report";
+        const title = "Procurement Agent Lead Times Report";
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -228,7 +229,7 @@ class SupplierLeadTimes extends Component {
         ]);
 
         let content = {
-            margin: { top: 90 },
+            margin: { top: 95 },
             startY: 165,
             head: [headers],
             body: data,
@@ -242,7 +243,7 @@ class SupplierLeadTimes extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Procurement Agent Lead Times.pdf")
+        doc.save("Procurement Agent Lead Times Report.pdf")
     }
     handleChangeProgram(programIds) {
 
@@ -1139,7 +1140,7 @@ class SupplierLeadTimes extends Component {
                                         </FormGroup>
                                     </Online> */}
                                     <FormGroup className="">
-                                        <Label htmlFor="appendedInputButton">Program</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
                                                 <Input
@@ -1150,7 +1151,7 @@ class SupplierLeadTimes extends Component {
                                                     // onChange={this.filterVersion}
                                                     onChange={(e) => { this.getPlanningUnit(); }}
                                                 >
-                                                    <option value="0">Please Select</option>
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
                                                     {programs.length > 0
                                                         && programs.map((item, i) => {
                                                             return (
@@ -1164,7 +1165,8 @@ class SupplierLeadTimes extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Planning Unit <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                        
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">
@@ -1179,7 +1181,8 @@ class SupplierLeadTimes extends Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Procurement Agent <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
+                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
                                         
                                         <div className="controls SelectGo">
                                             <InputGroup className="box">

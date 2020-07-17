@@ -9,7 +9,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import {
-    SECRET_KEY,DATE_FORMAT_CAP,
+    SECRET_KEY, DATE_FORMAT_CAP,
     MONTHS_IN_PAST_FOR_SUPPLY_PLAN,
     TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
     PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE
@@ -583,8 +583,8 @@ export default class ExpiredInventory extends Component {
 
                         }
 
-                        var dateFilterMyArray = myArray.filter(c => c.expiryDate >= moment(myStartDate).format('YYYY-MM-DD') && c.expiryDate <= moment(myEndDate).format('YYYY-MM-DD') && c.remainingQty > 0 );
-                        console.log("My array after accounting all the calcuklations", dateFilterMyArray);
+                        var dateFilterMyArray = myArray.filter(c => c.expiryDate >= moment(myStartDate).format('YYYY-MM-DD') && c.expiryDate <= moment(myEndDate).format('YYYY-MM-DD') && c.remainingQty > 0);
+                        console.log("My array after accounting all the calculations", dateFilterMyArray);
                         // var expiredStockArr = myArray;
                         // console.log(myEndDate+"======"+myStartDate);
 
@@ -824,6 +824,24 @@ export default class ExpiredInventory extends Component {
                             </a>
                         </div>
                     </div>
+                    {/* <CardBody className="pb-lg-0"> */}
+                    {/* <div className="TableCust" > */}
+                    {/* <div ref={ref}> */}
+                    {/* <Form >
+                            <Col md="12 pl-0">
+                                <div className="d-md-flex Selectdiv2">
+                                    <FormGroup className="tab-ml-1">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <div className="controls edit">
+
+                                            <Picker
+                                                ref="pickRange"
+                                                years={{ min: 2013 }}
+                                                value={rangeValue}
+                                                lang={pickerLang}
+                                                //theme="light"
+                                                onChange={this.handleRangeChange}
+                                                onDismiss={this.handleRangeDissmis} */}
                     <CardBody className="pb-lg-2 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
@@ -848,7 +866,7 @@ export default class ExpiredInventory extends Component {
                                             </div>
 
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -868,7 +886,7 @@ export default class ExpiredInventory extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -888,41 +906,41 @@ export default class ExpiredInventory extends Component {
                                         </FormGroup>
                                     </div>
                                 </Col>
-                                {/* </Form> */}
-                                <ToolkitProvider
-                                    keyField="id"
-                                    data={this.state.outPutList}
-                                    columns={columns}
-                                    search={{ searchFormatted: true }}
-                                    hover
-                                    filter={filterFactory()}
-                                >
-                                    {
-                                        props => (
+                        {/* </Form> */}
+                            <ToolkitProvider
+                                keyField="id"
+                                data={this.state.outPutList}
+                                columns={columns}
+                                search={{ searchFormatted: true }}
+                                hover
+                                filter={filterFactory()}
+                            >
+                                {
+                                    props => (
 
-                                            <div className="TableCust">
-                                                <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div>
-                                                <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                    pagination={paginationFactory(tabelOptions)}
-                                                    /* rowEvents={{
-                                                         onClick: (e, row, rowIndex) => {
-                                                             this.editRegion(row);
-                                                         }
-                                                     }}*/
-                                                    {...props.baseProps}
-                                                />
+                                        <div className="TableCust">
+                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                                <SearchBar {...props.searchProps} />
+                                                <ClearSearchButton {...props.searchProps} />
                                             </div>
-                                        )
-                                    }
-                                </ToolkitProvider>
-                            </div>
-                        </div>
+                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                pagination={paginationFactory(tabelOptions)}
+                                                /* rowEvents={{
+                                                     onClick: (e, row, rowIndex) => {
+                                                         this.editRegion(row);
+                                                     }
+                                                 }}*/
+                                                {...props.baseProps}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            </ToolkitProvider>
+                             </div> 
+                             </div> 
                     </CardBody>
                 </Card>
             </div>
-        );
-    }
+                );
+            }
 }

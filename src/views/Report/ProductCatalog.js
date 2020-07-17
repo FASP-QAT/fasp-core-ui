@@ -96,7 +96,9 @@ class ProductCatalog extends Component {
     exportCSV(columns) {
         var csvRow = [];
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('')
         csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('')
         csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
         csvRow.push('')
@@ -153,7 +155,7 @@ class ProductCatalog extends Component {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+            doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
                 doc.setPage(i)
@@ -222,7 +224,7 @@ class ProductCatalog extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Procurement Agent Report";
+        const title = "Product Catalog Report";
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
