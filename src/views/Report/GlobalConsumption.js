@@ -2058,7 +2058,7 @@ class GlobalConsumption extends Component {
                       <div className="controls">
                         <InputGroup className="box">
                           <ReactMultiSelectCheckboxes
-
+                            // isLoading={true}
                             name="planningUnitId"
                             id="planningUnitId"
                             bsSize="sm"

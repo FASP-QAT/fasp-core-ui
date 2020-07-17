@@ -154,9 +154,10 @@ class ProductCatalog extends Component {
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(6)
+           
             for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(6)
                 doc.setPage(i)
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
@@ -170,7 +171,7 @@ class ProductCatalog extends Component {
         }
         const addHeaders = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
+            
             for (var i = 1; i <= pageCount; i++) {
                 // doc.setFontSize(12)
                 // doc.setPage(i)
@@ -185,6 +186,7 @@ class ProductCatalog extends Component {
                 //     doc.text(doc.internal.pageSize.width / 8, 90, planningText)
 
                 // }
+                doc.setFont('helvetica', 'bold')
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
