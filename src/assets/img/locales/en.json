@@ -963,5 +963,9 @@
     "static.report.qtyBaseUnit": "Qty (Base units)",
     "static.report.costUsd": "Cost (USD)",
     "static.dataEntry.batchDetails": "Batch Details",
-    "static.report.timeWindow": "Time Window"
+    "static.report.timeWindow": "Time Window",
+    "static.report.plannedBudgetAmt":"Budget allocated to planned Shipment",
+    "static.report.orderedBudgetAmt":"Budget allocated to Ordered Shipment",
+    "static.report.remainingBudgetAmt":"Budget Remaining",
+    "static.report.inmillions":" (in Millions)"
 }
