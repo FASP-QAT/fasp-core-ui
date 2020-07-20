@@ -1046,7 +1046,7 @@ class warehouseCapacity extends Component {
                     this.setState({ message: message })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -1075,8 +1075,8 @@ class warehouseCapacity extends Component {
                             }
                         </Offline>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
-                        <div className="TableCust" >
+                    <CardBody className="pb-lg-2 pt-lg-0">
+                        <div className="" >
                             <div>
                                 <Form >
                                     <Col md="12 pl-0">
@@ -1183,7 +1183,7 @@ class warehouseCapacity extends Component {
                                 <Col md="12 pl-0">
 
                                     <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
+                                        <div className="col-md-12">
 
                                             <Table id="mytable" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                 <thead>

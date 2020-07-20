@@ -13,6 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
+import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -283,15 +284,15 @@ class AddprogramPlanningUnit extends Component {
                     minMonthsOfStock: map.get("3"),
                     localProcurementLeadTime: map.get("4"),
                     shelfLife: map.get("5"),
-                    catalogPrice:map.get("6"),
-                    active:map.get("8")
+                    catalogPrice: map.get("6"),
+                    active: map.get("8")
                 }
                 planningUnitArray.push(planningUnitJson);
             }
 
         }
         AuthenticationService.setupAxiosInterceptors();
-        console.log("SUBMIT----",planningUnitArray);
+        console.log("SUBMIT----", planningUnitArray);
         ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
             .then(response => {
                 if (response.status == "200") {
@@ -382,106 +383,112 @@ class AddprogramPlanningUnit extends Component {
                                             let myReasponse = response.data;
                                             var productDataArr = []
                                             // if (myReasponse.length > 0) {
-                                                this.setState({ rows: myReasponse });
-                                                var data = [];
-                                                if (myReasponse.length != 0) {
-                                                    for (var j = 0; j < myReasponse.length; j++) {
-                                                        data = [];
-                                                        data[0] = 0;
-                                                        data[1] = myReasponse[j].planningUnit.id;
-                                                        data[2] = myReasponse[j].reorderFrequencyInMonths;
-                                                        data[3] = myReasponse[j].minMonthsOfStock;
-                                                        data[4] = myReasponse[j].localProcurementLeadTime;
-                                                        data[5] = myReasponse[j].shelfLife;
-                                                        data[6] = myReasponse[j].catalogPrice;
-                                                        data[7] = myReasponse[j].programPlanningUnitId;
-                                                        data[8] = myReasponse[j].active;
-                                                        data[9] = 0;
-                                                        data[10] = myReasponse[j].program.id;
-                                                        productDataArr.push(data);
-                                                    }
-                                                } else {
-                                                    console.log("list length is 0.");
+                                            this.setState({ rows: myReasponse });
+                                            var data = [];
+                                            if (myReasponse.length != 0) {
+                                                for (var j = 0; j < myReasponse.length; j++) {
+                                                    data = [];
+                                                    data[0] = 0;
+                                                    data[1] = myReasponse[j].planningUnit.id;
+                                                    data[2] = myReasponse[j].reorderFrequencyInMonths;
+                                                    data[3] = myReasponse[j].minMonthsOfStock;
+                                                    data[4] = myReasponse[j].localProcurementLeadTime;
+                                                    data[5] = myReasponse[j].shelfLife;
+                                                    data[6] = myReasponse[j].catalogPrice;
+                                                    data[7] = myReasponse[j].programPlanningUnitId;
+                                                    data[8] = myReasponse[j].active;
+                                                    data[9] = 0;
+                                                    data[10] = myReasponse[j].program.id;
+                                                    productDataArr.push(data);
                                                 }
+                                            } else {
+                                                console.log("list length is 0.");
+                                            }
 
-                                                this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                this.el.destroy();
-                                                var json = [];
-                                                var data = productDataArr;
-                                                var options = {
-                                                    data: data,
-                                                    columnDrag: true,
-                                                    colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100],
-                                                    columns: [
-                                                        {
-                                                            title: 'Product Category',
-                                                            type: 'dropdown',
-                                                            source: productCategoryList
-                                                        },
-                                                        {
-                                                            title: 'Planning Unit',
-                                                            type: 'autocomplete',
-                                                            source: list,
-                                                            filter: this.dropdownFilter
-                                                        },
-                                                        {
-                                                            title: 'Reorder frequency in months',
-                                                            type: 'number',
+                                            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                            this.el.destroy();
+                                            var json = [];
+                                            var data = productDataArr;
+                                            var options = {
+                                                data: data,
+                                                columnDrag: true,
+                                                colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100],
+                                                columns: [
+                                                    {
+                                                        title: 'Product Category',
+                                                        type: 'dropdown',
+                                                        source: productCategoryList
+                                                    },
+                                                    {
+                                                        title: 'Planning Unit',
+                                                        type: 'autocomplete',
+                                                        source: list,
+                                                        filter: this.dropdownFilter
+                                                    },
+                                                    {
+                                                        title: 'Reorder frequency in months',
+                                                        type: 'number',
 
-                                                        },
-                                                        {
-                                                            title: 'Min month of stock',
-                                                            type: 'number'
-                                                        },
-                                                        {
-                                                            title: 'Local Procurment Lead Time',
-                                                            type: 'number'
-                                                        },
-                                                        {
-                                                            title: 'Shelf Life',
-                                                            type: 'number'
-                                                        },
-                                                        {
-                                                            title: 'Catalog Price',
-                                                            type: 'number'
-                                                        },
-                                                        {
-                                                            title: 'Id',
-                                                            type: 'hidden'
-                                                        },
-                                                        {
-                                                            title: 'Active',
-                                                            type: 'hidden'
-                                                        },
-                                                        {
-                                                            title: 'Changed Flag',
-                                                            type: 'hidden'
-                                                        },
-                                                        {
-                                                            title: 'ProgramId',
-                                                            type: 'hidden'
-                                                        }
+                                                    },
+                                                    {
+                                                        title: 'Min month of stock',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Local Procurment Lead Time',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Shelf Life',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Catalog Price',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Id',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Active',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Changed Flag',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'ProgramId',
+                                                        type: 'hidden'
+                                                    }
 
 
-                                                    ],
-                                                    pagination: 10,
-                                                    search: true,
-                                                    columnSorting: true,
-                                                    tableOverflow: true,
-                                                    wordWrap: true,
-                                                    paginationOptions: [10, 25, 50, 100],
-                                                    position: 'top',
-                                                    allowInsertColumn: false,
-                                                    allowManualInsertColumn: false,
-                                                    allowDeleteRow: false,
-                                                    onchange: this.changed,
-                                                    oneditionend: this.onedit,
-                                                    copyCompatibility: true
+                                                ],
+                                                pagination: 10,
+                                                search: true,
+                                                columnSorting: true,
+                                                tableOverflow: true,
+                                                wordWrap: true,
+                                                paginationOptions: [10, 25, 50, 100],
+                                                position: 'top',
+                                                allowInsertColumn: false,
+                                                allowManualInsertColumn: false,
+                                                allowDeleteRow: false,
+                                                onchange: this.changed,
+                                                oneditionend: this.onedit,
+                                                copyCompatibility: true,
+                                                text: {
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    show: '',
+                                                    entries: '',
+                                                },
+                                                onload: this.loaded,
 
-                                                };
-                                                var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-                                                this.el = elVar;
-                                                this.setState({ mapPlanningUnitEl: elVar });
+                                            };
+                                            var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                            this.el = elVar;
+                                            this.setState({ mapPlanningUnitEl: elVar });
                                             // }
                                         } else {
                                             this.setState({
@@ -524,38 +531,42 @@ class AddprogramPlanningUnit extends Component {
 
     }
 
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+
     render() {
 
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-               
-                    <div style={{ flexBasis: 'auto' }}>
-                        <Card>
-                            {/* <CardHeader>
+
+                <div style={{ flexBasis: 'auto' }}>
+                    <Card>
+                        {/* <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader> */}
-                            <CardBody className="p-0">
+                        <CardBody className="p-0">
                             <Col sm={12} md={12}>
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
-                                </Col>
-                            </CardBody>
-                            <CardFooter>
-                                <FormGroup>
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                    &nbsp;
+                            </Col>
+                        </CardBody>
+                        <CardFooter>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                &nbsp;
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
-                                    &nbsp;
+                                &nbsp;
                                 </FormGroup>
-                            </CardFooter>
-                        </Card>
-                    </div>
-                
+                        </CardFooter>
+                    </Card>
+                </div>
+
             </div>
 
         );

@@ -309,14 +309,14 @@ export default class PipelineProgramInventory extends Component {
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
                                     copyCompatibility: true,
-                                    // paginationOptions: [10, 25, 50, 100],
+                                    paginationOptions: [10, 25, 50, 100],
                                     position: 'top',
                                     text: {
                                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                         show: '',
                                         entries: '',
                                     },
-                                    onload: this.loaded,
+                                    onload: this.loadedJexcelCommonFunction,
                                 };
 
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);
@@ -330,7 +330,7 @@ export default class PipelineProgramInventory extends Component {
         });
     }
 
-    loaded = function (instance, cell, x, y, value) {
+    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
 

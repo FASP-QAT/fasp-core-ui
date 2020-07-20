@@ -250,7 +250,7 @@ class RealmDashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-              <Carousel className='trustedMechCarousel' activeIndex={activeIndex} next={this.next} previous={this.previous}>
+              <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
           <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
           {slides}
           {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> */}
@@ -446,6 +446,31 @@ class RealmDashboard extends Component {
               </CardBody>
             </Card>
           </Col> 
+
+          {/* <Col xs="12" sm="6" lg="3">
+            <Card className=" CardHeight">
+              <CardBody className="box-p">
+              <div class="h1 text-muted text-left mb-2  ">
+                <i class="fa fa-language  icon-color"></i>
+               <ButtonGroup className="float-right">
+                  <Dropdown id='card8' isOpen={this.state.card8} toggle={() => { this.setState({ card8: !this.state.card8 }); }}>
+                  <DropdownToggle caret className="p-0" color="transparent">
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                    <DropdownItem>Add Language</DropdownItem>
+                      <DropdownItem>View Language</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </ButtonGroup>
+              </div>
+               
+                <div className="TextTittle ">Language </div>
+                <div className="text-count">04</div>
+                <div className="chart-wrapper mt-4 pb-2" >
+                </div>
+              </CardBody>
+            </Card>
+          </Col>  */}
 
 
         </Row>

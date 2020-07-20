@@ -96,7 +96,9 @@ class ProductCatalog extends Component {
     exportCSV(columns) {
         var csvRow = [];
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('')
         csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('')
         csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
         csvRow.push('')
@@ -152,9 +154,10 @@ class ProductCatalog extends Component {
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+           
             for (var i = 1; i <= pageCount; i++) {
+                doc.setFont('helvetica', 'bold')
+                doc.setFontSize(6)
                 doc.setPage(i)
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
@@ -168,7 +171,7 @@ class ProductCatalog extends Component {
         }
         const addHeaders = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
+            
             for (var i = 1; i <= pageCount; i++) {
                 // doc.setFontSize(12)
                 // doc.setPage(i)
@@ -183,6 +186,7 @@ class ProductCatalog extends Component {
                 //     doc.text(doc.internal.pageSize.width / 8, 90, planningText)
 
                 // }
+                doc.setFont('helvetica', 'bold')
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
@@ -222,7 +226,7 @@ class ProductCatalog extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Procurement Agent Report";
+        const title = "Product Catalog Report";
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1316,7 +1320,7 @@ class ProductCatalog extends Component {
 
                         </div>}
                     </div>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-2">
                         {/* <div ref={ref}> */}
                         <br />
                         <Form >

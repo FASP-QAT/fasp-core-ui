@@ -340,7 +340,7 @@ class ApplicationDashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-              <Carousel className='trustedMechCarousel'  activeIndex={activeIndex} next={this.next} previous={this.previous}>
+              <Carousel className='trustedMechCarousel' defaultWait={1000}  activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
           <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
           {slides}
           {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
@@ -387,20 +387,22 @@ class ApplicationDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="box-p">
               <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-file-text-o icon-color"></i>
+                <i class="fa fa-language icon-color"></i>
               
                 <ButtonGroup className="float-right">
                   <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
                   <DropdownToggle caret className="p-0" color="transparent">
                     </DropdownToggle>
                     <DropdownMenu right>
-                      <DropdownItem>View Setup Program</DropdownItem>
+                    <DropdownItem>Add Language</DropdownItem>
+                      <DropdownItem>View Language</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
               </div>
                
-                <div className="TextTittle ">Setup Program </div>
+                <div className="TextTittle ">Languages </div>
+                <div className="text-count">04</div>
                <div className="chart-wrapper mt-4 pb-2" >
               </div>
               </CardBody>

@@ -776,7 +776,7 @@ console.log(endingBalanceArray)
         return (
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -794,7 +794,7 @@ console.log(endingBalanceArray)
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pt-lg-0 pb-lg-0">
+                    <CardBody className="pt-lg-0 pb-lg-2">
                         <div className="TableCust" >
                             <div ref={ref}>
 
