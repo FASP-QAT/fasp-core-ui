@@ -77,6 +77,12 @@ class UserService {
         return axios.get(`${API_URL}/api/role/${json}`, {}
         );
     }
+    updateUserLanguage(languageCode) {
+        return axios.post(`${API_URL}/api/user/language/`, { languageCode }, {})
+    };
+    acceptUserAgreement() {
+        return axios.post(`${API_URL}/api/user/agreement/`, {}, {})
+    }
 }
 
 export default new UserService()
