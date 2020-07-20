@@ -955,7 +955,13 @@
     "static.report.min": "Min",
     "static.report.reorderFrequencyInMonths": "Reorder Frequency",
     "static.report.shelfLife":"Shelf Life (Months)",
-    "static.report.procurementAgentName":"Procurement Agent"
+    "static.report.procurementAgentName":"Procurement Agent",
+    "static.report.planningUnit/ForecastingUnit":"Planning Unit/Forecasting Unit",
+    "static.report.id":"ID",
+    "static.report.expectedReceiveddate": "Expected Received Date",
+    "static.report.orders": "Orders",
+    "static.report.qtyBaseUnit": "Qty (Base units)",
+    "static.report.costUsd": "Cost (USD)"
 
     
 }

@@ -1654,6 +1654,7 @@ class ShipmentGlobalView extends Component {
                 doc.text(i18n.t('static.dashboard.shipmentGlobalViewheader'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
+
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
@@ -1715,6 +1716,13 @@ class ShipmentGlobalView extends Component {
         canvasImg = canvas.toDataURL("image/png", 1.0);
         doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
 
+        let displaylabel = [];
+        displaylabel = this.state.dateSplitList.filter((i, index) => (index < 1)).map(ele => (Object.keys(ele.amount)));
+        if (displaylabel.length > 0) {
+            displaylabel = displaylabel[0];
+        }
+        let length = displaylabel.length + 1;
+
         let content1 = {
             margin: { top: 80, left: 100 },
             startY: height + 90,
@@ -1729,7 +1737,7 @@ class ShipmentGlobalView extends Component {
             html: '#mytable1',
 
             didDrawCell: function (data) {
-                if (data.column.index === 9 && data.cell.section === 'body') {
+                if (data.column.index === length && data.cell.section === 'body') {
                     var td = data.cell.raw;
                     var img = td.getElementsByTagName('img')[0];
                     var dim = data.cell.height - data.cell.padding('vertical');
@@ -2180,14 +2188,14 @@ class ShipmentGlobalView extends Component {
                     var table1Body = [];
 
                     table1Headers = Object.keys(response.data.countrySplitList[0].amount);
-                    lab = Object.keys(response.data.dateSplitList[0].amount);
+                    // lab = Object.keys(response.data.dateSplitList[0].amount);
                     table1Headers.unshift("Country");
 
 
-                    for (var i = 0; i < response.data.dateSplitList.length; i++) {
-                        let temp = Object.values(response.data.dateSplitList[i].amount)
-                        val.push(temp);
-                    }
+                    // for (var i = 0; i < response.data.dateSplitList.length; i++) {
+                    //     let temp = Object.values(response.data.dateSplitList[i].amount)
+                    //     val.push(temp);
+                    // }
 
 
                     for (var item = 0; item < response.data.countrySplitList.length; item++) {
@@ -2416,6 +2424,44 @@ class ShipmentGlobalView extends Component {
             ]
         }
 
+        // let displaylabel = Object.keys(this.state.dateSplitList[0].amount);
+        let displaylabel = [];
+        displaylabel = this.state.dateSplitList.filter((i, index) => (index < 1)).map(ele => (Object.keys(ele.amount)));
+        if (displaylabel.length > 0) {
+            displaylabel = displaylabel[0];
+        }
+        // displaylabel = displaylabel[0];
+
+        console.log("displaylabel------->>>>", displaylabel);
+        let dateSplitList = this.state.dateSplitList;
+        let displayObject = [];
+
+        // for (var j = 0; j < dateSplitList.length; j++) {
+        //     console.log("NODE------", dateSplitList[j].amount);
+        // }
+
+        for (var i = 0; i < displaylabel.length; i++) {
+            // console.log("DDD------", displaylabel[i]);
+            let holdArray = [];
+            for (var j = 0; j < dateSplitList.length; j++) {
+                let subArraylab = Object.keys(dateSplitList[j].amount);
+                let subArrayval = Object.values(dateSplitList[j].amount);
+                for (var x = 0; x < subArraylab.length; x++) {
+                    if (displaylabel[i].localeCompare(subArraylab[x]) == 0) {
+                        holdArray.push(subArrayval[x]);
+                        x = subArraylab.length;
+                    }
+                }
+            }
+            displayObject.push(holdArray);
+        }
+        console.log("displayObject------", displayObject);
+
+
+
+
+
+
         const bar1 = {
 
             // labels: ["Jan 2019", "Feb 2019", "Mar 2019", "Apr 2019", "May 19", "Jun 19", "Jul 19", "Aug 2019", "Sep 2019", "Oct 2019", "Nov 2019", "Dec 2019"],
@@ -2447,7 +2493,7 @@ class ShipmentGlobalView extends Component {
 
 
             labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
-            datasets: this.state.dateSplitList.map((item, index) => ({ label: this.state.lab[index], data: this.state.val[index], borderWidth: 0, backgroundColor: backgroundColor[index] })),
+            datasets: displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] })),
 
         }
 
