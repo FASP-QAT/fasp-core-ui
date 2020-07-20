@@ -804,7 +804,7 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                 var amcAfterArray = [];
 
 
-                                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+                                for (var c = 0; c < planningUnit.monthsInPastForAmc; c++) {
 
                                     var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -835,7 +835,7 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                         }*/
                                     }
                                 }
-                                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                                for (var c = 0; c < planningUnit.monthsInFutureForAmc; c++) {
                                     var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                                     if (consumptionListForAMC.length > 0) {
