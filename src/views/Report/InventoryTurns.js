@@ -650,7 +650,7 @@ console.log(endingBalanceArray)
                 ReportService.inventoryTurns(this.state.CostOfInventoryInput).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: response.data    });
+                        costOfInventory: response.data ,message:''   });
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
