@@ -147,7 +147,6 @@ class StockStatusOverTime extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
-
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -172,7 +171,22 @@ class StockStatusOverTime extends Component {
 
     }
 
-
+     unCheck=()=> {
+        
+       // document.querySelectorAll('.planningUnitId').forEach(e => {console.log('********',e)})
+        /*var x = document.getElementById("planningUnitId");
+        for(var i=0; i<=x.length; i++) {
+           x[i].checked = false;
+         }   */
+      }
+      unCheck1=(e)=> {
+        console.log('uncheck',e)
+               // document.querySelectorAll('.planningUnitId').forEach(e => {console.log('********',e)})
+                /*var x = document.getElementById("planningUnitId");
+                for(var i=0; i<=x.length; i++) {
+                   x[i].checked = false;
+                 }   */
+              }
 
     show() {
     }
@@ -328,7 +342,7 @@ class StockStatusOverTime extends Component {
                 this.setState({
                     monthsInPastForAmc: program[0].monthsInPastForAmc,
                     monthsInFutureForAmc: program[0].monthsInFutureForAmc
-                })
+                },()=>{this.fetchData()})
 
             }
         }
@@ -357,8 +371,11 @@ class StockStatusOverTime extends Component {
             if (program.length == 1) {
                 if (navigator.onLine) {
                     this.setState({
-                        versions: []
-                    }, () => {
+                        versions: [],
+                        planningUnits:[],
+                        programValues: [],
+                        programLabels: []
+                    }, () => {this.unCheck();
                         this.setState({
                             versions: program[0].versionList.filter(function (x, i, a) {
                                 return a.indexOf(x) === i;
@@ -369,20 +386,31 @@ class StockStatusOverTime extends Component {
 
                 } else {
                     this.setState({
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
+                        versions: [],
+                        planningUnits:[],
+                        programValues: [],
+                        programLabels: []
+                       
+                    }, () => { this.unCheck();
+                        this.consolidatedVersionList(programId) })
                 }
             } else {
 
                 this.setState({
-                    versions: []
-                })
+                    versions: [],planningUnits:[],
+                    programValues: [],
+                    programLabels: []
+                   
+                },()=>{this.unCheck();})
 
             }
         } else {
             this.setState({
-                versions: []
-            })
+                versions: [],planningUnits:[],
+                programValues: [],
+                programLabels: []
+            
+            },()=>{this.unCheck();})
         }
     }
     consolidatedVersionList = (programId) => {
@@ -1324,7 +1352,7 @@ class StockStatusOverTime extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                consumptions: []
+                                matricsList: []
                             })
 
                             if (error.message === "Network Error") {
@@ -1347,13 +1375,13 @@ class StockStatusOverTime extends Component {
                     );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), matricsList: [] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
 
         } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
 
         }
 
@@ -1375,7 +1403,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
 
-        var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]]
+        var A = [[i18n.t('static.report.month'), i18n.t('static.program.program'),(( i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')]]
 
 
         this.state.matricsList.map(elt => A.push([this.dateFormatter(elt.dt).replaceAll(' ','%20'), ((getLabelText(elt.program.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock, elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)]));
@@ -1719,7 +1747,7 @@ class StockStatusOverTime extends Component {
                                                         bsSize="sm"
                                                         onChange={(e) => { this.getPlanningUnit(); }}
                                                     >
-                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                         {versionList}
                                                     </Input>
 
@@ -1733,9 +1761,11 @@ class StockStatusOverTime extends Component {
                                             <div className="controls ">
                                                 <InputGroup className="box">
                                                     <ReactMultiSelectCheckboxes
+                                                    className="planningUnitId"
                                                         name="planningUnitId"
                                                         id="planningUnitId"
                                                         bsSize="md"
+                                                        onInputChange={(e) => { this.unCheck1(e) }}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     />

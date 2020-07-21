@@ -78,7 +78,7 @@ export default class InventoryTurns extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data,message:''
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
