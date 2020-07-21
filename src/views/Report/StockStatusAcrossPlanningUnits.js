@@ -804,7 +804,7 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                 var amcAfterArray = [];
 
 
-                                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+                                for (var c = 0; c < planningUnit.monthsInPastForAmc; c++) {
 
                                     var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -835,7 +835,7 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
                                         }*/
                                     }
                                 }
-                                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                                for (var c = 0; c < planningUnit.monthsInFutureForAmc; c++) {
                                     var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                                     if (consumptionListForAMC.length > 0) {
@@ -1184,13 +1184,13 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
 
                             <a className="card-header-action">
                                 {this.state.data.length > 0 && <div className="card-header-actions">
-                                    <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                    <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px' ,cursor:'pointer'}} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>}
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0 CardBodyTop">
                         <div className="TableCust" >
                             <div ref={ref}>
 

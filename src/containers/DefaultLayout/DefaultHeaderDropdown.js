@@ -12,7 +12,10 @@ import image7 from '../../assets/img/avatars/7.jpg';
 import image8 from '../../assets/img/avatars/8.jpg';
 
 import AuthenticationService from '../../views/Common/AuthenticationService';
+import UserService from '../../api/UserService'
 import getLabelText from '../../CommonComponent/getLabelText';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 const propTypes = {
   notif: PropTypes.bool,
@@ -38,13 +41,37 @@ class DefaultHeaderDropdown extends Component {
       dropdownOpen: false,
       roleList: AuthenticationService.getLoggedInUserRole(),
       lang: localStorage.getItem('lang'),
+      message: ""
     };
   }
 
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
-    i18n.changeLanguage(lang)
-    window.location.reload();
+    AuthenticationService.updateUserLanguage(lang);
+    if (navigator.onLine) {
+    AuthenticationService.setupAxiosInterceptors();
+      UserService.updateUserLanguage(lang)
+        .then(response => {
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+            } else {
+              this.setState({ message: error.response.data.messageCode });
+            }
+            confirmAlert({
+              message: this.state.message,
+              buttons: [
+                {
+                  label: i18n.t('static.common.close')
+                }
+              ]
+            });
+          })
+    } 
+      i18n.changeLanguage(lang)
+      window.location.reload();
+
   }
 
   toggle() {

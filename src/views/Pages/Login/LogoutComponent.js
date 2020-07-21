@@ -18,9 +18,7 @@ class LogoutComponent extends Component {
 
     componentDidMount() {
         let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
-        console.log("2")
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("")
         if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
             AuthenticationService.setupAxiosInterceptors();
             LogoutService.logout()

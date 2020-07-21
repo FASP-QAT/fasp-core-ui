@@ -720,7 +720,7 @@ console.log('shiplist',shiplist)
                   var amcAfterArray = [];
 
 
-                  for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+                  for (var c = 0; c < pu.monthsInPastForAmc; c++) {
 
                     var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -749,7 +749,7 @@ console.log('shiplist',shiplist)
 
                     }
                   }
-                  for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                  for (var c = 0; c < pu.monthsInFutureForAmc; c++) {
                     var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                     var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                     if (consumptionListForAMC.length > 0) {

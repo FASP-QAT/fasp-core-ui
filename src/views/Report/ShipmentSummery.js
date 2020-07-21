@@ -1037,7 +1037,6 @@ class ShipmentSummery extends Component {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
         this.state = {
             planningUnitValues: [],
@@ -1056,10 +1055,10 @@ class ShipmentSummery extends Component {
             productCategories: [],
             offlineProductCategoryList: [],
             show: false,
+            data: [],
             message: '',
+            viewById: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
-
 
         };
         this.formatLabel = this.formatLabel.bind(this);
@@ -1095,28 +1094,102 @@ class ShipmentSummery extends Component {
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        this.state.planningUnitLabels.map(ele =>
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push(i18n.t('static.common.display').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
+
+        let viewById = this.state.viewById;
+
+
         var re;
-        var A = [[(i18n.t('static.report.consumptionDate')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20')]]
+        var A = [['', (i18n.t('static.report.orders')).replaceAll(' ', '%20'), (i18n.t('static.report.qtyBaseUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.costUsd')).replaceAll(' ', '%20')]]
+
         if (navigator.onLine) {
-            re = this.state.consumptions
+            let mainData = this.state.data;
+            let tempDataTable = mainData.map((item) => { return { shipmentId: item.shipmentId, fundingSource: item.fundingSource, shipmentQty: item.shipmentQty, totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
+
+            let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
+                if (!a[fundingSource.id])
+                    a[fundingSource.id] = Object.assign({}, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost });
+                else
+                    a[fundingSource.id].totalCost += totalCost;
+                a[fundingSource.id].shipmentQty += shipmentQty;
+                a[fundingSource.id].forecastCost += forecastCost;
+                return a;
+            }, {}));
+
+            let perResult = [];
+            for (var k = 0; k < result.length; k++) {
+                let count = 0;
+                for (var p = 0; p < mainData.length; p++) {
+                    if (result[k].fundingSource.id == mainData[p].fundingSource.id) {
+                        count = count + 1;
+                    }
+                }
+                let json = {
+                    shipmentId: result[k].shipmentId,
+                    fundingSource: result[k].fundingSource,
+                    shipmentQty: result[k].shipmentQty,
+                    totalCost: viewById == 1 ? result[k].totalCost : result[k].forecastCost,
+                    orders: 1
+                }
+                perResult.push(json);
+            }
+
+            perResult = perResult.sort((a, b) => parseFloat(b.orders) - parseFloat(a.orders));
+
+            re = perResult
+
+        } else {
+            re = this.state.offlineConsumptionList
+        }
+
+
+        for (var item = 0; item < re.length; item++) {
+            A.push([(getLabelText(re[item].fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].orders, re[item].shipmentQty, re[item].totalCost])
+        }
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+
+
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('')
+
+        var B = [[(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'), (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
+        (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
+        (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightPer')).replaceAll(' ', '%20'),
+        (i18n.t('static.report.totalCost')).replaceAll(' ', '%20'), (i18n.t('static.program.notes')).replaceAll(' ', '%20')]]
+
+        if (navigator.onLine) {
+            re = this.state.data
         } else {
             re = this.state.offlineConsumptionList
         }
 
         for (var item = 0; item < re.length; item++) {
-            A.push([re[item].consumption_date, re[item].forcast, re[item].Actual])
+            B.push([(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId, (getLabelText(re[item].procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            re[item].shipmentQty, (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            viewById == 1 ? re[item].productCost : re[item].productCost * re[item].multiplier,
+            viewById == 1 ? re[item].freightCost : re[item].freightCost * re[item].multiplier,
+            viewById == 1 ? re[item].totalCost : re[item].totalCost * re[item].multiplier,
+            re[item].notes
+            ])
         }
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
+        for (var i = 0; i < B.length; i++) {
+            csvRow.push(B[i].join(","))
         }
+
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.report.shipmentSummeryReport') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1148,23 +1221,14 @@ class ShipmentSummery extends Component {
             const pageCount = doc.internal.getNumberOfPages()
 
 
-            // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-            // var reader = new FileReader();
-
-            //var data='';
-            // Use fs.readFile() method to read the file 
-            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-            //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-                /*doc.addImage(data, 10, 30, {
-                align: 'justify'
-                });*/
+
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.shipmentSummeryReport'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1176,10 +1240,15 @@ class ShipmentSummery extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+
+                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+
+                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
                         align: 'left'
                     })
                 }
@@ -1207,27 +1276,53 @@ class ShipmentSummery extends Component {
 
         doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
-        const headers = [[i18n.t('static.report.consumptionDate'),
-        i18n.t('static.report.forecastConsumption'),
-        i18n.t('static.report.actualConsumption')]];
-        const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
+        let content1 = {
+            margin: { top: 40 },
+            startY: 200,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 100 },
+            },
+            html: '#mytable1',
 
-        let content = {
-            margin: { top: 80 },
-            startY: height,
-            head: headers,
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            didDrawCell: function (data) {
+                if (data.column.index === 4 && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var img = td.getElementsByTagName('img')[0];
+                    var dim = data.cell.height - data.cell.padding('vertical');
+                    var textPos = data.cell.textPos;
+                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+                }
+            }
+        };
+        doc.autoTable(content1);
 
+        let content2 = {
+            margin: { top: 80, left: 100 },
+            startY: doc.autoTableEndPosY() + 50,
+            pageBreak: 'auto',
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 100 },
+            },
+            html: '#mytable2',
+
+            didDrawCell: function (data) {
+                if (data.column.index === 11 && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var img = td.getElementsByTagName('img')[0];
+                    var dim = data.cell.height - data.cell.padding('vertical');
+                    var textPos = data.cell.textPos;
+                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+                }
+            }
         };
 
-
-
         //doc.text(title, marginLeft, 40);
-        doc.autoTable(content);
+        doc.autoTable(content2);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Consumption.pdf")
+        doc.save(i18n.t('static.report.shipmentSummeryReport') + ".pdf")
         //creates PDF from img
         /* var doc = new jsPDF('landscape');
         doc.setFontSize(20);
@@ -1536,7 +1631,7 @@ class ShipmentSummery extends Component {
 
 
         if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
-            console.log("INSIDE IF-----------------");
+
             if (versionId.includes('Local')) {
                 var db1;
                 var storeOS;
@@ -1556,7 +1651,7 @@ class ShipmentSummery extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log("1----", program)
+                    // console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -1564,47 +1659,86 @@ class ShipmentSummery extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        console.log("2----", programRequest)
+                        // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-                        var inventoryList = []
-                        // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
-                        planningUnitIds.map(planningUnitId =>
-                            inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)))]);
-                        var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
-                        var data = []
-                        planningUnitIds.map(planningUnitId => {
-                            dates.map(dt => {
+                        var shipmentList = (programJson.shipmentList);
+                        console.log("shipmentList------>", shipmentList);
+                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
 
-                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
-                                console.log("3--->", list)
-                                if (list.length > 0) {
-                                    var adjustment = 0;
-                                    list.map(ele => adjustment = adjustment + ele.adjustmentQty);
+                        let dateFilter = activeFilter.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
 
-                                    var json = {
-                                        program: programJson,
-                                        inventoryDate: moment(dt).format('MMM YYYY'),
-                                        planningUnit: list[0].planningUnit,
-                                        stockAdjustemntQty: adjustment,
-                                        lastModifiedBy: programJson.currentVersion.lastModifiedBy,
-                                        lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-                                        notes: list[0].notes,
-                                        dataSource: list[0].dataSource
-                                    }
-                                    data.push(json)
-                                } else {
-
+                        let data = [];
+                        let planningUnitFilter = [];
+                        for (let i = 0; i < planningUnitIds.length; i++) {
+                            for (let j = 0; j < dateFilter.length; j++) {
+                                if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+                                    planningUnitFilter.push(dateFilter[j]);
                                 }
+                            }
+                        }
+
+                        var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = [];
+
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+
+
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            for (var k = 0; k < myResult.length; k++) {
+                                var planningUnitObj = {
+                                    id: myResult[k].planningUnitId,
+                                    multiplier: myResult[k].multiplier
+                                }
+                                planningList[k] = planningUnitObj
+                            }
+
+                            console.log("planningList------>", planningList);
+
+
+
+
+                            for (let i = 0; i < planningUnitFilter.length; i++) {
+                                let multiplier = 0;
+                                for (let j = 0; j < planningList.length; j++) {
+                                    if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
+                                        multiplier = planningList[j].multiplier;
+                                        j = planningList.length;
+                                    }
+                                }
+
+                                let json = {
+                                    "shipmentId": planningUnitFilter[i].shipmentId,
+                                    "planningUnit": planningUnitFilter[i].planningUnit,
+                                    "forecastingUnit": planningUnitFilter[i].planningUnit.forecastingUnit,
+                                    "multiplier": multiplier,
+                                    "procurementAgent": planningUnitFilter[i].procurementAgent,
+                                    "fundingSource": planningUnitFilter[i].fundingSource,
+                                    "shipmentStatus": planningUnitFilter[i].shipmentStatus,
+                                    "shipmentQty": planningUnitFilter[i].shipmentQty,
+                                    "expectedDeliveryDate": planningUnitFilter[i].expectedDeliveryDate,
+                                    "productCost": planningUnitFilter[i].productCost,
+                                    "freightCost": planningUnitFilter[i].freightCost,
+                                    "totalCost": planningUnitFilter[i].productCost + planningUnitFilter[i].freightCost,
+                                    "notes": planningUnitFilter[i].notes
+                                }
+                                data.push(json);
+                            }
+
+                            console.log("data----->", data);
+                            this.setState({
+                                data: data
+                                , message: ''
                             })
-                        })
-                        console.log(data)
-                        this.setState({
-                            data: data
-                            , message: ''
-                        })
-                    }.bind(this)
+                        }.bind(this)
+                    }.bind(this);
                 }.bind(this)
             } else {
                 var inputjson = {
@@ -1614,14 +1748,15 @@ class ShipmentSummery extends Component {
                     stopDate: new moment(endDate),
                     planningUnitIds: planningUnitIds
                 }
-                AuthenticationService.setupAxiosInterceptors();
-                console.log("inputJson---->", inputjson);
-                ReportService.stockAdjustmentList(inputjson)
+
+                // console.log("inputJson---->", inputjson);
+                ReportService.ShipmentSummery(inputjson)
                     .then(response => {
 
                         console.log("RESP-------->", response.data);
                         this.setState({
                             data: response.data,
+                            viewById: viewById,
                             message: ''
                         }
                         )
@@ -1674,7 +1809,7 @@ class ShipmentSummery extends Component {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
-            this.filterData();
+            this.fetchData();
         })
 
     }
@@ -1691,7 +1826,7 @@ class ShipmentSummery extends Component {
 
     render() {
         const { programs } = this.state
-        // console.log(programs)
+
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -1710,7 +1845,118 @@ class ShipmentSummery extends Component {
             }, this);
 
         const { rangeValue } = this.state;
-        let bar = "";
+
+        var viewById = this.state.viewById;
+
+        const backgroundColor = [
+            '#002f6c',
+            '#118b70',
+            '#EDB944',
+            '#20a8d8',
+            '#d1e3f5',
+        ]
+
+        //Graph start
+        let shipmentStatus = [...new Set(this.state.data.map(ele => (getLabelText(ele.shipmentStatus.label, this.state.lang))))];
+
+        let shipmentSummerydata = [];
+        let data = [];
+        var mainData = this.state.data;
+        mainData = mainData.sort(function (a, b) {
+            return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate);
+        });
+        let dateArray = [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
+
+        for (var i = 0; i < shipmentStatus.length; i++) {
+
+            let data1 = mainData.filter(c => shipmentStatus[i].localeCompare(getLabelText(c.shipmentStatus.label, this.state.lang)) == 0).map((item) => { return { shipmentId: item.shipmentId, expectedDeliveryDate: (moment(item.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY')), totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
+
+            //logic for add same date data
+            let result = Object.values(data1.reduce((a, { shipmentId, totalCost, expectedDeliveryDate, forecastCost }) => {
+                if (!a[expectedDeliveryDate])
+                    a[expectedDeliveryDate] = Object.assign({}, { shipmentId, totalCost, expectedDeliveryDate, forecastCost });
+                else
+                    a[expectedDeliveryDate].totalCost += totalCost;
+                a[expectedDeliveryDate].forecastCost += forecastCost;
+                return a;
+            }, {}));
+
+
+            let tempdata = [];
+            for (var j = 0; j < dateArray.length; j++) {
+                let hold = 0
+                for (var k = 0; k < result.length; k++) {
+                    if (moment(dateArray[j], 'MM-YYYY').isSame(moment(result[k].expectedDeliveryDate, 'MM-YYYY'))) {
+                        hold = viewById == 1 ? result[k].totalCost : result[k].forecastCost;
+                        k = result.length;
+                    } else {
+                        hold = 0;
+                    }
+                }
+                tempdata.push(hold);
+
+            }
+
+            shipmentSummerydata.push(tempdata);
+
+            // console.log(new Date().format('MM-yyyy'));
+            // var data1 = [{ Date: "01-01-2000", Banana: 10 }, { Date: "01-01-2000", Apple: 15 }, { Date: "01-01-2000", Orange: 20 }, { Date: "01-02-2000", Banana: 25 }, { Date: "01-02-2000", Apple: 30 }, { Date: "01-02-2000", Orange: 35 }],
+            //     result = Object.values(data1.reduce((a, c) => {
+            //         a[c.Date] = Object.assign(a[c.Date] || {}, c);
+            //         return a;
+            //     }, {}));
+
+            // console.log("result------->", result);
+        }
+
+        const bar = {
+            labels: [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
+            datasets: shipmentSummerydata.map((item, index) => ({ label: shipmentStatus[index], data: item, backgroundColor: backgroundColor[index] })),
+        };
+        //Graph end
+
+        //Table-1 start
+
+        let tempDataTable = mainData.map((item) => { return { shipmentId: item.shipmentId, fundingSource: item.fundingSource, shipmentQty: item.shipmentQty, totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
+
+        let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
+            if (!a[fundingSource.id])
+                a[fundingSource.id] = Object.assign({}, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost });
+            else
+                a[fundingSource.id].totalCost += totalCost;
+            a[fundingSource.id].shipmentQty += shipmentQty;
+            a[fundingSource.id].forecastCost += forecastCost;
+            return a;
+        }, {}));
+
+        // console.log("RESULT------>>", result);
+
+        let perResult = [];
+        for (var k = 0; k < result.length; k++) {
+            let count = 0;
+            for (var p = 0; p < mainData.length; p++) {
+                if (result[k].fundingSource.id == mainData[p].fundingSource.id) {
+                    count = count + 1;
+                }
+            }
+            let json = {
+                shipmentId: result[k].shipmentId,
+                fundingSource: result[k].fundingSource,
+                shipmentQty: result[k].shipmentQty,
+                totalCost: viewById == 1 ? result[k].totalCost : result[k].forecastCost,
+                orders: 1
+            }
+            perResult.push(json);
+        }
+
+        perResult = perResult.sort((a, b) => parseFloat(b.orders) - parseFloat(a.orders));
+
+        // console.log("perResult-------->>", perResult);
+
+        //Table-1 end
+
+
+
 
         return (
             <div className="animated fadeIn" >
@@ -1722,9 +1968,7 @@ class ShipmentSummery extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.shipmentSummeryReport')}</strong> */}
-                        {/* <i className="icon-menu"></i><strong>Shipment Details</strong> */}
-                        {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
+
                         <Online>
                             {
                                 this.state.data.length > 0 &&
@@ -1864,7 +2108,7 @@ class ShipmentSummery extends Component {
                                                             name="viewById"
                                                             id="viewById"
                                                             bsSize="sm"
-                                                        // onChange={this.filterData}
+                                                            onChange={this.fetchData}
                                                         >
                                                             <option value="1">{i18n.t('static.dashboard.product')}</option>
                                                             <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
@@ -1879,24 +2123,24 @@ class ShipmentSummery extends Component {
                                 <Col md="12 pl-0">
                                     <div className="row">
                                         <Online>
-                                            {/* {
-                                                this.state.consumptions.length > 0
-                                                && */}
-                                            <div className="col-md-12 p-0">
-                                                <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                        <Bar id="cool-canvas" data={chartData} options={options} />
+                                            {
+                                                this.state.data.length > 0
+                                                &&
+                                                <div className="col-md-12 p-0">
+                                                    <div className="col-md-12">
+                                                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                            <Bar id="cool-canvas" data={bar} options={options} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-12">
+                                                        <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
+                                                            {this.state.show ? 'Hide Data' : 'Show Data'}
+                                                        </button>
+
                                                     </div>
                                                 </div>
-                                                <div className="col-md-12">
-                                                    <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
-                                                        {this.state.show ? 'Hide Data' : 'Show Data'}
-                                                    </button>
-
-                                                </div>
-                                            </div>
-                                            {/* } */}
+                                            }
 
 
 
@@ -1926,16 +2170,16 @@ class ShipmentSummery extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.show &&
-                                                <Table responsive className="table-bordered text-center mt-2">
+                                                <Table id="mytable1" responsive className="table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
                                                             <th style={{ width: '225px', cursor: 'pointer' }}></th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}># Orders</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>Qty (Base units)</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>Cost (USD)</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'center' }}>Global Fund</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
@@ -1948,7 +2192,19 @@ class ShipmentSummery extends Component {
                                                             <td style={{ 'text-align': 'right' }}>4,000</td>
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
+                                                    </tbody> */}
+                                                    <tbody>
+                                                        {perResult.length > 0 &&
+                                                            perResult.map((item, idx) =>
+                                                                <tr id="addr0" key={idx} >
+                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(perResult[idx].fundingSource.label, this.state.lang)}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{perResult[idx].orders}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{perResult[idx].shipmentQty}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{perResult[idx].totalCost}</td>
+                                                                </tr>
+                                                            )}
                                                     </tbody>
+
                                                 </Table>}
                                         </div>
                                     </div>
@@ -1957,90 +2213,91 @@ class ShipmentSummery extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.show &&
-                                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                                <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ 'text-align': 'left' }}>Planning Unit/Forecasting Unit</th>
-                                                            <th style={{ 'width': '87px' }}>ID</th>
-                                                            <th>Procurement Agent</th>
-                                                            <th>Funder</th>
-                                                            <th>Status</th>
-
-                                                            <th style={{ 'text-align': 'right' }}>Qty</th>
-                                                            {/* <th style={{ 'width': '87px' }}>Order Date</th> */}
-                                                            <th>Expected Receipt Date</th>
-                                                            <th style={{ 'text-align': 'right' }}>Product Cost (USD)</th>
-                                                            {/* <th style={{ 'text-align': 'right' }}>Freight(%)</th> */}
-                                                            <th style={{ 'text-align': 'right' }}>Freight Cost (USD)</th>
-                                                            <th style={{ 'text-align': 'right' }}>Total Cost (USD)</th>
-                                                            <th style={{ 'text-align': 'right' }}>Containers</th>
-                                                            <th>Notes</th>
+                                                            <th style={{ 'text-align': 'left' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
+                                                            <th style={{ 'width': '87px' }}>{i18n.t('static.report.id')}</th>
+                                                            <th>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th>{i18n.t('static.budget.fundingsource')}</th>
+                                                            <th>{i18n.t('static.common.status')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.qty')}</th>
+                                                            <th>{i18n.t('static.report.expectedReceiveddate')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.productCost')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.freightPer')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.totalCost')}</th>
+                                                            <th>{i18n.t('static.program.notes')}</th>
                                                         </tr>
 
                                                     </thead>
 
-                                                    <tbody>
-                                                        {/* <tr>
-                                                            <th colSpan="14" style={{ 'text-align': 'left' }}>Feb 2020</th>
-                                                        </tr> */}
+                                                    {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td style={{ 'width': '87px' }}>01</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Received</td>
-
                                                             <td style={{ 'text-align': 'right' }}>2,000</td>
-                                                            {/* <td>Feb-03-2020</td> */}
                                                             <td>Apr-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>3,400,000</td>
-                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>340,000</td>
                                                             <td style={{ 'text-align': 'right' }}>3,740,000</td>
                                                             <td style={{ 'text-align': 'right' }}>1</td>
                                                             <td></td>
                                                         </tr>
-                                                        {/* <tr>
-                                                            <th colSpan="14" style={{ 'text-align': 'left' }}>May 2020</th>
-                                                        </tr> */}
+
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>02</td>
                                                             <td>PEPFAR</td>
                                                             <td>Global Fund</td>
                                                             <td>Ordered</td>
-
                                                             <td style={{ 'text-align': 'right' }}>3,000</td>
-                                                            {/* <td>May-07-2020</td> */}
                                                             <td>Sep-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>5,100,000</td>
-                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>510,000</td>
                                                             <td style={{ 'text-align': 'right' }}>5,610,000</td>
                                                             <td style={{ 'text-align': 'right' }}>1.5</td>
                                                             <td></td>
                                                         </tr>
-                                                        {/* <tr>
-                                                            <th colSpan="14" style={{ 'text-align': 'left' }}>Jun 2020</th>
-                                                        </tr> */}
+
                                                         <tr>
                                                             <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
                                                             <td>03</td>
                                                             <td>PEPFAR</td>
                                                             <td>GHSC-PSM</td>
                                                             <td>Planned</td>
-
                                                             <td style={{ 'text-align': 'right' }}>4,000</td>
-                                                            {/* <td>Jun-03-2020</td> */}
                                                             <td>Nov-25-2020</td>
                                                             <td style={{ 'text-align': 'right' }}>6,800,000</td>
-                                                            {/* <td style={{ 'text-align': 'right' }}>10</td> */}
                                                             <td style={{ 'text-align': 'right' }}>680,000</td>
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
                                                             <td></td>
                                                         </tr>
+                                                    </tbody> */}
+
+                                                    <tbody>
+                                                        {this.state.data.length > 0 &&
+                                                            this.state.data.map((item, idx) =>
+                                                                <tr id="addr0" key={idx} >
+                                                                    <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.data[idx].planningUnit.label, this.state.lang)}</td>
+                                                                    <td>{this.state.data[idx].shipmentId}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].procurementAgent.label, this.state.lang)}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].fundingSource.label, this.state.lang)}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].shipmentStatus.label, this.state.lang)}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{this.state.data[idx].shipmentQty}</td>
+                                                                    <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? this.state.data[idx].productCost : this.state.data[idx].productCost * this.state.data[idx].multiplier}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? this.state.data[idx].freightCost : this.state.data[idx].freightCost * this.state.data[idx].multiplier}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? this.state.data[idx].totalCost : this.state.data[idx].totalCost * this.state.data[idx].multiplier}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
+                                                                </tr>
+                                                            )}
                                                     </tbody>
+
+
                                                 </Table>}
                                         </div>
                                     </div>

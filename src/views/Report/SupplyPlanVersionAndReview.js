@@ -319,7 +319,7 @@ class SupplyPlanVersionAndReview extends Component {
 
         var A = [headers]
 
-        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate.replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
+        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), ( moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
         ]));
 
 
@@ -416,27 +416,17 @@ class SupplyPlanVersionAndReview extends Component {
         columns.map((item, idx) => { headers[idx] = item.text });
         const header = [headers];
         console.log(header);
-        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? elt.lastModifiedDate : '', elt.notes]);
+        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '', elt.notes]);
 
         let content = {
             startY: 200,
             head: header,
             body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' , cellWidth: 75 },
             columnStyles: {
-                0: { cellWidth: '8%' },
-                2: { cellWidth: '8%' },
-                3: { cellWidth: '8%' },
-                4: { cellWidth: '8%' },
-                5: { cellWidth: '8%' },
-                6: { cellWidth: '8%' },
-                7: { cellWidth: '8%' },
-                8: { cellWidth: '8%' },
-                9: { cellWidth: '8%' },
-                10: { cellWidth: '8%' },
-                11: { cellWidth: '8%' },
-                12: { cellWidth: '8%' },
-
-            }
+                0: { cellWidth: 131.89 },
+                8: { cellWidth: 105 },
+              }
         };
 
         //  doc.text(title, marginLeft, 40);
@@ -598,7 +588,12 @@ class SupplyPlanVersionAndReview extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.checkValue
+                 formatter: (cellContent, row) => {
+                    return (
+                        (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
 
             }, {
                 dataField: 'notes',

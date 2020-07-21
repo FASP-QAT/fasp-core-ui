@@ -404,7 +404,7 @@
     "static.budget.startdatetext": "Por favor, introduzca la fecha de inicio",
     "static.region.country": "País",
     "static.currency.currencysymbol": "Símbolo de moneda",
-    "static.program.draftleadtime": "Planee el plazo de entrega del borrador en meses",
+    "static.program.planleadtime": "Planee el plazo de entrega del borrador en meses",
     "static.program.monthpastamc": "Mes pasado para AMC",
     "static.program.download": "Descargar datos del programa",
     "static.program.drafttosubmittext": "Ingrese el borrador al tiempo de entrega enviado en meses",
