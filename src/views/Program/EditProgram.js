@@ -632,7 +632,7 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             value={this.state.program.plannedToDraftLeadTime}

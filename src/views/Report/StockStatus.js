@@ -945,7 +945,7 @@ class StockStatus extends Component {
                 var amcAfterArray = [];
 
 
-                for (var c = 0; c < programJson.monthsInPastForAmc; c++) {
+                for (var c = 0; c < pu.monthsInPastForAmc; c++) {
 
                   var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
                   var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
@@ -974,7 +974,7 @@ class StockStatus extends Component {
 
                   }
                 }
-                for (var c = 0; c < programJson.monthsInFutureForAmc; c++) {
+                for (var c = 0; c < pu.monthsInFutureForAmc; c++) {
                   var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                   var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
                   if (consumptionListForAMC.length > 0) {
@@ -1678,13 +1678,13 @@ class StockStatus extends Component {
             <div className="card-header-actions">
               <a className="card-header-action">
                 {this.state.stockStatusList.length > 0 && <div className="card-header-actions">
-                  <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-                  <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                  <img style={{ height: '25px', width: '25px', cursor:'Pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                  <img style={{ height: '25px', width: '25px',cursor:'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>}
               </a>
             </div>
           </div>
-          <CardBody className="pb-lg-2 pt-lg-0">
+          <CardBody className="pb-lg-2 pt-lg-0 CardBodyTop">
             <div className="TableCust" >
               <div ref={ref}>
 

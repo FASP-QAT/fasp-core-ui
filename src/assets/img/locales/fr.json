@@ -398,7 +398,7 @@
     "static.dashboard.addhealtharea": "Ajouter un domaine de santé",
     "static.region.country": "Pays",
     "static.currency.currencysymbol": "Symbole de la monnaie",
-    "static.program.draftleadtime": "Planifier le délai d'exécution provisoire en mois",
+    "static.program.planleadtime": "Planifier le délai d'exécution provisoire en mois",
     "static.program.monthpastamc": "Mois passé pour AMC",
     "static.dashboard.addproduct": "Ajouter un produit",
     "static.program.download": "Télécharger les données du programme",
