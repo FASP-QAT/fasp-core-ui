@@ -223,6 +223,7 @@ const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('./view
 const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory= React.lazy(() => import('./views/Report/ExpiredInventory'));
+const Budgets= React.lazy(() => import('./views/Report/Budgets'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -341,7 +342,7 @@ const routes = [
   { path: '/realmCountry/listRealmCountry/:color/:message',  name: i18n.t('static.dashboard.realmcountrylist'), component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: i18n.t('static.dashboard.realmcountrylist'), component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realmcountry') }), component: AddRealmCountry },
-  { path: '/realmCountry/realmCountry/:realmId', exact: true, name: i18n.t('static.dashboard.realm') + " / " + i18n.t('static.dashboard.realmcountry'), component: RealmCountry },
+  { path: '/realmCountry/realmCountry/:realmId', exact: true, name: i18n.t('static.dashboard.realmcountry'), component: RealmCountry },
 
   { path: '/changePassword', exact: true, name: i18n.t('static.dashboard.changepassword'), component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -467,6 +468,8 @@ const routes = [
   { path: '/report/shipmentSummery', exact: true, name:  i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name:  i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
+  { path: '/report/budgets', name:  i18n.t('static.dashboard.budgetheader'), component: Budgets },
+  
   
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
@@ -531,8 +534,7 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/shipment/shipmentDetails', exact: true, name: 'Shipment Details', component: ShipmentList },
-  { path: '/shipment/shipmentDetails/:message', component: ShipmentList },
+  { path: '/shipment/shipmentDetails', name: 'Shipment Details', component: ShipmentList },
   { path: '/report/warehouseCapacity', name: i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
   { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name:  i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
   { path: '/report/stockAdjustment', name:  i18n.t('static.report.stockAdjustment'), component: StockAdjustment },

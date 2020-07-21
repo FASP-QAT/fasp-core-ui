@@ -3,7 +3,7 @@ import { API_URL } from '../Constants.js';
 
 class ReportService {
     getForecastMatricsOverTime(json) {
-        return axios.post(`${API_URL}/api/report/forecastError`, json, {
+        return axios.post(`${API_URL}/api/report/forecastMetricsMonthly`, json, {
         });
     }
     getGlobalConsumptiondata(json) {
@@ -11,7 +11,7 @@ class ReportService {
         );
     }
     getForecastError(json) {
-        return axios.post(`${API_URL}/api/report/forecastMetrics`, json, {}
+        return axios.post(`${API_URL}/api/report/forecastMetricsComparision`, json, {}
         );
     }
 
@@ -32,7 +32,7 @@ class ReportService {
     }
 
     getStockOverTime(json) {
-        return axios.post(`${API_URL}/api/report/stockStatusOverTime`,json,{}
+        return axios.post(`${API_URL}/api/report/stockStatusOverTime`, json, {}
         );
     }
     getProgramVersionList(programId, realmCountryId, versionStatusId, startDate, stopDate) {
@@ -40,18 +40,13 @@ class ReportService {
         );
     }
 
-    getStockOverTime(json) {
-        return axios.post(`${API_URL}/api/report/stockOverTime`, json, {}
-        );
-    }
-    
     costOfInventory(json){
         return axios.post(`${API_URL}/api/report/costOfInventory`,json,{}
-        );
+	        );
     }
 
     getStockStatusData(json) {
-        return axios.post(`${API_URL}/api/report/stockStatusVertical`,json,{}
+        return axios.post(`${API_URL}/api/report/stockStatusVertical`, json, {}
         );
     }
     inventoryTurns(json) {
@@ -91,8 +86,16 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/shipmentGlobalDemand`, json, {}
         );
     }
-    programLeadTimes(json){
-        return axios.post(`${API_URL}/api/report/programLeadTimes`,json,{}
+    programLeadTimes(json) {
+        return axios.post(`${API_URL}/api/report/programLeadTimes`, json, {}
+        );
+    }
+    ShipmentSummery(json) {
+        return axios.post(`${API_URL}/api/report/shipmentDetails`, json, {}
+        );
+    }
+    budgetReport(json) {
+        return axios.post(`${API_URL}/api/report/budgetReport`, json, {}
         );
     }
 

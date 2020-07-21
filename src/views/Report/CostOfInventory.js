@@ -654,7 +654,7 @@ export default class CostOfInventory extends Component {
                 ReportService.costOfInventory(inputjson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: response.data });
+                        costOfInventory: response.data ,message:''});
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
@@ -784,7 +784,7 @@ export default class CostOfInventory extends Component {
         return (
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">

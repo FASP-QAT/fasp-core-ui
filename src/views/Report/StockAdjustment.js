@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -795,7 +795,7 @@ class StockAdjustmentComponent extends Component {
                     this.setState({ message: message })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Stock Adjustment Report</strong>{' '} */}
@@ -856,7 +856,7 @@ class StockAdjustmentComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Version</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
@@ -875,7 +875,7 @@ class StockAdjustmentComponent extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Product</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls SelectGo">
                                         <InputGroup className="box">

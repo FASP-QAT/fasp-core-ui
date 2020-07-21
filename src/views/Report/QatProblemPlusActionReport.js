@@ -22,7 +22,34 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+
+
+const problemList = [
+    { problemId: 1, type: 'No recent inputs of actual consumption (in the last 3 months)' },
+    { problemId: 2, type: 'No recent inputs of inventory (in the last 3 months)' },
+    { problemId: 3, type: 'Negative ending stock balances' },
+    { problemId: 4, type: 'Actual consumption record replaces forecasted consumption record' },
+    { problemId: 5, type: 'Stock adjustments lack explanatory notes' },
+    { problemId: 6, type: 'Shipments with receive dates in the past have a status that is not received' },
+    { problemId: 7, type: 'PSM shipments lack an RO#' },
+    { problemId: 8, type: 'ARTMIS & supply plan alignment (checking for quantities, product SKU, receive date)' },
+    { problemId: 9, type: 'Supply Plan is not planned for 18 months into the future (forecasted consumption and shipments)' },
+    { problemId: 10, type: 'Shipments are showing a status of planned within the lead time (usually 6 months)' },
+];
+
+const actionList = [
+    { actionId: 1, problemId: 1, action: 'Add consumption data for planning unit' },
+    { actionId: 2, problemId: 2, action: 'Add inventory data for planning unit' },
+    { actionId: 3, problemId: 3, action: 'check why inventory is negative' },
+    { actionId: 4, problemId: 4, action: 'check actual and forecasted consumption record' },
+    { actionId: 5, problemId: 5, action: 'Add notes' },
+    { actionId: 6, problemId: 6, action: 'Add recived date for shipments' },
+    { actionId: 7, problemId: 7, action: 'Add RO' },
+    { actionId: 8, problemId: 8, action: 'Check quantities,SKU,received date' },
+    { actionId: 9, problemId: 9, action: 'Add consumption for planning unit for future 18 months' },
+    { actionId: 10, problemId: 10, action: 'check shipment status' },
+];
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -39,13 +66,16 @@ export default class ConsumptionDetails extends React.Component {
             procurementUnitList: [],
             supplierList: [],
             message: '',
+            planningUnitId: ''
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
 
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
-        this.filterData = this.filterData.bind(this);
+        this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.changed = this.changed.bind(this);
     }
 
     componentDidMount = function () {
@@ -83,135 +113,111 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList
                 })
-
-
-                data = [];
-                data[0] = 'Unplanned Order';
-                data[1] = 'HIV/AIDS - Malavi';
-                data[2] = 'Abacvair 20 mg/ml Solution';
-                data[3] = 'Mar-30-20';
-                data[4] = '60';
-                data[5] = 'High';
-                data[6] = 'Button. Which will be clickable and redirect on respective page';
-                data[7] = 'Text Area';
-                data[8] = 1;
-
-                var dataArray = [];
-                dataArray[0] = data
-
-                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                this.el.destroy();
-                var json = [];
-                var data = dataArray;
-                var options = {
-                    data: data,
-                    columnDrag: true,
-                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
-                    columns: [
-                        {
-                            title: 'Problem Type',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Program',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Planning Unit',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Problem Raised On',
-                            type: 'text',
-                            options: {
-                                format: 'YYYY-DD-MM'
-                            },
-                            readOnly: true
-                        },
-                        {
-                            title: 'Number of days the action has been outstanding​',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Priority',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Action',
-                            type: 'text',
-                            readOnly: true
-                        },
-                        {
-                            title: 'Country Updates',
-                            type: 'text',
-                        },
-                        {
-                            title: 'Post HQ Review Status',
-                            type: 'dropdown',
-                            source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
-                        },
-                    ],
-                    pagination: 10,
-                    search: true,
-                    columnSorting: true,
-                    tableOverflow: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    onchange: this.changed,
-                    oneditionend: this.onedit,
-                    copyCompatibility: true,
-                    paginationOptions: [10, 25, 50, 100],
-                    position: 'top',
-                    text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                        show: '',
-                        entries: '',
-                    },
-                    onload: this.loaded,
-                };
-                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-
-
-
-
-
-
-
-
-
             }.bind(this);
         }.bind(this)
 
 
     };
 
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+    addRow = function () {
+
+        var sel = document.getElementById("planningUnitId");
+        var planningUnitText = sel.options[sel.selectedIndex].text;
+
+        var selP = document.getElementById("programId");
+        var programText = selP.options[sel.selectedIndex].text;
+
+        // this.el.insertRow();
+        // var json = this.el.getJson();
+        var data = [];
+        data[0] = "";
+        data[1] = programText;
+        data[2] = planningUnitText;
+        data[3] = moment(Date.now()).format('YYYY-MM-DD');
+        data[4] = "0";
+        data[5] = "";
+        data[6] = "";
+        data[7] = "";
+        data[8] = 1;
+        this.el.insertRow(
+            data
+        );
     }
 
-    filterData() {
+    changed = function (instance, cell, x, y, value) {
+        // this.props.removeMessageText && this.props.removeMessageText();
+        if (x == 0) {
+            console.log("in if changed=======");
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+            // var columnName = jexcel.getColumnNameFromId([x + 6, y]);
+            // console.log("columnName====",columnName);
+            var actionId = actionList.filter(c => c.problemId == value);
+            console.log("actionId====", actionId);
+            this.el.setValueFromCoords(6, y, actionId[0].actionId, true);
+        }
+    }
+
+    getPlanningUnitList(event) {
+        // console.log("-------------in planning list-------------")
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                // console.log("myResult", myResult);
+                var programId = (document.getElementById("programId").value).split("_")[0];
+                // console.log('programId----->>>', programId)
+                console.log(myResult);
+                var proList = []
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].program.id == programId) {
+                        var productJson = {
+                            name: getLabelText(myResult[i].planningUnit.label, lan),
+                            id: myResult[i].planningUnit.id
+                        }
+                        proList[i] = productJson
+                    }
+                }
+                this.setState({
+                    planningUnitList: proList
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+
+    fetchData() {
         let programId = document.getElementById('programId').value;
         let planningUnitId = document.getElementById('planningUnitId').value;
         let priorityId = document.getElementById('priorityId').value;
         let hqStatusId = document.getElementById('hqStatusId').value;
         console.log("IMP ---------> ", programId)
+        this.setState({ programId: programId, planningUnitId: planningUnitId });
+        if (parseInt(programId) != 0 && planningUnitId != 0) {
 
-        this.setState({ programId: programId });
-
-
-
-        if (parseInt(programId) != 0) {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open('fasp', 1);
-
             var procurementAgentList = [];
             var fundingSourceList = [];
             var budgetList = [];
@@ -230,100 +236,134 @@ export default class ConsumptionDetails extends React.Component {
                     var sel = document.getElementById("planningUnitId");
                     var planningUnitText = sel.options[sel.selectedIndex].text;
 
-                    // data = [];
-                    // data[0] = 'abc';
-                    // data[1] = 'a';
-                    // data[2] = planningUnitText;
-                    // data[3] = '30-03-2020';
-                    // data[4] = '60';
-                    // data[5] = 'High';
-                    // data[6] = 'Button. Which will be clickable and redirect on respective page';
-                    // data[7] = 'Text Area';
-                    // data[8] = 1;
+                    var selP = document.getElementById("programId");
+                    var programText = selP.options[sel.selectedIndex].text;
 
-                    // var dataArray = [];
-                    // dataArray[0] = data
+                    var list = [];
+                    for (var k = 0; k < problemList.length; k++) {
+                        var problemJson = {
+                            name: problemList[k].type,
+                            id: problemList[k].problemId
+                        }
+                        list.push(problemJson);
+                    }
+                    console.log("list====>", list);
 
-                    // this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                    // this.el.destroy();
-                    // var json = [];
-                    // var data = dataArray;
-                    // var options = {
-                    //     data: data,
-                    //     columnDrag: true,
-                    //     colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
-                    //     columns: [
-                    //         {
-                    //             title: 'Problem Type',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Program',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Planning Unit',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Problem Raised On',
-                    //             type: 'text',
-                    //             options: {
-                    //                 format: 'YYYY-DD-MM'
-                    //             },
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Number of days the action has been outstanding​',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Priority',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Action',
-                    //             type: 'text',
-                    //             readOnly: true
-                    //         },
-                    //         {
-                    //             title: 'Country Updates',
-                    //             type: 'text',
-                    //         },
-                    //         {
-                    //             title: 'Post HQ Review Status',
-                    //             type: 'dropdown',
-                    //             source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
-                    //         },
-                    //     ],
-                    //     pagination: 10,
-                    //     search: true,
-                    //     columnSorting: true,
-                    //     tableOverflow: true,
-                    //     wordWrap: true,
-                    //     allowInsertColumn: false,
-                    //     allowManualInsertColumn: false,
-                    //     allowDeleteRow: false,
-                    //     onchange: this.changed,
-                    //     oneditionend: this.onedit,
-                    //     copyCompatibility: true,
-                    //     paginationOptions: [10, 25, 50, 100],
-                    //     position: 'top'
-                    // };
-                    // this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                    var list2 = [];
+                    for (var j = 0; j < actionList.length; j++) {
+                        var actionJson = {
+                            name: actionList[j].action,
+                            id: actionList[j].actionId
+                        }
+                        list2.push(actionJson);
+                    }
+                    console.log("list2====>", list2);
 
+                    data = [];
+                    // data[0] = 'No recent inputs of actual consumption (in the last 3 months)';
+                    data[0] = 1;
+                    data[1] = programText;
+                    data[2] = planningUnitText;
+                    data[3] = '2020-07-23';
+                    data[4] = '60';
+                    data[5] = 'High';
+                    // data[6] = 'Add consumption data for planning unit';
+                    data[6] = 1;
+                    data[7] = 'Text Area';
+                    data[8] = 1;
 
+                    var dataArray = [];
+                    dataArray[0] = data
 
+                    this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                    this.el.destroy();
+                    var json = [];
+                    var data = dataArray;
+                    var options = {
+                        data: data,
+                        columnDrag: true,
+                        colWidths: [200, 100, 100, 100, 100, 100, 200, 100, 100],
+                        columns: [
+                            {
+                                title: 'Problem Type',
+                                type: 'dropdown',
+                                source: list,
+                                // readOnly: true
+                            },
+                            {
+                                title: 'Program',
+                                type: 'text',
+                                readOnly: true
+                            },
+                            {
+                                title: 'Planning Unit',
+                                type: 'text',
+                                readOnly: true
+                            },
+                            {
+                                title: 'Problem Raised On',
+                                type: 'calendar',
+                                options: {
+                                    format: 'YYYY-MM-DD'
+                                },
+                                // readOnly: true
+                            },
+                            {
+                                title: 'Number of days the action has been outstanding​',
+                                type: 'text',
+                                readOnly: true
+                            },
+                            {
+                                title: 'Priority',
+                                type: 'text',
+                                readOnly: true
+                            },
+                            {
+                                title: 'Action',
+                                type: 'dropdown',
+                                source: list2,
+                                readOnly: true
+                            },
+                            {
+                                title: 'Country Updates',
+                                type: 'text',
+                            },
+                            {
+                                title: 'Post HQ Review Status',
+                                type: 'dropdown',
+                                source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
+                            },
+                        ],
+                        pagination: 10,
+                        search: true,
+                        columnSorting: true,
+                        tableOverflow: true,
+                        wordWrap: true,
+                        allowInsertColumn: false,
+                        allowManualInsertColumn: false,
+                        allowDeleteRow: false,
+                        onchange: this.changed,
+                        oneditionend: this.onedit,
+                        copyCompatibility: true,
+                        paginationOptions: [10, 25, 50, 100],
+                        position: 'top',
+                        text: {
+                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                            show: '',
+                            entries: '',
+                        },
+                        onload: this.loaded,
+                    };
+                    this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
                 }.bind(this)
             }.bind(this)
         }
     }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+
 
     render() {
         const lan = 'en';
@@ -406,7 +446,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     id="planningUnitId"
                                                                     bsSize="sm"
                                                                     value={this.state.planningUnitId}
-                                                                    onChange={this.filterData}
+                                                                    onChange={this.fetchData}
                                                                 >
                                                                     <option value="0">Please Select</option>
                                                                     {planningUnits}
@@ -464,8 +504,11 @@ export default class ConsumptionDetails extends React.Component {
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
+                            <Button color="danger" size="md" className="float-right mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.cancelClicked} > <i className="fa fa-angle-double-left "></i> Cancel</Button>
                             &nbsp;
-</FormGroup>
+                            {this.state.planningUnitId > 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRow}> <i className="fa fa-plus"></i> Add Row</Button>}
+                            &nbsp;
+                        </FormGroup>
                     </CardFooter>
                 </Card>
 
@@ -474,48 +517,9 @@ export default class ConsumptionDetails extends React.Component {
         );
     }
 
-    getPlanningUnitList(event) {
-        // console.log("-------------in planning list-------------")
-        const lan = 'en';
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            planningunitRequest.onsuccess = function (e) {
-                var myResult = [];
-                myResult = planningunitRequest.result;
-                // console.log("myResult", myResult);
-                var programId = (document.getElementById("programId").value).split("_")[0];
-                // console.log('programId----->>>', programId)
-                console.log(myResult);
-                var proList = []
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].program.id == programId) {
-                        var productJson = {
-                            name: getLabelText(myResult[i].planningUnit.label, lan),
-                            id: myResult[i].planningUnit.id
-                        }
-                        proList[i] = productJson
-                    }
-                }
-                this.setState({
-                    planningUnitList: proList
-                })
-            }.bind(this);
-        }.bind(this)
-    }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/ApplicationDashboard/`);
     }
 }
 

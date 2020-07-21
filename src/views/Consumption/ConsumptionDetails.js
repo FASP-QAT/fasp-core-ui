@@ -868,6 +868,8 @@ export default class ConsumptionDetails extends React.Component {
                 if (value != -1) {
                     var expiryDate = this.state.batchInfoListAllForConsumption.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
                     elInstance.setValueFromCoords(1, y, expiryDate, true);
+                } else {
+                    elInstance.setValueFromCoords(1, y, "", true);
                 }
                 var col1 = ("C").concat(parseInt(y) + 1);
                 var qty = elInstance.getValueFromCoords(2, y).replaceAll("\,", "");
@@ -882,7 +884,9 @@ export default class ConsumptionDetails extends React.Component {
         if (x == 2) {
             var reg = /^[0-9\b]+$/;
             var col = ("C").concat(parseInt(y) + 1);
+            value=(elInstance.getRowData(y))[2];
             value = value.toString().replaceAll("\,", "");
+            console.log("Value", value);
             if (value == "" || value == 0) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -1027,7 +1031,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
                     var col = ("C").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(2, y);
+                    var value=(elInstance.getRowData(y))[2];
                     value = value.toString().replaceAll("\,", "");
                     var reg = /^[0-9\b]+$/;
                     if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
@@ -1212,7 +1216,9 @@ export default class ConsumptionDetails extends React.Component {
         if (x == 3) {
             var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
+            value=(elInstance.getRowData(y))[3];
             value = value.toString().replaceAll("\,", "");
+            console.log("Value", value);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -1236,6 +1242,7 @@ export default class ConsumptionDetails extends React.Component {
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
+            value=(elInstance.getRowData(y))[4];
             value = value.toString().replaceAll("\,", "");
             if (value != "") {
                 if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -1370,7 +1377,7 @@ export default class ConsumptionDetails extends React.Component {
                 }
 
                 var col = ("D").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(3, y);
+                var value=(elInstance.getRowData(y))[3];
                 value = value.toString().replaceAll("\,", "");
                 var reg = /^[0-9\b]+$/;
                 if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -1389,7 +1396,7 @@ export default class ConsumptionDetails extends React.Component {
 
                 var reg = /^[0-9\b]+$/;
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y);
+                var value=(elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "");
                 if (value != "") {
                     if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {

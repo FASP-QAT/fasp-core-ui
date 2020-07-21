@@ -11,7 +11,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -208,7 +208,6 @@ export default class SupplyPlanComponent extends React.Component {
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
         this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
         this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
-        this.calculationsForOpeningAndClosingBalanceAccordingToMonths = this.calculationsForOpeningAndClosingBalanceAccordingToMonths.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
@@ -1837,7 +1836,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     orderedShipmentsDetailsArr.push(shipmentDetail);
                                     orderedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
-                                } else if (manualShipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == DRAFT_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                } else if (manualShipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || manualShipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
                                     if (manualShipmentArr[j].procurementAgent.id != "") {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
@@ -1883,7 +1882,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 orderedShipmentsTotalData.push("");
                             }
 
-                            if ((manualShipmentArr.filter(c => c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS || c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                            if ((manualShipmentArr.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                 var colour = paColor;
                                 if (plannedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
@@ -1928,7 +1927,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     orderedErpShipmentsDetailsArr.push(shipmentDetail);
                                     orderedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
-                                } else if (erpShipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == DRAFT_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                } else if (erpShipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || erpShipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
                                     if (erpShipmentArr[j].procurementAgent.id != "") {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
@@ -1974,7 +1973,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 orderedErpShipmentsTotalData.push("");
                             }
 
-                            if ((erpShipmentArr.filter(c => c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS || c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                            if ((erpShipmentArr.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                 var colour = paColor;
                                 if (plannedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
@@ -2309,7 +2308,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     isEmergencyOrder = 0;
                                 } else {
                                     isEmergencyOrder = 1;
-
                                 }
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": m[s].startDate, "isEmergencyOrder": isEmergencyOrder });
                             }
@@ -2459,42 +2457,6 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
 
-    }
-
-    calculationsForOpeningAndClosingBalanceAccordingToMonths() {
-        // var db1;
-        // var storeOS;
-        // getDatabase();
-        // var regionList = this.state.regionList;
-        // var regionListFiltered = this.state.regionList;
-        // console.log("RegionListFiltered", regionListFiltered)
-        // var planningUnitId = document.getElementById("planningUnitId").value;
-        // var openRequest = indexedDB.open('fasp', 1);
-        // openRequest.onerror = function (event) {
-        //     this.setState({
-        //         supplyPlanError: i18n.t('static.program.errortext')
-        //     })
-        // }.bind(this);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-        //     var programDataOs = programDataTransaction.objectStore('programData');
-        //     var programRequest = programDataOs.get(document.getElementById("programId").value);
-        //     programRequest.onerror = function (event) {
-        //         this.setState({
-        //             supplyPlanError: i18n.t('static.program.errortext')
-        //         })
-        //     }.bind(this);
-        //     programRequest.onsuccess = function (e) {
-        //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-        //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        //         var programJson = JSON.parse(programData);
-        //         console.log("ProgramJson in closing balance function", programJson);
-
-        //         console.log("Opening balance inside function", openingBalance)
-        //         return openingBalance;
-        //     }.bind(this)
-        // }.bind(this)
     }
 
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType) {
@@ -3251,6 +3213,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 2) {
             var reg = /^[0-9\b]+$/;
             var col = ("C").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[2];
             value = value.toString().replaceAll("\,", "");
             if (value == "" || value == 0) {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -3390,7 +3353,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     var col = ("C").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(2, y);
+                    var value = (elInstance.getRowData(y))[2];
                     value = value.toString().replaceAll("\,", "");
                     var reg = /^[0-9\b]+$/;
                     if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
@@ -3488,6 +3451,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 3) {
             var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[3];
             value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -3511,6 +3475,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
+            value = (elInstance.getRowData(y))[4];
             value = value.toString().replaceAll("\,", "");
             if (value != "") {
                 if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -3580,7 +3545,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 var col = ("D").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(3, y);
+                var value = (elInstance.getRowData(y))[3];
                 value = value.toString().replaceAll("\,", "");
                 var reg = /^[0-9\b]+$/;
                 if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -3599,7 +3564,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                 var reg = /^[0-9\b]+$/;
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y);
+                var value = (elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "");
                 if (value != "") {
                     if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -3684,7 +3649,7 @@ export default class SupplyPlanComponent extends React.Component {
                         } else {
                             var consumptionJson = {
                                 consumptionId: 0,
-                                consumptionDate: moment(map.get("7")).format("YYYY-MM-DD"),
+                                consumptionDate: moment(map.get("7")).startOf('month').format("YYYY-MM-DD"),
                                 region: {
                                     id: map.get("1")
                                 },
@@ -4513,6 +4478,7 @@ export default class SupplyPlanComponent extends React.Component {
             if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
                 // var reg = /^[0-9\b]+$/;
+                value = (elInstance.getRowData(y))[3];
                 value = value.toString().replaceAll("\,", "");
                 var col = ("D").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -4546,6 +4512,7 @@ export default class SupplyPlanComponent extends React.Component {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
                 var col = ("E").concat(parseInt(y) + 1);
+                value = (elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -4709,10 +4676,10 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     var col = ("D").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "");
+                    var value = ((elInstance.getRowData(y))[3]).toString().replaceAll("\,", "");
                     var reg = /-?\d+/;
                     // var reg = /^[0-9\b]+$/;
-                    if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
+                    if (value != "" && value != 0) {
                         var reg = /-?\d+/
                         // var reg = /^[0-9\b]+$/;
                         var col = ("D").concat(parseInt(y) + 1);
@@ -4737,8 +4704,8 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setComments(col, "");
                     }
 
-                    var value = elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "");
-                    if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
+                    var value = ((elInstance.getRowData(y))[4]).toString().replaceAll("\,", "");
+                    if (value != "" && value != 0) {
                         // var reg = /-?\d+/
                         var reg = /^[0-9\b]+$/;
                         var col = ("E").concat(parseInt(y) + 1);
@@ -4899,6 +4866,7 @@ export default class SupplyPlanComponent extends React.Component {
             if (elInstance.getValueFromCoords(7, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(7, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
                 // var reg = /^[0-9\b]+$/;
+                value = (elInstance.getRowData(y))[7];
                 value = value.toString().replaceAll("\,", "");
                 var col = ("H").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -4926,6 +4894,7 @@ export default class SupplyPlanComponent extends React.Component {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
                 var col = ("J").concat(parseInt(y) + 1);
+                value = (elInstance.getRowData(y))[9];
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -4969,6 +4938,25 @@ export default class SupplyPlanComponent extends React.Component {
                     cell.classList.remove('readonly');
                     elInstance.setValueFromCoords(9, y, "", true);
                 }
+            }
+        }
+
+        if (x == 11) {
+            var adjustmentType = (elInstance.getRowData(y))[5];
+            var col = ("L").concat(parseInt(y) + 1);
+            console.log("Adjustment type", adjustmentType);
+            if (adjustmentType == 2) {
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
         }
 
@@ -5050,10 +5038,10 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 var col = ("H").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(7, y).toString().replaceAll("\,", "");
+                var value = ((elInstance.getRowData(y))[7]).toString().replaceAll("\,", "");
                 var reg = /-?\d+/;
                 // var reg = /^[0-9\b]+$/;
-                if (elInstance.getValueFromCoords(7, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(7, y).toString().replaceAll("\,", "") != 0) {
+                if (value != "" && value != 0) {
                     var reg = /-?\d+/
                     // var reg = /^[0-9\b]+$/;
                     var col = ("H").concat(parseInt(y) + 1);
@@ -5078,8 +5066,8 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, "");
                 }
 
-                var value = elInstance.getValueFromCoords(9, y).toString().replaceAll("\,", "");
-                if (elInstance.getValueFromCoords(9, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(9, y).toString().replaceAll("\,", "") != 0) {
+                var value = ((elInstance.getRowData(y))[9]).toString().replaceAll("\,", "");
+                if (value != "" && value != 0) {
                     // var reg = /-?\d+/
                     var reg = /^[0-9\b]+$/;
                     var col = ("J").concat(parseInt(y) + 1);
@@ -5111,6 +5099,23 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var value = elInstance.getValueFromCoords(11, y);
+                var col = ("L").concat(parseInt(y) + 1);
+                if ((elInstance.getRowData(y))[5] == 2) {
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -5186,7 +5191,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 region: {
                                     id: map.get("1")
                                 },
-                                inventoryDate: map.get("14"),
+                                inventoryDate: moment(map.get("14")).endOf('month').format("YYYY-MM-DD"),
                                 adjustmentQty: map.get("7").toString().replaceAll("\,", ""),
                                 actualQty: map.get("9").toString().replaceAll("\,", ""),
                                 active: map.get("13"),
@@ -5232,7 +5237,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             id: QAT_DATA_SOURCE_ID
                                         },
                                         region: null,
-                                        inventoryDate: map.get("14"),
+                                        inventoryDate: moment(map.get("14")).endOf('month').format("YYYY-MM-DD"),
                                         adjustmentQty: nationalAdjustment,
                                         actualQty: "",
                                         active: true,
@@ -5372,7 +5377,7 @@ export default class SupplyPlanComponent extends React.Component {
                         for (var k = 0; k < currencyResult.length; k++) {
 
                             var currencyJson = {
-                                name: getLabelText(currencyResult[k].label, this.state.lang),
+                                name: getLabelText(currencyResult[k].label, this.state.lang) + "-" + currencyResult[k].currencyCode,
                                 id: currencyResult[k].currencyId
                             }
                             currencyList.push(currencyJson);
@@ -5710,6 +5715,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
+            value = (elInstance.getRowData(y))[2];
             value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -5924,7 +5930,7 @@ export default class SupplyPlanComponent extends React.Component {
         for (var y = 0; y < json.length; y++) {
 
             var col = ("C").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(2, y);
+            var value = (elInstance.getRowData(y))[2];
             var reg = /^[0-9\b]+$/;
             value = value.toString().replaceAll("\,", "");
             if (value == "") {
@@ -6295,8 +6301,8 @@ export default class SupplyPlanComponent extends React.Component {
                 <h5 className="red">{this.state.supplyPlanError}</h5>
 
                 <Card>
-                    <div className="Card-header-reporticon">
-                        {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
+                    <CardHeader>
+                        <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
                         <div className="card-header-actions">
 
                             <a className="card-header-action">
@@ -6304,8 +6310,8 @@ export default class SupplyPlanComponent extends React.Component {
                             </a>
 
                         </div>
-                    </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    </CardHeader>
+                    <CardBody>
                         <Formik
                             render={
                                 ({
@@ -6643,7 +6649,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 } else if (supplyPlanType == 'orderedShipments') {
                                                     shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
                                                 } else if (supplyPlanType == 'plannedShipments') {
-                                                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS || c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                                    shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                                                 } else if (supplyPlanType == 'deliveredErpShipments') {
                                                     shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                                                     tableEditableBasedOnSupplyPlan = false;
@@ -6654,7 +6660,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
                                                     tableEditableBasedOnSupplyPlan = false;
                                                 } else if (supplyPlanType == 'plannedErpShipments') {
-                                                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DRAFT_SHIPMENT_STATUS || c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                                    shipmentList = shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                                                     tableEditableBasedOnSupplyPlan = false;
                                                 }
 
@@ -6678,7 +6684,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             }
                                                         }
 
-                                                        if (procurementAgentPlanningUnit.unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                        if (procurementAgentPlanningUnit.unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0 && procurementAgentPlanningUnit.unitsPerContainer != null && procurementAgentPlanningUnit.unitsPerPalletEuro1 != null) {
                                                             userQty = shipmentList[i].shipmentQty;
                                                         }
                                                     }
@@ -7340,6 +7346,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (x == 2) {
             var reg = /^[0-9\b]+$/;
             var col = ("C").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[2];
             value = value.toString().replaceAll("\,", "");
             if (value == "" || value == 0) {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -7417,7 +7424,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y);
+                var value = (elInstance.getRowData(y))[2];
                 value = value.toString().replaceAll("\,", "");
                 var reg = /^[0-9\b]+$/;
                 if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -7553,12 +7560,15 @@ export default class SupplyPlanComponent extends React.Component {
             var col1 = ("AA").concat(parseInt(y) + 1);
             var col2 = ("AB").concat(parseInt(y) + 1);
             var col3 = ("I").concat(parseInt(y) + 1);
+            var col4 = ("E").concat(parseInt(y) + 1);
+            var col5 = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (value == DELIVERED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS) {
+                var oldShipmentId = elInstance.getValueFromCoords(38, y);
+                if ((value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS) && oldShipmentId != DELIVERED_SHIPMENT_STATUS) {
                     var procurementUnit = elInstance.getValueFromCoords(26, y);
                     var supplier = elInstance.getValueFromCoords(27, y);
                     if (procurementUnit == "") {
@@ -7578,7 +7588,7 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col2, "background-color", "transparent");
                         elInstance.setComments(col2, "");
                     }
-                } else if (value == SUBMITTED_SHIPMENT_STATUS) {
+                } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
                     var budget = elInstance.getValueFromCoords(8, y);
                     if (budget == "") {
                         elInstance.setStyle(col3, "background-color", "transparent");
@@ -7587,6 +7597,27 @@ export default class SupplyPlanComponent extends React.Component {
                     } else {
                         elInstance.setStyle(col3, "background-color", "transparent");
                         elInstance.setComments(col3, "");
+                    }
+
+                    var procurementAgent = (elInstance.getRowData(y))[4];
+                    var fundingSource = (elInstance.getRowData(y))[7];
+
+                    if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
+                        elInstance.setStyle(col4, "background-color", "transparent");
+                        elInstance.setStyle(col4, "background-color", "yellow");
+                        elInstance.setComments(col4, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col4, "background-color", "transparent");
+                        elInstance.setComments(col4, "");
+                    }
+
+                    if (fundingSource == TBD_FUNDING_SOURCE) {
+                        elInstance.setStyle(col5, "background-color", "transparent");
+                        elInstance.setStyle(col5, "background-color", "yellow");
+                        elInstance.setComments(col5, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col5, "background-color", "transparent");
+                        elInstance.setComments(col5, "");
                     }
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -7597,6 +7628,10 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col2, "");
                     elInstance.setStyle(col3, "background-color", "transparent");
                     elInstance.setComments(col3, "");
+                    elInstance.setStyle(col4, "background-color", "transparent");
+                    elInstance.setComments(col4, "");
+                    elInstance.setStyle(col5, "background-color", "transparent");
+                    elInstance.setComments(col5, "");
                 }
             }
         }
@@ -7621,31 +7656,43 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 elInstance.setValueFromCoords(26, y, "", true);
             } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var procurementAgentPlanningUnit = this.state.procurementAgentListAll.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
-                var procurementUnitValue = elInstance.getRowData(y)[26];
-                var pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
-                if (procurementUnitValue != "") {
-                    var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == procurementUnitValue && p.procurementAgent.id == value)[0];
-                    if (procurementUnit.vendorPrice != 0 && procurementUnit.vendorPrice != null) {
-                        pricePerUnit = procurementUnit.vendorPrice;
+                var shipmentStatus = (elInstance.getRowData(y))[1];
+                if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (value == TBD_PROCUREMENT_AGENT_ID) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                    var procurementAgentPlanningUnit = this.state.procurementAgentListAll.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
+                    var procurementUnitValue = elInstance.getRowData(y)[26];
+                    var pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
+                    if (procurementUnitValue != "") {
+                        var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == procurementUnitValue && p.procurementAgent.id == value)[0];
+                        if (procurementUnit.vendorPrice != 0 && procurementUnit.vendorPrice != null) {
+                            pricePerUnit = procurementUnit.vendorPrice;
+                        }
+                    }
+                    var conversionRateToUsd = elInstance.getValueFromCoords(6, y);
+                    pricePerUnit = (pricePerUnit / conversionRateToUsd).toFixed(2);
+                    elInstance.setValueFromCoords(11, y, procurementAgentPlanningUnit.moq, true);
+                    elInstance.setValueFromCoords(28, y, pricePerUnit, true);
+                    elInstance.setValueFromCoords(12, y, procurementAgentPlanningUnit.unitsPerPalletEuro1, true);
+                    elInstance.setValueFromCoords(13, y, procurementAgentPlanningUnit.unitsPerPalletEuro2, true);
+                    elInstance.setValueFromCoords(14, y, procurementAgentPlanningUnit.unitsPerContainer, true);
+                    if (procurementAgentPlanningUnit.unitsPerPalletEuro1 == 0 || procurementAgentPlanningUnit.unitsPerContainer == 0 || procurementAgentPlanningUnit.unitsPerPalletEuro1 == null || procurementAgentPlanningUnit.unitsPerContainer == null) {
+                        elInstance.setValueFromCoords(18, y, "", true);
+                        elInstance.setValueFromCoords(19, y, "", true);
+                        elInstance.setValueFromCoords(20, y, "", true);
                     }
                 }
-                var conversionRateToUsd = elInstance.getValueFromCoords(6, y);
-                pricePerUnit = (pricePerUnit / conversionRateToUsd).toFixed(2);
-                elInstance.setValueFromCoords(11, y, procurementAgentPlanningUnit.moq, true);
-                elInstance.setValueFromCoords(28, y, pricePerUnit, true);
-                elInstance.setValueFromCoords(12, y, procurementAgentPlanningUnit.unitsPerPalletEuro1, true);
-                elInstance.setValueFromCoords(13, y, procurementAgentPlanningUnit.unitsPerPalletEuro2, true);
-                elInstance.setValueFromCoords(14, y, procurementAgentPlanningUnit.unitsPerContainer, true);
-                if (procurementAgentPlanningUnit.unitsPerPalletEuro1 == 0 || procurementAgentPlanningUnit.unitsPerContainer == 0) {
-                    elInstance.setValueFromCoords(18, y, "", true);
-                    elInstance.setValueFromCoords(19, y, "", true);
-                    elInstance.setValueFromCoords(20, y, "", true);
-                }
+                elInstance.setValueFromCoords(26, y, "", true);
             }
-            elInstance.setValueFromCoords(26, y, "", true);
         }
 
         if (x == 7) {
@@ -7655,13 +7702,26 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
+                var shipmentStatus = (elInstance.getRowData(y))[1];
+                if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (value == TBD_FUNDING_SOURCE) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
             }
         }
 
         if (x == 20) {
             var col = ("U").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[20];
             value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -7680,6 +7740,8 @@ export default class SupplyPlanComponent extends React.Component {
 
         if (x == 25) {
             var col = ("Z").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[25];
+            value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
@@ -7767,6 +7829,8 @@ export default class SupplyPlanComponent extends React.Component {
 
         if (x == 31) {
             var col = ("AF").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[31];
+            value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
@@ -7888,13 +7952,17 @@ export default class SupplyPlanComponent extends React.Component {
                 var col1 = ("AA").concat(parseInt(y) + 1);
                 var col2 = ("AB").concat(parseInt(y) + 1);
                 var col3 = ("I").concat(parseInt(y) + 1);
+
+                var col4 = ("E").concat(parseInt(y) + 1);
+                var col5 = ("H").concat(parseInt(y) + 1);
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (value == DELIVERED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS) {
+                    var oldShipmentId = elInstance.getValueFromCoords(38, y);
+                    if ((value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS) && oldShipmentId != DELIVERED_SHIPMENT_STATUS) {
                         var procurementUnit = elInstance.getValueFromCoords(26, y);
                         var supplier = elInstance.getValueFromCoords(27, y);
                         if (procurementUnit == "") {
@@ -7916,16 +7984,26 @@ export default class SupplyPlanComponent extends React.Component {
                             elInstance.setStyle(col2, "background-color", "transparent");
                             elInstance.setComments(col2, "");
                         }
-                    } else if (value == SUBMITTED_SHIPMENT_STATUS) {
-                        var budget = elInstance.getValueFromCoords(8, y);
-                        if (budget == "") {
-                            elInstance.setStyle(col3, "background-color", "transparent");
-                            elInstance.setStyle(col3, "background-color", "yellow");
-                            elInstance.setComments(col3, i18n.t('static.label.fieldRequired'));
-                            valid = false;
+                    } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        var procurementAgent = (elInstance.getRowData(y))[4];
+                        var fundingSource = (elInstance.getRowData(y))[7];
+
+                        if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
+                            elInstance.setStyle(col4, "background-color", "transparent");
+                            elInstance.setStyle(col4, "background-color", "yellow");
+                            elInstance.setComments(col4, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
                         } else {
-                            elInstance.setStyle(col3, "background-color", "transparent");
-                            elInstance.setComments(col3, "");
+                            elInstance.setStyle(col4, "background-color", "transparent");
+                            elInstance.setComments(col4, "");
+                        }
+
+                        if (fundingSource == TBD_FUNDING_SOURCE) {
+                            elInstance.setStyle(col5, "background-color", "transparent");
+                            elInstance.setStyle(col5, "background-color", "yellow");
+                            elInstance.setComments(col5, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col5, "background-color", "transparent");
+                            elInstance.setComments(col5, "");
                         }
                     } else {
                         elInstance.setStyle(col, "background-color", "transparent");
@@ -7936,6 +8014,10 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setComments(col2, "");
                         elInstance.setStyle(col3, "background-color", "transparent");
                         elInstance.setComments(col3, "");
+                        elInstance.setStyle(col4, "background-color", "transparent");
+                        elInstance.setComments(col4, "");
+                        elInstance.setStyle(col5, "background-color", "transparent");
+                        elInstance.setComments(col5, "");
                     }
                 }
 
@@ -7952,7 +8034,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 var col = ("U").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(20, y);
+                var value = ((elInstance.getRowData(y))[20]).toString().replaceAll("\,", "");
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -7976,8 +8058,44 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
+                    var shipmentStatus = (elInstance.getRowData(y))[1];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (value == TBD_PROCUREMENT_AGENT_ID) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                }
+
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(7, y);
+                if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var shipmentStatus = (elInstance.getRowData(y))[1];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (value == TBD_FUNDING_SOURCE) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
                 }
 
                 var col = ("D").concat(parseInt(y) + 1);
@@ -7993,7 +8111,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 var col = ("Z").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(25, y);
+                var value = ((elInstance.getRowData(y))[25]).toString().replaceAll("\,", "");
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -8010,7 +8128,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 var col = ("AF").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(31, y);
+                var value = ((elInstance.getRowData(y))[31]).toString().replaceAll("\,", "");
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -8104,28 +8222,21 @@ export default class SupplyPlanComponent extends React.Component {
                     for (var j = 0; j < json.length; j++) {
                         var map = new Map(Object.entries(json[j]));
                         var selectedShipmentStatus = map.get("1");
-                        var shipmentStatusId = DRAFT_SHIPMENT_STATUS;
-                        if (selectedShipmentStatus == PLANNED_SHIPMENT_STATUS) {
-                            shipmentStatusId = DRAFT_SHIPMENT_STATUS;
-                        } else {
-                            shipmentStatusId = selectedShipmentStatus;
-                        }
-
-
-                        var shipmentQty = (elInstance.getCell(`V${j}`)).innerHTML;
-                        var productCost = (elInstance.getCell(`AD${j}`)).innerHTML;
+                        var shipmentStatusId = selectedShipmentStatus;
+                        var shipmentQty = (elInstance.getCell(`V${parseInt(j) + 1}`)).innerHTML;
+                        var productCost = (elInstance.getCell(`AD${parseInt(j) + 1}`)).innerHTML;
                         var rate = 0;
-                        if ((elInstance.getCell(`Z${j}`)).innerHTML != "" || (elInstance.getCell(`Z${j}`)).innerHTML != 0) {
-                            rate = (elInstance.getCell(`Z${j}`)).innerHTML;
+                        if ((elInstance.getCell(`Z${parseInt(j) + 1}`)).innerHTML != "" || (elInstance.getCell(`Z${parseInt(j) + 1}`)).innerHTML != 0) {
+                            rate = (elInstance.getCell(`Z${parseInt(j) + 1}`)).innerHTML;
                         } else {
-                            rate = (elInstance.getCell(`AC${j}`)).innerHTML;
+                            rate = (elInstance.getCell(`AC${parseInt(j) + 1}`)).innerHTML;
                         }
 
                         var freightCost = 0;
-                        if ((elInstance.getCell(`AF${j}`)).innerHTML != "" || (elInstance.getCell(`AF${j}`)).innerHTML != 0) {
-                            freightCost = (elInstance.getCell(`AF${j}`)).innerHTML;
+                        if ((elInstance.getCell(`AF${parseInt(j) + 1}`)).innerHTML != "" || (elInstance.getCell(`AF${parseInt(j) + 1}`)).innerHTML != 0) {
+                            freightCost = (elInstance.getCell(`AF${parseInt(j) + 1}`)).innerHTML;
                         } else {
-                            freightCost = (elInstance.getCell(`AG${j}`)).innerHTML;
+                            freightCost = (elInstance.getCell(`AG${parseInt(j) + 1}`)).innerHTML;
                         }
                         var shipmentMode = "Sea";
                         if (map.get("30") == 2) {
@@ -8213,6 +8324,7 @@ export default class SupplyPlanComponent extends React.Component {
                         this.toggleLarge(supplyPlanType);
                         this.setState({
                             message: i18n.t('static.message.shipmentsSaved'),
+                            color: 'green',
                             shipmentChangedFlag: 0,
                             budgetChangedFlag: 0,
                             shipmentsEl: '',

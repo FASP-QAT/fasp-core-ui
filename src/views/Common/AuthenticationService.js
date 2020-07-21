@@ -536,7 +536,7 @@ class AuthenticationService {
                     break;
                 case "/realm/realmlist":
                 case "/realm/realmlist/:color/:message":
-                    if (bfunction.includes("ROLE_BF_LIST_REALM")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
                         return true;
                     }
                     break;
@@ -984,6 +984,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                    case "/report/budgets":
+                        if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
+                            return true;
+                        }
+                        break;
                 case "/report/supplyPlanVersionAndReview":
                 case "/report/editStatus/:programId/:versionId":
                 case "/report/supplyPlanVersionAndReview/:message":

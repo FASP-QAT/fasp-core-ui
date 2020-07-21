@@ -9,7 +9,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, APPROVED_SHIPMENT_STATUS } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -47,9 +47,9 @@ export default class ShipmentDetails extends React.Component {
         this.budgetDropdownFilter = this.budgetDropdownFilter.bind(this)
         this.toggleLarge = this.toggleLarge.bind(this);
         this.batchInfoChangedShipment = this.batchInfoChangedShipment.bind(this);
-        this.checkValidationForShipments=this.checkValidationForShipments.bind(this);
-        this.checkValidationShipmentBatchInfo=this.checkValidationShipmentBatchInfo.bind(this);
-        
+        this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
+        this.checkValidationShipmentBatchInfo = this.checkValidationShipmentBatchInfo.bind(this);
+        this.saveShipmentBatchInfo = this.saveShipmentBatchInfo.bind(this);
     }
 
     hideFirstComponent() {
@@ -149,7 +149,8 @@ export default class ShipmentDetails extends React.Component {
                 }
                 console.log("proList---" + proList);
                 this.setState({
-                    planningUnitList: proList
+                    planningUnitList: proList,
+                    planningUnitListAll: myResult
                 })
             }.bind(this);
         }.bind(this)
@@ -201,12 +202,17 @@ export default class ShipmentDetails extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+
+                console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
+                var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var airFreightPerc = programJson.airFreightPerc;
                 var seaFreightPerc = programJson.seaFreightPerc;
 
-                var batchInfoListAll = programJson.batchInfoList.filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
+                var batchInfoListAll = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
                 this.setState({
-                    batchInfoListAll: batchInfoListAll
+                    batchInfoListAll: batchInfoListAll,
+                    programPlanningUnit: programPlanningUnit,
+                    shelfLife: programPlanningUnit.shelfLife
                 })
                 var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
@@ -406,6 +412,8 @@ export default class ShipmentDetails extends React.Component {
                                                         }
 
                                                     }
+                                                    var planningUnit = document.getElementById("planningUnitId");
+                                                    var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
                                                     this.setState({
                                                         budgetList: budgetListAll,
                                                         budgetListAll: bResult,
@@ -438,8 +446,7 @@ export default class ShipmentDetails extends React.Component {
                                                                     pricePerUnit = procurementUnit.vendorPrice;
                                                                 }
                                                             }
-
-                                                            if (procurementAgentPlanningUnit.unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                            if (procurementAgentPlanningUnit.unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit.unitsPerPalletEuro1 != null && procurementAgentPlanningUnit.unitsPerContainer != 0 && procurementAgentPlanningUnit.unitsPerContainer != null) {
                                                                 userQty = shipmentList[i].shipmentQty;
                                                             }
                                                         }
@@ -475,7 +482,7 @@ export default class ShipmentDetails extends React.Component {
                                                         data[6] = shipmentList[i].currency.conversionRateToUsd;//G
                                                         data[7] = shipmentList[i].fundingSource.id;//H
                                                         data[8] = shipmentList[i].budget.id;//I
-                                                        data[9] = this.state.planningUnitName; //J
+                                                        data[9] = planningUnitName; //J
                                                         data[10] = shipmentList[i].suggestedQty; //K
                                                         data[11] = moq; //L
                                                         if (shipmentList[i].procurementAgent.id != "") {
@@ -622,7 +629,7 @@ export default class ShipmentDetails extends React.Component {
                                                             { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
                                                             { type: 'hidden', title: i18n.t('static.realmcountry.airFreightPercentage'), width: 0 },
                                                             { type: 'hidden', title: i18n.t('static.realmcountry.seaFreightPercentage'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
+                                                            { type: 'text', title: i18n.t('static.supplyPlan.index'), width: 0 },
                                                             { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentStatus'), width: 0 },
                                                             { type: 'hidden', title: i18n.t('static.supplyPlan.supplyPlanType'), width: 0 },
                                                             { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 60 },
@@ -651,48 +658,48 @@ export default class ShipmentDetails extends React.Component {
                                                             entries: '',
                                                         },
                                                         onload: this.loadedShipments,
-                                                        // updateTable: function (el, cell, x, y, source, value, id) {
-                                                        //     var elInstance = el.jexcel;
-                                                        //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                                        //         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                                                        //         'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG',
-                                                        //         'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
-                                                        //     var rowData = elInstance.getRowData(y);
-                                                        //     var unitsPerPalletEuro1ForUpdate = rowData[12];
-                                                        //     var unitsPerPalletEuro2ForUpdate = rowData[13];
-                                                        //     var unitsPerContainerForUpdate = rowData[14];
-                                                        //     var shipmentStatus = rowData[38];
-                                                        //     var erpFlag = rowData[45];
-                                                        //     if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || erpFlag == true) {
-                                                        //         for (var i = 0; i < colArr.length; i++) {
-                                                        //             var cell = elInstance.getCell(`${colArr[i]}${parseInt(y) + 1}`)
-                                                        //             cell.classList.add('readonly');
-                                                        //         }
-                                                        //     } else {
-                                                        //         if (unitsPerPalletEuro1ForUpdate == 0 || unitsPerContainerForUpdate == 0) {
-                                                        //             var cell = elInstance.getCell(`S${parseInt(y) + 1}`)
-                                                        //             cell.classList.add('readonly');
-                                                        //             var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
-                                                        //             cell.classList.add('readonly');
-                                                        //             var cell = elInstance.getCell(`U${parseInt(y) + 1}`)
-                                                        //             cell.classList.add('readonly');
-                                                        //         } else {
-                                                        //             var cell = elInstance.getCell(`S${parseInt(y) + 1}`)
-                                                        //             cell.classList.remove('readonly');
-                                                        //             var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
-                                                        //             cell.classList.remove('readonly');
-                                                        //             var cell = elInstance.getCell(`U${parseInt(y) + 1}`)
-                                                        //             cell.classList.remove('readonly');
-                                                        //         }
-                                                        //     }
-                                                        // }.bind(this),
+                                                        updateTable: function (el, cell, x, y, source, value, id) {
+                                                            var elInstance = el.jexcel;
+                                                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                                                                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                                                                'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG',
+                                                                'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
+                                                            var rowData = elInstance.getRowData(y);
+                                                            var unitsPerPalletEuro1ForUpdate = rowData[12];
+                                                            var unitsPerPalletEuro2ForUpdate = rowData[13];
+                                                            var unitsPerContainerForUpdate = rowData[14];
+                                                            var shipmentStatus = rowData[38];
+                                                            var erpFlag = rowData[45];
+                                                            if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || erpFlag == true) {
+                                                                for (var i = 0; i < colArr.length; i++) {
+                                                                    var cell = elInstance.getCell(`${colArr[i]}${parseInt(y) + 1}`)
+                                                                    cell.classList.add('readonly');
+                                                                }
+                                                            } else {
+                                                                if (unitsPerPalletEuro1ForUpdate == 0 || unitsPerContainerForUpdate == 0) {
+                                                                    var cell = elInstance.getCell(`S${parseInt(y) + 1}`)
+                                                                    cell.classList.add('readonly');
+                                                                    var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
+                                                                    cell.classList.add('readonly');
+                                                                    var cell = elInstance.getCell(`U${parseInt(y) + 1}`)
+                                                                    cell.classList.add('readonly');
+                                                                } else {
+                                                                    var cell = elInstance.getCell(`S${parseInt(y) + 1}`)
+                                                                    cell.classList.remove('readonly');
+                                                                    var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
+                                                                    cell.classList.remove('readonly');
+                                                                    var cell = elInstance.getCell(`U${parseInt(y) + 1}`)
+                                                                    cell.classList.remove('readonly');
+                                                                }
+                                                            }
+                                                        }.bind(this),
                                                         contextMenu: function (obj, x, y, e) {
                                                             var items = [];
 
                                                             // Add shipment batch info
                                                             var rowData = obj.getRowData(y);
                                                             var expectedDeliveryDate = moment(rowData[0]).format("YYYY-MM-DD");
-                                                            var expiryDate = moment(expectedDeliveryDate).add(this.state.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                                            var expiryDate = moment(expectedDeliveryDate).add(programPlanningUnit.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                             var readOnlyBatchInfo = false;
                                                             if (rowData[38] != DELIVERED_SHIPMENT_STATUS) {
                                                                 readOnlyBatchInfo = true
@@ -923,6 +930,13 @@ export default class ShipmentDetails extends React.Component {
                                                             }
                                                             // -------------------------------------
 
+                                                            items.push({
+                                                                title: i18n.t('static.supplyPlan.addNewShipment'),
+                                                                onclick: function () {
+                                                                    this.toggleAddNewShipment();
+                                                                }
+                                                            })
+
                                                             if (y == null) {
                                                                 // Insert a new column
                                                                 if (obj.options.allowInsertColumn == true) {
@@ -1150,13 +1164,17 @@ export default class ShipmentDetails extends React.Component {
                 var col1 = ("AA").concat(parseInt(y) + 1);
                 var col2 = ("AB").concat(parseInt(y) + 1);
                 var col3 = ("I").concat(parseInt(y) + 1);
+
+                var col4 = ("E").concat(parseInt(y) + 1);
+                var col5 = ("H").concat(parseInt(y) + 1);
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (value == DELIVERED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS) {
+                    var oldShipmentId = elInstance.getValueFromCoords(38, y);
+                    if ((value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS) && oldShipmentId != DELIVERED_SHIPMENT_STATUS) {
                         var procurementUnit = elInstance.getValueFromCoords(26, y);
                         var supplier = elInstance.getValueFromCoords(27, y);
                         if (procurementUnit == "") {
@@ -1178,7 +1196,7 @@ export default class ShipmentDetails extends React.Component {
                             elInstance.setStyle(col2, "background-color", "transparent");
                             elInstance.setComments(col2, "");
                         }
-                    } else if (value == SUBMITTED_SHIPMENT_STATUS) {
+                    } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
                         var budget = elInstance.getValueFromCoords(8, y);
                         if (budget == "") {
                             elInstance.setStyle(col3, "background-color", "transparent");
@@ -1189,6 +1207,26 @@ export default class ShipmentDetails extends React.Component {
                             elInstance.setStyle(col3, "background-color", "transparent");
                             elInstance.setComments(col3, "");
                         }
+                        var procurementAgent = (elInstance.getRowData(y))[4];
+                        var fundingSource = (elInstance.getRowData(y))[7];
+
+                        if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
+                            elInstance.setStyle(col4, "background-color", "transparent");
+                            elInstance.setStyle(col4, "background-color", "yellow");
+                            elInstance.setComments(col4, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col4, "background-color", "transparent");
+                            elInstance.setComments(col4, "");
+                        }
+
+                        if (fundingSource == TBD_FUNDING_SOURCE) {
+                            elInstance.setStyle(col5, "background-color", "transparent");
+                            elInstance.setStyle(col5, "background-color", "yellow");
+                            elInstance.setComments(col5, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col5, "background-color", "transparent");
+                            elInstance.setComments(col5, "");
+                        }
                     } else {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
@@ -1198,6 +1236,10 @@ export default class ShipmentDetails extends React.Component {
                         elInstance.setComments(col2, "");
                         elInstance.setStyle(col3, "background-color", "transparent");
                         elInstance.setComments(col3, "");
+                        elInstance.setStyle(col4, "background-color", "transparent");
+                        elInstance.setComments(col4, "");
+                        elInstance.setStyle(col5, "background-color", "transparent");
+                        elInstance.setComments(col5, "");
                     }
                 }
 
@@ -1214,7 +1256,7 @@ export default class ShipmentDetails extends React.Component {
                 }
 
                 var col = ("U").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(20, y);
+                var value = (elInstance.getRowData(y))[20];
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -1238,8 +1280,44 @@ export default class ShipmentDetails extends React.Component {
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
+                    var shipmentStatus = (elInstance.getRowData(y))[1];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (value == TBD_PROCUREMENT_AGENT_ID) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                }
+
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(7, y);
+                if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var shipmentStatus = (elInstance.getRowData(y))[1];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (value == TBD_FUNDING_SOURCE) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
                 }
 
                 var col = ("D").concat(parseInt(y) + 1);
@@ -1255,7 +1333,8 @@ export default class ShipmentDetails extends React.Component {
                 }
 
                 var col = ("Z").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(25, y);
+                var value = (elInstance.getRowData(y))[25];
+                value = value.toString().replaceAll("\,", "");
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -1272,7 +1351,8 @@ export default class ShipmentDetails extends React.Component {
                 }
 
                 var col = ("AF").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(31, y);
+                var value = (elInstance.getRowData(y))[31];
+                value = value.toString().replaceAll("\,", "");
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -1374,12 +1454,15 @@ export default class ShipmentDetails extends React.Component {
             var col1 = ("AA").concat(parseInt(y) + 1);
             var col2 = ("AB").concat(parseInt(y) + 1);
             var col3 = ("I").concat(parseInt(y) + 1);
+            var col4 = ("E").concat(parseInt(y) + 1);
+            var col5 = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (value == DELIVERED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS) {
+                var oldShipmentId = elInstance.getValueFromCoords(38, y);
+                if ((value == SHIPPED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS) && oldShipmentId != DELIVERED_SHIPMENT_STATUS) {
                     var procurementUnit = elInstance.getValueFromCoords(26, y);
                     var supplier = elInstance.getValueFromCoords(27, y);
                     if (procurementUnit == "") {
@@ -1399,7 +1482,7 @@ export default class ShipmentDetails extends React.Component {
                         elInstance.setStyle(col2, "background-color", "transparent");
                         elInstance.setComments(col2, "");
                     }
-                } else if (value == SUBMITTED_SHIPMENT_STATUS) {
+                } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
                     var budget = elInstance.getValueFromCoords(8, y);
                     if (budget == "") {
                         elInstance.setStyle(col3, "background-color", "transparent");
@@ -1408,6 +1491,27 @@ export default class ShipmentDetails extends React.Component {
                     } else {
                         elInstance.setStyle(col3, "background-color", "transparent");
                         elInstance.setComments(col3, "");
+                    }
+
+                    var procurementAgent = (elInstance.getRowData(y))[4];
+                    var fundingSource = (elInstance.getRowData(y))[7];
+
+                    if (procurementAgent == TBD_PROCUREMENT_AGENT_ID) {
+                        elInstance.setStyle(col4, "background-color", "transparent");
+                        elInstance.setStyle(col4, "background-color", "yellow");
+                        elInstance.setComments(col4, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col4, "background-color", "transparent");
+                        elInstance.setComments(col4, "");
+                    }
+
+                    if (fundingSource == TBD_FUNDING_SOURCE) {
+                        elInstance.setStyle(col5, "background-color", "transparent");
+                        elInstance.setStyle(col5, "background-color", "yellow");
+                        elInstance.setComments(col5, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col5, "background-color", "transparent");
+                        elInstance.setComments(col5, "");
                     }
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -1418,6 +1522,10 @@ export default class ShipmentDetails extends React.Component {
                     elInstance.setComments(col2, "");
                     elInstance.setStyle(col3, "background-color", "transparent");
                     elInstance.setComments(col3, "");
+                    elInstance.setStyle(col4, "background-color", "transparent");
+                    elInstance.setComments(col4, "");
+                    elInstance.setStyle(col5, "background-color", "transparent");
+                    elInstance.setComments(col5, "");
                 }
             }
         }
@@ -1442,31 +1550,43 @@ export default class ShipmentDetails extends React.Component {
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 elInstance.setValueFromCoords(26, y, "", true);
             } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var procurementAgentPlanningUnit = this.state.procurementAgentListAll.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
-                var procurementUnitValue = elInstance.getRowData(y)[26];
-                var pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
-                if (procurementUnitValue != "") {
-                    var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == procurementUnitValue && p.procurementAgent.id == value)[0];
-                    if (procurementUnit.vendorPrice != 0 && procurementUnit.vendorPrice != null) {
-                        pricePerUnit = procurementUnit.vendorPrice;
+                var shipmentStatus = (elInstance.getRowData(y))[1];
+                if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (value == TBD_PROCUREMENT_AGENT_ID) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                    var procurementAgentPlanningUnit = this.state.procurementAgentListAll.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
+                    var procurementUnitValue = elInstance.getRowData(y)[26];
+                    var pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
+                    if (procurementUnitValue != "") {
+                        var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == procurementUnitValue && p.procurementAgent.id == value)[0];
+                        if (procurementUnit.vendorPrice != 0 && procurementUnit.vendorPrice != null) {
+                            pricePerUnit = procurementUnit.vendorPrice;
+                        }
+                    }
+                    var conversionRateToUsd = elInstance.getValueFromCoords(6, y);
+                    pricePerUnit = (pricePerUnit / conversionRateToUsd).toFixed(2);
+                    elInstance.setValueFromCoords(11, y, procurementAgentPlanningUnit.moq, true);
+                    elInstance.setValueFromCoords(28, y, pricePerUnit, true);
+                    elInstance.setValueFromCoords(12, y, procurementAgentPlanningUnit.unitsPerPalletEuro1, true);
+                    elInstance.setValueFromCoords(13, y, procurementAgentPlanningUnit.unitsPerPalletEuro2, true);
+                    elInstance.setValueFromCoords(14, y, procurementAgentPlanningUnit.unitsPerContainer, true);
+                    if (procurementAgentPlanningUnit.unitsPerPalletEuro1 == 0 || procurementAgentPlanningUnit.unitsPerContainer == 0 || procurementAgentPlanningUnit.unitsPerContainer == null || procurementAgentPlanningUnit.unitsPerPalletEuro1 == null) {
+                        elInstance.setValueFromCoords(18, y, "", true);
+                        elInstance.setValueFromCoords(19, y, "", true);
+                        elInstance.setValueFromCoords(20, y, "", true);
                     }
                 }
-                var conversionRateToUsd = elInstance.getValueFromCoords(6, y);
-                pricePerUnit = (pricePerUnit / conversionRateToUsd).toFixed(2);
-                elInstance.setValueFromCoords(11, y, procurementAgentPlanningUnit.moq, true);
-                elInstance.setValueFromCoords(28, y, pricePerUnit, true);
-                elInstance.setValueFromCoords(12, y, procurementAgentPlanningUnit.unitsPerPalletEuro1, true);
-                elInstance.setValueFromCoords(13, y, procurementAgentPlanningUnit.unitsPerPalletEuro2, true);
-                elInstance.setValueFromCoords(14, y, procurementAgentPlanningUnit.unitsPerContainer, true);
-                if (procurementAgentPlanningUnit.unitsPerPalletEuro1 == 0 || procurementAgentPlanningUnit.unitsPerContainer == 0) {
-                    elInstance.setValueFromCoords(18, y, "", true);
-                    elInstance.setValueFromCoords(19, y, "", true);
-                    elInstance.setValueFromCoords(20, y, "", true);
-                }
+                elInstance.setValueFromCoords(26, y, "", true);
             }
-            elInstance.setValueFromCoords(26, y, "", true);
         }
 
         if (x == 7) {
@@ -1476,13 +1596,26 @@ export default class ShipmentDetails extends React.Component {
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
+                var shipmentStatus = (elInstance.getRowData(y))[1];
+                if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (value == TBD_FUNDING_SOURCE) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
             }
         }
 
         if (x == 20) {
             var col = ("U").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[20];
             value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -1501,6 +1634,8 @@ export default class ShipmentDetails extends React.Component {
 
         if (x == 25) {
             var col = ("Z").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[25];
+            value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
@@ -1588,6 +1723,8 @@ export default class ShipmentDetails extends React.Component {
 
         if (x == 31) {
             var col = ("AF").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[31];
+            value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
@@ -1697,9 +1834,10 @@ export default class ShipmentDetails extends React.Component {
         this.setState({
             shipmentBatchInfoChangedFlag: 0,
             shipmentBatchInfoDuplicateError: '',
+            shipmentValidationBatchError: ''
         })
         this.setState({
-            consumptionBatchInfo: !this.state.consumptionBatchInfo,
+            batchInfo: !this.state.batchInfo,
         });
     }
 
@@ -1708,6 +1846,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     batchInfoChangedShipment = function (instance, cell, x, y, value) {
+        console.log("In change")
         this.setState({
             shipmentValidationBatchError: ''
         })
@@ -1719,6 +1858,7 @@ export default class ShipmentDetails extends React.Component {
             var col = ("A").concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
+            console.log("In 0")
         }
 
         if (x == 1) {
@@ -1735,6 +1875,7 @@ export default class ShipmentDetails extends React.Component {
         if (x == 2) {
             var reg = /^[0-9\b]+$/;
             var col = ("C").concat(parseInt(y) + 1);
+            value = (elInstance.getRowData(y))[2];
             value = value.toString().replaceAll("\,", "");
             if (value == "" || value == 0) {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -1812,7 +1953,7 @@ export default class ShipmentDetails extends React.Component {
                 }
 
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y);
+                var value = (elInstance.getRowData(y))[2];
                 value = value.toString().replaceAll("\,", "");
                 var reg = /^[0-9\b]+$/;
                 if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -1886,7 +2027,6 @@ export default class ShipmentDetails extends React.Component {
             var cell = shipmentInstance.getCell(`A${parseInt(rowNumber) + 1}`)
             cell.classList.remove('readonly');
             this.toggleLarge();
-            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
             elInstance.destroy();
         } else {
             this.setState({
@@ -1912,6 +2052,7 @@ export default class ShipmentDetails extends React.Component {
             })
             var elInstance = this.state.shipmentsEl;
             var json = elInstance.getJson();
+            console.log("json", json);
             var db1;
             var storeOS;
             getDatabase();
@@ -1943,28 +2084,21 @@ export default class ShipmentDetails extends React.Component {
                     for (var j = 0; j < json.length; j++) {
                         var map = new Map(Object.entries(json[j]));
                         var selectedShipmentStatus = map.get("1");
-                        var shipmentStatusId = DRAFT_SHIPMENT_STATUS;
-                        if (selectedShipmentStatus == PLANNED_SHIPMENT_STATUS) {
-                            shipmentStatusId = DRAFT_SHIPMENT_STATUS;
-                        } else {
-                            shipmentStatusId = selectedShipmentStatus;
-                        }
-
-
-                        var shipmentQty = (elInstance.getCell(`V${j}`)).innerHTML;
-                        var productCost = (elInstance.getCell(`AD${j}`)).innerHTML;
+                        var shipmentStatusId = selectedShipmentStatus;
+                        var shipmentQty = (elInstance.getCell(`V${parseInt(j) + 1}`)).innerHTML;
+                        var productCost = (elInstance.getCell(`AD${parseInt(j) + 1}`)).innerHTML;
                         var rate = 0;
-                        if ((elInstance.getCell(`Z${j}`)).innerHTML != "" || (elInstance.getCell(`Z${j}`)).innerHTML != 0) {
-                            rate = (elInstance.getCell(`Z${j}`)).innerHTML;
+                        if ((elInstance.getCell(`Z${parseInt(j) + 1}`)).innerHTML != "" || (elInstance.getCell(`Z${parseInt(j) + 1}`)).innerHTML != 0) {
+                            rate = (elInstance.getCell(`Z${parseInt(j) + 1}`)).innerHTML;
                         } else {
-                            rate = (elInstance.getCell(`AC${j}`)).innerHTML;
+                            rate = (elInstance.getCell(`AC${parseInt(j) + 1}`)).innerHTML;
                         }
 
                         var freightCost = 0;
-                        if ((elInstance.getCell(`AF${j}`)).innerHTML != "" || (elInstance.getCell(`AF${j}`)).innerHTML != 0) {
-                            freightCost = (elInstance.getCell(`AF${j}`)).innerHTML;
+                        if ((elInstance.getCell(`AF${parseInt(j) + 1}`)).innerHTML != "" || (elInstance.getCell(`AF${parseInt(j) + 1}`)).innerHTML != 0) {
+                            freightCost = (elInstance.getCell(`AF${parseInt(j) + 1}`)).innerHTML;
                         } else {
-                            freightCost = (elInstance.getCell(`AG${j}`)).innerHTML;
+                            freightCost = (elInstance.getCell(`AG${parseInt(j) + 1}`)).innerHTML;
                         }
                         var shipmentMode = "Sea";
                         if (map.get("30") == 2) {
@@ -2049,15 +2183,13 @@ export default class ShipmentDetails extends React.Component {
                         })
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        // this.toggleLarge();
                         this.setState({
-                            message: i18n.t('static.message.shipmentsSaved'),
+                            message: 'static.message.shipmentsSaved',
                             shipmentChangedFlag: 0,
-                            budgetChangedFlag: 0,
-                            shipmentsEl: '',
-                            shipmentBudgetTableEl: ''
+                            color: 'green'
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.hideFirstComponent();
+                        this.props.history.push(`/shipment/shipmentDetails/` + i18n.t('static.message.shipmentsSaved'));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -2066,6 +2198,10 @@ export default class ShipmentDetails extends React.Component {
                 shipmentError: i18n.t('static.supplyPlan.validationFailed')
             })
         }
+    }
+
+    actionCanceled() {
+        this.toggleLarge();
     }
 
     render() {
@@ -2140,6 +2276,7 @@ export default class ShipmentDetails extends React.Component {
                                     )} />
 
                         <Col xs="12" sm="12" className="p-0">
+                            <h6 className="red">{this.state.shipmentDuplicateError || this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable">
                                 </div>
@@ -2155,7 +2292,7 @@ export default class ShipmentDetails extends React.Component {
                     </CardFooter>
                 </Card>
 
-                <Modal isOpen={this.state.consumptionBatchInfo}
+                <Modal isOpen={this.state.batchInfo}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
@@ -2167,7 +2304,7 @@ export default class ShipmentDetails extends React.Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveShipmentBatchInfo()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                        {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveShipmentBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>

@@ -180,6 +180,13 @@ export default class AddInventory extends Component {
         if (this.state.changedFlag == 1) {
 
         } else {
+            this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+            this.el.destroy();
+
+            this.setState({
+                inventoryEl: "",
+                changedFlag: 0
+            })
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId });
             var db1;
@@ -897,6 +904,8 @@ export default class AddInventory extends Component {
                 if (value != -1) {
                     var expiryDate = this.state.batchInfoListAllForInventory.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
                     elInstance.setValueFromCoords(1, y, expiryDate, true);
+                } else {
+                    elInstance.setValueFromCoords(1, y, "", true);
                 }
                 var col1 = ("D").concat(parseInt(y) + 1);
                 elInstance.setStyle(col1, "background-color", "transparent");
@@ -908,6 +917,7 @@ export default class AddInventory extends Component {
             if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
                 // var reg = /^[0-9\b]+$/;
+                value=(elInstance.getRowData(y))[3];
                 value = value.toString().replaceAll("\,", "");
                 var col = ("D").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -941,6 +951,7 @@ export default class AddInventory extends Component {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
                 var col = ("E").concat(parseInt(y) + 1);
+                value=(elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -1107,10 +1118,10 @@ export default class AddInventory extends Component {
                     }
 
                     var col = ("D").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "");
+                    var value = value=((elInstance.getRowData(y))[3]).toString().replaceAll("\,", "");
                     var reg = /-?\d+/;
                     // var reg = /^[0-9\b]+$/;
-                    if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
+                    if (value != "" && value != 0) {
                         var reg = /-?\d+/
                         // var reg = /^[0-9\b]+$/;
                         var col = ("D").concat(parseInt(y) + 1);
@@ -1135,8 +1146,8 @@ export default class AddInventory extends Component {
                         elInstance.setComments(col, "");
                     }
 
-                    var value = elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "");
-                    if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
+                    var value = ((elInstance.getRowData(y))[4]).toString().replaceAll("\,", "");
+                    if (value != "" && value != 0) {
                         // var reg = /-?\d+/
                         var reg = /^[0-9\b]+$/;
                         var col = ("E").concat(parseInt(y) + 1);
@@ -1324,6 +1335,7 @@ export default class AddInventory extends Component {
         if (x == 4) {
             if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
+                value=(elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "");
                 var col = ("E").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -1351,6 +1363,7 @@ export default class AddInventory extends Component {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
                 var col = ("F").concat(parseInt(y) + 1);
+                value=(elInstance.getRowData(y))[5];
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -1503,10 +1516,10 @@ export default class AddInventory extends Component {
 
 
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "");
+                var value = ((elInstance.getRowData(y))[4]).toString().replaceAll("\,", "");
                 var reg = /-?\d+/;
                 // var reg = /^[0-9\b]+$/;
-                if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
+                if (value != "" && value != 0) {
                     var reg = /-?\d+/
                     // var reg = /^[0-9\b]+$/;
                     var col = ("E").concat(parseInt(y) + 1);
@@ -1531,8 +1544,8 @@ export default class AddInventory extends Component {
                     elInstance.setComments(col, "");
                 }
 
-                var value = elInstance.getValueFromCoords(5, y).toString().replaceAll("\,", "");
-                if (elInstance.getValueFromCoords(5, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(5, y).toString().replaceAll("\,", "") != 0) {
+                var value = ((elInstance.getRowData(y))[5]).toString().replaceAll("\,", "");
+                if (value != "" && value != 0) {
                     // var reg = /-?\d+/
                     var reg = /^[0-9\b]+$/;
                     var col = ("F").concat(parseInt(y) + 1);
@@ -1632,11 +1645,16 @@ export default class AddInventory extends Component {
                     var planningUnitId = inventoryDataList[0].planningUnit.id;
                     for (var i = 0; i < inventoryDataList.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]));
-                        inventoryDataListNotFiltered[parseInt(map.get("8"))].inventoryDate = moment(map.get("0")).format("YYYY-MM-DD");
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
                         inventoryDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
                         inventoryDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("2");
-                        inventoryDataListNotFiltered[parseInt(map.get("8"))].adjustmentQty = parseInt(map.get("4"));
-                        inventoryDataListNotFiltered[parseInt(map.get("8"))].actualQty = map.get("5");
+                        if (map.get("3") == 1) {
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].adjustmentQty = "";
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].actualQty = parseInt(map.get("5"));
+                        } else {
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].adjustmentQty = parseInt(map.get("4"));
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].actualQty = "";
+                        }
                         inventoryDataListNotFiltered[parseInt(map.get("8"))].notes = map.get("6");
                         inventoryDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
                         inventoryDataListNotFiltered[parseInt(map.get("8"))].batchInfoList = map.get("9")
@@ -1647,7 +1665,7 @@ export default class AddInventory extends Component {
                         var map = new Map(Object.entries(tableJson[i]));
                         var json = {
                             inventoryId: 0,
-                            inventoryDate: moment(map.get("1")).format("YYYY-MM-DD"),
+                            inventoryDate: moment(map.get("0")).endOf('month').format("YYYY-MM-DD"),
                             region: {
                                 id: map.get("1")
                             },

@@ -182,7 +182,7 @@ class ForecastMetrics extends Component {
   formatValue(cell, row) {
     // console.log("celll----", cell);
     if (cell != null && cell != "") {
-      return this.roundN(cell * 100) + '%';
+      return this.roundN(cell) + '%';
     } else if (cell == "0" && row.months == 0) {
       return "No data points containing both actual and forecast consumption ";
     } else {
@@ -192,7 +192,7 @@ class ForecastMetrics extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
     this.state.countryLabels.map(ele =>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.programLabels.map(ele =>
@@ -206,16 +206,16 @@ class ForecastMetrics extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
+    var A = [[(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
     (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')]]
 
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[getLabelText(re[item].realmCountry.label), (getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+      A.push([[ (getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-      re[item].months == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError * 100) + '%', re[item].months]])
+      re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError ) + '%', re[item].monthCount]])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -224,7 +224,7 @@ class ForecastMetrics extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.forecastmetrics') + + '_' + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.dashboard.forecastmetrics')+ ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -273,7 +273,7 @@ class ForecastMetrics extends Component {
         if (i == 1) {
           doc.setFontSize(8)
           doc.setFont('helvetica', 'normal')
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
         })
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
@@ -303,12 +303,12 @@ class ForecastMetrics extends Component {
 
   
     var height = doc.internal.pageSize.height;
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
+    const headers = [[ i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
+    const data = this.state.consumptions.map(elt => [ getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-    elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100) + '%', elt.months]);
+    elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError ) + '%', elt.monthCount]);
     let startY = this.state.planningUnitLabels.length > 15 ? 250 : 200
     let content = {
       margin: { top: 80 },
@@ -317,11 +317,10 @@ class ForecastMetrics extends Component {
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 130 },
-        1: { cellWidth: 186 },
-        2: { cellWidth: 186 },
-        3: { cellWidth: 130 },
-        4: { cellWidth: 130 }}
+        0: { cellWidth: 219.0 },
+        1: { cellWidth:  218.89 },
+        2: { cellWidth: 162 },
+        3: { cellWidth: 162 }}
 
     };
 
@@ -330,7 +329,7 @@ class ForecastMetrics extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("ForecastMatrics.pdf")
+    doc.save(i18n.t('static.dashboard.forecastmetrics')+".pdf")
     //creates PDF from img
     /*  var doc = new jsPDF('landscape');
       doc.setFontSize(20);
@@ -341,7 +340,7 @@ class ForecastMetrics extends Component {
 
 
   rowClassNameFormat(row, rowIdx) {
-    return (row.forecastError * 100) > 50 ? 'background-red' : '';
+    return (row.forecastError  > 50 )? 'background-red' : '';
   }
 
 
@@ -356,7 +355,7 @@ class ForecastMetrics extends Component {
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
+      this.filterData()
     })
   }
   handleChangeProgram(programIds) {
@@ -366,7 +365,7 @@ class ForecastMetrics extends Component {
       programLabels: programIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
+      this.filterData()
     })
 
   }
@@ -378,30 +377,22 @@ class ForecastMetrics extends Component {
       planningUnitLabels: planningUnitIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
+      this.filterData()
     })
   }
 
 
   filterData() {
-    /*this.setState({
-      consumptions: {date:["04-2019","05-2019","06-2019","07-2019"],countryData:[{label:"c1",value:[10,4,5,7]},
-      {label:"c2",value:[13,2,8,7]},
-      {label:"c3",value:[9,1,0,7]},
-      {label:"c4",value:[5,4,3,7]}]}
-    })
-    */
-    setTimeout('', 10000);
     let productCategoryId = document.getElementById("productCategoryId").value;
     let CountryIds = this.state.countryValues;
     let planningUnitIds = this.state.planningUnitValues;
     let programIds = this.state.programValues
-    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-    if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
+    let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
+    let monthInCalc=document.getElementById("viewById").value;
+                if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
 
       var inputjson = {
-        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "stopDate": stopDate
+        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate,"previousMonths":monthInCalc
       }
       AuthenticationService.setupAxiosInterceptors();
 
@@ -766,18 +757,12 @@ class ForecastMetrics extends Component {
 
     const columns = [
       {
-        dataField: 'realmCountry.label',
-        text: i18n.t('static.dashboard.country'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
-      }, {
         dataField: 'program.label',
         text: i18n.t('static.program.program'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
+        style: { align: 'center' ,width: '420px' },
         formatter: this.formatLabel
       }, {
         dataField: 'planningUnit.label',
@@ -785,6 +770,7 @@ class ForecastMetrics extends Component {
         sort: true,
         align: 'center',
         headerAlign: 'center',
+        style: { align: 'center' ,width: '420px' },
         formatter: this.formatLabel
       }/*, {
             dataField: 'historicalConsumptionDiff',
@@ -806,13 +792,15 @@ class ForecastMetrics extends Component {
         sort: true,
         align: 'center',
         headerAlign: 'center',
+        style: { align: 'center' ,width: '250px' },
         formatter: this.formatValue
 
       }, {
-        dataField: 'months',
+        dataField: 'monthCount',
         text: i18n.t('static.report.noofmonth'),
         sort: true,
         align: 'center',
+        style: { align: 'center' ,width: '250px' },
         headerAlign: 'center',
 
       }];
@@ -863,7 +851,7 @@ class ForecastMetrics extends Component {
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-        <h5>{i18n.t(this.state.message)}</h5>
+        <h5 className="red">{i18n.t(this.state.message)}</h5>
 
         <Card>
           <div className="Card-header-reporticon">
@@ -883,7 +871,7 @@ class ForecastMetrics extends Component {
                 <Col md="12 pl-0">
                   <div className="row">
 
-                 {/*}    <FormGroup className="col-md-3">
+                  <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
                         <Picker
@@ -899,25 +887,27 @@ class ForecastMetrics extends Component {
                         </Picker>
                       </div>
 
-                    </FormGroup>*/}
-                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                      <div className="controls edit">
+                    </FormGroup>
+                    <FormGroup className="col-md-3">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.timeWindow')}</Label>
+                        <div className="controls">
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="viewById"
+                              id="viewById"
+                              bsSize="sm"
+                              onChange={this.filterData}
+                            >
+                              <option value="5">6 {i18n.t('static.dashboard.months')}</option>
+                              <option value="2">3 {i18n.t('static.dashboard.months')}</option>
+                              <option value="8">9 {i18n.t('static.dashboard.months')}</option>
+                              <option value="11">12 {i18n.t('static.dashboard.months')}</option>
+                            </Input>
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
 
-                        <Picker
-                          ref="pickRange"
-                          years={{ min: 2013 }}
-                          value={rangeValue}
-                          lang={pickerLang}
-                          //theme="light"
-                          onChange={this.handleRangeChange}
-                          onDismiss={this.handleRangeDissmis}
-                        >
-                          <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                        </Picker>
-                      </div>
-
-    </FormGroup>
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
