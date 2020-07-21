@@ -809,8 +809,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/shipment/ShipmentList":
-                case "/shipment/shipmentList/:message":
+                case "/shipment/shipmentDetails":
+                case "/shipment/shipmentDetails/:message":
                 case "/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                         return true;

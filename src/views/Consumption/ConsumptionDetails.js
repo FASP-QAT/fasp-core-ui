@@ -142,7 +142,7 @@ export default class ConsumptionDetails extends React.Component {
                 var categoryId = document.getElementById("categoryId").value;
                 console.log(categoryId)
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].productCategory.productCategoryId == categoryId) {
+                    if (myResult[i].productCategory.productCategoryId == categoryId && myResult[i].active == true) {
                         var productJson = {
                             name: getLabelText(myResult[i].label, this.state.lang),
                             id: myResult[i].productId
@@ -190,7 +190,7 @@ export default class ConsumptionDetails extends React.Component {
                 console.log(myResult);
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].program.id == programId) {
+                    if (myResult[i].program.id == programId && myResult[i].active == true) {
                         var productJson = {
                             name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                             id: myResult[i].planningUnit.id
@@ -256,7 +256,7 @@ export default class ConsumptionDetails extends React.Component {
                 dataSourceRequest.onsuccess = function (event) {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
-                    dataSourceResult = dataSourceResult.filter(c => c.dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || c.dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE);
+                    dataSourceResult = dataSourceResult.filter(c => (c.dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || c.dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE) && c.active == true);
                     for (var k = 0; k < dataSourceResult.length; k++) {
                         if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
                             if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {

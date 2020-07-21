@@ -189,7 +189,7 @@ const StockStatusReport = React.lazy(() => import('./views/Report/StockStatus'))
 const GlobalConsumptionReport = React.lazy(() => import('./views/Report/GlobalConsumption'));
 const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
-const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentList'));
+const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentDetails'));
 const EditShipment = React.lazy(() => import('./views/Shipment/EditShipment'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
@@ -531,10 +531,8 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
-  { path: '/shipment/ShipmentList', exact: true, name: 'Shipment Details', component: ShipmentList },
-  { path: '/shipment/shipmentList/:message', component: ShipmentList },
-  { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: 'Edit Shipment Details', component: EditShipment },
+  { path: '/shipment/shipmentDetails', exact: true, name: 'Shipment Details', component: ShipmentList },
+  { path: '/shipment/shipmentDetails/:message', component: ShipmentList },
   { path: '/report/warehouseCapacity', name: i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
   { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name:  i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
   { path: '/report/stockAdjustment', name:  i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
