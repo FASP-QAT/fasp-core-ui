@@ -400,7 +400,9 @@ label.arrow_label:after {
 .table td {
   padding: 0.55rem;
 }
-
+.table {
+  margin-bottom: 0px!important;
+}
 //table add button
 .card-header-action a i {
   font-size: 25px;
@@ -2139,20 +2141,6 @@ input::placeholder {
   .report-table{
     max-height:300px;
   }
-  
-  // .table-fixed tbody {
-  //   height: 300px;
-  //   overflow-y: auto;
-  //   width: 100%;
-  // }
-  
-  // .table-fixed thead,
-  // .table-fixed tbody,
-  // .table-fixed tr,
-  // .table-fixed td,
-  // .table-fixed th {
-  //   display: block;
-  // }
   
   .formula-img-mr{
     margin: 10px 0px 20px 0px;
