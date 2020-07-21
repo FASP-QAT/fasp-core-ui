@@ -29,7 +29,8 @@ const validationSchema = function (values) {
             // .max(30, i18n.t('static.user.validpasswordlength'))
             // .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             // .matches(/^\S*$/, i18n.t('static.user.nospace'))
-            .required(i18n.t('static.user.validusername')),
+            .required(i18n.t('static.user.validusername'))
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext')),
         showRealm: Yup.boolean(),
         realmId: Yup.string()
             .when("showRealm", (showRealm, schema) => {
