@@ -143,7 +143,13 @@ class AuthenticationService {
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
         return decryptedUser.sessionExpiresOn;
     }
-
+    updateUserLanguage(languageCode) {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+        decryptedUser.language.languageCode = languageCode;
+        localStorage.removeItem('user-' + decryptedCurUser);
+        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+    }
     // refreshToken() {
     //     let token = localStorage.getItem('token');
     //     this.setupAxiosInterceptors();
@@ -984,11 +990,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                    case "/report/budgets":
-                        if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
-                            return true;
-                        }
-                        break;
+                case "/report/budgets":
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
+                        return true;
+                    }
+                    break;
                 case "/report/supplyPlanVersionAndReview":
                 case "/report/editStatus/:programId/:versionId":
                 case "/report/supplyPlanVersionAndReview/:message":
@@ -1014,7 +1020,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/ProgramDashboard":
-                    case "/RealmDashboard":
+                case "/RealmDashboard":
                     if (bfunction.includes("ROLE_BF_PROGRAM_DASHBOARD")) {
                         return true;
                     }

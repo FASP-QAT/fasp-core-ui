@@ -288,7 +288,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.plannedToDraftLeadTime && this.props.items.program.plannedToDraftLeadTime != ''}

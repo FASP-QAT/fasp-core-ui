@@ -13,7 +13,6 @@ const entityname = i18n.t('static.procurementagent.procurementagent');
 
 const initialValues = {
     procurementAgentName: "",
-    draftToSubmittedLeadTime: "",
     submittedToApprovedLeadTime: "",
     approvedToShippedLeadTime: "",
     colorHtmlCode: "",
@@ -23,19 +22,14 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
-        // submittedToApprovedLeadTime: Yup.string()
-        //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-        draftToSubmittedLeadTime: Yup.string()
-            .required(i18n.t('static.procurementagent.draftToSubmittedLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
-            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        // submittedToApprovedLeadTime: Yup.number()
-        //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
-        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-        //     .min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         colorHtmlCode: Yup.string()
             .max(6, i18n.t('static.common.max6digittext'))
             .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
@@ -87,7 +81,6 @@ class EditProcurementAgentComponent extends Component {
                 },
                 procurementAgentCode: '',
                 colorHtmlCode: '',
-                draftToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 // localProcurementAgent: false,
@@ -136,9 +129,6 @@ class EditProcurementAgentComponent extends Component {
         if (event.target.name == "procurementAgentName") {
             procurementAgent.label.label_en = event.target.value;
         }
-        if (event.target.name == "draftToSubmittedLeadTime") {
-            procurementAgent.draftToSubmittedLeadTime = event.target.value;
-        }
         if (event.target.name == "submittedToApprovedLeadTime") {
             procurementAgent.submittedToApprovedLeadTime = event.target.value;
         }
@@ -159,7 +149,6 @@ class EditProcurementAgentComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             procurementAgentName: true,
-            draftToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
             colorHtmlCode: true,
@@ -219,7 +208,6 @@ class EditProcurementAgentComponent extends Component {
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
                                         procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        draftToSubmittedLeadTime: this.state.procurementAgent.draftToSubmittedLeadTime,
                                         submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
                                         approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
@@ -317,25 +305,6 @@ class EditProcurementAgentComponent extends Component {
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="draftToSubmittedLeadTime">{i18n.t('static.procurementagent.procurementagentdrafttosubmittime')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="draftToSubmittedLeadTime"
-                                                            id="draftToSubmittedLeadTime"
-                                                            valid={!errors.draftToSubmittedLeadTime && this.state.procurementAgent.draftToSubmittedLeadTime != ''}
-                                                            invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.procurementAgent.draftToSubmittedLeadTime}
-                                                            min="0"
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.draftToSubmittedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
