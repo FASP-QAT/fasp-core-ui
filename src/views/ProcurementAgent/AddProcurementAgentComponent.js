@@ -37,11 +37,11 @@ const validationSchema = function (values) {
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9]+$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9]+$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         // submittedToApprovedLeadTime: Yup.number()
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))

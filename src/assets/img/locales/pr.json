@@ -399,7 +399,7 @@
     "static.dashboard.addhealtharea": "Adicionar área de saúde",
     "static.region.country": "País",
     "static.currency.currencysymbol": "Símbolo Monetário",
-    "static.program.draftleadtime": "Planejar lead time em meses",
+    "static.program.planleadtime": "Planejar lead time em meses",
     "static.program.monthpastamc": "Mês passado para a AMC",
     "static.dashboard.addproduct": "Adicionar produto",
     "static.program.download": "Baixar dados do programa",
