@@ -264,7 +264,7 @@
     "static.message.updateSuccess": "{{entityname}} updated successfully",
     "static.message.cancelled": "{{entityname}} Action Cancelled",
     "static.budget.budgetdesctext": "Please enter Budget description",
-    "static.message.listFailed": "{{entityname}} list failed",
+    "static.message.listFailed": "{{entityname}} List failed",
     "static.common.update": "Update",
     "static.common.result": "  Showing {{from}} to {{to}} of {{size}}",
     "static.common.first": "First",
