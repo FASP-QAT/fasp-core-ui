@@ -963,5 +963,6 @@
     "static.report.qtyBaseUnit": "Qty (Base units)",
     "static.report.costUsd": "Cost (USD)",
     "static.dataEntry.batchDetails": "Batch Details",
-    "static.report.timeWindow": "Time Window"
+    "static.report.timeWindow": "Time Window",
+    "static.report.validShipmentStatusText": "Please select Shipment Status."
 }

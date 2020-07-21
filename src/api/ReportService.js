@@ -99,6 +99,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/shipmentDetails`, json, {}
         );
     }
+    shipmentOverview(json) {
+        return axios.post(`${API_URL}/api/report/shipmentOverview`, json, {}
+        );
+    }
 
 }
 export default new ReportService();
