@@ -54,8 +54,7 @@ export default class PipelineProgramSetup extends Component {
                 airFreightPerc: '',
                 seaFreightPerc: '',
                 deliveredToReceivedLeadTime: '',
-                draftToSubmittedLeadTime: '',
-                plannedToDraftLeadTime: '',
+                plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
@@ -392,10 +391,8 @@ export default class PipelineProgramSetup extends Component {
             program.seaFreightPerc = event.target.value;
         } if (event.target.name == 'deliveredToReceivedLeadTime') {
             program.deliveredToReceivedLeadTime = event.target.value;
-        } if (event.target.name == 'draftToSubmittedLeadTime') {
-            program.draftToSubmittedLeadTime = event.target.value;
-        } if (event.target.name == 'plannedToDraftLeadTime') {
-            program.plannedToDraftLeadTime = event.target.value;
+        } if (event.target.name == 'plannedToSubmittedLeadTime') {
+            program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
             program.submittedToApprovedLeadTime = event.target.value;
         } if (event.target.name == 'approvedToShippedLeadTime') {

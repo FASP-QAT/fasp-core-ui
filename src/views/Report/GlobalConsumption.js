@@ -1957,7 +1957,7 @@ class GlobalConsumption extends Component {
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
         <Card>
-          <div className="Card-header-reporticon">
+        <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
@@ -1967,7 +1967,9 @@ class GlobalConsumption extends Component {
               </a>
             </div>}
           </div>
+         
           <CardBody className="pb-lg-2 pt-lg-0">
+         
             <div ref={ref}>
 
               <Form >

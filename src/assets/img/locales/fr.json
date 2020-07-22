@@ -387,7 +387,7 @@
     "static.dashboard.healtharea": "Domaines de santé",
     "static.program.realm": "Domaine",
     "static.program.validvaluetext": "Veuillez saisir une valeur supérieure à 0",
-    "static.program.validplantodrafttext": "Veuillez saisir le plan pour rédiger le délai d'exécution en mois",
+    "static.program.validplantosubmittext": "Veuillez saisir le plan pour rédiger le délai d'exécution en mois",
     "static.dashboard.addprogramproduct": "Ajouter un produit programme",
     "static.program.seafreightperctext": "Pourcentage de fret maritime",
     "static.dashboard.listprogramproduct": "Liste des produits du programme",

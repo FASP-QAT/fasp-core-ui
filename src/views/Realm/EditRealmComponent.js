@@ -13,12 +13,10 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const entityname = i18n.t('static.realm.realm');
 let initialValues = {
     realmCode: '',
-    label: ''
-    /*,
-    monthInPastForAmc: '',
-    monthInFutureForAmc: '',
-    orderFrequency: '',*/
-
+    label: '',
+    minMosMinGaurdrail: '',
+    minMosMaxGaurdrail: '',
+    maxMosMaxGaurdrail: ''
 }
 
 const validationSchema = function (values) {
@@ -27,6 +25,18 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
+        minMosMinGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.realm.minMosMinGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        minMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.realm.minMosMaxGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        maxMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.realm.maxMosMaxGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         /*   monthInPastForAmc: Yup.number()
                .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
            monthInFutureForAmc: Yup.number()
@@ -75,7 +85,10 @@ export default class UpdateDataSourceComponent extends Component {
                 /*  monthInPastForAmc: '',
                   monthInFutureForAmc: '',
                   orderFrequency: '',*/
-                defaultRealm: ''
+                defaultRealm: '',
+                minMosMinGaurdrail: '',
+                minMosMaxGaurdrail: '',
+                maxMosMaxGaurdrail: ''
             },
             lang: localStorage.getItem('lang'),
             message: ''
@@ -104,6 +117,15 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
+        if (event.target.name === "minMosMinGaurdrail") {
+            realm.minMosMinGaurdrail = event.target.value
+        }
+        if (event.target.name === "minMosMaxGaurdrail") {
+            realm.minMosMaxGaurdrail = event.target.value
+        }
+        if (event.target.name === "maxMosMaxGaurdrail") {
+            realm.maxMosMaxGaurdrail = event.target.value
+        }
         /* if (event.target.name === "monthInPastForAmc") {
              realm.monthInPastForAmc = event.target.value
          }
@@ -128,9 +150,9 @@ export default class UpdateDataSourceComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-            /*   monthInPastForAmc: true,
-               monthInFutureForAmc: true,
-               orderFrequency: true*/
+            minMosMinGaurdrail: true,
+            minMosMaxGaurdrail: true,
+            maxMosMaxGaurdrail: true
         }
         )
         this.validateForm(errors)
@@ -158,7 +180,7 @@ export default class UpdateDataSourceComponent extends Component {
                     realm: response.data
                 });
             }
-            else{
+            else {
 
                 this.setState({
                     message: response.data.messageCode
@@ -167,7 +189,7 @@ export default class UpdateDataSourceComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-          
+
 
         })
     }
@@ -177,7 +199,7 @@ export default class UpdateDataSourceComponent extends Component {
         realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
-        this.props.history.push(`/realm/realmList/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/realmList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     render() {
@@ -189,17 +211,17 @@ export default class UpdateDataSourceComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
                                     realmCode: this.state.realm.realmCode,
                                     label: getLabelText(this.state.realm.label, this.state.lang),
-                                    /* monthInPastForAmc: this.state.realm.monthInPastForAmc,
-                                     monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
-                                     orderFrequency: this.state.realm.orderFrequency,*/
+                                    minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
+                                    minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
+                                    maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
                                     defaultRealm: this.state.realm.defaultRealm,
                                 }}
 
@@ -209,7 +231,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/realm/realmList/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/realm/realmList/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -264,6 +286,51 @@ export default class UpdateDataSourceComponent extends Component {
                                                             value={this.state.realm.realmCode}
                                                             required />
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}</Label>
+                                                        <Input type="number"
+                                                            min="0"
+                                                            name="minMosMinGaurdrail"
+                                                            id="minMosMinGaurdrail"
+                                                            bsSize="sm"
+                                                            valid={!errors.minMosMinGaurdrail && this.state.realm.minMosMinGaurdrail != ''}
+                                                            invalid={touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minMosMinGaurdrail}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minMosMinGaurdrail}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}</Label>
+                                                        <Input type="number"
+                                                            min="0"
+                                                            name="minMosMaxGaurdrail"
+                                                            id="minMosMaxGaurdrail"
+                                                            bsSize="sm"
+                                                            valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
+                                                            invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minMosMaxGaurdrail}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minMosMaxGaurdrail}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}</Label>
+                                                        <Input type="number"
+                                                            min="0"
+                                                            name="maxMosMaxGaurdrail"
+                                                            id="maxMosMaxGaurdrail"
+                                                            bsSize="sm"
+                                                            valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
+                                                            invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.maxMosMaxGaurdrail}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
                                                     </FormGroup>
                                                     {/*    <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
