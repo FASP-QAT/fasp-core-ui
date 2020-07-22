@@ -1667,7 +1667,7 @@ class ShipmentSummery extends Component {
                         console.log("shipmentList------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
 
-                        let dateFilter = activeFilter.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
+                        let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
 
                         let data = [];
                         let planningUnitFilter = [];
@@ -2147,7 +2147,7 @@ class ShipmentSummery extends Component {
                                         </Online>
                                         <Offline>
                                             {
-                                                this.state.offlineConsumptionList.length > 0
+                                                this.state.data.length > 0
                                                 &&
                                                 <div className="col-md-12 p-0">
                                                     <div className="col-md-12">
