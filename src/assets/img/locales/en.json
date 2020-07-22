@@ -231,7 +231,7 @@
     "static.dashboard.healthareaheader": "Technical Area",
     "static.program.realm": "Realm",
     "static.program.validvaluetext": "Please enter value greater than 0",
-    "static.program.validplantodrafttext": "Please enter plan to draft lead time In Months",
+    "static.program.validplantosubmittext": "Please enter planned to submitted lead time In Months",
     "static.dashboard.addprogramproduct": "Add Program Product",
     "static.product.realm": "Realm",
     "static.program.seafreightperctext": "Sea/Land Freight Percentage",

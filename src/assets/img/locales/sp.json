@@ -396,7 +396,7 @@
     "static.program.delivertoreceivetext": "Ingrese el tiempo de entrega entregado y recibido en meses",
     "static.program.realm": "Reino",
     "static.program.validvaluetext": "Por favor, introduzca un valor mayor que 0",
-    "static.program.validplantodrafttext": "Ingrese el plan para redactar el plazo de entrega en meses",
+    "static.program.validplantosubmittext": "Ingrese el plan para redactar el plazo de entrega en meses",
     "static.program.seafreightperctext": "Porcentaje de carga marítima",
     "static.program.region": "Región",
     "static.program.programmanager": "Director del programa",
