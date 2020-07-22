@@ -1163,7 +1163,7 @@ class ShipmentSummery extends Component {
 
         var B = [[(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'), (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
         (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
-        (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightPer')).replaceAll(' ', '%20'),
+        (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
         (i18n.t('static.report.totalCost')).replaceAll(' ', '%20'), (i18n.t('static.program.notes')).replaceAll(' ', '%20')]]
 
         if (navigator.onLine) {
@@ -1189,7 +1189,7 @@ class ShipmentSummery extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.shipmentSummeryReport') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.report.shipmentDetailReport') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1228,7 +1228,7 @@ class ShipmentSummery extends Component {
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
 
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.shipmentSummeryReport'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.shipmentDetailReport'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1322,7 +1322,7 @@ class ShipmentSummery extends Component {
         doc.autoTable(content2);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.report.shipmentSummeryReport') + ".pdf")
+        doc.save(i18n.t('static.report.shipmentDetailReport') + ".pdf")
         //creates PDF from img
         /* var doc = new jsPDF('landscape');
         doc.setFontSize(20);
@@ -1462,6 +1462,7 @@ class ShipmentSummery extends Component {
                 versions: []
             })
         }
+        this.fetchData();
     }
 
     consolidatedVersionList = (programId) => {
@@ -1667,7 +1668,7 @@ class ShipmentSummery extends Component {
                         console.log("shipmentList------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
 
-                        let dateFilter = activeFilter.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
+                        let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
 
                         let data = [];
                         let planningUnitFilter = [];
@@ -1724,18 +1725,22 @@ class ShipmentSummery extends Component {
                                     "shipmentStatus": planningUnitFilter[i].shipmentStatus,
                                     "shipmentQty": planningUnitFilter[i].shipmentQty,
                                     "expectedDeliveryDate": planningUnitFilter[i].expectedDeliveryDate,
-                                    "productCost": planningUnitFilter[i].productCost,
-                                    "freightCost": planningUnitFilter[i].freightCost,
-                                    "totalCost": planningUnitFilter[i].productCost + planningUnitFilter[i].freightCost,
+                                    "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                    "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                    "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
                                     "notes": planningUnitFilter[i].notes
                                 }
                                 data.push(json);
+
+
+
                             }
 
                             console.log("data----->", data);
                             this.setState({
-                                data: data
-                                , message: ''
+                                data: data,
+                                message: '',
+                                viewById: viewById,
                             })
                         }.bind(this)
                     }.bind(this);
@@ -1789,7 +1794,7 @@ class ShipmentSummery extends Component {
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
-        } else if (versionId == 0) {
+        } else if (versionId == -1) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
         } else if (planningUnitIds.length == 0) {
@@ -2147,7 +2152,7 @@ class ShipmentSummery extends Component {
                                         </Online>
                                         <Offline>
                                             {
-                                                this.state.offlineConsumptionList.length > 0
+                                                this.state.data.length > 0
                                                 &&
                                                 <div className="col-md-12 p-0">
                                                     <div className="col-md-12">
@@ -2199,8 +2204,8 @@ class ShipmentSummery extends Component {
                                                                 <tr id="addr0" key={idx} >
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(perResult[idx].fundingSource.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{perResult[idx].orders}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{perResult[idx].shipmentQty}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{perResult[idx].totalCost}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{(perResult[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{(perResult[idx].totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>
                                                             )}
                                                     </tbody>
@@ -2224,7 +2229,7 @@ class ShipmentSummery extends Component {
                                                             <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.qty')}</th>
                                                             <th>{i18n.t('static.report.expectedReceiveddate')}</th>
                                                             <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.productCost')}</th>
-                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.freightPer')}</th>
+                                                            <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.freightCost')}</th>
                                                             <th style={{ 'text-align': 'right' }}>{i18n.t('static.report.totalCost')}</th>
                                                             <th>{i18n.t('static.program.notes')}</th>
                                                         </tr>
@@ -2287,11 +2292,11 @@ class ShipmentSummery extends Component {
                                                                     <td>{getLabelText(this.state.data[idx].procurementAgent.label, this.state.lang)}</td>
                                                                     <td>{getLabelText(this.state.data[idx].fundingSource.label, this.state.lang)}</td>
                                                                     <td>{getLabelText(this.state.data[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{this.state.data[idx].shipmentQty}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{(this.state.data[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? this.state.data[idx].productCost : this.state.data[idx].productCost * this.state.data[idx].multiplier}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? this.state.data[idx].freightCost : this.state.data[idx].freightCost * this.state.data[idx].multiplier}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? this.state.data[idx].totalCost : this.state.data[idx].totalCost * this.state.data[idx].multiplier}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (this.state.data[idx].productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (this.state.data[idx].productCost * this.state.data[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (this.state.data[idx].freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (this.state.data[idx].freightCost * this.state.data[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (this.state.data[idx].totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (this.state.data[idx].totalCost * this.state.data[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}
