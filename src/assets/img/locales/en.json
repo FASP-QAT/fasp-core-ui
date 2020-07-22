@@ -985,6 +985,6 @@
     "static.supplyPlan.procurementAgentCannotBeTBD": "Procurement agent cannot be TBD",
     "static.supplyPlan.fundingSourceCannotBeTBD": "Funding source cannot be TBD",
     "static.dashboard.shipmentdetails": "Shipment Details",
-    "static.inventory.inventorydetils": "Inventory Details"
-
+    "static.inventory.inventorydetils": "Inventory Details",
+     "static.report.shipmentDetailReport": "Shipment Details Report"
 }
