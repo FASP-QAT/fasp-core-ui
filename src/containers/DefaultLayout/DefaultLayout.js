@@ -521,7 +521,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FUNDER_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            name: i18n.t('static.report.shipmentCostReport'),
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
@@ -699,7 +699,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            name: i18n.t('static.report.shipmentCostReport'),
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }

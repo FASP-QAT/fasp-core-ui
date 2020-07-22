@@ -1606,34 +1606,62 @@ class ShipmentGlobalDemandView extends Component {
 
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-        this.state.countryLabels.map(ele =>
-            csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        this.state.programLabels.map(ele =>
-            csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        this.state.planningUnitLabels.map(ele =>
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        if (navigator.onLine) {
+            csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'));
+
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push((i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            this.state.shipmentStatusLabels.map(ele =>
+                csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+
+        } else {
+
+            csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push((i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')));
+            this.state.shipmentStatusLabels.map(ele =>
+                csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        }
+
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
         var re;
 
+        if (this.state.procurementAgentSplit.length > 0) {
+            var A = [];
+            A[0] = this.state.table1Headers;
+            re = this.state.procurementAgentSplit;
+            for (var item = 0; item < re.length; item++) {
+                let item = Object.values(re[item].procurementAgentQty);
+                A.push([[getLabelText(re[item].planningUnit.label, this.state.lang), item, re[item].total]])
+            }
+            for (var i = 0; i < A.length; i++) {
+                csvRow.push(A[i].join(","))
+            }
+        }
+
         var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
-
         re = this.state.consumptions
-
         for (var item = 0; item < re.length; item++) {
             A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
+
+
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.globalconsumption') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.dashboard.shipmentGlobalDemandView') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1690,7 +1718,7 @@ class ShipmentGlobalDemandView extends Component {
                   align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.globalconsumption'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.shipmentGlobalDemandView'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1699,18 +1727,40 @@ class ShipmentGlobalDemandView extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                    if (navigator.onLine) {
+                        doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                            align: 'left'
+                        })
 
-                    planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 140, planningText)
 
-                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
-                        align: 'left'
-                    })
-                    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText)
 
-                    doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
+                        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 200, statusText)
+
+
+                    } else {
+                        doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                            align: 'left'
+                        })
+
+                        doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                            align: 'left'
+                        })
+
+                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+
+                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 180, fundingSourceText)
+
+                        var statusText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 210, statusText)
+                    }
+
                 }
 
             }
@@ -1724,36 +1774,53 @@ class ShipmentGlobalDemandView extends Component {
 
         doc.setFontSize(10);
 
-        const title = "Consumption Report";
-        var canvas = document.getElementById("cool-canvas");
-        //creates image
+        const title = "Shipment Global Demand";
+        var canvas = document.getElementById("cool-canvas1");
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
+        doc.addImage(canvasImg, 'png', 50, 240, 300, 200, 'a', 'CANVAS');
 
-        doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
+        //creates image2
+        canvas = document.getElementById("cool-canvas2");
 
-        const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
-        const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
+        canvasImg = canvas.toDataURL("image/png", 1.0);
+        doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
 
-        let content = {
-            margin: { top: 80 },
-            startY: height,
-            head: headers,
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+        //Tables
+        let content1 = {
+            margin: { top: 80, left: 100 },
+            startY: height + 90,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 100 },
+                // 1: { cellWidth: 100 },
+                // 2: { cellWidth: 200 },
+                // 3: { cellWidth: 100 },
+                // 4: { cellWidth: 100 },
+            },
+            html: '#mytable1',
 
+            didDrawCell: function (data) {
+                if (data.column.index === this.state.table1Headers.length && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var img = td.getElementsByTagName('img')[0];
+                    var dim = data.cell.height - data.cell.padding('vertical');
+                    var textPos = data.cell.textPos;
+                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+                }
+            }
         };
-
+        doc.autoTable(content1);
 
         //doc.text(title, marginLeft, 40);
-        doc.autoTable(content);
+        // doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("GlobalConsumption.pdf")
+        doc.save(i18n.t('static.dashboard.shipmentGlobalDemandView') + ".pdf")
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -1856,6 +1923,7 @@ class ShipmentGlobalDemandView extends Component {
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
             let fundingSourceIds = this.state.fundingSourceValues;
             let shipmentStatusIds = this.state.shipmentStatusValues;
+            console.log("shipmentStatusIds---->", shipmentStatusIds);
 
             if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
                 var db1;
@@ -1952,8 +2020,9 @@ class ShipmentGlobalDemandView extends Component {
                             //Table-1
                             for (let i = 0; i < planningUnitIds.length; i++) {
                                 let obj = {};
-                                let planningUnit = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id)).map((item) => { return { planningUnit: item.planningUnit } })[0];
+                                let planningUnit = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id)).map((item) => { return { planningUnit: item.planningUnit } })[0].planningUnit;
                                 let total = 0;
+                                let buffer = [];
                                 for (let j = 0; j < procurementAgentList.length; j++) {
                                     let data1 = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id && procurementAgentList[j].id == c.procurementAgent.id)).map((item) => { return { procurementAgent: item.procurementAgent, suggestedQty: item.suggestedQty } });
 
@@ -1965,18 +2034,29 @@ class ShipmentGlobalDemandView extends Component {
                                         return a;
                                     }, {}));
 
-                                    let name = '';
-                                    let value = 0;
                                     if (data2.length > 0) {
-                                        name = data2[0].procurementAgent.code;
-                                        value = data2[0].suggestedQty;
+                                        let key = data2[0].procurementAgent.code;
+                                        let value = data2[0].suggestedQty;
+                                        let json = {}
+                                        json[data2[0].procurementAgent.code] = data2[0].suggestedQty;
+
+                                        buffer.push(json);
+                                        total = total + value;
                                     } else {
-                                        name = procurementAgentList[j].code;
+                                        let key = procurementAgentList[j].code;
+                                        let value = 0;
+                                        let json = {}
+                                        json[procurementAgentList[j].code] = value;
+                                        buffer.push(json);
                                     }
 
-                                    total = total + value;
-                                    Object.assign(obj, { name: value });
 
+                                    // Object.assign(obj, { name: value });
+
+                                }
+
+                                for (let j = 0; j < buffer.length; j++) {
+                                    Object.assign(obj, buffer[j]);
                                 }
 
                                 let json = {
@@ -2726,15 +2806,15 @@ class ShipmentGlobalDemandView extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon">
-                        {/* {this.state.consumptions.length > 0 && */}
-                        <div className="card-header-actions">
-                            <a className="card-header-action">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                        {(this.state.fundingSourceSplit.length > 0 || this.state.planningUnitSplit.length > 0 || this.state.procurementAgentSplit.length > 0) &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
 
-                            </a>
-                        </div>
-                        {/* } */}
+                                </a>
+                            </div>
+                        }
                     </div>
                     <CardBody className=" pt-lg-0">
                         <div ref={ref}>
@@ -2917,7 +2997,7 @@ class ShipmentGlobalDemandView extends Component {
                                         this.state.planningUnitSplit.length > 0 &&
                                         <Col md="8 pl-0">
                                             <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
-                                                <HorizontalBar id="cool-canvas" data={chartData} options={options} />
+                                                <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
                                             </div>
                                         </Col>
                                     }
@@ -2925,7 +3005,7 @@ class ShipmentGlobalDemandView extends Component {
                                         this.state.fundingSourceSplit.length > 0 &&
                                         <Col md="4 pl-0">
                                             <div className="chart-wrapper">
-                                                <Pie data={chartDataForPie} options={optionsPie}
+                                                <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
                                                 /><br />
                                             </div>
                                         </Col>

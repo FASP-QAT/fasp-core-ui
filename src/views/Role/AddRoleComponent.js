@@ -19,7 +19,8 @@ const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required(i18n.t('static.role.roletext')),
+            .required(i18n.t('static.role.roletext'))
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext')),
         // businessFunctions: Yup.string()
         //     .required(i18n.t('static.role.businessfunctiontext')),
         // canCreateRole: Yup.string()
@@ -266,7 +267,6 @@ class AddRoleComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("8888888************", this.state.role);
                                     UserService.addNewRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {

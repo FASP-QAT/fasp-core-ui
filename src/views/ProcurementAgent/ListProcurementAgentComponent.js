@@ -314,13 +314,6 @@ class ListProcurementAgentComponent extends Component {
                 headerAlign: 'center'
             },
             {
-                dataField: 'draftToSubmittedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentdrafttosubmittime'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
                 dataField: 'submittedToApprovedLeadTime',
                 text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetime'),
                 sort: true,
