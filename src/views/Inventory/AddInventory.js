@@ -2,16 +2,18 @@ import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
 import jexcel from 'jexcel';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, 
-    InputGroup, InputGroupAddon, Label,Modal,ModalBody,ModalFooter,ModalHeader } from 'reactstrap';
+import {
+    Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input,
+    InputGroup, InputGroupAddon, Label, Modal, ModalBody, ModalFooter, ModalHeader
+} from 'reactstrap';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY } from '../../Constants.js';
+import { SECRET_KEY, INVENTORY_DATA_SOURCE_TYPE } from '../../Constants.js';
 import i18n from '../../i18n';
 import moment from "moment";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const entityname = i18n.t('static.inventory.inventory')
 export default class AddInventory extends Component {
@@ -32,6 +34,8 @@ export default class AddInventory extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getCountrySKUList = this.getCountrySKUList.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.checkValidationInventoryBatchInfo = this.checkValidationInventoryBatchInfo.bind(this);
+        this.saveInventoryBatchInfo = this.saveInventoryBatchInfo.bind(this);
 
     }
 
@@ -52,10 +56,15 @@ export default class AddInventory extends Component {
         }, 8000);
     }
     componentDidMount() {
-        const lan = 'en';
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+        }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -63,8 +72,11 @@ export default class AddInventory extends Component {
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
-                // Handle errors!
-            };
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+            }.bind(this);
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
@@ -74,8 +86,11 @@ export default class AddInventory extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + "~v" + myResult[i].version,
+                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -97,13 +112,24 @@ export default class AddInventory extends Component {
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
         var countrySKUList = []
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+        }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-
+            programRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+            }.bind(this);
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -112,16 +138,22 @@ export default class AddInventory extends Component {
                 var countrySKUTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                 var countrySKUOs = countrySKUTransaction.objectStore('realmCountryPlanningUnit');
                 var countrySKURequest = countrySKUOs.getAll();
+                countrySKURequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
                 countrySKURequest.onsuccess = function (event) {
                     var countrySKUResult = [];
-                    countrySKUResult = countrySKURequest.result;
+                    countrySKUResult = (countrySKURequest.result).filter(c => c.active == true);
                     for (var k = 0; k < countrySKUResult.length; k++) {
                         if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId) {
                             var countrySKUJson = {
                                 name: getLabelText(countrySKUResult[k].label, this.state.lang),
                                 id: countrySKUResult[k].realmCountryPlanningUnitId
                             }
-                            countrySKUList[k] = countrySKUJson
+                            countrySKUList.push(countrySKUJson);
                         }
                     }
                     console.log("countryasdas", countrySKUList);
@@ -130,10 +162,31 @@ export default class AddInventory extends Component {
             }.bind(this);
         }.bind(this);
     }
+
+    filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var value = (instance.jexcel.getJson()[r])[5];
+        console.log("Value", value);
+        var d = (instance.jexcel.getJson()[r])[0];
+        if (value != 0) {
+            mylist = this.state.batchInfoList.filter(c => c.id != -1);
+        } else {
+            mylist = this.state.batchInfoList;
+        }
+        return mylist;
+    }.bind(this)
+
     formSubmit() {
         if (this.state.changedFlag == 1) {
 
         } else {
+            this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+            this.el.destroy();
+
+            this.setState({
+                inventoryEl: "",
+                changedFlag: 0
+            })
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId });
             var db1;
@@ -142,32 +195,57 @@ export default class AddInventory extends Component {
             var dataSourceList = []
             var regionList = []
             var countrySKUList = []
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+            }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
 
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var programTransaction = transaction.objectStore('programData');
                 var programRequest = programTransaction.get(programId);
-
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    this.setState({
+                        programJsonAfterAdjustmentClicked: programJson
+                    })
+                    var batchList = []
+                    var batchInfoList = programJson.batchInfoList;
+                    this.setState({
+                        batchInfoListAllForInventory: batchInfoList
+                    })
 
                     var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                     var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                     var dataSourceRequest = dataSourceOs.getAll();
+                    dataSourceRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                    }.bind(this);
                     dataSourceRequest.onsuccess = function (event) {
                         var dataSourceResult = [];
-                        dataSourceResult = dataSourceRequest.result;
+                        dataSourceResult = (dataSourceRequest.result).filter(c => c.active == true && c.dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE);
                         for (var k = 0; k < dataSourceResult.length; k++) {
                             if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
                                 if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                     var dataSourceJson = {
-                                        name: dataSourceResult[k].label.label_en,
+                                        name: getLabelText(dataSourceResult[k].label, this.state.lang),
                                         id: dataSourceResult[k].dataSourceId
                                     }
-                                    dataSourceList[k] = dataSourceJson
+                                    dataSourceList.push(dataSourceJson);
                                 }
                             }
                         }
@@ -176,13 +254,19 @@ export default class AddInventory extends Component {
                         var regionTransaction = db1.transaction(['region'], 'readwrite');
                         var regionOs = regionTransaction.objectStore('region');
                         var regionRequest = regionOs.getAll();
+                        regionRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                        }.bind(this);
                         regionRequest.onsuccess = function (event) {
                             var regionResult = [];
-                            regionResult = regionRequest.result;
+                            regionResult = (regionRequest.result).filter(c => c.active == true);
                             for (var k = 0; k < regionResult.length; k++) {
                                 if (regionResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
                                     var regionJson = {
-                                        name: regionResult[k].label.label_en,
+                                        name: getLabelText(regionResult[k].label, this.state.lang),
                                         id: regionResult[k].regionId
                                     }
                                     regionList.push(regionJson);
@@ -249,7 +333,7 @@ export default class AddInventory extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [100, 100, 100, 130, 130, 130, 130],
+                                colWidths: [100, 100, 150, 120, 100, 100, 230, 80],
                                 columns: [
                                     {
                                         title: i18n.t('static.inventory.inventoryDate'),
@@ -344,6 +428,29 @@ export default class AddInventory extends Component {
                                                 this.el = jexcel(document.getElementById("inventoryBatchInfoTable"), '');
                                                 this.el.destroy();
                                                 var json = [];
+                                                var batchList = [];
+                                                var rowData = obj.getRowData(y);
+                                                var countrySKUId = document.getElementById('countrySKU').value;
+                                                var inventoryList = this.state.inventoryList.filter(c => c.realmCountryPlanningUnit.id == countrySKUId)[0];
+                                                var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
+                                                batchInfoList = batchInfoList.filter(c => (moment(c.expiryDate).format("YYYY-MM-DD") >= date && moment(c.createdDate).format("YYYY-MM-DD") <= date));
+                                                console.log("Batch info list", batchInfoList);
+                                                batchList.push({
+                                                    name: i18n.t('static.supplyPlan.fefo'),
+                                                    id: -1
+                                                })
+                                                for (var k = 0; k < batchInfoList.length; k++) {
+                                                    if (batchInfoList[k].planningUnitId == inventoryList.planningUnit.id) {
+                                                        var batchJson = {
+                                                            name: batchInfoList[k].batchNo,
+                                                            id: batchInfoList[k].batchId
+                                                        }
+                                                        batchList.push(batchJson);
+                                                    }
+                                                }
+                                                this.setState({
+                                                    batchInfoList: batchList
+                                                })
                                                 // var elInstance=this.state.plannedPsmShipmentsEl;
                                                 var rowData = obj.getRowData(y);
                                                 var batchInfo = rowData[9];
@@ -418,7 +525,7 @@ export default class AddInventory extends Component {
                                                             title: i18n.t('static.supplyPlan.batchId'),
                                                             type: 'dropdown',
                                                             source: this.state.batchInfoList,
-                                                            filter: this.filterBatchInfoForExistingDataForInventory
+                                                            filter: this.filterBatchInfoForExistingData
                                                         },
                                                         {
                                                             title: i18n.t('static.supplyPlan.expiryDate'),
@@ -759,11 +866,385 @@ export default class AddInventory extends Component {
                                     return items;
                                 }.bind(this)
                             };
-                            this.el = jexcel(document.getElementById("inventorytableDiv"), options);
+                            var inventoryEl = jexcel(document.getElementById("inventorytableDiv"), options);
+                            this.el = inventoryEl;
+                            this.setState({
+                                inventoryEl: inventoryEl
+                            });
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
+        }
+    }
+
+    loadedBatchInfoInventory = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance);
+    }
+
+    batchInfoChangedInventory = function (instance, cell, x, y, value) {
+        this.setState({
+            inventoryBatchError: ''
+        })
+        var elInstance = instance.jexcel;
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.setState({
+                    inventoryBatchInfoDuplicateError: '',
+                    inventoryBatchInfoNoStockError: ''
+                })
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+
+                if (value != -1) {
+                    var expiryDate = this.state.batchInfoListAllForInventory.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
+                    elInstance.setValueFromCoords(1, y, expiryDate, true);
+                } else {
+                    elInstance.setValueFromCoords(1, y, "", true);
+                }
+                var col1 = ("D").concat(parseInt(y) + 1);
+                elInstance.setStyle(col1, "background-color", "transparent");
+                elInstance.setComments(col1, "");
+            }
+        }
+
+        if (x == 3) {
+            if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
+                var reg = /-?\d+/
+                // var reg = /^[0-9\b]+$/;
+                value=(elInstance.getRowData(y))[3];
+                value = value.toString().replaceAll("\,", "");
+                var col = ("D").concat(parseInt(y) + 1);
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.setState({
+                        inventoryBatchInfoNoStockError: ''
+                    })
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else if (elInstance.getValueFromCoords(2, y) == 2) {
+                var col = ("D").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ("D").concat(parseInt(y) + 1);
+                this.setState({
+                    inventoryBatchInfoNoStockError: ''
+                })
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 4) {
+            if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
+                // var reg = /-?\d+/
+                var reg = /^[0-9\b]+$/;
+                var col = ("E").concat(parseInt(y) + 1);
+                value=(elInstance.getRowData(y))[4];
+                value = value.toString().replaceAll("\,", "")
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else if (elInstance.getValueFromCoords(2, y) == 1) {
+                var col = ("E").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ("E").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                if (value == 1) {
+                    var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    cell.classList.remove('readonly');
+                    elInstance.setValueFromCoords(3, y, "", true);
+                } else {
+                    var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    cell.classList.remove('readonly');
+                    elInstance.setValueFromCoords(4, y, "", true);
+                }
+            }
+        }
+
+        this.setState({
+            inventoryBatchInfoChangedFlag: 1
+        })
+    }.bind(this)
+
+    checkValidationInventoryBatchInfo() {
+        var valid = true;
+        var elInstance = this.state.inventoryBatchInfoTableEl;
+        console.log("elInstnace", elInstance);
+        var json = elInstance.getJson();
+        console.log("Json", json)
+        var mapArray = [];
+        for (var y = 0; y < json.length; y++) {
+            var map = new Map(Object.entries(json[y]));
+            mapArray.push(map);
+
+            var checkDuplicateInMap = mapArray.filter(c =>
+                c.get("0") == map.get("0")
+            )
+            if (checkDuplicateInMap.length > 1) {
+                var colArr = ['A'];
+                for (var c = 0; c < colArr.length; c++) {
+                    var col = (colArr[c]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateBatchNumber'));
+                }
+                valid = false;
+                this.setState({
+                    inventoryBatchInfoDuplicateError: i18n.t('static.supplyPlan.duplicateBatchNumber')
+                })
+                console.log("In errror")
+            } else {
+                var programJson = this.state.programJsonAfterAdjustmentClicked;
+                var shipmentList = programJson.shipmentList;
+                var shipmentBatchArray = [];
+                for (var ship = 0; ship < shipmentList.length; ship++) {
+                    var batchInfoList = shipmentList[ship].batchInfoList;
+                    for (var bi = 0; bi < batchInfoList.length; bi++) {
+                        shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                    }
+                }
+                if (map.get("0") != -1) {
+                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
+                    var totalStockForBatchNumber = stockForBatchNumber.qty;
+
+                    var consumptionList = programJson.consumptionList;
+                    var consumptionBatchArray = [];
+
+                    for (var con = 0; con < consumptionList.length; con++) {
+                        var batchInfoList = consumptionList[con].batchInfoList;
+                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                        }
+                    }
+                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                    if (consumptionForBatchNumber == undefined) {
+                        consumptionForBatchNumber = [];
+                    }
+                    var consumptionQty = 0;
+                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                    }
+
+                    var inventoryList = programJson.inventoryList;
+                    var inventoryBatchArray = [];
+                    for (var inv = 0; inv < inventoryList.length; inv++) {
+                        var invIndex = (this.state.inventoryEl).getRowData(parseInt(map.get("6")))[8];
+                        if (inv != invIndex) {
+                            var batchInfoList = inventoryList[inv].batchInfoList;
+                            for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                            }
+                        }
+                    }
+
+                    var inventoryForBatchNumber = [];
+                    if (inventoryBatchArray.length > 0) {
+                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
+                    }
+                    if (inventoryForBatchNumber == undefined) {
+                        inventoryForBatchNumber = [];
+                    }
+                    var adjustmentQty = 0;
+                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                    }
+                    adjustmentQty += parseInt(map.get("3").toString().replaceAll("\,", ""));
+                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                    if (remainingBatchQty < 0) {
+                        var col = ("D").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
+
+                        valid = false;
+                        this.setState({
+                            inventoryBatchInfoNoStockError: i18n.t('static.supplyPlan.noStockAvailable')
+                        })
+                    }
+                } else {
+                    var colArr = ['A'];
+                    for (var c = 0; c < colArr.length; c++) {
+                        var col = (colArr[c]).concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    var col = ("A").concat(parseInt(y) + 1);
+                    var value = elInstance.getValueFromCoords(0, y);
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var col = ("D").concat(parseInt(y) + 1);
+                    var value = value=((elInstance.getRowData(y))[3]).toString().replaceAll("\,", "");
+                    var reg = /-?\d+/;
+                    // var reg = /^[0-9\b]+$/;
+                    if (value != "" && value != 0) {
+                        var reg = /-?\d+/
+                        // var reg = /^[0-9\b]+$/;
+                        var col = ("D").concat(parseInt(y) + 1);
+                        if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else if (elInstance.getValueFromCoords(2, y) == 2) {
+                        var col = ("D").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ("D").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var value = ((elInstance.getRowData(y))[4]).toString().replaceAll("\,", "");
+                    if (value != "" && value != 0) {
+                        // var reg = /-?\d+/
+                        var reg = /^[0-9\b]+$/;
+                        var col = ("E").concat(parseInt(y) + 1);
+                        if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    } else if (elInstance.getValueFromCoords(2, y) == 1) {
+                        var col = ("E").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ("E").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                    var value = elInstance.getValueFromCoords(2, y);
+                    var col = ("C").concat(parseInt(y) + 1);
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                }
+            }
+        }
+        return valid;
+    }
+
+    saveInventoryBatchInfo() {
+        var validation = this.checkValidationInventoryBatchInfo();
+        if (validation == true) {
+            var elInstance = this.state.inventoryBatchInfoTableEl;
+            var json = elInstance.getJson();
+            var batchInfoArray = [];
+            var rowNumber = 0;
+            var totalAdjustments = 0;
+            var totalActualStock = 0;
+
+            for (var i = 0; i < json.length; i++) {
+                var map = new Map(Object.entries(json[i]));
+                if (i == 0) {
+                    rowNumber = map.get("6");
+                }
+                if (map.get("0") != -1) {
+                    var batchInfoJson = {
+                        inventoryTransBatchInfoId: map.get("5"),
+                        batch: {
+                            batchId: map.get("0"),
+                            batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
+                            expiryDate: map.get("1")
+                        },
+                        adjustmentQty: map.get("3").toString().replaceAll("\,", ""),
+                        actualQty: map.get("4").toString().replaceAll("\,", "")
+                    }
+                    batchInfoArray.push(batchInfoJson);
+                }
+                totalAdjustments += parseInt(map.get("3").toString().replaceAll("\,", ""));
+                totalActualStock += parseInt(map.get("4").toString().replaceAll("\,", ""));
+            }
+            console.log("Total actual stock", totalActualStock);
+            var inventoryInstance = this.state.inventoryEl;
+            console.log("map.get(1)", map.get("1"));
+            if (map.get("2") == 1) {
+                console.log("In if")
+                inventoryInstance.setValueFromCoords(4, rowNumber, "", true);
+                inventoryInstance.setValueFromCoords(5, rowNumber, totalActualStock, true);
+            } else {
+                inventoryInstance.setValueFromCoords(4, rowNumber, totalAdjustments, true);
+                inventoryInstance.setValueFromCoords(5, rowNumber, "", true);
+            }
+            // rowData[15] = batchInfoArray;
+            inventoryInstance.setValueFromCoords(9, rowNumber, batchInfoArray, "");
+            this.setState({
+                inventoryChangedFlag: 1,
+                inventoryBatchInfoChangedFlag: 0,
+                inventoryBatchInfoTableEl: ''
+            })
+            this.toggleLarge();
+            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+            elInstance.destroy();
+        } else {
+            this.setState({
+                inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
+            })
         }
     }
 
@@ -773,251 +1254,351 @@ export default class AddInventory extends Component {
 
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
-        //     $("#saveButtonDiv").show();
         this.setState({
             changedFlag: 1
         })
+        var elInstance = this.state.inventoryEl;
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                // if (isNaN(Date.parse(value))) {
+                //     elInstance.setStyle(col, "background-color", "transparent");
+                //     elInstance.setStyle(col, "background-color", "yellow");
+                //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                // } else {
+                this.setState({
+                    message: ''
+                })
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(1, y)
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    this.setState({
+                        message: ''
+                    })
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
             }
+            // }
         }
+
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                this.setState({
+                    message: ''
+                })
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(0, y)
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.setState({
+                        message: ''
+                    })
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
             }
         }
 
-        if (x == 3) {
-            console.log("In x===5")
-            if (this.el.getValueFromCoords(3, y) != "") {
-                var reg = /^[0-9\b]+$/;
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    var col = ("D").concat(parseInt(y) + 1);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    var col = ("D").concat(parseInt(y) + 1);
-                    if (this.el.getValueFromCoords(5, y) != "" && this.el.getValueFromCoords(3, y) != "") {
-                        var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                        this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
-                    }
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                var col = ("D").concat(parseInt(y) + 1);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
         }
 
         if (x == 4) {
-            var reg = /-?\d+/
-            // var reg = /^[0-9\b]+$/;
-            var col = ("E").concat(parseInt(y) + 1);
-            console.log("Value-------->", value);
-            if (value === "") {
-                console.log("In if");
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+            if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
+                var reg = /-?\d+/
+                value=(elInstance.getRowData(y))[4];
+                value = value.toString().replaceAll("\,", "");
+                var col = ("E").concat(parseInt(y) + 1);
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
-
+            } else if ((elInstance.getRowData(y))[3] == 2) {
+                var col = ("E").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ("E").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
         }
-
 
         if (x == 5) {
-            console.log("In x==9");
-            if (this.el.getValueFromCoords(5, y) != "") {
+            if (elInstance.getValueFromCoords(5, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(5, y).toString().replaceAll("\,", "") != 0) {
+                // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
+                var col = ("F").concat(parseInt(y) + 1);
+                value=(elInstance.getRowData(y))[5];
+                value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    var col = ("F").concat(parseInt(y) + 1);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
-                    this.el.setValueFromCoords(4, y, "", true);
-                    var col = ("F").concat(parseInt(y) + 1);
-                    if (this.el.getValueFromCoords(5, y) != "" && this.el.getValueFromCoords(3, y) != "") {
-                        var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                        this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
-                    }
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
+            } else if ((elInstance.getRowData(y))[3] == 1) {
+                var col = ("F").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 var col = ("F").concat(parseInt(y) + 1);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
         }
 
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                if (value == 1) {
+                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(`F${parseInt(y) + 1}`)
+                    cell.classList.remove('readonly');
+                    elInstance.setValueFromCoords(4, y, "", true);
+                } else {
+                    var cell = elInstance.getCell(`F${parseInt(y) + 1}`)
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    cell.classList.remove('readonly');
+                    elInstance.setValueFromCoords(5, y, "", true);
+                }
+            }
+        }
 
+        if (x == 6) {
+            var adjustmentType = (elInstance.getRowData(y))[3];
+            var col = ("G").concat(parseInt(y) + 1);
+            console.log("Adjustment type", adjustmentType);
+            if (adjustmentType == 2) {
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
 
     }.bind(this);
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        if (x == 4) {
-            this.el.setValueFromCoords(5, y, "", true);
-            this.el.setValueFromCoords(3, y, "", true);
-        }
     }.bind(this);
 
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var elInstance = this.state.inventoryEl;
+        var json = elInstance.getJson();
+        var mapArray = [];
         for (var y = 0; y < json.length; y++) {
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+            var map = new Map(Object.entries(json[y]));
+            mapArray.push(map);
 
-            var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(1, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-
-
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(2, y);
-
-            if (value == "Invalid date" || value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                // console.log("my val", Date.parse(value));
-                // if (isNaN(Date.parse(value))) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, "In valid Date.");
-                //     valid = false;
-                // } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                // }
-            }
-
-            var value = this.el.getValueFromCoords(3, y);
-            if (this.el.getValueFromCoords(3, y) != "") {
-                var reg = /^[0-9\b]+$/;
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    var col = ("D").concat(parseInt(y) + 1);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false
-                } else {
-                    var col = ("D").concat(parseInt(y) + 1);
-                    // var manualAdj = this.el.getValueFromCoords(9, y) - this.el.getValueFromCoords(5, y);
-                    // this.el.setValueFromCoords(7, y, parseInt(manualAdj), true);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+            var checkDuplicateInMap = mapArray.filter(c =>
+                moment(c.get("0")).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
+                c.get("1").toString() == map.get("1").toString()
+            )
+            if (checkDuplicateInMap.length > 1) {
+                var colArr = ['A', 'B'];
+                for (var c = 0; c < colArr.length; c++) {
+                    var col = (colArr[c]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateAdjustments'));
                 }
-            } else {
-                var col = ("D").concat(parseInt(y) + 1);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-
-            var col = ("E").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(4, y);
-            var reg = /-?\d+/;
-            // var reg = /^[0-9\b]+$/;
-            if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
                 valid = false;
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                }
+                this.setState({
+                    message: i18n.t('static.supplyPlan.duplicateAdjustments'),
+                    color: 'red'
+                })
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+                var colArr = ['A', 'B'];
+                for (var c = 0; c < colArr.length; c++) {
+                    var col = (colArr[c]).concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
 
-            var value = this.el.getValueFromCoords(5, y);
-            if (this.el.getValueFromCoords(5, y) != "") {
-                var reg = /^[0-9\b]+$/;
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(0, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    // if (isNaN(Date.parse(value))) {
+                    //     elInstance.setStyle(col, "background-color", "transparent");
+                    //     elInstance.setStyle(col, "background-color", "yellow");
+                    //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                    //     valid = false;
+                    // } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                    // }
+                }
+
+
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(1, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(2, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = ((elInstance.getRowData(y))[4]).toString().replaceAll("\,", "");
+                var reg = /-?\d+/;
+                // var reg = /^[0-9\b]+$/;
+                if (value != "" && value != 0) {
+                    var reg = /-?\d+/
+                    // var reg = /^[0-9\b]+$/;
+                    var col = ("E").concat(parseInt(y) + 1);
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else if ((elInstance.getRowData(y))[3] == 2) {
+                    var col = ("E").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ("E").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var value = ((elInstance.getRowData(y))[5]).toString().replaceAll("\,", "");
+                if (value != "" && value != 0) {
+                    // var reg = /-?\d+/
+                    var reg = /^[0-9\b]+$/;
                     var col = ("F").concat(parseInt(y) + 1);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else if ((elInstance.getRowData(y))[3] == 1) {
+                    var col = ("F").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
                     var col = ("F").concat(parseInt(y) + 1);
-                    // var manualAdj = this.el.getValueFromCoords(9, y) - this.el.getValueFromCoords(5, y);
-                    // this.el.setValueFromCoords(7, y, parseInt(manualAdj), true);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
-            } else {
-                var col = ("F").concat(parseInt(y) + 1);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+
+                var value = elInstance.getValueFromCoords(3, y);
+                var col = ("D").concat(parseInt(y) + 1);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var value = elInstance.getValueFromCoords(6, y);
+                var col = ("G").concat(parseInt(y) + 1);
+                if ((elInstance.getRowData(y))[3] == 2) {
+                    if (value == "") {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
             }
-
-
         }
         return valid;
     }
@@ -1025,105 +1606,76 @@ export default class AddInventory extends Component {
     saveData = function () {
         var validation = this.checkValidation();
         if (validation == true) {
-            this.setState(
-                {
-                    changedFlag: 0
-                }
-            );
-
-            var tableJson = this.el.getJson();
+            this.setState({
+                changedFlag: 0
+            });
+            var elInstance = this.state.inventoryEl;
+            var tableJson = elInstance.getJson();
             console.log("tableJson------------------->", tableJson);
             var db1;
             var storeOS;
             getDatabase();
             var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+            }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var programTransaction = transaction.objectStore('programData');
                 var programId = (document.getElementById("programId").value);
                 var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
                 programRequest.onsuccess = function (event) {
-
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    var regionListFiltered = programJson.regionList;
                     var countrySKU = document.getElementById("countrySKU").value;
                     var inventoryDataList = (programJson.inventoryList).filter(c => c.realmCountryPlanningUnit.id == countrySKU);
                     var inventoryDataListNotFiltered = programJson.inventoryList;
                     var planningUnitId = inventoryDataList[0].planningUnit.id;
-                    // var count = 0;
                     for (var i = 0; i < inventoryDataList.length; i++) {
-
-                        // if (inventoryDataList[count] != undefined) {
-                        //     if (inventoryDataList[count].inventoryId == inventoryDataListNotFiltered[i].inventoryId) {
                         var map = new Map(Object.entries(tableJson[i]));
-                        var expBalance = 0
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].dataSource.id = map.get("0");
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].region.id = map.get("1");
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].inventoryDate = moment(map.get("2")).format("YYYY-MM-DD");
-
-                        // if (i == 0) {
-                        //     expBalance = 0;
-                        // } else {
-                        //     // var previousMap = new Map(Object.entries(tableJson[i - 1]))
-                        //     expBalance = parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].expectedBal) + parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].adjustmentQty);
-                        // }
-                        // inventoryDataListNotFiltered[parseInt(map.get("7"))].expectedBal = expBalance;
-                        // console.log("expBaalalance---------->", expBalance);
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].adjustmentQty = parseInt(map.get("4"));
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].actualQty = map.get("5");
-                        // inventoryDataListNotFiltered[parseInt(map.get("9"))].batchNo = map.get("6");
-                        // if (inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != null && inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != "") {
-                        //     inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = moment(map.get("7")).format("YYYY-MM-DD");
-                        // } else {
-                        //     inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = "";
-                        // }
-                        inventoryDataListNotFiltered[parseInt(map.get("7"))].active = map.get("6");
-                        // if (inventoryDataList.length >= count) {
-                        //     count++;
-                        // }
-                        //     }
-                        // }
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("2");
+                        if (map.get("3") == 1) {
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].adjustmentQty = "";
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].actualQty = parseInt(map.get("5"));
+                        } else {
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].adjustmentQty = parseInt(map.get("4"));
+                            inventoryDataListNotFiltered[parseInt(map.get("8"))].actualQty = "";
+                        }
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].notes = map.get("6");
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
+                        inventoryDataListNotFiltered[parseInt(map.get("8"))].batchInfoList = map.get("9")
                     }
 
 
                     for (var i = inventoryDataList.length; i < tableJson.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]));
-                        // var expBalance = 0
-                        // if (i == 0) {
-                        //     expBalance = 0;
-                        // } else {
-                        //     // var previousMap = new Map(Object.entries(tableJson[i - 1]))
-                        //     // console.log("previous--->", previousMap);
-                        //     // console.log("val1--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].expectedBal));
-                        //     // console.log("val2--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].adjustmentQty));
-                        //     // console.log("inventoryDataList----->", inventoryDataList[i - 1]);
-                        //     expBalance = parseInt(inventoryDataList[i - 1].expectedBal) + parseInt(inventoryDataList[i - 1].adjustmentQty);
-                        //     // console.log("expected bal--->", expBalance);
-                        // }
-                        // var expiryDate = "";
-                        // if (map.get("7") != null && map.get("7") != "") {
-                        //     expiryDate = moment(map.get("7")).format("YYYY-MM-DD")
-                        // } else {
-                        //     expiryDate = ""
-                        // }
                         var json = {
                             inventoryId: 0,
-                            dataSource: {
-                                id: map.get("0")
-                            },
+                            inventoryDate: moment(map.get("0")).endOf('month').format("YYYY-MM-DD"),
                             region: {
                                 id: map.get("1")
                             },
-                            inventoryDate: moment(map.get("2")).format("YYYY-MM-DD"),
-                            // expectedBal: expBalance,
+                            dataSource: {
+                                id: map.get("2")
+                            },
                             adjustmentQty: map.get("4"),
                             actualQty: map.get("5"),
-                            // batchNo: map.get("6"),
-                            // expiryDate: expiryDate,
-                            active: map.get("6"),
-
+                            notes: map.get("6"),
+                            active: map.get("7"),
                             realmCountryPlanningUnit: {
                                 id: countrySKU,
                             },
@@ -1131,85 +1683,91 @@ export default class AddInventory extends Component {
                             planningUnit: {
                                 id: planningUnitId
                             },
-                            notes: "",
-                            batchInfoList: []
+                            batchInfoList: map.get("9")
                         }
                         inventoryDataList.push(json);
                         inventoryDataListNotFiltered.push(json);
                     }
-
                     console.log("inventoryDataListNotFiltered------->", inventoryDataListNotFiltered);
 
-
-
-                    let count = 0;
-                    for (var i = 0; i < tableJson.length; i++) {
-
-                        count = 0;
-                        var map = new Map(Object.entries(tableJson[i]));
-
-                        for (var j = 0; j < tableJson.length; j++) {
-
-                            var map1 = new Map(Object.entries(tableJson[j]));
-
-                            if (moment(map.get("2")).format("YYYY-MM") === moment(map1.get("2")).format("YYYY-MM") && parseInt(map.get("1")) === parseInt(map1.get("1"))) {
-                                count++;
-                            }
-                            if (count > 1) {
-                                i = tableJson.length;
-                                break;
-                            }
+                    var invList = inventoryDataListNotFiltered.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") && c.region != null);
+                    var actualQty = 0;
+                    var adjustmentQty = 0;
+                    var actualQtyCount = 0;
+                    var regionWiseInventoryCount = 0;
+                    for (var i = 0; i < invList.length; i++) {
+                        regionWiseInventoryCount += 1;
+                        if (invList[i].actualQty != "" && invList[i].actualQty != null) {
+                            actualQty += parseFloat(invList[i].actualQty) * parseFloat(invList[i].multiplier);
+                            actualQtyCount += 1;
+                        }
+                        if (invList[i].adjustmentQty != "" && invList[i].adjustmentQty != null) {
+                            adjustmentQty += parseFloat(invList[i].adjustmentQty);
                         }
                     }
+                    if (actualQty > 0 && adjustmentQty == 0 && regionWiseInventoryCount == regionListFiltered.length) {
+                        // var endDate = moment(map.get("0")).format("YYYY-MM-DD");
+                        // var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]);
+                        // var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
+                        // nationalAdjustment = Math.round(parseFloat(nationalAdjustment) / parseFloat(map.get("4")));
+                        // if (nationalAdjustment != 0) {
+                        //     var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
+                        //     if (nationAdjustmentIndex == -1) {
+                        //         var inventoryJson = {
+                        //             inventoryId: 0,
+                        //             dataSource: {
+                        //                 id: QAT_DATA_SOURCE_ID
+                        //             },
+                        //             region: null,
+                        //             inventoryDate: map.get("14"),
+                        //             adjustmentQty: nationalAdjustment,
+                        //             actualQty: "",
+                        //             active: true,
+                        //             realmCountryPlanningUnit: {
+                        //                 id: map.get("3"),
+                        //             },
+                        //             multiplier: map.get("4"),
+                        //             planningUnit: {
+                        //                 id: planningUnitId
+                        //             },
+                        //             notes: NOTES_FOR_QAT_ADJUSTMENTS,
+                        //             batchInfoList: []
+                        //         }
+                        //         inventoryDataList.push(inventoryJson);
+                        //     } else {
+                        //         inventoryDataList[parseInt(nationAdjustmentIndex)].adjustmentQty = nationalAdjustment;
+                        //     }
+                        // }
 
+                        // }
+                    }
 
-
-
-
-
-
-
-                    if (count <= 1) {
-                        programJson.inventoryList = inventoryDataListNotFiltered;
-                        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                        var putRequest = programTransaction.put(programRequest.result);
-
-                        putRequest.onerror = function (event) {
-                            // Handle errors!
-                        };
-                        putRequest.onsuccess = function (event) {
-                            // $("#saveButtonDiv").hide();
-                            this.setState({
-                                message: 'static.message.inventorysuccess',
-                                changedFlag: 0,
-                                color: 'green'
-                            })
-
-                            this.hideFirstComponent();
-                            this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
-                        }.bind(this)
-                    } else {
+                    programJson.inventoryList = inventoryDataListNotFiltered;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+                    putRequest.onerror = function (event) {
                         this.setState({
-                            message: 'Duplicate Inventory Details Found',
-                            changedFlag: 0,
+                            message: i18n.t('static.program.errortext'),
                             color: 'red'
+                        })
+                    }.bind(this);
+                    putRequest.onsuccess = function (event) {
+                        // $("#saveButtonDiv").hide();
+                        this.setState({
+                            message: 'static.message.inventorysuccess',
+                            changedFlag: 0,
+                            color: 'green'
                         })
 
                         this.hideFirstComponent();
-
-                    }
-
+                        this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
-
-
-
         } else {
             console.log("some thing get wrong...");
         }
-
     }.bind(this);
-
 
     render() {
         const { programList } = this.state;
@@ -1334,6 +1892,9 @@ export default class AddInventory extends Component {
         this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    actionCanceled() {
+        this.toggleLarge();
+    }
 }
 
 

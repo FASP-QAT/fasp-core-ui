@@ -1184,13 +1184,13 @@ let includePlanningShipments= document.getElementById("includePlanningShipments"
 
                             <a className="card-header-action">
                                 {this.state.data.length > 0 && <div className="card-header-actions">
-                                    <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                    <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px' ,cursor:'pointer'}} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>}
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0 CardBodyTop">
                         <div className="TableCust" >
                             <div ref={ref}>
 

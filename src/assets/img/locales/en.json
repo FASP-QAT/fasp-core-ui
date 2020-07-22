@@ -973,5 +973,7 @@
     "static.report.plannedBudgetAmt":"Budget allocated to planned Shipment",
     "static.report.orderedBudgetAmt":"Budget allocated to Ordered Shipment",
     "static.report.remainingBudgetAmt":"Budget Remaining",
-    "static.report.inmillions":" (in Millions)"
+    "static.report.inmillions":" (in Millions)",
+    "static.supplyPlan.procurementAgentCannotBeTBD":"Procurement agent cannot be TBD",
+    "static.supplyPlan.fundingSourceCannotBeTBD":"Funding source cannot be TBD"
 }

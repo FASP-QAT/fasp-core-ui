@@ -402,7 +402,7 @@ class DefaultLayout extends Component {
                           // },
                           {
                             name: 'Shipment Details',
-                            url: '/shipment/shipmentList',
+                            url: '/shipment/shipmentDetails',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }
@@ -659,7 +659,7 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: 'Shipment Details',
-                            url: '/shipment/shipmentList',
+                            url: '/shipment/shipmentDetails',
                             icon: 'fa fa-list',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }

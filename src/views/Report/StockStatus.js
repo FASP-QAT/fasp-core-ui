@@ -1678,13 +1678,13 @@ class StockStatus extends Component {
             <div className="card-header-actions">
               <a className="card-header-action">
                 {this.state.stockStatusList.length > 0 && <div className="card-header-actions">
-                  <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-                  <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                  <img style={{ height: '25px', width: '25px', cursor:'Pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                  <img style={{ height: '25px', width: '25px',cursor:'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>}
               </a>
             </div>
           </div>
-          <CardBody className="pb-lg-2 pt-lg-0">
+          <CardBody className="pb-lg-2 pt-lg-0 CardBodyTop">
             <div className="TableCust" >
               <div ref={ref}>
 
