@@ -60,7 +60,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-
+        //Prodct category
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -75,7 +75,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             instance.jexcel.setValue(columnName, '');
         }
 
-
+        //Planning Unit
         if (x == 3) {
             var json = this.el.getJson();
             var col = ("D").concat(parseInt(y) + 1);
@@ -101,6 +101,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
             // instance.jexcel.setValue(columnName, '');
         }
+        //Reorder frequency in months
         if (x == 4) {
             var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
@@ -119,6 +120,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
+        //Min month of stock
         if (x == 5) {
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
@@ -137,9 +139,28 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-
+        //Months In Future For AMC
+        if (x == 6) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Months In Past For AMC
         if (x == 7) {
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -156,9 +177,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        if (x == 8) {
-            var reg = /^[0-9\b]+$/;
-            var col = ("I").concat(parseInt(y) + 1);
+        //Local Procurment Lead Time
+        if (x == 9) {
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -174,10 +196,30 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        if (x == 9) {
+        //Shelf Life
+        if (x == 10) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("K").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Catalog Price
+        if (x == 11) {
             // var reg = /^[0-9]+.[0-9]+$/;
-            var reg=/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var col = ("J").concat(parseInt(y) + 1);
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("L").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -198,7 +240,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     checkValidation() {
 
         var reg = /^[0-9\b]+$/;
-        var regDec =/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
         var json = this.el.getJson();
@@ -274,29 +316,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(7, y);
-            if (value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-
-            }
-
-            var col = ("I").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(8, y);
-            if (value === "") {
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -311,10 +334,30 @@ export default class PipelineProgramPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
             }
 
-            var col = ("J").concat(parseInt(y) + 1);
+            var reg = /^[0-9\b]+$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            //Local procurement lead time
+            var col = ("I").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(9, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -333,7 +376,47 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
 
             }
-        
+
+            var col = ("J").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(10, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(11, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
 
         }
         return valid;
@@ -363,11 +446,11 @@ export default class PipelineProgramPlanningUnits extends Component {
                 planningUnitId: planningUnitId,
                 reorderFrequencyInMonths: map.get("4"),
                 minMonthsOfStock: map.get("5"),
-                programPlanningUnitId: map.get("6"),
-                localProcurmentLeadTime:map.get("7"),
-                shelfLife:map.get("8"),
-                catalogPrice:map.get("9")
-                
+                programPlanningUnitId: map.get("8"),
+                localProcurmentLeadTime: map.get("9"),
+                shelfLife: map.get("10"),
+                catalogPrice: map.get("11")
+
             }
             planningUnitArray.push(planningUnitJson);
         }
@@ -448,11 +531,13 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[3] = planningUnitList[j].planningUnitId;
                                                     data[4] = planningUnitList[j].reorderFrequencyInMonths;
                                                     data[5] = planningUnitList[j].minMonthsOfStock;
-                                                    data[6] = planningUnitList[j].programPlanningUnitId
-                                                    data[7] = planningUnitList[j].localProcurmentLeadTime
+                                                    data[6] = planningUnitList[j].monthsInFutureForAmc;
+                                                    data[7] = planningUnitList[j].monthsInPastForAmc;
+                                                    data[8] = planningUnitList[j].programPlanningUnitId
+                                                    data[9] = planningUnitList[j].localProcurmentLeadTime
 
-                                                    data[8] = planningUnitList[j].shelfLife
-                                                    data[9] = planningUnitList[j].catalogPrice
+                                                    data[10] = planningUnitList[j].shelfLife
+                                                    data[11] = planningUnitList[j].catalogPrice
                                                     productDataArr.push(data);
 
                                                 }
@@ -468,7 +553,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [290, 290, 290, 290, 170, 170],
+                                                colWidths: [290, 290, 290, 290, 170, 170, 170, 170],
                                                 columns: [
 
                                                     {
@@ -502,6 +587,14 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         type: 'number'
                                                     },
                                                     {
+                                                        title: 'Months In Future For AMC',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Months In Past For AMC',
+                                                        type: 'number'
+                                                    },
+                                                    {
                                                         title: 'Pipeline Product Id',
                                                         type: 'hidden'
                                                     },
@@ -522,7 +615,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
-                                                wordWrap: true, 
+                                                wordWrap: true,
                                                 paginationOptions: [10, 25, 50, 100],
                                                 // position: 'top',
                                                 allowInsertColumn: false,
