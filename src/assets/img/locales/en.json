@@ -246,7 +246,7 @@
     "static.currency.currencysymbol": "Currency Symbol",
     "static.program.planleadtime": "Planned To Submitted Lead Time In Months",
     "static.program.monthpastamc": "Month In Past For AMC",
-    "static.dashboard.consumptiondetails": "Consumption details",
+    "static.dashboard.consumptiondetails": "Consumption Details",
     "static.dashboard.addproduct": "Add Product",
     "static.program.download": "Download Program Data",
     "static.program.drafttosubmittext": "Enter draft to submitted lead time In Months",
@@ -983,5 +983,8 @@
     "static.report.inmillions":" (in Millions)",
     "static.report.shipmentCostReport":"Shipment Cost Report",
     "static.supplyPlan.procurementAgentCannotBeTBD": "Procurement agent cannot be TBD",
-    "static.supplyPlan.fundingSourceCannotBeTBD": "Funding source cannot be TBD"
+    "static.supplyPlan.fundingSourceCannotBeTBD": "Funding source cannot be TBD",
+    "static.dashboard.shipmentdetails": "Shipment Details",
+    "static.inventory.inventorydetils": "Inventory Details"
+
 }
