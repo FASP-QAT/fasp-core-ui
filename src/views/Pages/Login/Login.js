@@ -26,6 +26,8 @@ import moment from 'moment';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
+import { qatProblemActions } from '../../../CommonComponent/QatProblemActions'
+
 
 const initialValues = {
   emailId: "",
@@ -142,7 +144,7 @@ class Login extends Component {
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
     console.log("htnl content....... ", htmlContent);
-    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum') )  {
+    if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum')) {
       logoutMessage.style.color = 'red';
     }
     else if (htmlContent.includes('Access Denied')) {
@@ -203,7 +205,8 @@ class Login extends Component {
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
 
                                 AuthenticationService.setupAxiosInterceptors();
-                                this.props.history.push(`/masterDataSync`)
+                                this.props.history.push(`/masterDataSync`);
+                                // qatProblemActions();
                               })
                               .catch(
                                 error => {
@@ -232,6 +235,7 @@ class Login extends Component {
                                   }
                                 }
                               );
+
                           }
                           else {
                             var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
@@ -254,7 +258,9 @@ class Login extends Component {
                                     this.props.history.push(`/logout/static.message.syncExpiresOn`)
                                   } else {
                                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                                    qatProblemActions();
                                     this.props.history.push(`/ApplicationDashboard`)
+
                                   }
                                 } else {
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
@@ -353,8 +359,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                  official U.S. government information and does not represent the views or positions of the
-                                                                  Agency for International Development or the U.S. government.
+                                                                          official U.S. government information and does not represent the views or positions of the
+                                                                          Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

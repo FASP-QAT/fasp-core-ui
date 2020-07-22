@@ -1,0 +1,247 @@
+import { getDatabase } from "../CommonComponent/IndexedDbFunctions";
+import AuthenticationService from '../views/Common/AuthenticationService';
+import i18n from '../i18n';
+import { SECRET_KEY } from '../Constants.js';
+import CryptoJS from 'crypto-js';
+import moment from 'moment';
+import { date } from "yup";
+
+export function qatProblemActions() {
+    var problemActionList = [];
+    var db1;
+    var storeOS;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+        var realmId = AuthenticationService.getRealmId();
+        // console.log("QPA 1====>", realmId);
+        var programList = []
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var program = transaction.objectStore('programData');
+        var getRequest = program.getAll();
+        getRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext')
+            })
+        };
+        getRequest.onsuccess = function (event) {
+            var latestVersionProgramList = [];
+            for (var i = 0; i < getRequest.result.length; i++) {
+                // console.log("QPA 2=====>  in for");
+                var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                // console.log("QPA 2====>", programJson);
+                programList.push(programJson);
+            }
+            if (realmId == -1) {
+                programList = programList;
+            } else {
+                programList = programList.filter(c => c.realmCountry.realm.realmId == realmId);
+            }
+
+            for (var d = 0; d < programList.length; d++) {
+                var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
+                if (index == -1) {
+                    latestVersionProgramList.push(programList[d]);
+                } else {
+                    var versionId = latestVersionProgramList[index].currentVersion.versionId;
+                    if (versionId < programList[d].currentVersion.versionId) {
+                        latestVersionProgramList[index] = programList[d];
+                    }
+                }
+
+            }
+            programList = latestVersionProgramList;
+            // console.log("QPA 3====>", programList);
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningUnitList = []
+            planningunitRequest.onerror = function (event) {
+                this.setState({
+                    supplyPlanError: i18n.t('static.program.errortext')
+                })
+            }.bind(this);
+            planningunitRequest.onsuccess = function (e) {
+                // console.log("QPA 4====>", "hi-----")
+                var planningUnitResult = [];
+                planningUnitResult = planningunitRequest.result;
+                // console.log("QPA 5====>", planningUnitResult);
+                for (var pp = 0; pp < programList.length; pp++) {
+                    var regionList = programList[pp].regionList;
+                    // console.log("QPA 6====>", regionList)
+                    planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
+                    // console.log("QPA 7====>", planningUnitList);
+                    for (var r = 0; r < regionList.length; r++) {
+                        // console.log("QAP===>8");
+                        for (var p = 0; p < planningUnitList.length; p++) {
+                            // problem conditions start from here ====================
+
+                            // 1 consumption=================
+                            var consumptionList = programList[pp].consumptionList;
+                            consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                            // console.log("QAP 9====>", consumptionList);
+                            var numberOfMonths = 3;
+                            for (var m = 1; m <= numberOfMonths; m++) {
+                                var myDate = moment(Date.now()).subtract(m, 'months').startOf('month').format("YYYY-MM-DD");
+                                // console.log("QAP 10====>", myDate);
+
+                                var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') == myDate && c.actualFlag.toString() == "true");
+                                var index = problemActionList.findIndex(
+                                    c => c.month == myDate
+                                        && c.region.regionId == regionList[r].regionId
+                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                        && c.program.programId == programList[pp].programId
+                                        && c.problemId == 1);
+
+                                if (filteredConsumptionList.length == 0) {
+                                    if (index == -1) {
+                                        var json = {
+                                            program: programList[pp],
+                                            versionId: programList[pp].currentVersion.versionId,
+                                            region: regionList[r],
+                                            planningUnit: planningUnitList[p].planningUnit,
+
+                                            problemId: 1,
+                                            month: myDate,
+                                            isFound: 1,
+                                            problemStatusId: 1,
+                                            note: '',
+
+                                            actionName: {
+                                                label: {
+                                                    label_en: 'Add Consumption Data'
+                                                }
+                                            },
+                                            actionUrl: '/consumptionDetails'
+                                        }
+                                        problemActionList.push(json);
+                                    } else {
+                                        problemActionList[index].isFound = 1;
+                                    }
+
+                                } else {
+                                    if (index != -1) {
+                                        problemActionList[index].isFound = 0;
+                                    }
+                                }
+                            }
+
+                            // console.log("QAP 11====>", problemActionList);
+                            // 1 consumption end =================
+
+                            //2 inventory  ====================
+                            var inventoryList = programList[pp].inventoryList;
+                            inventoryList = inventoryList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                            // console.log("QAP 12====>", inventoryList);
+                            var numberOfMonthsInventory = 3;
+                            for (var mi = 1; mi <= numberOfMonthsInventory; mi++) {
+                                var myDateInventory = moment(Date.now()).subtract(mi, 'months').startOf('month').format("YYYY-MM-DD");
+                                // console.log("QAP 13====>", myDateInventory);
+                                var filterInventoryList = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') == myDateInventory);
+                                var index = problemActionList.findIndex(
+                                    c => c.month == myDateInventory
+                                        && c.region.regionId == regionList[r].regionId
+                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                        && c.program.programId == programList[pp].programId
+                                        && c.problemId == 2);
+
+                                if (filterInventoryList.length == 0) {
+                                    if (index == -1) {
+                                        var json = {
+                                            program: programList[pp],
+                                            versionId: programList[pp].currentVersion.versionId,
+                                            region: regionList[r],
+                                            planningUnit: planningUnitList[p].planningUnit,
+
+                                            problemId: 2,
+                                            month: myDateInventory,
+                                            isFound: 1,
+                                            problemStatusId: 1,
+                                            note: '/inventory/addInventory',
+
+                                            actionName: {
+                                                label: {
+                                                    label_en: 'Add Inventory Data'
+                                                }
+                                            },
+                                            actionUrl: ''
+
+                                        }
+                                        problemActionList.push(json);
+                                    } else {
+                                        problemActionList[index].isFound = 1;
+                                    }
+                                } else {
+                                    if (index != -1) {
+                                        problemActionList[index].isFound = 0;
+                                    }
+                                }
+                            }
+                            // console.log("QAP 14====>", problemActionList);
+                            // 2 inventory end=================
+
+                            // 3 shipment which have delivered date in past but status is not yet delivered
+                            var shipmentList = programList[pp].shipmentList;
+                            shipmentList = shipmentList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                            // console.log("shipment list ====>", shipmentList);
+                            var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
+                            // console.log("shipment date =====>", myDateShipment);
+                            var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') < myDateShipment && c.shipmentStatus.id != 7);
+                            // console.log("filteredShipmentList ====>", filteredShipmentList);
+
+                            var indexShipment = problemActionList.findIndex(
+                                c => c.month == myDateShipment
+                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                    && c.progrem.programId == programList[pp].programId
+                                    && c.problemId == 3);
+
+                            if (filteredShipmentList.length > 0) {
+                                if (indexShipment == -1) {
+                                    var json = {
+                                        program: programList[pp],
+                                        versionId: programList[pp].currentVersion.versionId,
+                                        region: '',
+                                        planningUnit: planningUnitList[p].planningUnit,
+
+                                        problemId: 3,
+                                        month: myDateShipment,
+                                        isFound: 1,
+                                        problemStatusId: 1,
+                                        note: '',
+
+                                        actionName: {
+                                            label: {
+                                                label_en: 'Check Shipment Status'
+                                            }
+                                        },
+                                        actionUrl: '/shipment/shipmentList'
+
+
+                                    }
+                                    problemActionList.push(json);
+                                } else {
+                                    problemActionList[indexShipment].isFound = 1;
+                                }
+                            } else {
+                                if (indexShipment != -1) {
+                                    problemActionList[indexShipment].isFound = 0;
+                                }
+                            }
+
+                            // console.log("QAP 15====>", problemActionList);
+
+                            // 3 shipment which have delivered date in past but status is not yet delivered
+                            // problem conditions  end here ====================
+                        }
+                    }
+                }
+                // console.log("final problemList=====>", problemActionList);
+            }.bind(this);
+        }.bind(this);
+    }.bind(this)
+
+    return problemActionList;
+}
