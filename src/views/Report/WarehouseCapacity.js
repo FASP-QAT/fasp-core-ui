@@ -1214,7 +1214,7 @@ class warehouseCapacity extends Component {
 
                                                                 </td>
                                                                 <td>{this.state.data[idx].gln}</td>
-                                                                <td>{this.state.data[idx].capacityCbm}</td>
+                                                                <td>{(this.state.data[idx].capacityCbm).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                             </tr>
                                                         )}
 
