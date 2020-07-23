@@ -391,6 +391,7 @@
     "static.dashboard.dimensionheader": "Dimension",
     "static.dashboard.unit": "Units",
     "static.dashboard.realm": "Realms",
+    "static.dashboard.realmheader": "Realm",
     "static.unit.unittext": "Please enter unit ",
     "static.unit.unitcodetext": "Please enter unit code",
     "static.planningUnit.planningUnitName": "Planning unit name",
