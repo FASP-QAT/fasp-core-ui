@@ -2808,7 +2808,7 @@ class Consumption extends Component {
 
                       <Online>
                         <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
                             <InputGroup>
                               <Input
@@ -2838,7 +2838,7 @@ class Consumption extends Component {
                       </Online>
                       <Offline>
                         <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
                             <InputGroup>
                               <Input
@@ -2876,7 +2876,7 @@ class Consumption extends Component {
                               bsSize="sm"
                               onChange={this.filterData}
                             >
-                              <option value="1">{i18n.t('static.dashboard.product')}</option>
+                              <option value="1">{i18n.t('static.report.planningUnit')}</option>
                               <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
                             </Input>
                           </InputGroup>

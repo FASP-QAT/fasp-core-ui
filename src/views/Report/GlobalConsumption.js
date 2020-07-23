@@ -2088,7 +2088,7 @@ class GlobalConsumption extends Component {
                             bsSize="sm"
                             onChange={this.filterData}
                           >
-                            <option value="1">{i18n.t('static.dashboard.product')}</option>
+                            <option value="1">{i18n.t('static.report.planningUnit')}</option>
                             <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
                           </Input>
                         </InputGroup>

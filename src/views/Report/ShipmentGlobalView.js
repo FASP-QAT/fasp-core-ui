@@ -2292,7 +2292,7 @@ class ShipmentGlobalView extends Component {
             });
         } else if (viewby == 2 && procurementAgentIds.length == 0) {
             this.setState({
-                message: i18n.t('static.report.procurementAgent'),
+                message: i18n.t('static.procurementAgent.selectProcurementAgent'),
                 data: [],
                 shipmentList: [],
                 dateSplitList: [],
@@ -2737,7 +2737,7 @@ class ShipmentGlobalView extends Component {
                                                                         {
                                                                             this.state.table1Body[idx].amount.map((item, idx1) =>
                                                                                 <td id="addr1" key={idx1}>
-                                                                                    {this.state.table1Body[idx].amount[idx1]}
+                                                                                    {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
                                                                                 </td>
                                                                             )
                                                                         }
@@ -2779,7 +2779,7 @@ class ShipmentGlobalView extends Component {
                                                                     <tr id="addr0" key={idx} >
                                                                         <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                        <td>{this.state.shipmentList[idx].amount}</td>
+                                                                        <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
                                                                     </tr>

@@ -2777,7 +2777,8 @@ class ShipmentGlobalDemandView extends Component {
             ]
         };
         const chartDataForPie = {
-            labels: [...new Set(this.state.fundingSourceSplit.map(ele => (getLabelText(ele.fundingSource.label, this.state.lang))))],
+            // labels: [...new Set(this.state.fundingSourceSplit.map(ele => (getLabelText(ele.fundingSource.label, this.state.lang))))],
+            labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
                 backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944'],
@@ -2917,7 +2918,7 @@ class ShipmentGlobalDemandView extends Component {
                                         </Offline>
 
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
                                                 <InputGroup className="box">
@@ -3058,11 +3059,11 @@ class ShipmentGlobalDemandView extends Component {
                                                                         {
                                                                             Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
                                                                                 <td id="addr1" key={idx1}>
-                                                                                    {item}
+                                                                                    {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
                                                                                 </td>
                                                                             )
                                                                         }
-                                                                        <td>{this.state.procurementAgentSplit[idx].total}</td>
+                                                                        <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
 
 
                                                                     </tr>
