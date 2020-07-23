@@ -702,9 +702,9 @@ round = num => {
                       </InputGroup>
                     </FormGroup>
 
-                    <FormGroup className="tab-ml-1">
+                    <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                      <div className="controls SelectGo">
+                      <div className="controls ">
                         <InputGroup>
                           <Input
                             type="select"
