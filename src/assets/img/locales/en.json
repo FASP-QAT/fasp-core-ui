@@ -246,7 +246,7 @@
     "static.currency.currencysymbol": "Currency Symbol",
     "static.program.planleadtime": "Planned To Submitted Lead Time In Months",
     "static.program.monthpastamc": "Month In Past For AMC",
-    "static.dashboard.consumptiondetails": "Consumption details",
+    "static.dashboard.consumptiondetails": "Consumption Details",
     "static.dashboard.addproduct": "Add Product",
     "static.program.download": "Download Program Data",
     "static.program.drafttosubmittext": "Enter draft to submitted lead time In Months",
@@ -267,7 +267,7 @@
     "static.message.updateSuccess": "{{entityname}} updated successfully",
     "static.message.cancelled": "{{entityname}} Action Cancelled",
     "static.budget.budgetdesctext": "Please enter Budget description",
-    "static.message.listFailed": "{{entityname}} list failed",
+    "static.message.listFailed": "{{entityname}} List failed",
     "static.common.update": "Update",
     "static.common.result": "  Showing {{from}} to {{to}} of {{size}}",
     "static.common.first": "First",
@@ -984,5 +984,7 @@
     "static.report.shipmentCostReport":"Shipment Cost Report",
     "static.supplyPlan.procurementAgentCannotBeTBD": "Procurement agent cannot be TBD",
     "static.supplyPlan.fundingSourceCannotBeTBD": "Funding source cannot be TBD",
-    "static.report.shipmentDetailReport": "Shipment Details Report"
+    "static.dashboard.shipmentdetails": "Shipment Details",
+    "static.inventory.inventorydetils": "Inventory Details",
+     "static.report.shipmentDetailReport": "Shipment Details Report"
 }

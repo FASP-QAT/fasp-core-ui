@@ -2506,7 +2506,7 @@ class ShipmentGlobalView extends Component {
                     this.setState({ message: message })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5  className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">

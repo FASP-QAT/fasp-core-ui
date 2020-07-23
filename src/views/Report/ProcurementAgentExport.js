@@ -2865,8 +2865,8 @@ class ProcurementAgentExport extends Component {
                     this.setState({ message: message })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <Card >
                     <div className="Card-header-reporticon">
 
                         {/* <div className="card-header-actions">
@@ -2983,7 +2983,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 mb-lg-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -3002,7 +3002,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 mb-lg-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -3023,7 +3023,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3" id="procurementAgentDiv">
+                                <FormGroup className="col-md-3 mb-lg-0" id="procurementAgentDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -3113,17 +3113,6 @@ class ProcurementAgentExport extends Component {
                         </ToolkitProvider>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div className="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
-
-                            <div className="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }
