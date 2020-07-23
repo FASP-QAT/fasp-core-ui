@@ -2728,3 +2728,70 @@ input::placeholder {
   border-left: 0;
   display: flex;
 }
+////user agreement css
+.userAgrementP{
+  line-height: 20px;
+}
+.list-summery {
+  position: relative;
+  display: inline-flex;
+  padding: 3px 1.25rem;
+  margin-bottom: -1px;
+  
+}
+.list-summer-icon {
+  font-size:15px;
+  color:#697069;
+  margin-top: 1px;
+
+  
+}
+.UserTitle{
+  font-size: 15px;
+  font-weight: bold;
+  color: #20a8d8;
+}
+/* list */
+.rounded-list ol 
+{
+counter-reset:li; /* Initiate a counter */
+margin-left:34px; /* Remove the default left margin */
+padding-left:0; /* Remove the default left padding */
+}
+
+/* item  */
+.rounded-list ol > li
+{
+position:relative; /* Create a positioning context */
+list-style:none; /* Disable the normal item numbering */
+// background:#f6f6f6; /* Item background color */
+margin:0; /* Give each list item a left margin to make room for the numbers */
+padding-left: 15px; /* Add some spacing around the content */
+padding-bottom:0px;
+padding-top:0px;
+margin-bottom: -14px;
+}
+
+/* number  */
+.rounded-list ol > li p:before
+{
+content: counter(li); 
+counter-increment: li; 
+position: absolute; 
+left: -1.3em;
+top: 50%;
+
+/* number background */
+// background: #a1a5a1; 
+background: #697069;
+height: 21px;
+width: 21px;
+font-size: 10px;
+color: #fff;
+margin-top: -1em;
+line-height: 1.5em;
+border: .3em solid #fff;
+text-align: center;
+font-weight: bold;
+border-radius: 2em;
+}

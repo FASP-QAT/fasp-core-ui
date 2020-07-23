@@ -37,10 +37,14 @@ export default class PlanningUnitListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideFirstComponent() {
-        setTimeout(function () {
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -76,14 +80,14 @@ export default class PlanningUnitListComponent extends Component {
     PlanningUnitCapacity(event, row) {
         event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT_CAPACITY')) {
-        // console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
-            state: { planningUnit: row }
+            // console.log(JSON.stringify(row))
+            this.props.history.push({
+                pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
+                state: { planningUnit: row }
 
 
-        })
-    }
+            })
+        }
     }
     componentDidMount() {
         this.hideFirstComponent();
@@ -118,7 +122,7 @@ export default class PlanningUnitListComponent extends Component {
                     })
 
                     PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
-                        console.log("RESP-----",response.data)
+                        console.log("RESP-----", response.data)
                         this.setState({
                             planningUnitList: response.data,
                             selSource: response.data

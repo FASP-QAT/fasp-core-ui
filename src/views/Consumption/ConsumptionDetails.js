@@ -34,6 +34,7 @@ export default class ConsumptionDetails extends React.Component {
             changedFlag: 0,
             planningUnitList: [],
             productCategoryId: '',
+            timeout: 0
         }
         this.getProductList = this.getProductList.bind(this);
         this.saveData = this.saveData.bind(this)
@@ -46,11 +47,19 @@ export default class ConsumptionDetails extends React.Component {
         this.saveConsumptionBatchInfo = this.saveConsumptionBatchInfo.bind(this);
     }
 
+
     hideFirstComponent() {
-        setTimeout(function () {
+        document.getElementById('div1').style.display = 'block';
+        clearTimeout(this.state.timeout);
+        this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
+
     }
+
+    // componentWillUnmount() {
+    // clearTimeout(this.timeout);
+    // }
 
     toggleLarge() {
         this.setState({
@@ -884,7 +893,7 @@ export default class ConsumptionDetails extends React.Component {
         if (x == 2) {
             var reg = /^[0-9\b]+$/;
             var col = ("C").concat(parseInt(y) + 1);
-            value=(elInstance.getRowData(y))[2];
+            value = (elInstance.getRowData(y))[2];
             value = value.toString().replaceAll("\,", "");
             console.log("Value", value);
             if (value == "" || value == 0) {
@@ -1031,7 +1040,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
                     var col = ("C").concat(parseInt(y) + 1);
-                    var value=(elInstance.getRowData(y))[2];
+                    var value = (elInstance.getRowData(y))[2];
                     value = value.toString().replaceAll("\,", "");
                     var reg = /^[0-9\b]+$/;
                     if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
@@ -1216,7 +1225,7 @@ export default class ConsumptionDetails extends React.Component {
         if (x == 3) {
             var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
-            value=(elInstance.getRowData(y))[3];
+            value = (elInstance.getRowData(y))[3];
             value = value.toString().replaceAll("\,", "");
             console.log("Value", value);
             if (value == "") {
@@ -1242,7 +1251,7 @@ export default class ConsumptionDetails extends React.Component {
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
-            value=(elInstance.getRowData(y))[4];
+            value = (elInstance.getRowData(y))[4];
             value = value.toString().replaceAll("\,", "");
             if (value != "") {
                 if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -1377,7 +1386,7 @@ export default class ConsumptionDetails extends React.Component {
                 }
 
                 var col = ("D").concat(parseInt(y) + 1);
-                var value=(elInstance.getRowData(y))[3];
+                var value = (elInstance.getRowData(y))[3];
                 value = value.toString().replaceAll("\,", "");
                 var reg = /^[0-9\b]+$/;
                 if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -1396,7 +1405,7 @@ export default class ConsumptionDetails extends React.Component {
 
                 var reg = /^[0-9\b]+$/;
                 var col = ("E").concat(parseInt(y) + 1);
-                var value=(elInstance.getRowData(y))[4];
+                var value = (elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "");
                 if (value != "") {
                     if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
@@ -1540,7 +1549,7 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this);
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {
@@ -1571,7 +1580,7 @@ export default class ConsumptionDetails extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardBody >
+                    <CardBody>
                         <Formik
                             render={
                                 ({

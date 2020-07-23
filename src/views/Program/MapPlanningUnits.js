@@ -30,8 +30,8 @@ export default class MapPlanningUnits extends Component {
 
     checkValidation() {
         var reg = /^[0-9\b]+$/;
-        var regDec =/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-        
+        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
@@ -108,7 +108,7 @@ export default class MapPlanningUnits extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -142,6 +142,46 @@ export default class MapPlanningUnits extends Component {
 
             var col = ("G").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(6, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(8, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -238,7 +278,7 @@ export default class MapPlanningUnits extends Component {
             }
         }
         if (x == 4) {
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -274,9 +314,45 @@ export default class MapPlanningUnits extends Component {
             }
         }
         if (x == 6) {
-            // var reg = /^[0-9]+.[0-9]+$/;
-            var reg=/^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 7) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 8) {
+            // var reg = /^[0-9]+.[0-9]+$/;
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -371,13 +447,13 @@ export default class MapPlanningUnits extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [290, 290, 170, 170,170,170],
+                                    colWidths: [290, 290, 170, 170, 170, 170, 170, 170],
                                     columns: [
 
                                         {
                                             title: 'Product Category',
                                             type: 'dropdown',
-                                            source:productCategoryList
+                                            source: productCategoryList
                                         },
                                         {
                                             title: 'Planning Unit',
@@ -392,6 +468,14 @@ export default class MapPlanningUnits extends Component {
                                         },
                                         {
                                             title: 'Min month of stock',
+                                            type: 'number'
+                                        },
+                                        {
+                                            title: 'Months In Future For AMC',
+                                            type: 'number'
+                                        },
+                                        {
+                                            title: 'Months In Past For AMC',
                                             type: 'number'
                                         },
                                         {
@@ -456,7 +540,7 @@ export default class MapPlanningUnits extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
     }
-    
+
     myFunction() {
         var json = this.el.getJson();
         var planningUnitArray = []
@@ -471,12 +555,14 @@ export default class MapPlanningUnits extends Component {
                 },
                 reorderFrequencyInMonths: map.get("2"),
                 minMonthsOfStock: map.get("3"),
-                localProcurementLeadTime:map.get("4"),
-                shelfLife:map.get("5"),
-                catalogPrice:map.get("6"),
+                monthsInFutureForAmc: map.get("4"),
+                monthsInPastForAmc: map.get("5"),
+                localProcurementLeadTime: map.get("6"),
+                shelfLife: map.get("7"),
+                catalogPrice: map.get("8"),
                 active: true,
                 programPlanningUnitId: 0
-               
+
             }
             planningUnitArray.push(planningUnitJson);
         }

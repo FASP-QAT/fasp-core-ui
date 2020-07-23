@@ -18,7 +18,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 
-const entityname = i18n.t('static.dashboard.consumptiondetails');
+const entityname = i18n.t('static.dashboard.shipmentdetails');
 
 export default class ShipmentDetails extends React.Component {
 
@@ -35,7 +35,8 @@ export default class ShipmentDetails extends React.Component {
             changedFlag: 0,
             planningUnitList: [],
             productCategoryId: '',
-            shipmentsEl: ''
+            shipmentsEl: '',
+            timeout: 0
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -53,9 +54,13 @@ export default class ShipmentDetails extends React.Component {
     }
 
     hideFirstComponent() {
-        setTimeout(function () {
+        document.getElementById('div1').style.display = 'block';
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
+    }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
     }
 
     componentDidMount = function () {
@@ -1827,7 +1832,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     toggleLarge() {

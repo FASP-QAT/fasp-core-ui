@@ -1611,6 +1611,7 @@ class ProcurementAgentExport extends Component {
                 versions: []
             })
         }
+        this.fetchData();
     }
     consolidatedVersionList = (programId) => {
         const lan = 'en';
@@ -1974,7 +1975,7 @@ class ProcurementAgentExport extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
         if (viewby == 1) {
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0 && isPlannedShipmentId > 0) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
                     var storeOS;
@@ -2033,10 +2034,10 @@ class ProcurementAgentExport extends Component {
                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
 
                                 let isPlannedShipment = [];
-                                if (isPlannedShipmentId == 1) {//yes
-                                    isPlannedShipment = activeFilter;
-                                } else {//no
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                                if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
+                                    isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
+                                } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
                                 }
 
                                 const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
@@ -2151,13 +2152,11 @@ class ProcurementAgentExport extends Component {
             } else if (planningUnitIds.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
-            } else if (isPlannedShipmentId == 0) {
-                this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
             } else if (procurementAgentId == 0) {
                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
             }
         } else if (viewby == 2) {
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0 && isPlannedShipmentId > 0) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
                     var storeOS;
@@ -2216,10 +2215,10 @@ class ProcurementAgentExport extends Component {
                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                                 let isPlannedShipment = [];
-                                if (isPlannedShipmentId == 1) {//yes
-                                    isPlannedShipment = activeFilter;
-                                } else {//no
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                                if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
+                                    isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
+                                } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
                                 }
 
                                 const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
@@ -2335,13 +2334,11 @@ class ProcurementAgentExport extends Component {
             } else if (planningUnitIds.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
-            } else if (isPlannedShipmentId == 0) {
-                this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
             } else if (fundingSourceId == 0) {
                 this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
             }
         } else {
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && isPlannedShipmentId > 0) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
                     var storeOS;
@@ -2399,10 +2396,10 @@ class ProcurementAgentExport extends Component {
                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
 
                                 let isPlannedShipment = [];
-                                if (isPlannedShipmentId == 1) {//yes
-                                    isPlannedShipment = activeFilter;
-                                } else {//no
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
+                                if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
+                                    isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
+                                } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
                                 }
 
                                 const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
@@ -2510,8 +2507,6 @@ class ProcurementAgentExport extends Component {
             } else if (planningUnitIds.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
-            } else if (isPlannedShipmentId == 0) {
-                this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
             }
         }
 
@@ -2780,7 +2775,7 @@ class ProcurementAgentExport extends Component {
             obj2,
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.dashboard.product'),
+                text: i18n.t('static.report.planningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2870,10 +2865,10 @@ class ProcurementAgentExport extends Component {
                     this.setState({ message: message })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <Card >
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>Shipment Cost Report</strong> */}
+
                         {/* <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
@@ -2972,7 +2967,7 @@ class ProcurementAgentExport extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
                                         <InputGroup className="box">
@@ -2988,7 +2983,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 mb-lg-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -2999,7 +2994,6 @@ class ProcurementAgentExport extends Component {
                                                 bsSize="sm"
                                                 onChange={this.fetchData}
                                             >
-                                                <option value="-1">{i18n.t('static.common.select')}</option>
                                                 <option value="1">{i18n.t('static.program.yes')}</option>
                                                 <option value="2">{i18n.t('static.program.no')}</option>
                                             </Input>
@@ -3008,8 +3002,8 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Report View By</Label>
+                                <FormGroup className="col-md-3 mb-lg-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -3029,7 +3023,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3" id="procurementAgentDiv">
+                                <FormGroup className="col-md-3 mb-lg-0" id="procurementAgentDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -3119,17 +3113,6 @@ class ProcurementAgentExport extends Component {
                         </ToolkitProvider>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div className="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
-
-                            <div className="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }
