@@ -1385,6 +1385,7 @@ class Consumption extends Component {
       programs: [],
       offlinePrograms: [],
       planningUnits: [],
+      versions: [],
       consumptions: [],
       offlineConsumptionList: [],
       offlinePlanningUnitList: [],
@@ -1536,6 +1537,7 @@ class Consumption extends Component {
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
@@ -1559,6 +1561,16 @@ class Consumption extends Component {
     let row3 = [];
     if (navigator.onLine) {
       let consumptionArray = this.state.consumptions;
+      head.push('');
+      row1.push(i18n.t('static.report.forecasted'));
+      row2.push(i18n.t('static.report.actual'));
+      for (let i = 0; i < consumptionArray.length; i++) {
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption);
+      }
+    } else {
+      let consumptionArray = this.state.offlineConsumptionList;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
@@ -1641,13 +1653,16 @@ class Consumption extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
-          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
             align: 'left'
           })
 
@@ -1679,7 +1694,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
     // let content = {
     //   margin: { top: 80 },
     //   startY: height,
@@ -1701,9 +1716,9 @@ class Consumption extends Component {
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forcast);
-        row2.push(consumptionArray[i].Actual);
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption);
       }
     } else {
       let consumptionArray = this.state.finalOfflineConsumption;
@@ -1746,78 +1761,211 @@ class Consumption extends Component {
 
 
 
-  filterData() {
-    let programId = 0;
-    if (navigator.onLine) {
-      programId = document.getElementById("programId").value;
-    } else {
-      programId = (document.getElementById("programId").value).split("_")[0];
-    }
+  // filterData() {
+  //   let programId = 0;
+  //   if (navigator.onLine) {
+  //     programId = document.getElementById("programId").value;
+  //   } else {
+  //     programId = (document.getElementById("programId").value).split("_")[0];
+  //   }
 
+  //   let viewById = document.getElementById("viewById").value;
+  //   let versionId = document.getElementById("versionId").value;
+  //   let productCategoryId = document.getElementById("productCategoryId").value;
+  //   let planningUnitId = document.getElementById("planningUnitId").value;
+  //   let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+  //   let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+  //   if (productCategoryId >= 0 && planningUnitId > 0 && programId > 0) {
+
+  //     if (navigator.onLine) {
+  //       let realmId = AuthenticationService.getRealmId();
+  //       AuthenticationService.setupAxiosInterceptors();
+  //       ProductService.getConsumptionData(realmId, programId, versionId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+  //         .then(response => {
+  //           // console.log(JSON.stringify(response.data));
+  //           this.setState({
+  //             consumptions: response.data,
+  //             message: ''
+  //           },
+  //             () => {
+  //               this.storeProduct(planningUnitId);
+  //               if (viewById == 2) {
+  //                 this.toggleView();
+  //               }
+  //             })
+  //         }).catch(
+  //           error => {
+  //             this.setState({
+  //               consumptions: []
+  //             })
+
+  //             if (error.message === "Network Error") {
+  //               this.setState({ message: error.message });
+  //             } else {
+  //               switch (error.response ? error.response.status : "") {
+  //                 case 500:
+  //                 case 401:
+  //                 case 404:
+  //                 case 406:
+  //                 case 412:
+  //                   this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+  //                   break;
+  //                 default:
+  //                   this.setState({ message: 'static.unkownError' });
+  //                   break;
+  //               }
+  //             }
+  //           }
+  //         );
+  //     } else {
+  //       // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+  //       programId = document.getElementById("programId").value;
+  //       var db1;
+  //       getDatabase();
+  //       var openRequest = indexedDB.open('fasp', 1);
+  //       openRequest.onsuccess = function (e) {
+  //         db1 = e.target.result;
+
+  //         var transaction = db1.transaction(['programData'], 'readwrite');
+  //         var programTransaction = transaction.objectStore('programData');
+  //         var programRequest = programTransaction.get(programId);
+
+  //         programRequest.onsuccess = function (event) {
+  //           var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+  //           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+  //           var programJson = JSON.parse(programData);
+  //           var offlineConsumptionList = (programJson.consumptionList);
+
+  //           const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
+
+  //           const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+  //           const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
+
+  //           // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+  //           const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
+
+  //           const sorted = dateFilter.sort((a, b) => {
+  //             var dateA = new Date(a.consumptionDate).getTime();
+  //             var dateB = new Date(b.consumptionDate).getTime();
+  //             return dateA > dateB ? 1 : -1;
+  //           });
+  //           let previousDate = "";
+  //           let finalOfflineConsumption = [];
+  //           var json;
+
+  //           for (let i = 0; i <= sorted.length; i++) {
+  //             let forcast = 0;
+  //             let actual = 0;
+  //             if (sorted[i] != null && sorted[i] != "") {
+  //               previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+  //               for (let j = 0; j <= sorted.length; j++) {
+  //                 if (sorted[j] != null && sorted[j] != "") {
+  //                   if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+  //                     if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
+  //                       forcast = forcast + parseFloat(sorted[j].consumptionQty);
+  //                     }
+  //                     if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
+  //                       actual = actual + parseFloat(sorted[j].consumptionQty);
+  //                     }
+  //                   }
+  //                 }
+  //               }
+
+  //               let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+  //               json = {
+  //                 consumption_date: date,
+  //                 Actual: actual,
+  //                 forcast: forcast
+  //               }
+
+  //               if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+  //                 finalOfflineConsumption.push(json);
+  //               }
+
+  //               // console.log("finalOfflineConsumption---", finalOfflineConsumption);
+
+  //             }
+  //           }
+  //           console.log("final consumption---", finalOfflineConsumption);
+  //           this.setState({
+  //             offlineConsumptionList: finalOfflineConsumption
+  //           },
+  //             () => {
+  //               this.storeProduct(planningUnitId);
+  //               if (viewById == 2) {
+  //                 this.toggleView();
+  //               }
+  //             });
+
+  //         }.bind(this)
+
+  //       }.bind(this)
+  //       // }
+  //     }
+  //   } else if (programId == 0) {
+  //     this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+
+  //   } else if (productCategoryId == -1) {
+  //     this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
+
+  //   } else {
+  //     this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+
+  //   }
+  // }
+
+
+
+  filterData() {
+
+    let programId = document.getElementById("programId").value;
     let viewById = document.getElementById("viewById").value;
+    let versionId = document.getElementById("versionId").value;
     let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-    if (productCategoryId >= 0 && planningUnitId > 0 && programId > 0) {
 
-      if (navigator.onLine) {
-        let realmId = AuthenticationService.getRealmId();
-        AuthenticationService.setupAxiosInterceptors();
-        ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
-          .then(response => {
-            // console.log(JSON.stringify(response.data));
-            this.setState({
-              consumptions: response.data,
-              message: ''
-            },
-              () => {
-                this.storeProduct(planningUnitId);
-                if (viewById == 2) {
-                  this.toggleView();
-                }
-              })
-          }).catch(
-            error => {
-              this.setState({
-                consumptions: []
-              })
-
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
-                }
-              }
-            }
-          );
-      } else {
-        // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
-        programId = document.getElementById("programId").value;
+    if (productCategoryId >= 0 && planningUnitId > 0 && programId > 0 && versionId != 0) {
+      if (versionId.includes('Local')) {
         var db1;
+        var storeOS;
         getDatabase();
+        var regionList = [];
         var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext')
+          })
+        }.bind(this);
         openRequest.onsuccess = function (e) {
+          var version = (versionId.split('(')[0]).trim()
+
+          //for user id
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+          //for program id
+          var program = `${programId}_v${version}_uId_${userId}`
+
           db1 = e.target.result;
-
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
-
-          programRequest.onsuccess = function (event) {
+          var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+          var programDataOs = programDataTransaction.objectStore('programData');
+          // console.log(program)
+          var programRequest = programDataOs.get(program);
+          programRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext')
+            })
+          }.bind(this);
+          programRequest.onsuccess = function (e) {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
+
+            // var shipmentList = (programJson.shipmentList);
+            // console.log("shipmentList----*********----", shipmentList);
+
             var offlineConsumptionList = (programJson.consumptionList);
 
             const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
@@ -1872,7 +2020,9 @@ class Consumption extends Component {
             }
             console.log("final consumption---", finalOfflineConsumption);
             this.setState({
-              offlineConsumptionList: finalOfflineConsumption
+              offlineConsumptionList: finalOfflineConsumption,
+              consumptions: finalOfflineConsumption
+
             },
               () => {
                 this.storeProduct(planningUnitId);
@@ -1882,12 +2032,45 @@ class Consumption extends Component {
               });
 
           }.bind(this)
-
         }.bind(this)
-        // }
+
+      } else {
+        this.setState({
+          message: ''
+        })
+
+        let realmId = AuthenticationService.getRealmId();
+
+        var inputjson = {
+          startDate: new moment(startDate),
+          stopDate: new moment(endDate),
+          programId: programId,
+          versionId: versionId,
+          planningUnitId: planningUnitId,
+          reportView: viewById
+        }
+        console.log("JSON INPUT---------->", inputjson);
+        ProductService.getConsumptionData(inputjson)
+          .then(response => {
+            console.log("RESP---------->", response.data);
+            this.setState({
+              consumptions: response.data,
+              message: ''
+            },
+              () => {
+                this.storeProduct(planningUnitId);
+                if (viewById == 2) {
+                  this.toggleView();
+                }
+              })
+          })
       }
+
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+
+    } else if (versionId == -1) {
+      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
 
     } else if (productCategoryId == -1) {
       this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
@@ -1897,6 +2080,18 @@ class Consumption extends Component {
 
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
 
   getPrograms() {
     if (navigator.onLine) {
@@ -2130,8 +2325,97 @@ class Consumption extends Component {
 
     }
     this.getPlanningUnit();
+    this.filterVersion();
 
   }
+
+
+  filterVersion = () => {
+    // document.getElementById("planningUnitId").checked = false;
+    let programId = document.getElementById("programId").value;
+    if (programId != 0) {
+
+      const program = this.state.programs.filter(c => c.programId == programId)
+      console.log(program)
+      if (program.length == 1) {
+        if (navigator.onLine) {
+          this.setState({
+            versions: []
+          }, () => {
+            this.setState({
+              versions: program[0].versionList.filter(function (x, i, a) {
+                return a.indexOf(x) === i;
+              })
+            }, () => { this.consolidatedVersionList(programId) });
+          });
+
+
+        } else {
+          this.setState({
+            versions: []
+          }, () => { this.consolidatedVersionList(programId) })
+        }
+      } else {
+
+        this.setState({
+          versions: []
+        })
+
+      }
+    } else {
+      this.setState({
+        versions: []
+      })
+    }
+  }
+  consolidatedVersionList = (programId) => {
+    const lan = 'en';
+    const { versions } = this.state
+    var verList = versions;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId && myResult[i].programId == programId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = databytes.toString(CryptoJS.enc.Utf8)
+            var version = JSON.parse(programData).currentVersion
+
+            version.versionId = `${version.versionId} (Local)`
+            verList.push(version)
+
+          }
+        }
+
+        console.log(verList)
+        this.setState({
+          versions: verList.filter(function (x, i, a) {
+            return a.indexOf(x) === i;
+          })
+        })
+
+      }.bind(this);
+    }.bind(this)
+  }
+
+
   componentDidMount() {
     if (navigator.onLine) {
       this.getPrograms();
@@ -2221,11 +2505,21 @@ class Consumption extends Component {
     const { productCategories } = this.state;
     const { offlineProductCategoryList } = this.state;
 
+    const { versions } = this.state;
+    let versionList = versions.length > 0
+      && versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionId}
+          </option>
+        )
+      }, this);
+
     let bar = "";
     if (navigator.onLine) {
       bar = {
 
-        labels: this.state.consumptions.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
+        labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YYYY'))),
         datasets: [
           {
             type: "line",
@@ -2242,7 +2536,7 @@ class Consumption extends Component {
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "$#,##0",
-            data: this.state.consumptions.map((item, index) => (item.forcast))
+            data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
@@ -2251,7 +2545,7 @@ class Consumption extends Component {
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
-            data: this.state.consumptions.map((item, index) => (item.Actual)),
+            data: this.state.consumptions.map((item, index) => (item.actualConsumption)),
           }
         ],
 
@@ -2359,7 +2653,7 @@ class Consumption extends Component {
               }
             </Offline>
           </div>
-          <CardBody className="pb-lg-2 pt-lg-0">
+          <CardBody className="pb-lg-2 pt-lg-0 ">
             <div className="TableCust" >
               <div ref={ref}>
                 <Form >
@@ -2440,6 +2734,25 @@ class Consumption extends Component {
                         </FormGroup>
                       </Offline>
 
+                      <FormGroup className="col-md-3">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                        <div className="controls">
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="versionId"
+                              id="versionId"
+                              bsSize="sm"
+                              onChange={this.filterData}
+                            >
+                              <option value="-1">{i18n.t('static.common.select')}</option>
+                              {versionList}
+                            </Input>
+
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
+
                       <Online>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
@@ -2495,7 +2808,7 @@ class Consumption extends Component {
 
                       <Online>
                         <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
                             <InputGroup>
                               <Input
@@ -2525,7 +2838,7 @@ class Consumption extends Component {
                       </Online>
                       <Offline>
                         <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
                             <InputGroup>
                               <Input
@@ -2563,7 +2876,7 @@ class Consumption extends Component {
                               bsSize="sm"
                               onChange={this.filterData}
                             >
-                              <option value="1">{i18n.t('static.dashboard.product')}</option>
+                              <option value="1">{i18n.t('static.report.planningUnit')}</option>
                               <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
                             </Input>
                           </InputGroup>
@@ -2639,7 +2952,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
+                                        {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YYYY')}
                                       </td>
                                     )
                                   }
@@ -2652,7 +2965,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.consumptions[idx].forcast)}
+                                        {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
                                       </td>
                                     )
                                   }
@@ -2665,7 +2978,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.consumptions[idx].Actual)}
+                                        {this.formatter(this.state.consumptions[idx].actualConsumption)}
                                       </td>
                                     )
                                   }

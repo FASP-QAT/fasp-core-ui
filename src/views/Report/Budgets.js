@@ -855,7 +855,7 @@ class Budgets extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <div className="Card-header-addicon">
+                    <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -868,7 +868,7 @@ class Budgets extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 ">
+                    <CardBody className="pb-lg-0 pt-lg-0">
 
                         <Col md="12 pl-0">
                             <div className="row">

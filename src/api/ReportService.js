@@ -40,9 +40,9 @@ class ReportService {
         );
     }
 
-    costOfInventory(json){
-        return axios.post(`${API_URL}/api/report/costOfInventory`,json,{}
-	        );
+    costOfInventory(json) {
+        return axios.post(`${API_URL}/api/report/costOfInventory`, json, {}
+        );
     }
 
     getStockStatusData(json) {
@@ -92,6 +92,10 @@ class ReportService {
     }
     ShipmentSummery(json) {
         return axios.post(`${API_URL}/api/report/shipmentDetails`, json, {}
+        );
+    }
+    shipmentOverview(json) {
+        return axios.post(`${API_URL}/api/report/shipmentOverview`, json, {}
         );
     }
     budgetReport(json) {

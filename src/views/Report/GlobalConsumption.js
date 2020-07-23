@@ -1425,16 +1425,22 @@ class GlobalConsumption extends Component {
     let productCategoryId = document.getElementById("productCategoryId").value;
     let CountryIds = this.state.countryValues;
     let planningUnitIds = this.state.planningUnitValues;
-    let programIds = this.state.programValues
+    let programIds = this.state.programValues;
+    let viewById = document.getElementById("viewById").value;
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
     if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
-
+      let realmId = AuthenticationService.getRealmId();
       var inputjson = {
-        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "stopDate": stopDate
+        "realmId": 1,
+        "realmCountryIds": CountryIds,
+        "programIds": programIds,
+        "planningUnitIds": planningUnitIds,
+        "startDate": startDate,
+        "stopDate": stopDate,
+        "reportView": viewById
       }
       console.log('inputJSON***' + inputjson)
-      AuthenticationService.setupAxiosInterceptors();
 
       ReportService.getGlobalConsumptiondata(inputjson)
         .then(response => {
@@ -1951,7 +1957,7 @@ class GlobalConsumption extends Component {
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
         <Card>
-          <div className="Card-header-reporticon">
+        <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
@@ -1961,7 +1967,9 @@ class GlobalConsumption extends Component {
               </a>
             </div>}
           </div>
+         
           <CardBody className="pb-lg-2 pt-lg-0">
+         
             <div ref={ref}>
 
               <Form >
@@ -2065,6 +2073,24 @@ class GlobalConsumption extends Component {
                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           />
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
+
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                      <div className="controls">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="viewById"
+                            id="viewById"
+                            bsSize="sm"
+                            onChange={this.filterData}
+                          >
+                            <option value="1">{i18n.t('static.report.planningUnit')}</option>
+                            <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
+                          </Input>
                         </InputGroup>
                       </div>
                     </FormGroup>

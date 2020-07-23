@@ -36,3 +36,5 @@ export const DATE_PLACEHOLDER_TEXT = "dd-mmm-yy"
 export const QAT_DATA_SOURCE_ID = 13
 export const FIRST_DATA_ENTRY_DATE='2017-01-01'
 export const NOTES_FOR_QAT_ADJUSTMENTS='Adjustment calculated by the system due to an actual stock count'
+export const TBD_PROCUREMENT_AGENT_ID=11
+export const TBD_FUNDING_SOURCE=8

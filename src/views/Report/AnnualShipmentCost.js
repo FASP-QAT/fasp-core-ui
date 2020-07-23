@@ -1233,7 +1233,7 @@ class AnnualShipmentCost extends Component {
                     this.setState({ message: message })
                 }} />*/}
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -1246,7 +1246,7 @@ class AnnualShipmentCost extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div className="TableCust" >
                             <div ref={ref}>
                                 <Form >

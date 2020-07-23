@@ -813,7 +813,7 @@ export default class ExpiredInventory extends Component {
                     this.setState({ message: message })
                 }} />*/}
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5  className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Expired Inventory</strong> */}
@@ -842,7 +842,7 @@ export default class ExpiredInventory extends Component {
                                                 //theme="light"
                                                 onChange={this.handleRangeChange}
                                                 onDismiss={this.handleRangeDissmis} */}
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0 CardBodyMargin">
                         <div className="TableCust" >
                             <div ref={ref}>
                                 {/* <Form > */}
@@ -866,7 +866,7 @@ export default class ExpiredInventory extends Component {
                                             </div>
 
                                         </FormGroup>
-                                        <FormGroup className="tab-ml-1">
+                                        <FormGroup  className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -886,7 +886,7 @@ export default class ExpiredInventory extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="tab-ml-1">
+                                        <FormGroup  className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>

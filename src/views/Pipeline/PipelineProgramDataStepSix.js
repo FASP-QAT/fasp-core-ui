@@ -41,19 +41,17 @@ const validationSchemaSix = function (values) {
         seaFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
-        draftToSubmittedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
-        plannedToDraftLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
+        // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
+        plannedToSubmittedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.program.validplantosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInFutureForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
+        // monthsInFutureForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+        //     .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
+        // monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+        //     .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
 
         arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter Arrived to deliverd lead time').min(0, i18n.t('static.program.validvaluetext')),
@@ -108,12 +106,11 @@ export default class PipelineProgramDataStepSix extends Component {
             airFreightPerc: true,
             seaFreightPerc: true,
             // deliveredToReceivedLeadTime: true,
-            draftToSubmittedLeadTime: true,
-            plannedToDraftLeadTime: true,
+            plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
-            monthsInFutureForAmc: true,
-            monthsInPastForAmc: true,
+            // monthsInFutureForAmc: true,
+            // monthsInPastForAmc: true,
             // healthAreaId: true,
             // programNotes: true,
             arrivedToDeliveredLeadTime: '',
@@ -196,16 +193,15 @@ export default class PipelineProgramDataStepSix extends Component {
                         airFreightPerc: this.props.items.program.airFreightPerc,
                         seaFreightPerc: this.props.items.program.seaFreightPerc,
                         // deliveredToReceivedLeadTime: this.props.items.program.deliveredToReceivedLeadTime,
-                        draftToSubmittedLeadTime: this.props.items.program.draftToSubmittedLeadTime,
-                        plannedToDraftLeadTime: this.props.items.program.plannedToDraftLeadTime,
+                        plannedToSubmittedLeadTime: this.props.items.program.plannedToSubmittedLeadTime,
                         submittedToApprovedLeadTime: this.props.items.program.submittedToApprovedLeadTime,
                         approvedToShippedLeadTime: this.props.items.program.approvedToShippedLeadTime,
                         monthsInFutureForAmc: this.props.items.program.monthsInFutureForAmc,
                         monthsInPastForAmc: this.props.items.program.monthsInPastForAmc,
                         programNotes: this.props.items.program.programNotes,
-                        arrivedToDeliveredLeadTime:this.props.items.program.arrivedToDeliveredLeadTime,
-                        shippedToArrivedBySeaLeadTime:this.props.items.program.shippedToArrivedBySeaLeadTime,
-                        shippedToArrivedByAirLeadTime:this.props.items.program.shippedToArrivedByAirLeadTime
+                        arrivedToDeliveredLeadTime: this.props.items.program.arrivedToDeliveredLeadTime,
+                        shippedToArrivedBySeaLeadTime: this.props.items.program.shippedToArrivedBySeaLeadTime,
+                        shippedToArrivedByAirLeadTime: this.props.items.program.shippedToArrivedByAirLeadTime
                     }
                 }
                 validate={validateSix(validationSchemaSix)}
@@ -238,7 +234,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             value={this.props.items.program.label.label_en}
-                                            id="programName" placeholder={i18n.t('static.program.programtext')} />
+                                            id="programName"  />
                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -269,7 +265,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             type="number"
                                             min="0"
                                             value={this.props.items.program.airFreightPerc}
-                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')}
+                                            name="airFreightPerc" id="airFreightPerc" 
                                         />
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
@@ -284,36 +280,22 @@ export default class PipelineProgramDataStepSix extends Component {
                                             type="number"
                                             min="0"
                                             value={this.props.items.program.seaFreightPerc}
-                                            name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
+                                            name="seaFreightPerc" id="seaFreightPerc"  />
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.plannedToDraftLeadTime && this.props.items.program.plannedToDraftLeadTime != ''}
-                                            invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
+                                            valid={!errors.plannedToSubmittedLeadTime && this.props.items.program.plannedToSubmittedLeadTime != ''}
+                                            invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            value={this.props.items.program.plannedToDraftLeadTime}
-                                            name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
-                                        <FormFeedback className="red">{errors.plannedToDraftLeadTime}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            valid={!errors.draftToSubmittedLeadTime && this.props.items.program.draftToSubmittedLeadTime != ''}
-                                            invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="number"
-                                            min="0"
-                                            value={this.props.items.program.draftToSubmittedLeadTime}
-                                            name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
-                                        <FormFeedback className="red">{errors.draftToSubmittedLeadTime}</FormFeedback>
+                                            value={this.props.items.program.plannedToSubmittedLeadTime}
+                                            name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime"  />
+                                        <FormFeedback className="red">{errors.plannedToSubmittedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
@@ -326,7 +308,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             type="number"
                                             min="0"
                                             value={this.props.items.program.submittedToApprovedLeadTime}
-                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
+                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime"  />
                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -340,7 +322,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             type="number"
                                             min="0"
                                             value={this.props.items.program.approvedToShippedLeadTime}
-                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
+                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime"  />
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     {/* <FormGroup className="col-md-6">
@@ -357,20 +339,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                         <FormFeedback className="red">{errors.deliveredToReceivedLeadTime}</FormFeedback>
                                     </FormGroup> */}
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">Arrived To Delivered Lead Time<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}
-                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="number"
-                                            min="0"
-                                            value={this.props.items.program.arrivedToDeliveredLeadTime}
-                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
-                                        <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
-                                    </FormGroup>
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">Shipped To Arrived By Sea Lead Time<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -400,32 +369,18 @@ export default class PipelineProgramDataStepSix extends Component {
                                         <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">Arrived To Delivered Lead Time<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.monthsInPastForAmc && this.props.items.program.monthsInPastForAmc != ''}
-                                            invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
+                                            valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}
+                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            value={this.props.items.program.monthsInPastForAmc}
-                                            name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
-                                        <FormFeedback className="red">{errors.monthsInPastForAmc}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            valid={!errors.monthsInFutureForAmc && this.props.items.program.monthsInFutureForAmc != ''}
-                                            invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="number"
-                                            min="0"
-                                            value={this.props.items.program.monthsInFutureForAmc}
-                                            name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
-                                        <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
+                                            value={this.props.items.program.arrivedToDeliveredLeadTime}
+                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
+                                        <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
