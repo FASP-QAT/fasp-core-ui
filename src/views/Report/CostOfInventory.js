@@ -654,7 +654,7 @@ export default class CostOfInventory extends Component {
                 ReportService.costOfInventory(inputjson).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: response.data });
+                        costOfInventory: response.data ,message:''});
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
@@ -802,7 +802,7 @@ export default class CostOfInventory extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div className="TableCust" >
                             <div ref={ref}>
 

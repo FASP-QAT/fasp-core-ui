@@ -203,10 +203,16 @@ class Login extends Component {
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
+                                localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
+                                i18n.changeLanguage(decoded.user.language.languageCode);
+
 
                                 AuthenticationService.setupAxiosInterceptors();
-                                this.props.history.push(`/masterDataSync`);
-                                // qatProblemActions();
+                                if (decoded.user.agreementAccepted) {
+                                  this.props.history.push(`/masterDataSync`)
+                                } else {
+                                  this.props.history.push(`/userAgreement`)
+                                }
                               })
                               .catch(
                                 error => {
@@ -253,12 +259,14 @@ class Login extends Component {
                                   localStorage.setItem('typeOfSession', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
+                                  localStorage.setItem('i18nextLng', user.language.languageCode);
+                                  i18n.changeLanguage(user.language.languageCode);
                                   localStorage.removeItem("tempUser");
                                   if (AuthenticationService.syncExpiresOn() == true) {
                                     this.props.history.push(`/logout/static.message.syncExpiresOn`)
                                   } else {
                                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
-                                    qatProblemActions();
+                                    // qatProblemActions();
                                     this.props.history.push(`/ApplicationDashboard`)
 
                                   }
@@ -359,8 +367,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                          official U.S. government information and does not represent the views or positions of the
-                                                                          Agency for International Development or the U.S. government.
+                                                                      official U.S. government information and does not represent the views or positions of the
+                                                                      Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

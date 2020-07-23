@@ -3,6 +3,8 @@ import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { DATE_FORMAT_CAP } from '../../Constants.js';
+import moment from 'moment';
 import {
   Badge,
   Button,
@@ -253,6 +255,21 @@ class ApplicationDashboard extends Component {
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
     this.problemAction = this.problemAction.bind(this);
+    this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
+  }
+
+  rowClassNameFormat(row, rowIdx) {
+    // row is whole row object
+    // rowIdx is index of row
+    // console.log('in rowClassNameFormat')
+    // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
+    if (row.criticality.id == 3) {
+      return row.criticality.id == 3 && row.isFound == 1 ? 'background-red' : '';
+    } else if (row.criticality.id == 2) {
+      return row.criticality.id == 2 && row.isFound == 1 ? 'background-orange' : '';
+    } else {
+      return row.criticality.id == 1 && row.isFound == 1 ? 'background-yellow' : '';
+    }
   }
 
   problemAction(problemAction) {
@@ -289,6 +306,7 @@ class ApplicationDashboard extends Component {
     console.log("problemActionlist ==========", problemActionlist);
 
   }
+
 
   onExiting() {
     this.animating = true;
@@ -386,7 +404,12 @@ class ApplicationDashboard extends Component {
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        // formatter: this.formatLabel
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+            return modifiedDate;
+          }
+        }
       },
       {
         dataField: 'isFound',
@@ -408,6 +431,37 @@ class ApplicationDashboard extends Component {
           }
         }
       },
+      {
+        dataField: 'criticality.label',
+        text: 'Criticality',
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+      },
+      {
+        dataField: 'problemStatus.label',
+        text: 'HQ Review Status',
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+      },
+      {
+        dataField: 'note',
+        text: 'HQ Note',
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      }
     ];
     const options = {
       hidePageListOnlyOnePage: true,
@@ -593,7 +647,7 @@ class ApplicationDashboard extends Component {
                           <SearchBar {...props.searchProps} />
                           <ClearSearchButton {...props.searchProps} />
                         </div>
-                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                        <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                           pagination={paginationFactory(options)}
                           rowEvents={{
                             onClick: (e, row, rowIndex) => {

@@ -186,7 +186,7 @@ class DefaultLayout extends Component {
                               name: i18n.t('static.dashboard.realm'),
                               url: '/realm/realmlist',
                               icon: 'fa fa-th-large',
-                              attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
+                              // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
                             }, {
                               name: i18n.t('static.dashboard.realmcountry'),
                               url: '/realmCountry/listRealmCountry',
@@ -402,7 +402,7 @@ class DefaultLayout extends Component {
                           // },
                           {
                             name: 'Shipment Details',
-                            url: '/shipment/shipmentList',
+                            url: '/shipment/shipmentDetails',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }
@@ -659,7 +659,7 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: 'Shipment Details',
-                            url: '/shipment/shipmentList',
+                            url: '/shipment/shipmentDetails',
                             icon: 'fa fa-list',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }

@@ -400,7 +400,9 @@ label.arrow_label:after {
 .table td {
   padding: 0.55rem;
 }
-
+.table {
+  margin-bottom: 0px!important;
+}
 //table add button
 .card-header-action a i {
   font-size: 25px;
@@ -1894,7 +1896,15 @@ input::placeholder {
 
 .background-red {
   // background-color: red;
-  background-color: #fac8c8!important;
+  background-color: #ce2f2f!important;
+}
+.background-orange {
+  // background-color: red;
+  background-color: #e07847!important;
+}
+.background-yellow {
+  // background-color: red;
+  background-color: #e0d24d!important;
 }
 
 .supplyplan-larrow {
@@ -2139,20 +2149,6 @@ input::placeholder {
   .report-table{
     max-height:300px;
   }
-  
-  // .table-fixed tbody {
-  //   height: 300px;
-  //   overflow-y: auto;
-  //   width: 100%;
-  // }
-  
-  // .table-fixed thead,
-  // .table-fixed tbody,
-  // .table-fixed tr,
-  // .table-fixed td,
-  // .table-fixed th {
-  //   display: block;
-  // }
   
   .formula-img-mr{
     margin: 10px 0px 20px 0px;
@@ -2465,7 +2461,7 @@ input::placeholder {
     color: #73818f !important;
     font-size: 13px!important;
 }
-
+/////card header css
 .Card-header-addicon
 {
   padding:10px 20px 10px 20px;
@@ -2473,6 +2469,19 @@ input::placeholder {
 .Card-header-reporticon{
   padding: 8px 20px 0px 20px;
 }
+.CardBodyMargin{
+  margin-top: -1%;
+}
+.CardBodySupplyplanMargin{
+  margin-top: -2%;
+}
+.CardBodyTop{
+  margin-top: -1%;
+}
+.CardBodyTopMargin{
+  margin-top: -3%;
+}
+
 
 /////application dashboard card css
 .ImgCont{

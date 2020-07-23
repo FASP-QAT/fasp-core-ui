@@ -1,9 +1,10 @@
 import { getDatabase } from "../CommonComponent/IndexedDbFunctions";
 import AuthenticationService from '../views/Common/AuthenticationService';
 import i18n from '../i18n';
+
 import { SECRET_KEY } from '../Constants.js';
 import CryptoJS from 'crypto-js';
-import moment from 'moment';
+import moment, { months } from 'moment';
 import { date } from "yup";
 
 export function qatProblemActions() {
@@ -107,15 +108,25 @@ export function qatProblemActions() {
                                             problemId: 1,
                                             month: myDate,
                                             isFound: 1,
-                                            problemStatusId: 1,
+                                            problemStatus: {
+                                                id: 1,
+                                                label: { label_en: 'Open' }
+                                            },
                                             note: '',
 
                                             actionName: {
                                                 label: {
-                                                    label_en: 'Add Consumption Data'
+                                                    label_en: 'Add Actual Consumption For Past Months'
                                                 }
                                             },
-                                            actionUrl: '/consumptionDetails'
+                                            actionUrl: '/consumptionDetails',
+                                            criticality: {
+                                                id: '1',
+                                                color: 'fff633',
+                                                label: {
+                                                    label_en: 'Low'
+                                                }
+                                            }
                                         }
                                         problemActionList.push(json);
                                     } else {
@@ -159,15 +170,26 @@ export function qatProblemActions() {
                                             problemId: 2,
                                             month: myDateInventory,
                                             isFound: 1,
-                                            problemStatusId: 1,
-                                            note: '/inventory/addInventory',
+                                            problemStatus: {
+                                                id: 1,
+                                                label: { label_en: 'Open' }
+                                            },
+                                            note: '',
 
                                             actionName: {
                                                 label: {
-                                                    label_en: 'Add Inventory Data'
+                                                    label_en: 'Add Inventory Data For Past Months'
                                                 }
                                             },
-                                            actionUrl: ''
+                                            actionUrl: '/inventory/addInventory',
+
+                                            criticality: {
+                                                id: '2',
+                                                color: 'ff9333',
+                                                label: {
+                                                    label_en: 'Medium'
+                                                }
+                                            }
 
                                         }
                                         problemActionList.push(json);
@@ -195,7 +217,7 @@ export function qatProblemActions() {
                             var indexShipment = problemActionList.findIndex(
                                 c => c.month == myDateShipment
                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                    && c.progrem.programId == programList[pp].programId
+                                    && c.program.programId == programList[pp].programId
                                     && c.problemId == 3);
 
                             if (filteredShipmentList.length > 0) {
@@ -209,15 +231,26 @@ export function qatProblemActions() {
                                         problemId: 3,
                                         month: myDateShipment,
                                         isFound: 1,
-                                        problemStatusId: 1,
+                                        problemStatus: {
+                                            id: 1,
+                                            label: { label_en: 'Open' }
+                                        },
                                         note: '',
 
                                         actionName: {
                                             label: {
-                                                label_en: 'Check Shipment Status'
+                                                label_en: 'Please check to make sure this shipment was received, and update either the receive date or the shipment status.'
                                             }
                                         },
-                                        actionUrl: '/shipment/shipmentList'
+                                        actionUrl: '/shipment/shipmentDetails',
+
+                                        criticality: {
+                                            id: '3',
+                                            color: 'ff3333',
+                                            label: {
+                                                label_en: 'High'
+                                            }
+                                        }
 
 
                                     }
@@ -232,13 +265,76 @@ export function qatProblemActions() {
                             }
 
                             // console.log("QAP 15====>", problemActionList);
+                            // End  3 shipment which have delivered date in past but status is not yet delivered
 
-                            // 3 shipment which have delivered date in past but status is not yet delivered
+                            // 4 no forecasted consumption for future 18 months
+
+                            var consumptionList = programList[pp].consumptionList;
+                            consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                            // console.log("QAP 9====>", consumptionList);
+                            var numberOfMonthsInFunture = 18;
+                            for (var m = 1; m <= numberOfMonthsInFunture; m++) {
+                                var myDateFuture = moment(Date.now()).add(m, 'months').startOf('month').format("YYYY-MM-DD");
+                                // console.log("date====>", myDateFuture);
+
+                                var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') == myDateFuture && c.actualFlag.toString() == "false");
+                                var index = problemActionList.findIndex(
+                                    c => c.month == myDateFuture
+                                        && c.region.regionId == regionList[r].regionId
+                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                        && c.program.programId == programList[pp].programId
+                                        && c.problemId == 1);
+
+                                if (filteredConsumptionList.length == 0) {
+                                    if (index == -1) {
+                                        var json = {
+                                            program: programList[pp],
+                                            versionId: programList[pp].currentVersion.versionId,
+                                            region: regionList[r],
+                                            planningUnit: planningUnitList[p].planningUnit,
+
+                                            problemId: 4,
+                                            month: myDateFuture,
+                                            isFound: 1,
+                                            problemStatus: {
+                                                id: 1,
+                                                label: { label_en: 'Open' }
+                                            },
+                                            note: '',
+
+                                            actionName: {
+                                                label: {
+                                                    label_en: 'Add Forecasted Consumption For Future Months'
+                                                }
+                                            },
+                                            actionUrl: '/consumptionDetails',
+
+                                            criticality: {
+                                                id: '1',
+                                                color: 'fff633',
+                                                label: {
+                                                    label_en: 'Low'
+                                                }
+                                            }
+                                        }
+                                        problemActionList.push(json);
+                                    } else {
+                                        problemActionList[index].isFound = 1;
+                                    }
+
+                                } else {
+                                    if (index != -1) {
+                                        problemActionList[index].isFound = 0;
+                                    }
+                                }
+                            }
+
+                            // end 4 no forecasted consumption for future 18 months
                             // problem conditions  end here ====================
                         }
                     }
                 }
-                // console.log("final problemList=====>", problemActionList);
+                console.log("final problemList=====>", problemActionList);
             }.bind(this);
         }.bind(this);
     }.bind(this)
