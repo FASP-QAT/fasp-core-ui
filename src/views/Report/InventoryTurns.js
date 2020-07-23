@@ -802,7 +802,7 @@ console.log(endingBalanceArray)
                                     <Col md="12 pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Program</Label>
+                                                <Label htmlFor="appendedInputButton">{ i18n.t('static.program.programMaster')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -820,7 +820,7 @@ console.log(endingBalanceArray)
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Version</Label>
+                                                <Label htmlFor="appendedInputButton">{ i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
