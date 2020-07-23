@@ -1790,10 +1790,13 @@ class ShipmentGlobalDemandView extends Component {
         canvasImg = canvas.toDataURL("image/png", 1.0);
         doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
 
+        // let tableHeadLength = this.state.table1Headers.length;
+        let length = this.state.table1Headers.length + 1;
+
         //Tables
         let content1 = {
-            margin: { top: 80, left: 100 },
-            startY: height + 90,
+            margin: { top: 80 },
+            startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
@@ -1805,7 +1808,7 @@ class ShipmentGlobalDemandView extends Component {
             html: '#mytable1',
 
             didDrawCell: function (data) {
-                if (data.column.index === this.state.table1Headers.length && data.cell.section === 'body') {
+                if (data.column.index === length && data.cell.section === 'body') {
                     var td = data.cell.raw;
                     var img = td.getElementsByTagName('img')[0];
                     var dim = data.cell.height - data.cell.padding('vertical');
@@ -3035,8 +3038,8 @@ class ShipmentGlobalDemandView extends Component {
                                     <div className="row">
                                         <div className="col-md-12">
                                             {this.state.show && this.state.procurementAgentSplit.length > 0 &&
-                                                < div className="table-responsive ">
-                                                    <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                <div className="table-responsive ">
+                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
                                                         <thead>
                                                             <tr>
@@ -3071,77 +3074,6 @@ class ShipmentGlobalDemandView extends Component {
 
                                                         </tbody>
                                                     </Table>
-
-                                                    {/* <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
-
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="text-left" style={{ width: '300px' }} rowSpan="2"> Planning Unit </th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">GF</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">Govt</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">Local</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">PSM</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">Total</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Total Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Total Amount (USD) </th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                            <tr id="addr0" key={1} >
-
-                                                                <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Units</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>15,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
-                                                            </tr>
-                                                            <tr id="addr0" key={2} >
-
-                                                                <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Units</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,100,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>8,500,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>11,900,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}>15,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
-                                                            </tr>
-                                                            <tr id="addr0" key={3} >
-
-                                                                <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Units</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>15,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </Table> */}
 
                                                 </div>
 

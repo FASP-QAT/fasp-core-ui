@@ -1724,8 +1724,8 @@ class ShipmentGlobalView extends Component {
         let length = displaylabel.length + 1;
 
         let content1 = {
-            margin: { top: 80, left: 100 },
-            startY: height + 90,
+            margin: { top: 80 },
+            startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
