@@ -718,17 +718,16 @@ PercentageFormatter=num=>{
                var currentActualconsumption = 0;
                var currentForcastConsumption = 0;
                 for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
-
-                  var dt = from + "-" + String(i).padStart(2, '0') + "-01"
-                  console.log('date' , dt)
+                  if (i == 0) {
+                    i = 12;
+                    year = year - 1
+                  }
+                  var dt = year + "-" + String(i).padStart(2, '0') + "-01"
                   var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                  
-                  //for (var k = 0; k < programJson.regionList.length; k++) {
                     var actconsumption = 0;
                     var forConsumption = 0;
-                 // var list = conlist.filter(c => c.region.id == programJson.regionList[k].regionId)
-                  //console.log(list)
-                
+                 
                     for (var l = 0; l < conlist.length; l++) {
                       if (conlist[l].actualFlag.toString() == 'true') {
                         actconsumption = actconsumption + conlist[l].consumptionQty
@@ -741,22 +740,15 @@ PercentageFormatter=num=>{
                         if(j==0){
                         currentActualconsumption=currentActualconsumption+actconsumption
                         currentForcastConsumption=currentForcastConsumption+forConsumption}
-                        console.log('absvalue',absvalue,'actconsumption',actconsumption,'forConsumption',forConsumption)
                         if(actconsumption>0 && forConsumption>0)
                         absvalue = absvalue + (Math.abs(actconsumption - forConsumption))
                      
-                      console.log(' absvalue(actconsumption - forConsumption)',absvalue)
-                  
+                      
                 
                  
-                  if (i == 0) {
-                    i = 12;
-                    year = year - 1
-                  }
+                 
                 }
                
-               // console.log('method 1 calulation for forcast error',(Math.abs(actualconsumption - forcastConsumption))*100 /actualconsumption)
-                console.log('method 2 calulation for forcast error',((absvalue * 100)/ actualconsumption))
                 var json = {
                   month: new Date(from, month - 1),
                   actualConsumption: currentActualconsumption,
