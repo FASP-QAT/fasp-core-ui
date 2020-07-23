@@ -48,10 +48,10 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInFutureForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
+        // monthsInFutureForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+        //     .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
+        // monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+        //     .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
 
         arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter Arrived to deliverd lead time').min(0, i18n.t('static.program.validvaluetext')),
@@ -109,8 +109,8 @@ export default class PipelineProgramDataStepSix extends Component {
             plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
-            monthsInFutureForAmc: true,
-            monthsInPastForAmc: true,
+            // monthsInFutureForAmc: true,
+            // monthsInPastForAmc: true,
             // healthAreaId: true,
             // programNotes: true,
             arrivedToDeliveredLeadTime: '',

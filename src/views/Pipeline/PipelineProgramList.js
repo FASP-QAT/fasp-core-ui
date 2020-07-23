@@ -33,7 +33,17 @@ export default class PipelineProgramList extends Component {
         this.importNewProgram = this.importNewProgram.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.formatDate = this.formatDate.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
+
+    hideFirstComponent() {
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
+        }, 8000);
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     formatDate(cell, row) {
         if (cell != null && cell != "") {
@@ -45,6 +55,7 @@ export default class PipelineProgramList extends Component {
     }
 
     componentDidMount() {
+        this.hideFirstComponent();
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.getPipelineProgramList().then(response => {
             if (response.status == 200) {

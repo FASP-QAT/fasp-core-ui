@@ -51,7 +51,7 @@ export default class ReactListComponent extends Component {
                 this.setState({
                     realmList: response.data,
                     selRealm: response.data,
-                     loading: false
+                    loading: false
                 })
             } else {
                 this.setState({
@@ -139,7 +139,29 @@ export default class ReactListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            }, {
+            },
+            {
+                dataField: 'minMosMinGaurdrail',
+                text: i18n.t('static.realm.minMosMinGaurdraillabel'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'minMosMaxGaurdrail',
+                text: i18n.t('static.realm.minMosMaxGaurdraillabel'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'maxMosMaxGaurdrail',
+                text: i18n.t('static.realm.maxMosMaxGaurdraillabel'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'realmId',
                 text: 'Action',
                 align: 'center',
@@ -195,7 +217,7 @@ export default class ReactListComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <div  className="Card-header-addicon">
+                    <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
 
                         <div className="card-header-actions">
