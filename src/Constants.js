@@ -38,3 +38,4 @@ export const FIRST_DATA_ENTRY_DATE='2017-01-01'
 export const NOTES_FOR_QAT_ADJUSTMENTS='Adjustment calculated by the system due to an actual stock count'
 export const TBD_PROCUREMENT_AGENT_ID=11
 export const TBD_FUNDING_SOURCE=8
+export const TOTAL_NO_OF_MASTERS_IN_SYNC=29

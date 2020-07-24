@@ -1563,10 +1563,17 @@ class ShipmentGlobalView extends Component {
 
         if (this.state.table1Body.length > 0) {
             var A = [];
-            A[0] = this.state.table1Headers;
+
+            let tableHead = this.state.table1Headers;
+            let tableHeadTemp = [];
+
+            for (var i = 0; i < tableHead.length; i++) {
+                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
+            }
+            A[0] = tableHeadTemp;
             re = this.state.table1Body
             for (var item = 0; item < re.length; item++) {
-                A.push([[getLabelText(re[item].country.label, this.state.lang), re[item].amount]])
+                A.push([[(getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount]])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -1583,10 +1590,10 @@ class ShipmentGlobalView extends Component {
             } else {
                 tempLabel = i18n.t('static.procurementagent.procurementagent');
             }
-            var B = [[i18n.t('static.dashboard.months'), i18n.t('static.program.realmcountry'), i18n.t('static.supplyPlan.amountInUSD'), tempLabel, i18n.t('static.common.status')]];
+            var B = [[(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')]];
             re = this.state.shipmentList;
             for (var item = 0; item < re.length; item++) {
-                B.push([[moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY'), getLabelText(re[item].country.label, this.state.lang), re[item].amount, getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang), getLabelText(re[item].shipmentStatus.label, this.state.lang)]])
+                B.push([[(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')]])
             }
             for (var i = 0; i < B.length; i++) {
                 csvRow.push(B[i].join(","))
@@ -1679,11 +1686,14 @@ class ShipmentGlobalView extends Component {
                     })
                     var viewby = document.getElementById("viewById").value;
                     if (viewby == 1) {
-                        var planningText = doc.splitTextToSize(i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+
+                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 190, fundingSourceText)
+
                     } else {
-                        var planningText = doc.splitTextToSize(i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+
+                        var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 190, procurementAgentText)
                     }
 
                 }
@@ -1724,8 +1734,8 @@ class ShipmentGlobalView extends Component {
         let length = displaylabel.length + 1;
 
         let content1 = {
-            margin: { top: 80, left: 100 },
-            startY: height + 90,
+            margin: { top: 80 },
+            startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
@@ -2292,7 +2302,7 @@ class ShipmentGlobalView extends Component {
             });
         } else if (viewby == 2 && procurementAgentIds.length == 0) {
             this.setState({
-                message: i18n.t('static.report.procurementAgent'),
+                message: i18n.t('static.procurementAgent.selectProcurementAgent'),
                 data: [],
                 shipmentList: [],
                 dateSplitList: [],
@@ -2506,7 +2516,7 @@ class ShipmentGlobalView extends Component {
                     this.setState({ message: message })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5  className="red">{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -2737,7 +2747,7 @@ class ShipmentGlobalView extends Component {
                                                                         {
                                                                             this.state.table1Body[idx].amount.map((item, idx1) =>
                                                                                 <td id="addr1" key={idx1}>
-                                                                                    {this.state.table1Body[idx].amount[idx1]}
+                                                                                    {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
                                                                                 </td>
                                                                             )
                                                                         }
@@ -2779,7 +2789,7 @@ class ShipmentGlobalView extends Component {
                                                                     <tr id="addr0" key={idx} >
                                                                         <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                        <td>{this.state.shipmentList[idx].amount}</td>
+                                                                        <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
                                                                     </tr>

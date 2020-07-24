@@ -426,6 +426,7 @@ export default class ConsumptionDetails extends React.Component {
                         onchange: this.changed,
                         oneditionend: this.onedit,
                         copyCompatibility: true,
+                        allowExport: false,
                         paginationOptions: [10, 25, 50, 100],
                         position: 'top',
                         updateTable: function (el, cell, x, y, source, value, id) {
@@ -553,6 +554,7 @@ export default class ConsumptionDetails extends React.Component {
                                             copyCompatibility: true,
                                             allowInsertRow: true,
                                             allowManualInsertRow: false,
+                                            allowExport: false,
                                             onchange: this.batchInfoChangedConsumption,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,

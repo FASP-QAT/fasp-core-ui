@@ -704,7 +704,7 @@ class StockAdjustmentComponent extends Component {
             },
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.dashboard.product'),
+                text: i18n.t('static.report.planningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -799,10 +799,12 @@ class StockAdjustmentComponent extends Component {
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Stock Adjustment Report</strong>{' '} */}
-                        <div className="card-header-actions">
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                        </div>
+                        {this.state.data.length > 0 &&
+                            <div className="card-header-actions">
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                            </div>
+                        }
                     </div>
                     <CardBody className=" mt-3">
 
@@ -875,7 +877,7 @@ class StockAdjustmentComponent extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls SelectGo">
                                         <InputGroup className="box">

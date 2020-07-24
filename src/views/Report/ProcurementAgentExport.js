@@ -1796,7 +1796,7 @@ class ProcurementAgentExport extends Component {
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         this.state.planningUnitLabels.map(ele =>
             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push(i18n.t('static.program.isincludeplannedshipment') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.program.isincludeplannedshipment').replaceAll(' ', '%20') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
@@ -2775,7 +2775,7 @@ class ProcurementAgentExport extends Component {
             obj2,
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.dashboard.product'),
+                text: i18n.t('static.report.planningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2967,7 +2967,7 @@ class ProcurementAgentExport extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.product')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
                                         <InputGroup className="box">
