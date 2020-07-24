@@ -2785,19 +2785,19 @@ input::placeholder {
 /* list */
 .rounded-list ol 
 {
-counter-reset:li; /* Initiate a counter */
-margin-left:34px; /* Remove the default left margin */
-padding-left:0; /* Remove the default left padding */
+counter-reset:li; 
+margin-left:34px;
+padding-left:0;
 }
 
 /* item  */
 .rounded-list ol > li
 {
-position:relative; /* Create a positioning context */
-list-style:none; /* Disable the normal item numbering */
+position:relative; 
+list-style:none; 
 // background:#f6f6f6; /* Item background color */
-margin:0; /* Give each list item a left margin to make room for the numbers */
-padding-left: 15px; /* Add some spacing around the content */
+margin:0; 
+padding-left: 15px;
 padding-bottom:0px;
 padding-top:0px;
 margin-bottom: -14px;

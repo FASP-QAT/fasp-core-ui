@@ -2965,7 +2965,7 @@ class Consumption extends Component {
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
                       <Online>
-                        {this.state.show &&
+                        {this.state.show && this.state.consumptions.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -3014,7 +3014,7 @@ class Consumption extends Component {
                           </Table>}
                       </Online>
                       <Offline>
-                        {this.state.show &&
+                        {this.state.show && this.state.offlineConsumptionList.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
