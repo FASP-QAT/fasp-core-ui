@@ -2251,7 +2251,7 @@ class FunderExport extends Component {
                     this.setState({ message: message })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.fundingSource')}</strong> */}

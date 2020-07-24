@@ -15,7 +15,7 @@ import moment from "moment";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
-const entityname = i18n.t('static.inventory.inventory')
+const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -25,7 +25,8 @@ export default class AddInventory extends Component {
             changedFlag: 0,
             countrySKUList: [],
             message: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            timeout: 0
 
         }
         this.options = props.options;
@@ -49,12 +50,25 @@ export default class AddInventory extends Component {
             inventoryBatchInfo: !this.state.inventoryBatchInfo,
         });
     }
-
     hideFirstComponent() {
-        setTimeout(function () {
+        document.getElementById('div1').style.display = 'block';
+        this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
     }
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+    }
+
+    // hideFirstComponent() {
+    //     document.getElementById('div1').style.display = 'block';
+    //     clearTimeout(this.state.timeout);
+    //     this.state.timeout = setTimeout(function () {
+    //         document.getElementById('div1').style.display = 'none';
+    //     }, 8000);
+
+    // }
+
     componentDidMount() {
         var db1;
         getDatabase();
@@ -919,7 +933,7 @@ export default class AddInventory extends Component {
             if (elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(3, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
                 // var reg = /^[0-9\b]+$/;
-                value=(elInstance.getRowData(y))[3];
+                value = (elInstance.getRowData(y))[3];
                 value = value.toString().replaceAll("\,", "");
                 var col = ("D").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -953,7 +967,7 @@ export default class AddInventory extends Component {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
                 var col = ("E").concat(parseInt(y) + 1);
-                value=(elInstance.getRowData(y))[4];
+                value = (elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -1120,7 +1134,7 @@ export default class AddInventory extends Component {
                     }
 
                     var col = ("D").concat(parseInt(y) + 1);
-                    var value = value=((elInstance.getRowData(y))[3]).toString().replaceAll("\,", "");
+                    var value = value = ((elInstance.getRowData(y))[3]).toString().replaceAll("\,", "");
                     var reg = /-?\d+/;
                     // var reg = /^[0-9\b]+$/;
                     if (value != "" && value != 0) {
@@ -1337,7 +1351,7 @@ export default class AddInventory extends Component {
         if (x == 4) {
             if (elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != "" && elInstance.getValueFromCoords(4, y).toString().replaceAll("\,", "") != 0) {
                 var reg = /-?\d+/
-                value=(elInstance.getRowData(y))[4];
+                value = (elInstance.getRowData(y))[4];
                 value = value.toString().replaceAll("\,", "");
                 var col = ("E").concat(parseInt(y) + 1);
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -1365,7 +1379,7 @@ export default class AddInventory extends Component {
                 // var reg = /-?\d+/
                 var reg = /^[0-9\b]+$/;
                 var col = ("F").concat(parseInt(y) + 1);
-                value=(elInstance.getRowData(y))[5];
+                value = (elInstance.getRowData(y))[5];
                 value = value.toString().replaceAll("\,", "")
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -1755,14 +1769,18 @@ export default class AddInventory extends Component {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
+
                         this.setState({
                             message: 'static.message.inventorysuccess',
                             changedFlag: 0,
                             color: 'green'
-                        })
+                        },
+                            () => {
+                                this.hideFirstComponent();
+                            });
 
-                        this.hideFirstComponent();
-                        this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
+
+                        // this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1891,7 +1909,7 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {

@@ -520,14 +520,14 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
+                          // {
+                          //   name: i18n.t('static.dashboard.funderExport'),
+                          //   url: '/report/funderExport',
+                          //   icon: 'fa fa-list-alt',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FUNDER_REPORT') ? false : true) }
+                          // },
                           {
-                            name: i18n.t('static.dashboard.funderExport'),
-                            url: '/report/funderExport',
-                            icon: 'fa fa-list-alt',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_FUNDER_REPORT') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            name: i18n.t('static.report.shipmentCostReport'),
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
@@ -540,26 +540,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           }
                           ,
-                          {
-                            name: i18n.t('static.dashboard.shipmentGlobalDemandView'),
-                            url: '/report/shipmentGlobalDemandView',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
-                          ,
-                          {
-                            name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
-                            url: '/report/aggregateShipmentByProduct',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
-                          ,
-                          {
-                            name: i18n.t('static.dashboard.shipmentGlobalView'),
-                            url: '/report/shipmentGlobalView',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
+                          // {
+                          //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                          //   url: '/report/aggregateShipmentByProduct',
+                          //   icon: 'fa fa-wpforms',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          // }
                           ,
 
                           {
@@ -575,10 +561,22 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.report.shipmentSummeryReport'),
+                            name: i18n.t('static.report.shipmentDetailReport'),
                             url: '/report/shipmentSummery',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                            url: '/report/shipmentGlobalDemandView',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                            url: '/report/shipmentGlobalView',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           },
                           {
                             name: i18n.t('static.report.expiredInventory'),
@@ -711,7 +709,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            name: i18n.t('static.report.shipmentCostReport'),
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
@@ -722,12 +720,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-file-text',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
-                            url: '/report/aggregateShipmentByProduct',
-                            icon: 'fa fa-wpforms',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.aggregateShipmentByProduct'),
+                          //   url: '/report/aggregateShipmentByProduct',
+                          //   icon: 'fa fa-wpforms',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
@@ -771,6 +769,18 @@ class DefaultLayout extends Component {
                             url: '/report/inventoryTurns',
                             icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.report.shipmentDetailReport'),
+                            url: '/report/shipmentSummery',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                            url: '/report/shipmentGlobalDemandView',
+                            icon: 'fa fa-wpforms',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
                           }
                         ]
                       }

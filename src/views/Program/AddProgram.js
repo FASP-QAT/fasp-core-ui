@@ -48,36 +48,40 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        airFreightPerc: Yup.number()
-            .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        seaFreightPerc: Yup.number()
-            .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
+        airFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validairfreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+        seaFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         // deliveredToReceivedLeadTime: Yup.number()
         //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
-            .required(i18n.t('static.program.validplantodrafttext'))
+            .required(i18n.t('static.program.validplantosubmittext'))
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.program.validsubmittoapprovetext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9](\.[0-9]+)?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.program.validapprovetoshiptext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9](\.[0-9]+)?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         shippedToArrivedByAirLeadTime: Yup.string()
             .required(i18n.t('static.program.shippedToArrivedByAirLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9](\.[0-9]+)?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         shippedToArrivedBySeaLeadTime: Yup.string()
             .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9](\.[0-9]+)?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         arrivedToDeliveredLeadTime: Yup.string()
             .required(i18n.t('static.program.arrivedToDeliveredLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^[0-9](\.[0-9]+)?$/, i18n.t('static.program.validBudgetAmount')),
+            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
@@ -478,7 +482,19 @@ export default class AddProgram extends Component {
                                                     <strong>{i18n.t('static.program.programadd')}</strong>
                                                 </CardHeader> */}
                                                 <CardBody>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
 
+                                                        <Input
+                                                            type="text" name="programName" valid={!errors.programName && this.state.program.label.label_en != ''}
+                                                            bsSize="sm"
+                                                            invalid={touched.programName && !!errors.programName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.label.label_en}
+                                                            id="programName" />
+                                                        <FormFeedback className="red">{errors.programName}</FormFeedback>
+                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
@@ -496,19 +512,6 @@ export default class AddProgram extends Component {
                                                         </Input>
 
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            type="text" name="programName" valid={!errors.programName && this.state.program.label.label_en != ''}
-                                                            bsSize="sm"
-                                                            invalid={touched.programName && !!errors.programName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.program.label.label_en}
-                                                            id="programName" />
-                                                        <FormFeedback className="red">{errors.programName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
 
@@ -629,6 +632,19 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
+                                                        <Input
+                                                            value={this.state.program.seaFreightPerc}
+                                                            bsSize="sm"
+                                                            valid={!errors.seaFreightPerc && this.state.program.seaFreightPerc != ''}
+                                                            invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
+                                                    </FormGroup>
+                                                    <FormGroup>
 
                                                         <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
 
@@ -745,7 +761,6 @@ export default class AddProgram extends Component {
                                                             min="0"
                                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                                         <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
-
                                                     </FormGroup>
 
                                                 </CardBody>

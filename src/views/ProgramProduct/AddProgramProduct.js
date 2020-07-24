@@ -32,6 +32,8 @@ class AddprogramPlanningUnit extends Component {
             planningUnitName: '',
             reorderFrequencyInMonths: '',
             minMonthsOfStock: '',
+            monthsInFutureForAmc: '',
+            monthsInPastForAmc: '',
             rows: rows,
             programList: [],
             planningUnitList: [],
@@ -73,11 +75,13 @@ class AddprogramPlanningUnit extends Component {
         data[3] = "";
         data[4] = "";
         data[5] = "";
-        data[6] = 0;
+        data[6] = "";
         data[7] = "";
-        data[8] = 1;
-        data[9] = 1;
-        data[10] = this.props.match.params.programId;
+        data[8] = 0;
+        data[9] = 0;
+        data[10] = 1;
+        data[11] = 1;
+        data[12] = this.props.match.params.programId;
         this.el.insertRow(
             data
         );
@@ -85,33 +89,37 @@ class AddprogramPlanningUnit extends Component {
 
     changed = function (instance, cell, x, y, value) {
         var valid = true;
+        //Product category
+        console.log("changed 1");
         if (x == 0) {
+            console.log("changed 2");
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = true;
             }
             var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
             instance.jexcel.setValue(columnName, '');
         }
 
-
+        //Planning Unit
         if (x == 1) {
+            console.log("changed 3");
             var json = this.el.getJson();
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 for (var i = 0; i < json.length; i++) {
@@ -122,12 +130,12 @@ class AddprogramPlanningUnit extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, "Planning Unit aready exist");
                         i = json.length;
-                        this.el.setValueFromCoords(9, y, 1, true);
+                        this.el.setValueFromCoords(11, y, 1, true);
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
-                        this.el.setValueFromCoords(9, y, 1, true);
+                        this.el.setValueFromCoords(11, y, 1, true);
                         valid = true;
                     }
                 }
@@ -136,122 +144,184 @@ class AddprogramPlanningUnit extends Component {
             // instance.jexcel.setValue(columnName, '');
         }
 
+        //Reorder frequency
         if (x == 2) {
+            console.log("changed 4");
             var reg = /^[0-9\b]+$/;
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = true;
                 }
             }
         }
+        //Min months of stock
         if (x == 3) {
+            console.log("changed 5");
             var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = true;
                 }
             }
         }
+        //Months in future for AMC
         if (x == 4) {
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            console.log("changed 6");
+            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = true;
                 }
             }
         }
+        //Months in past for AMC
         if (x == 5) {
+            console.log("changed 7");
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = true;
                 }
             }
         }
+        //Local procurement lead time
         if (x == 6) {
+            console.log("changed 8");
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(9, y, 1, true);
+                this.el.setValueFromCoords(11, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(9, y, 1, true);
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Shelf life
+        if (x == 7) {
+            console.log("changed 9");
+            var reg = /^[0-9\b]+$/;
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Catalog price
+        if (x == 8) {
+            console.log("changed 10");
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("I").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(11, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(11, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(11, y, 1, true);
                     valid = true;
                 }
             }
@@ -264,28 +334,32 @@ class AddprogramPlanningUnit extends Component {
         var json = this.el.getJson();
         console.log("Rows on submit", json)
         var planningUnitArray = []
+        console.log("json.length---"+json.length);
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
-            if (map.get("9") == 1) {
-                if (map.get("7") == "") {
+            console.log("(map.get(11)---"+map.get("11"));
+            if (map.get("11") == 1) {
+                if (map.get("9") == "") {
                     var pId = 0;
                 } else {
-                    var pId = map.get("7");
+                    var pId = map.get("9");
                 }
                 var planningUnitJson = {
                     programPlanningUnitId: pId,
                     program: {
-                        id: map.get("10")
+                        id: map.get("12")
                     },
                     planningUnit: {
                         id: map.get("1"),
                     },
                     reorderFrequencyInMonths: map.get("2"),
                     minMonthsOfStock: map.get("3"),
-                    localProcurementLeadTime: map.get("4"),
-                    shelfLife: map.get("5"),
-                    catalogPrice: map.get("6"),
-                    active: map.get("8")
+                    monthsInFutureForAmc: map.get("4"),
+                    monthsInPastForAmc: map.get("5"),
+                    localProcurementLeadTime: map.get("6"),
+                    shelfLife: map.get("7"),
+                    catalogPrice: map.get("8"),
+                    active: map.get("10")
                 }
                 planningUnitArray.push(planningUnitJson);
             }
@@ -392,13 +466,15 @@ class AddprogramPlanningUnit extends Component {
                                                     data[1] = myReasponse[j].planningUnit.id;
                                                     data[2] = myReasponse[j].reorderFrequencyInMonths;
                                                     data[3] = myReasponse[j].minMonthsOfStock;
-                                                    data[4] = myReasponse[j].localProcurementLeadTime;
-                                                    data[5] = myReasponse[j].shelfLife;
-                                                    data[6] = myReasponse[j].catalogPrice;
-                                                    data[7] = myReasponse[j].programPlanningUnitId;
-                                                    data[8] = myReasponse[j].active;
-                                                    data[9] = 0;
-                                                    data[10] = myReasponse[j].program.id;
+                                                    data[4] = myReasponse[j].monthsInFutureForAmc;
+                                                    data[5] = myReasponse[j].monthsInPastForAmc;
+                                                    data[6] = myReasponse[j].localProcurementLeadTime;
+                                                    data[7] = myReasponse[j].shelfLife;
+                                                    data[8] = myReasponse[j].catalogPrice;
+                                                    data[9] = myReasponse[j].programPlanningUnitId;
+                                                    data[10] = myReasponse[j].active;
+                                                    data[11] = 0;
+                                                    data[12] = myReasponse[j].program.id;
                                                     productDataArr.push(data);
                                                 }
                                             } else {
@@ -412,7 +488,7 @@ class AddprogramPlanningUnit extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100],
+                                                colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                 columns: [
                                                     {
                                                         title: 'Product Category',
@@ -432,6 +508,14 @@ class AddprogramPlanningUnit extends Component {
                                                     },
                                                     {
                                                         title: 'Min month of stock',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Months In Future For AMC',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Months In Past For AMC',
                                                         type: 'number'
                                                     },
                                                     {

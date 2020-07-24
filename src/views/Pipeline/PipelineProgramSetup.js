@@ -54,8 +54,7 @@ export default class PipelineProgramSetup extends Component {
                 airFreightPerc: '',
                 seaFreightPerc: '',
                 deliveredToReceivedLeadTime: '',
-                draftToSubmittedLeadTime: '',
-                plannedToDraftLeadTime: '',
+                plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
@@ -392,10 +391,8 @@ export default class PipelineProgramSetup extends Component {
             program.seaFreightPerc = event.target.value;
         } if (event.target.name == 'deliveredToReceivedLeadTime') {
             program.deliveredToReceivedLeadTime = event.target.value;
-        } if (event.target.name == 'draftToSubmittedLeadTime') {
-            program.draftToSubmittedLeadTime = event.target.value;
-        } if (event.target.name == 'plannedToDraftLeadTime') {
-            program.plannedToDraftLeadTime = event.target.value;
+        } if (event.target.name == 'plannedToSubmittedLeadTime') {
+            program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
             program.submittedToApprovedLeadTime = event.target.value;
         } if (event.target.name == 'approvedToShippedLeadTime') {
@@ -603,7 +600,7 @@ export default class PipelineProgramSetup extends Component {
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card className="mt-1">
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>Setup Program</strong>{' '}
                             </CardHeader> */}
@@ -716,7 +713,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Program Info</strong>{' '}
+                                               <strong>Program Info</strong>{' '}
                                             </CardHeader>
                                             <CardBody>
                                                 <ProgressBar
@@ -827,7 +824,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Program Planning Units</strong>{' '}
+                                               <strong>Program Planning Units</strong>{' '}
                                             </CardHeader>
                                             <CardBody  className="pt-0">
                                                 {/* <h3>Program Planning Units</h3> */}
@@ -857,7 +854,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Consumption Details</strong>{' '}
+                                               <strong>Consumption Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
@@ -882,7 +879,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Inventory Details</strong>{' '}
+                                                <strong>Inventory Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/* <h3>Inventory</h3> */}
@@ -906,7 +903,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Shipment Details</strong>{' '}
+                                                <strong>Shipment Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/*<h3>Shipments</h3>*/}

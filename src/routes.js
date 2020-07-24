@@ -247,9 +247,9 @@ const routes = [
   { path: '/diamension/diamensionlist/:message', component: DimensionList },
   { path: '/diamension/editDiamension/:dimensionId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.dimensionheader') }), component: EditDimension },
 
-  { path: '/realm/addrealm', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realm') }), component: AddRealm },
+  { path: '/realm/addrealm', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realmheader') }), component: AddRealm },
   { path: '/realm/realmlist', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.realm') }), component: RealmList },
-  { path: '/realm/updateRealm/:realmId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.realm') }), component: EditRealm },
+  { path: '/realm/updateRealm/:realmId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.realmheader') }), component: EditRealm },
   { path: '/realm/realmlist/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.realm') }), component: RealmList },
 
   { path: '/product/editProduct/:productId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.product.product') }), component: EditProdct },
@@ -454,7 +454,7 @@ const routes = [
   { path: '/report/qatProblemPlusActionReport', name: 'Qat Problem Plus Action Report', component: QatProblemPlusActionReport },
 
   { path: '/report/funderExport', name: i18n.t('static.dashboard.funderExport'), component: FunderExport },
-  { path: '/report/procurementAgentExport', name: i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
+  { path: '/report/procurementAgentExport', name: i18n.t('static.report.shipmentCostReport'), component: ProcurementAgentExport },
   { path: '/report/supplierLeadTimes', name: i18n.t('static.dashboard.supplierLeadTimes'), component: SupplierLeadTimes },
   { path: '/report/shipmentGlobalDemandView', name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'), component: ShipmentGlobalDemandView },
   { path: '/report/aggregateShipmentByProduct', name: i18n.t('static.dashboard.aggregateShipmentByProduct'), component: AggregateShipmentByProduct },
@@ -467,7 +467,7 @@ const routes = [
   { path: '/report/editStatus/:programId/:versionId', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: EditSupplyPlanStatus },
   { path: '/report/supplyPlanVersionAndReview/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
 
-  { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
+  { path: '/report/shipmentSummery', exact: true, name: i18n.t('static.report.shipmentDetailReport'), component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.shipmentSummeryReport'), component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: i18n.t('static.dashboard.stockstatusacrossplanningunit'), component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: i18n.t('static.dashboard.budgetheader'), component: Budgets },

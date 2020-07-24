@@ -22,7 +22,8 @@ export default class DatabaseTranslations extends React.Component {
         this.state = {
             changedFlag: [],
             labelList: [],
-            rowId: 1
+            rowId: 1,
+            loading: true
         }
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);

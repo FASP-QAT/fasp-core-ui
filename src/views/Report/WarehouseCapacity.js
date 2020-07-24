@@ -1184,43 +1184,44 @@ class warehouseCapacity extends Component {
 
                                     <div className="row">
                                         <div className="col-md-12">
+                                            {this.state.data.length > 0 &&
+                                                <Table id="mytable" responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>{i18n.t('static.region.country')}</th>
+                                                            <th>{i18n.t('static.region.region')}</th>
+                                                            <th>{i18n.t('static.program.program')}</th>
+                                                            <th>{i18n.t('static.region.gln')}</th>
+                                                            <th>{i18n.t('static.region.capacitycbm')}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {
+                                                            this.state.data.length > 0
+                                                            &&
+                                                            this.state.data.map((item, idx) =>
+                                                                <tr id="addr0" key={idx} >
+                                                                    <td>{getLabelText(this.state.data[idx].realmCountry.label, this.state.lang)}</td>
+                                                                    <td>{getLabelText(this.state.data[idx].region.label, this.state.lang)}</td>
+                                                                    <td>
+                                                                        {
+                                                                            this.state.data[idx].programList.map((item, idx1) =>
+                                                                                <>
+                                                                                    <span id="addr1" key={idx1}>{getLabelText(this.state.data[idx].programList[idx1].label, this.state.lang)}</span> <br />
+                                                                                </>
+                                                                            )
+                                                                        }
 
-                                            <Table id="mytable" responsive className="table-striped table-hover table-bordered text-center mt-2">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{i18n.t('static.region.country')}</th>
-                                                        <th>{i18n.t('static.region.region')}</th>
-                                                        <th>{i18n.t('static.program.program')}</th>
-                                                        <th>{i18n.t('static.region.gln')}</th>
-                                                        <th>{i18n.t('static.region.capacitycbm')}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {
-                                                        this.state.data.length > 0
-                                                        &&
-                                                        this.state.data.map((item, idx) =>
-                                                            <tr id="addr0" key={idx} >
-                                                                <td>{getLabelText(this.state.data[idx].realmCountry.label, this.state.lang)}</td>
-                                                                <td>{getLabelText(this.state.data[idx].region.label, this.state.lang)}</td>
-                                                                <td>
-                                                                    {
-                                                                        this.state.data[idx].programList.map((item, idx1) =>
-                                                                            <>
-                                                                                <span id="addr1" key={idx1}>{getLabelText(this.state.data[idx].programList[idx1].label, this.state.lang)}</span> <br />
-                                                                            </>
-                                                                        )
-                                                                    }
+                                                                    </td>
+                                                                    <td>{this.state.data[idx].gln}</td>
+                                                                    <td>{(this.state.data[idx].capacityCbm).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                </tr>
+                                                            )}
 
-                                                                </td>
-                                                                <td>{this.state.data[idx].gln}</td>
-                                                                <td>{this.state.data[idx].capacityCbm}</td>
-                                                            </tr>
-                                                        )}
+                                                    </tbody>
 
-                                                </tbody>
-
-                                            </Table>
+                                                </Table>
+                                            }
                                         </div>
                                     </div>
 

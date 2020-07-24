@@ -33,7 +33,17 @@ export default class PipelineProgramList extends Component {
         this.importNewProgram = this.importNewProgram.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.formatDate = this.formatDate.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
+
+    hideFirstComponent() {
+        this.timeout = setTimeout(function () {
+        document.getElementById('div1').style.display = 'none';
+        }, 8000);
+        }
+        componentWillUnmount() {
+        clearTimeout(this.timeout);
+        }
 
     formatDate(cell, row) {
         if (cell != null && cell != "") {
@@ -45,6 +55,7 @@ export default class PipelineProgramList extends Component {
     }
 
     componentDidMount() {
+        this.hideFirstComponent();
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.getPipelineProgramList().then(response => {
             if (response.status == 200) {
@@ -166,7 +177,7 @@ export default class PipelineProgramList extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <div className="Card-header-addicon">
+                    <div  style={{padding:'4px 20px 2px 20px'}}>
                         {/* <i className="icon-menu"></i><strong>Programs</strong>{' '} */}
 
                         <div className="card-header-actions">
@@ -175,7 +186,7 @@ export default class PipelineProgramList extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0">
                         <ToolkitProvider
                             keyField="pipelineId"
                             data={this.state.pipelineProgramList}

@@ -1724,8 +1724,8 @@ class ShipmentGlobalView extends Component {
         let length = displaylabel.length + 1;
 
         let content1 = {
-            margin: { top: 80, left: 100 },
-            startY: height + 90,
+            margin: { top: 80 },
+            startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
@@ -2292,7 +2292,7 @@ class ShipmentGlobalView extends Component {
             });
         } else if (viewby == 2 && procurementAgentIds.length == 0) {
             this.setState({
-                message: i18n.t('static.report.procurementAgent'),
+                message: i18n.t('static.procurementAgent.selectProcurementAgent'),
                 data: [],
                 shipmentList: [],
                 dateSplitList: [],
@@ -2506,7 +2506,7 @@ class ShipmentGlobalView extends Component {
                     this.setState({ message: message })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5  className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -2737,7 +2737,7 @@ class ShipmentGlobalView extends Component {
                                                                         {
                                                                             this.state.table1Body[idx].amount.map((item, idx1) =>
                                                                                 <td id="addr1" key={idx1}>
-                                                                                    {this.state.table1Body[idx].amount[idx1]}
+                                                                                    {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
                                                                                 </td>
                                                                             )
                                                                         }
@@ -2779,7 +2779,7 @@ class ShipmentGlobalView extends Component {
                                                                     <tr id="addr0" key={idx} >
                                                                         <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                        <td>{this.state.shipmentList[idx].amount}</td>
+                                                                        <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
                                                                         <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
                                                                     </tr>
