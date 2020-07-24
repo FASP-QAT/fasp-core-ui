@@ -6361,12 +6361,8 @@ export default class SupplyPlanComponent extends React.Component {
 
                         </div>
                     </CardHeader> */}
-<<<<<<< HEAD
-                    <CardBody className="CardBodySupplyplanMargin pb-lg-0">
-=======
                     <CardBody className="pt-lg-0 pb-lg-0">
                    
->>>>>>> dev
                         <Formik
                             render={
                                 ({
