@@ -1896,7 +1896,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (fundingSourceIds == 0) {
+            } else if (fundingSourceIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
                     data: [],
@@ -1905,7 +1905,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (shipmentStatusIds == 0) {
+            } else if (shipmentStatusIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
                     data: [],
@@ -1925,7 +1925,7 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues;
             console.log("shipmentStatusIds---->", shipmentStatusIds);
 
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -2154,7 +2154,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (fundingSourceIds == 0) {
+            } else if (fundingSourceIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
                     data: [],
@@ -2163,7 +2163,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (shipmentStatusIds == 0) {
+            } else if (shipmentStatusIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
                     data: [],
