@@ -116,6 +116,12 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('procurementAgentProcurementUnit')) {
             storeOS = db1.createObjectStore('procurementAgentProcurementUnit', { keyPath: 'procurementAgentProcurementUnitId', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('problem')) {
+            storeOS = db1.createObjectStore('problem', { keyPath: 'problemId', autoIncrement: true });
+        }
+        if (!db1.objectStoreNames.contains('problemStatus')) {
+            storeOS = db1.createObjectStore('problemStatus', { keyPath: 'problemStatusId', autoIncrement: true });
+        }
     };
 }
 
