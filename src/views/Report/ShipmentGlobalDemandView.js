@@ -1797,7 +1797,7 @@ class ShipmentGlobalDemandView extends Component {
         let content1 = {
             margin: { top: 80 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 20, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
