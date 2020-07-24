@@ -328,7 +328,7 @@ export default class WhatIfReportComponent extends React.Component {
         if (event.target.name === 'scenarioId') {
             this.setState({ scenarioId: event.target.value });
             if (event.target.value == 1 || event.target.value == 2) {
-                document.getElementById("consumptionScenariosFields").style.display = "block";
+                document.getElementById("consumptionScenariosFields").style.display = "inline-flex";
             } else {
                 document.getElementById("consumptionScenariosFields").style.display = "none";
             }
@@ -1456,7 +1456,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1467,7 +1467,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1478,7 +1478,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1489,7 +1489,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1547,7 +1547,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1558,7 +1558,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1569,7 +1569,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -1580,7 +1580,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang)+"-"+procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
                                         paColor = "#efefef"
@@ -5043,7 +5043,7 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var k = 0; k < papuResult.length; k++) {
                         if (papuResult[k].planningUnit.id == planningUnitId && papuResult[k].active == true) {
                             var papuJson = {
-                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang)+"-"+papuResult[k].procurementAgent.code,
+                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang) + "-" + papuResult[k].procurementAgent.code,
                                 id: papuResult[k].procurementAgent.id
                             }
                             procurementAgentList.push(papuJson);
@@ -5690,7 +5690,7 @@ export default class WhatIfReportComponent extends React.Component {
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                elInstance.setCommentsclass="tab-ml-1 form-group"(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -6132,10 +6132,13 @@ export default class WhatIfReportComponent extends React.Component {
                                     setTouched
                                 }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
+                                        
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="tab-ml-1">
+                                                    <FormGroup className="">
                                                         <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
+                                                        <div className="controls SelectGo">
+                                                            <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="scenarioId"
@@ -6152,11 +6155,15 @@ export default class WhatIfReportComponent extends React.Component {
                                                             <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
                                                             <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
                                                         </Input>
+                                                        </InputGroup>
+                                                        </div>
                                                         <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                     </FormGroup>
                                                     <div id="consumptionScenariosFields" style={{ display: 'none' }}>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
+                                                            <div className="controls SelectGo">
+                                                            <InputGroup>
                                                             <Input
                                                                 type="number"
                                                                 name="percentage"
@@ -6169,10 +6176,14 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                             >
                                                             </Input>
+                                                            </InputGroup>
+                                                            </div>
                                                             <FormFeedback className="red">{errors.percentage}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                            <div className="controls SelectGo">
+                                                            <InputGroup>
                                                             <DatePicker
                                                                 id="startDate"
                                                                 name="startDate"
@@ -6186,9 +6197,13 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 autoComplete={"off"}
                                                                 dateFormat={DATE_FORMAT_SM}
                                                             />
+                                                            </InputGroup>
+                                                            </div>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                            <div className="controls SelectGo">
+                                                            <InputGroup>
                                                             <DatePicker
                                                                 id="stopDate"
                                                                 name="stopDate"
@@ -6202,15 +6217,18 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 autoComplete={"off"}
                                                                 dateFormat={DATE_FORMAT_SM}
                                                             />
+                                                            </InputGroup>
+                                                            </div>
                                                         </FormGroup>
                                                     </div>
-                                                    <FormGroup className="tab-ml-1">
-                                                        <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                    <FormGroup className="tab-ml-1 mt-4">
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </div>
                                             </Col>
+                                            
                                         </Form>
                                     )} />
                         <div className="animated fadeIn">
@@ -6810,25 +6828,10 @@ export default class WhatIfReportComponent extends React.Component {
                             </a>
                         </div>
                     </div>
-                    {/* <CardHeader>
-                        <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
-                        <div className="card-header-actions">
-
-                            <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
-                            </a>
-
-                        </div>
-                    </CardHeader> */}
-                    <CardBody className="CardBodySupplyplanMargin pb-lg-0">
-                        {/* <Formik
-                            render={
-                                ({
-                                }) => (
-                                        <Form name='simpleForm'> */}
+                    <CardBody className="pt-lg-0 pb-lg-0">
                         <Col md="12 pl-0">
                             <div className="d-md-flex">
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -6876,14 +6879,13 @@ export default class WhatIfReportComponent extends React.Component {
                                         <NavItem>
                                             <NavLink
                                                 active={this.state.activeTab[0] === '1'}
-                                                onClick={() => { this.toggle(0, '1'); }}
-                                            >{i18n.t('static.dashboard.supplyPlan')}</NavLink>
+                                                onClick={() => { this.toggle(0, '1'); }}>
+                                                {i18n.t('static.dashboard.supplyPlan')}</NavLink>
                                         </NavItem>
                                         <NavItem>
                                             <NavLink
                                                 active={this.state.activeTab[0] === '2'}
-                                                onClick={() => { this.toggle(0, '2'); }}
-                                            >
+                                                onClick={() => { this.toggle(0, '2'); }}>
                                                 {i18n.t('static.whatIf.scenarioList')}
                                             </NavLink>
 
@@ -6971,7 +6973,7 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var k = 0; k < papuResult.length; k++) {
                         if (papuResult[k].planningUnit.id == planningUnitId && papuResult[k].active == true) {
                             var papuJson = {
-                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang)+"-"+papuResult[k].procurementAgent.code,
+                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang) + "-" + papuResult[k].procurementAgent.code,
                                 id: papuResult[k].procurementAgent.id
                             }
                             procurementAgentList.push(papuJson);
