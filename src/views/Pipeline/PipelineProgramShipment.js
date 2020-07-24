@@ -881,8 +881,8 @@ export default class PipelineProgramShipment extends Component {
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
-            paginationOptions: [10, 25, 50, 100],
-            position: 'top',
+            // paginationOptions: [10, 25, 50, 100],
+            // position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
@@ -903,7 +903,7 @@ export default class PipelineProgramShipment extends Component {
     }
 
     loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        // jExcelLoadedFunction(instance);
     }
 
 

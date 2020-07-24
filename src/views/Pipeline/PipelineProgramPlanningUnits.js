@@ -446,6 +446,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                 planningUnitId: planningUnitId,
                 reorderFrequencyInMonths: map.get("4"),
                 minMonthsOfStock: map.get("5"),
+
+                monthsInFutureForAmc: parseInt(map.get("6")),
+                monthsInPastForAmc: parseInt(map.get("7")),
+
                 programPlanningUnitId: map.get("8"),
                 localProcurmentLeadTime: map.get("9"),
                 shelfLife: map.get("10"),
@@ -454,6 +458,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
             planningUnitArray.push(planningUnitJson);
         }
+        console.log("planning unit array====>", planningUnitArray);
         return planningUnitArray;
 
     }
@@ -553,17 +558,17 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [290, 290, 290, 290, 170, 170, 170, 170],
+                                                colWidths: [190, 290, 200, 290, 170, 170, 100, 100 ,100 ,170,100,100],
                                                 columns: [
 
                                                     {
                                                         title: 'Pipeline Product Category',
                                                         type: 'text',
-                                                        readonly: true
+                                                        readOnly: true
                                                     }, {
                                                         title: 'Pipeline Product',
                                                         type: 'text',
-                                                        readonly: true
+                                                        readOnly: true
                                                     },
                                                     {
                                                         title: 'Product Category',
@@ -616,7 +621,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50, 100],
+                                                // paginationOptions: [10, 25, 50, 100],
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -761,7 +766,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        // jExcelLoadedFunction(instance);
     }
 
     render() {

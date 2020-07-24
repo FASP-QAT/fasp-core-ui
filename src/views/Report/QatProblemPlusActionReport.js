@@ -4,6 +4,7 @@ import jexcel from 'jexcel';
 // import "./style.css";
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
+import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
@@ -30,12 +31,12 @@ const problemList = [
     { problemId: 2, type: 'No recent inputs of inventory (in the last 3 months)' },
     { problemId: 3, type: 'Negative ending stock balances' },
     { problemId: 4, type: 'Actual consumption record replaces forecasted consumption record' },
-    { problemId: 5, type: 'Stock adjustments lack explanatory notes' },
-    { problemId: 6, type: 'Shipments with receive dates in the past have a status that is not received' },
-    { problemId: 7, type: 'PSM shipments lack an RO#' },
-    { problemId: 8, type: 'ARTMIS & supply plan alignment (checking for quantities, product SKU, receive date)' },
-    { problemId: 9, type: 'Supply Plan is not planned for 18 months into the future (forecasted consumption and shipments)' },
-    { problemId: 10, type: 'Shipments are showing a status of planned within the lead time (usually 6 months)' },
+    // { problemId: 5, type: 'Stock adjustments lack explanatory notes' },
+    // { problemId: 6, type: 'Shipments with receive dates in the past have a status that is not received' },
+    // { problemId: 7, type: 'PSM shipments lack an RO#' },
+    // { problemId: 8, type: 'ARTMIS & supply plan alignment (checking for quantities, product SKU, receive date)' },
+    // { problemId: 9, type: 'Supply Plan is not planned for 18 months into the future (forecasted consumption and shipments)' },
+    // { problemId: 10, type: 'Shipments are showing a status of planned within the lead time (usually 6 months)' },
 ];
 
 const actionList = [
@@ -43,14 +44,14 @@ const actionList = [
     { actionId: 2, problemId: 2, action: 'Add inventory data for planning unit' },
     { actionId: 3, problemId: 3, action: 'check why inventory is negative' },
     { actionId: 4, problemId: 4, action: 'check actual and forecasted consumption record' },
-    { actionId: 5, problemId: 5, action: 'Add notes' },
-    { actionId: 6, problemId: 6, action: 'Add recived date for shipments' },
-    { actionId: 7, problemId: 7, action: 'Add RO' },
-    { actionId: 8, problemId: 8, action: 'Check quantities,SKU,received date' },
-    { actionId: 9, problemId: 9, action: 'Add consumption for planning unit for future 18 months' },
-    { actionId: 10, problemId: 10, action: 'check shipment status' },
+    // { actionId: 5, problemId: 5, action: 'Add notes' },
+    // { actionId: 6, problemId: 6, action: 'Add recived date for shipments' },
+    // { actionId: 7, problemId: 7, action: 'Add RO' },
+    // { actionId: 8, problemId: 8, action: 'Check quantities,SKU,received date' },
+    // { actionId: 9, problemId: 9, action: 'Add consumption for planning unit for future 18 months' },
+    // { actionId: 10, problemId: 10, action: 'check shipment status' },
 ];
-
+let problemActionlist = [];
 export default class ConsumptionDetails extends React.Component {
 
     constructor(props) {
@@ -116,7 +117,7 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this);
         }.bind(this)
 
-
+        problemActionlist = qatProblemActions();
     };
 
     addRow = function () {
@@ -259,22 +260,53 @@ export default class ConsumptionDetails extends React.Component {
                     }
                     console.log("list2====>", list2);
 
-                    data = [];
-                    // data[0] = 'No recent inputs of actual consumption (in the last 3 months)';
-                    data[0] = 1;
-                    data[1] = programText;
-                    data[2] = planningUnitText;
-                    data[3] = '2020-07-23';
-                    data[4] = '60';
-                    data[5] = 'High';
-                    // data[6] = 'Add consumption data for planning unit';
-                    data[6] = 1;
-                    data[7] = 'Text Area';
-                    data[8] = 1;
+                    // var programProblemActionList = []
+                    // programProblemActionList = qatProblemActions();
+                    console.log("problemactionList===>*****", problemActionlist);
+                    
+                    var data = [];
+                    var dataArray = []
+                    if (problemActionlist.length != 0) {
+                        for (var j = 0; j < problemActionlist.length; j++) {
+                            data = [];
 
-                    var dataArray = [];
-                    dataArray[0] = data
+                            data[0] = problemActionlist[j].problemType.id;
+                            data[1] = problemActionlist[j].program.label.label_en;
+                            data[2] = problemActionlist[j].planningUnit.label.label_en;
 
+                            data[3] = '';
+                            data[4] = '';
+
+                            data[5] = problemActionlist[j].criticality.id;
+                            data[6] = problemActionlist[j].actionName.label.label_en;
+
+                            data[7] = problemActionlist[j].note;
+                            data[8] = problemActionlist[j].problemStatus.id;
+
+                            // data[9] = programProblemActionList[j].localProcurmentLeadTime
+                            // data[10] = programProblemActionList[j].shelfLife
+                            // data[11] = programProblemActionList[j].catalogPrice
+                            dataArray.push(data);
+
+                        }
+                    } else {
+                        console.log("product list length is 0.");
+                    }
+
+                    // data[0] = 1;
+                    // data[1] = programText;
+                    // data[2] = planningUnitText;
+                    // data[3] = '2020-07-23';
+                    // data[4] = '60';
+                    // data[5] = 'High';
+
+                    // data[6] = 1;
+                    // data[7] = 'Text Area';
+                    // data[8] = 1;
+
+
+                    // dataArray = data;
+                    console.log("data Array====>", dataArray);
                     this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
                     this.el.destroy();
                     var json = [];
@@ -287,7 +319,7 @@ export default class ConsumptionDetails extends React.Component {
                             {
                                 title: 'Problem Type',
                                 type: 'dropdown',
-                                source: list,
+                                source: [{ 'id': '1', 'name': 'Automatic' }, { 'id': '2', 'name': 'Mannual' }],
                                 // readOnly: true
                             },
                             {
@@ -314,14 +346,14 @@ export default class ConsumptionDetails extends React.Component {
                                 readOnly: true
                             },
                             {
-                                title: 'Priority',
-                                type: 'text',
-                                readOnly: true
+                                title: 'Criticality',
+                                type: 'dropdown',
+                                source: [{ 'id': '1', 'name': 'Low' }, { 'id': '2', 'name': 'Medium' }, { 'id': '3', 'name': 'High' }],
                             },
                             {
                                 title: 'Action',
-                                type: 'dropdown',
-                                source: list2,
+                                type: 'text',
+                                // source: list2,
                                 readOnly: true
                             },
                             {

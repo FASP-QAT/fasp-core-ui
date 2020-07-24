@@ -188,42 +188,42 @@ export default class PipelineProgramSetup extends Component {
         //     alert("Please resolve all error and then proceed.");
         // }
         // else {
-            // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
-            var planningUnits = this.refs.child.savePlanningUnits();
-            var checkValidation = this.refs.child.checkValidation();
-            AuthenticationService.setupAxiosInterceptors();
-            PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
-                then(response => {
-                    if (response.status == "200") {
-                        // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
-                        //     if (response.status == "200") {
-                        if (checkValidation == true) {
-                            this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
-                            document.getElementById('stepOne').style.display = 'none';
-                            document.getElementById('stepTwo').style.display = 'none';
-                            document.getElementById('stepThree').style.display = 'block';
-                            document.getElementById('stepFour').style.display = 'none';
-                            document.getElementById('stepFive').style.display = 'none';
-                        }
-                        else {
-                            alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
-                        }
-
-                        // } else {
-                        //     this.setState({
-                        //         message: response.data.messageCode
-                        //     })
-                        // }
-                        // });
-
-
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode
-                        })
+        // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
+        var planningUnits = this.refs.child.savePlanningUnits();
+        var checkValidation = this.refs.child.checkValidation();
+        AuthenticationService.setupAxiosInterceptors();
+        PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
+            then(response => {
+                if (response.status == "200") {
+                    // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
+                    //     if (response.status == "200") {
+                    if (checkValidation == true) {
+                        this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
+                        document.getElementById('stepOne').style.display = 'none';
+                        document.getElementById('stepTwo').style.display = 'none';
+                        document.getElementById('stepThree').style.display = 'block';
+                        document.getElementById('stepFour').style.display = 'none';
+                        document.getElementById('stepFive').style.display = 'none';
                     }
+                    else {
+                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                    }
+
+                    // } else {
+                    //     this.setState({
+                    //         message: response.data.messageCode
+                    //     })
+                    // }
+                    // });
+
+
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
                 }
-                )
+            }
+            )
         // }
 
     }
@@ -822,28 +822,29 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepTwo">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        <Card>
+                                        {/* <Card>
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Program Planning Units</strong>{' '}
                                             </CardHeader>
-                                            <CardBody  className="pt-0">
-                                                {/* <h3>Program Planning Units</h3> */}
-                                                <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId} realmId={this.state.program.realmCountry.realm.realmId}></PipelineProgramPlanningUnits>
-                                            </CardBody>
-                                            {/* <CardFooter>
+                                            <CardBody  className="pt-0"> */}
+                                        {/* <h3>Program Planning Units</h3> */}
+                                        <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId} realmId={this.state.program.realmCountry.realm.realmId}></PipelineProgramPlanningUnits>
+                                        {/* </CardBody> */}
+                                        {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                            <CardFooter>
+                                        {/* <CardFooter>
                                                 <span className="red">
                                                     *Planning Unit cells in yellow color indicates that either the same planning unit is being selected twice or the planning unit which you are trying to map does not exist.
                                                     please created ticket for the planning units which do not exist.
                                                 </span>
                                             </CardFooter>
-                                        </Card>
+                                        </Card> */}
+                                        <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Save <i className="fa fa-angle-double-right"></i></Button>
@@ -852,23 +853,24 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepThree">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        <Card>
+                                        {/* <Card>
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Consumption Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0">
-                                                {/* <h3>Consumption</h3> */}
-                                                {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
-                                                {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>}
-                                            </CardBody>
-                                            {/* <CardFooter>
+                                            <CardBody className="pt-0"> */}
+                                        {/* <h3>Consumption</h3> */}
+                                        {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
+                                        {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>}
+                                        {/* </CardBody> */}
+                                        {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        </Card>
+                                        {/* </Card> */}
+                                        <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Save<i className="fa fa-angle-double-right"></i></Button>
@@ -877,22 +879,23 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepFour">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        <Card>
+                                        {/* <Card>
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Inventory Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0">
-                                                {/* <h3>Inventory</h3> */}
-                                                {this.state.inventoryStatus && <PipelineProgramInventory pipelineId={this.props.match.params.pipelineId} ref="inventoryChild"></PipelineProgramInventory>}
-                                            </CardBody>
-                                            {/* <CardFooter>
+                                            <CardBody className="pt-0"> */}
+                                        {/* <h3>Inventory</h3> */}
+                                        {this.state.inventoryStatus && <PipelineProgramInventory pipelineId={this.props.match.params.pipelineId} ref="inventoryChild"></PipelineProgramInventory>}
+                                        {/* </CardBody> */}
+                                        {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        </Card>
+                                        {/* </Card> */}
+                                        <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Save <i className="fa fa-angle-double-right"></i></Button>
@@ -901,29 +904,29 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepFive">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        <Card>
+                                        {/* <Card>
                                             <CardHeader>
                                                 <i className="icon-note"></i><strong>Shipment Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0">
-                                                {/*<h3>Shipments</h3>*/}
-                                                {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>}
-                                            </CardBody>
-                                            {/* <CardFooter>
+                                            <CardBody className="pt-0"> */}
+                                        {/*<h3>Shipments</h3>*/}
+                                        {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>}
+                                        {/* </CardBody> */}
+                                        {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        </Card>
+                                        {/* </Card> */}
                                     </Col>
                                 </div>
                             </CardBody>
                         </Card>
                     </Col>
-                </Row>
-            </div>
+                </Row >
+            </div >
         );
     }
 

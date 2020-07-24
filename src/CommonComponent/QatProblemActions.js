@@ -126,6 +126,12 @@ export function qatProblemActions() {
                                                 label: {
                                                     label_en: 'Low'
                                                 }
+                                            },
+                                            problemType: {
+                                                id: 1,
+                                                label: {
+                                                    label_en: 'Automatic'
+                                                }
                                             }
                                         }
                                         problemActionList.push(json);
@@ -189,6 +195,12 @@ export function qatProblemActions() {
                                                 label: {
                                                     label_en: 'Medium'
                                                 }
+                                            },
+                                            problemType: {
+                                                id: 1,
+                                                label: {
+                                                    label_en: 'Automatic'
+                                                }
                                             }
 
                                         }
@@ -250,6 +262,12 @@ export function qatProblemActions() {
                                             label: {
                                                 label_en: 'High'
                                             }
+                                        },
+                                        problemType: {
+                                            id: 1,
+                                            label: {
+                                                label_en: 'Automatic'
+                                            }
                                         }
 
 
@@ -277,7 +295,7 @@ export function qatProblemActions() {
                                 var myDateFuture = moment(Date.now()).add(m, 'months').startOf('month').format("YYYY-MM-DD");
                                 // console.log("date====>", myDateFuture);
 
-                                var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') == myDateFuture && c.actualFlag.toString() == "false");
+                                var filteredConsumptionListTwo = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') == myDateFuture && c.actualFlag.toString() == "false");
                                 var index = problemActionList.findIndex(
                                     c => c.month == myDateFuture
                                         && c.region.regionId == regionList[r].regionId
@@ -285,7 +303,7 @@ export function qatProblemActions() {
                                         && c.program.programId == programList[pp].programId
                                         && c.problemId == 1);
 
-                                if (filteredConsumptionList.length == 0) {
+                                if (filteredConsumptionListTwo.length == 0) {
                                     if (index == -1) {
                                         var json = {
                                             program: programList[pp],
@@ -314,6 +332,12 @@ export function qatProblemActions() {
                                                 color: 'fff633',
                                                 label: {
                                                     label_en: 'Low'
+                                                }
+                                            },
+                                            problemType: {
+                                                id: 1,
+                                                label: {
+                                                    label_en: 'Automatic'
                                                 }
                                             }
                                         }

@@ -1,5 +1,5 @@
 import React, { Component, lazy, Suspense } from 'react';
-import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
+import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import getLabelText from '../../CommonComponent/getLabelText';
