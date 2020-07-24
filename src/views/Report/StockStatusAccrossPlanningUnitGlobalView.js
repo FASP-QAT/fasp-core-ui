@@ -262,7 +262,7 @@ round = num => {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView') + ".csv"
+    a.download = i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView') + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -329,7 +329,7 @@ round = num => {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -384,7 +384,7 @@ round = num => {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save(i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView') + ".pdf")
+    doc.save(i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView') + ".pdf")
   }
 
 

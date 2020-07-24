@@ -200,7 +200,7 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageName"
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
-                                                            invalid={touched.languageName && !!errors.languageName}
+                                                            invalid={(touched.languageName && !!errors.languageName || this.state.language.languageName == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
@@ -214,7 +214,7 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageCode"
                                                             bsSize="sm"
                                                             valid={!errors.languageCode}
-                                                            invalid={touched.languageCode && !!errors.languageCode}
+                                                            invalid={(touched.languageCode && !!errors.languageCode || this.state.language.languageCode == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}

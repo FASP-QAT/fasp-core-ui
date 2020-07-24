@@ -1273,9 +1273,9 @@ class ShipmentSummery extends Component {
         doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
         let content1 = {
-            margin: { top: 40 },
-            startY: 200,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            margin: { top: 80 },
+            startY: height,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 190.5, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
             },
@@ -1294,10 +1294,10 @@ class ShipmentSummery extends Component {
         doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 80, left: 100 },
+            margin: { top: 80 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
             },
