@@ -6159,7 +6159,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         </div>
                                                         <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                     </FormGroup>
-                                                    <div className="inlineField" id="consumptionScenariosFields" style={{ display: 'none' }}>
+                                                    <div id="consumptionScenariosFields" style={{ display: 'none' }}>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
                                                             <div className="controls SelectGo">
@@ -6221,7 +6221,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                             </div>
                                                         </FormGroup>
                                                     </div>
-                                                    <FormGroup className="tab-ml-1 mt-3">
+                                                    <FormGroup className="tab-ml-1 mt-4">
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                         &nbsp;
