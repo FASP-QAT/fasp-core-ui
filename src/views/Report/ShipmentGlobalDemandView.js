@@ -1636,26 +1636,23 @@ class ShipmentGlobalDemandView extends Component {
 
         if (this.state.procurementAgentSplit.length > 0) {
             var A = [];
-            A[0] = this.state.table1Headers;
+
+            let tableHead = this.state.table1Headers;
+            let tableHeadTemp = [];
+            for (var i = 0; i < tableHead.length; i++) {
+                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
+            }
+
+            A[0] = tableHeadTemp;
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
-                let item = Object.values(re[item].procurementAgentQty);
-                A.push([[getLabelText(re[item].planningUnit.label, this.state.lang), item, re[item].total]])
+                let item1 = Object.values(re[item].procurementAgentQty);
+                A.push([[(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), item1, re[item].total]])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
             }
         }
-
-        var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
-        re = this.state.consumptions
-        for (var item = 0; item < re.length; item++) {
-            A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
-        }
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
-        }
-
 
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
@@ -1797,9 +1794,9 @@ class ShipmentGlobalDemandView extends Component {
         let content1 = {
             margin: { top: 80 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 20, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
             columnStyles: {
-                // 0: { cellWidth: 100 },
+                0: { cellWidth: 70 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
                 // 3: { cellWidth: 100 },
@@ -3018,7 +3015,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
                             </Col>
-                            {
+                            {/* {
                                 this.state.procurementAgentSplit.length > 0 &&
                                 <Col md="12 pl-0">
                                     <div className="col-md-12 p-0">
@@ -3029,7 +3026,7 @@ class ShipmentGlobalDemandView extends Component {
                                         </div>
                                     </div>
                                 </Col>
-                            }
+                            } */}
 
                             <br></br>
 
@@ -3037,7 +3034,7 @@ class ShipmentGlobalDemandView extends Component {
                                 <div className="globalviwe-scroll">
                                     <div className="row">
                                         <div className="col-md-12">
-                                            {this.state.show && this.state.procurementAgentSplit.length > 0 &&
+                                            {this.state.procurementAgentSplit.length > 0 &&
                                                 <div className="table-responsive ">
                                                     <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 

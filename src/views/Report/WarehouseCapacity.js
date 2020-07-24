@@ -699,7 +699,10 @@ class warehouseCapacity extends Component {
                         //     align: 'left'
                         // })
 
-                        var programText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                        // var programText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                        // doc.text(doc.internal.pageSize.width / 8, 110, programText)
+
+                        var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, 110, programText)
 
                     } else {
