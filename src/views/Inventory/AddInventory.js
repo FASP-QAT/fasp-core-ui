@@ -385,6 +385,7 @@ export default class AddInventory extends Component {
                                 onchange: this.changed,
                                 oneditionend: this.onedit,
                                 copyCompatibility: true,
+                                allowExport: false,
                                 text: {
                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                     show: '',
@@ -573,6 +574,7 @@ export default class AddInventory extends Component {
                                                     copyCompatibility: true,
                                                     allowInsertRow: true,
                                                     allowManualInsertRow: false,
+                                                    allowExport: false,
                                                     onchange: this.batchInfoChangedInventory,
                                                     text: {
                                                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,

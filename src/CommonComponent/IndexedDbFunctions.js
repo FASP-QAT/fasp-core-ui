@@ -14,6 +14,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('downloadedProgramData')) {
             storeOS = db1.createObjectStore('downloadedProgramData', { keyPath: 'id' });
         }
+        if (!db1.objectStoreNames.contains('whatIfProgramData')) {
+            storeOS = db1.createObjectStore('whatIfProgramData', { keyPath: 'id' });
+        }
         if (!db1.objectStoreNames.contains('program')) {
             storeOS = db1.createObjectStore('program', { keyPath: 'programId', autoIncrement: true });
         }

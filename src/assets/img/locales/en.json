@@ -900,7 +900,7 @@
     "static.supplyPlan.shipmentsDetails": "Shipments Details",
     "static.supplyPlan.shipped": "Shipped (Shipped, Arrived)",
     "static.supplyPlan.ordered": "Approved",
-    "static.supplyPlan.planned": "Planned (Planned, Draft, On hold, Submitted)",
+    "static.supplyPlan.planned": "Planned (Planned, On hold, Submitted)",
     "static.supplyPlan.erpShipments": "Shipments from ERP",
     "static.report.warehouseCapacity": "Warehouse Capacity",
     "static.report.stockAdjustment": "Stock Adjustment",
@@ -975,5 +975,18 @@
     "static.report.remainingBudgetAmt":"Budget Remaining",
     "static.report.inmillions":" (in Millions)",
     "static.supplyPlan.procurementAgentCannotBeTBD":"Procurement agent cannot be TBD",
-    "static.supplyPlan.fundingSourceCannotBeTBD":"Funding source cannot be TBD"
+    "static.supplyPlan.fundingSourceCannotBeTBD":"Funding source cannot be TBD",
+    "static.dashboard.whatIf":"What If",
+    "static.whatIf.validScenario":"Please select scenario",
+    "static.whatIf.scenario":"Scenario",
+    "static.whatIf.scenarioList":"Scenario List",
+    "static.whatIf.increaseConsumption":"Increase consumption",
+    "static.whatIf.decreaseConsumption":"Decrease consumption",
+    "static.whatIf.removeUnFundedShipments":"Remove all un funded shipments",
+    "static.supplyPlan.currentSupplyPlan":"Current Supply Plan",
+    "static.supplyPlan.supplyPlanForV":"Supply Plan for v",
+    "static.whatIf.supplyPlanReset":"Supply plan reseted successfully",
+    "static.whatIf.percentage":"Percentage",
+    "static.whatIf.scenarioAdded":"Scenario added successfully"
+
 }
