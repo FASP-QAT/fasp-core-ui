@@ -2,7 +2,7 @@ import axios from "axios"
 import { API_URL } from '../Constants.js'
 
 class MasterSyncService {
-    
+
     getLanguageListForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/language/${lastSyncDate}`, {
         });
@@ -101,52 +101,52 @@ class MasterSyncService {
         });
     }
 
-    getProcurementUnitForSync(lastSyncDate){
+    getProcurementUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/procurementUnit/${lastSyncDate}`, {
         });
     }
 
-    getPlanningUnitForSync(lastSyncDate){
+    getPlanningUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/planningUnit/${lastSyncDate}`, {
         });
     }
 
-    getForecastingUnitForSync(lastSyncDate){
+    getForecastingUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/forecastingUnit/${lastSyncDate}`, {
         });
     }
 
-    getRealmCountryPlanningUnitForSync(lastSyncDate){
+    getRealmCountryPlanningUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/realmCountryPlanningUnit/${lastSyncDate}`, {
         });
     }
 
-    getProgramPlanningUnitForSync(lastSyncDate){
+    getProgramPlanningUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/programPlanningUnit/${lastSyncDate}`, {
         });
     }
 
-    getProcurementAgentPlanningUnitForSync(lastSyncDate){
+    getProcurementAgentPlanningUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/procurementAgent/planningUnit/${lastSyncDate}`, {
         });
     }
 
-    getProcurementAgentProcurementUnitForSync(lastSyncDate){
+    getProcurementAgentProcurementUnitForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/procurementAgent/procurementUnit/${lastSyncDate}`, {
         });
     }
 
-    getShipmentStatusForSync(lastSyncDate){
+    getShipmentStatusForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/shipmentStatus/${lastSyncDate}`, {
         });
     }
 
-    getProblemListForSync(lastSyncDate){
-        return axios.get(`${API_URL}/api/sync/problem/realmId/1/${lastSyncDate}`, {
+    getProblemListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/problem/realmId/${parseInt(1)}/${lastSyncDate}`, {
         });
     }
 
-    getProblemStatusListForSync(lastSyncDate){
+    getProblemStatusListForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/problemStatus/${lastSyncDate}`, {
         });
     }
