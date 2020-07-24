@@ -6370,7 +6370,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="tab-ml-1">
+                                                    <FormGroup className="">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls SelectGo">
                                                             <InputGroup>
