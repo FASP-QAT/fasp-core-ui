@@ -195,6 +195,7 @@ export default class AddInventory extends Component {
 
         } else {
             this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+            document.getElementById("inventorytableDiv").classList.add('Iventorysearchinline');
             this.el.destroy();
 
             this.setState({
@@ -1827,11 +1828,11 @@ export default class AddInventory extends Component {
                                 }) => (
                                         <Form name='simpleForm'>
 
-                                            <Col md="12 pl-0">
-                                                <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                            <Col md="col-md-6 pl-0 InventoryCol-position">
+                                                <div className="row" >
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
-                                                        <div className="controls ">
+                                                        <div className="controls InventoryselectSize">
                                                             <InputGroup>
                                                                 <Input type="select"
                                                                     bsSize="sm"
@@ -1845,9 +1846,9 @@ export default class AddInventory extends Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
-                                                        <div className="controls ">
+                                                        <div className="controls InventoryselectSize">
                                                             <InputGroup>
                                                                 <Input
                                                                     type="select"
@@ -1877,7 +1878,7 @@ export default class AddInventory extends Component {
                             </div>
                         </Col>
                     </CardBody>
-                    <CardFooter>
+                    <CardFooter className="mt-lg-5">
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>

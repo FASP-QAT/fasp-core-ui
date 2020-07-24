@@ -1071,6 +1071,7 @@ export default class ShipmentDetails extends React.Component {
                                                         }.bind(this)
                                                     };
                                                     myVar = jexcel(document.getElementById("shipmentsDetailsTable"), options);
+                                                    document.getElementById("shipmentsDetailsTable").classList.add('Shipmentsearchinline');
                                                     this.el = myVar;
                                                     // submitted shipments
                                                     this.setState({
@@ -2241,7 +2242,7 @@ export default class ShipmentDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 pl-0">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
