@@ -949,7 +949,7 @@
     "static.report.ok": "Okay",
     "static.supplyplan.exipredStock": "Exipred Stock",
     "static.report.expiredInventory": "Expired Inventory",
-    "static.report.StockStatusAccrossPlanningUnitGlobalView": "Stock Status Accross PlanningUnit Global View",
+    "static.report.stockStatusAccrossPlanningUnitGlobalView": "Stock Status Accross PlanningUnit Global View",
     "static.report.updatestatus": "Update Program Status",
     "static.procurementAgentPlanningUnit.unitPerPalletEuro1": "Units Per Pallet EURO 1",
     "static.procurementAgentPlanningUnit.unitPerPalletEuro2": "Units Per Pallet EURO 2",
