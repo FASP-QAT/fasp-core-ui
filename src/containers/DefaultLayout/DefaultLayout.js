@@ -420,6 +420,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
+                            name: i18n.t('static.dashboard.whatIf'),
+                            url: '/report/whatIf',
+                            icon: 'fa fa-calculator',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
                             name: i18n.t('static.dashboard.regionreport'),
                             url: '/region/listRegion',
                             icon: 'fa fa-globe',
@@ -667,9 +673,15 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: "Supply Plan",
+                            name: i18n.t('static.dashboard.supplyPlan'),
                             url: '/supplyPlan',
-                            icon: 'fa fa-list-alt',
+                            icon: 'fa fa-calculator',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.whatIf'),
+                            url: '/report/whatIf',
+                            icon: 'fa fa-calculator',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
