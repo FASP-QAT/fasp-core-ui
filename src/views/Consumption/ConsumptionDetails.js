@@ -357,7 +357,6 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
                     this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
-                    document.getElementById("consumptiontableDiv").classList.add('Consumptionsearchinline');
                     this.el.destroy();
                     var json = [];
                     var data = consumptionDataArr;
@@ -833,6 +832,7 @@ export default class ConsumptionDetails extends React.Component {
                         }.bind(this)
                     };
                     var consumptionEl = jexcel(document.getElementById("consumptiontableDiv"), options);
+                    document.getElementById("consumptiontableDiv").classList.add('Consumptionsearchinline');
                     this.el = consumptionEl;
                     this.setState({
                         consumptionEl: consumptionEl
