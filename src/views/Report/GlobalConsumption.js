@@ -1596,7 +1596,7 @@ class GlobalConsumption extends Component {
     if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
       let realmId = AuthenticationService.getRealmId();
       var inputjson = {
-        "realmId": 1,
+        "realmId": realmId,
         "realmCountryIds": CountryIds,
         "programIds": programIds,
         "planningUnitIds": planningUnitIds,
