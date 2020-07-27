@@ -28,10 +28,12 @@ const validationSchema = function (values) {
         label: Yup.string()
             .required(i18n.t('static.country.countrytext')),
         countryCode2: Yup.string()
-            .max(2, 'Country code 2 is 2 digit number')
+            // .max(2, 'Country code 2 is 2 digit number')
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.country.countrycodetext')),
         countryCode: Yup.string()
-            .max(3, i18n.t('static.country.countrycodemax3digittext'))
+            // .max(3, i18n.t('static.country.countrycodemax3digittext'))
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.country.countrycodetext')),
         // languageId: Yup.string()
         //     .required(i18n.t('static.country.languagetext')),
@@ -345,7 +347,9 @@ export default class AddCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode}
-                                                            required />
+                                                            required
+                                                            maxLength={3}
+                                                             />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
@@ -362,7 +366,9 @@ export default class AddCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode2}
-                                                            required />
+                                                            required 
+                                                            maxLength={2}
+                                                            />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
                                                     </FormGroup>

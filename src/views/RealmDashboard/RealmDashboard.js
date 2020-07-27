@@ -35,6 +35,7 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
+import AuthenticationService from '../Common/AuthenticationService';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -164,7 +165,9 @@ class RealmDashboard extends Component {
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
   }
-
+  redirectToCrud = (url) => {
+    this.props.history.push(url);
+  }
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
@@ -236,30 +239,30 @@ class RealmDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="p-0">
-              <div class="h1 text-muted text-left mb-0 m-3">
-                <i class="icon-people icon-color"></i>
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View User</DropdownItem>
-                      <DropdownItem>Add User</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
-          <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
-          {slides}
-          {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> */}
-          {/* <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} /> */}
-        </Carousel>
-        <div className="chart-wrapper " >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
-              </div>
+                <div class="h1 text-muted text-left mb-0 m-3">
+                  <i class="icon-people icon-color"></i>
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                        {/* <i className="icon-settings"></i> */}
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>View User</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                  <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
+                    <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                    {slides}
+                    {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> */}
+                    {/* <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} /> */}
+                  </Carousel>
+                  <div className="chart-wrapper " >
+                    {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -274,8 +277,8 @@ class RealmDashboard extends Component {
                         {/* <i className="icon-settings"></i> */}
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem>View Country</DropdownItem>
-                        <DropdownItem>Add Country</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>View Country</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>Add Country</DropdownItem>
 
                       </DropdownMenu>
                     </Dropdown>
@@ -294,22 +297,22 @@ class RealmDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-medkit  icon-color"></i>
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Technical Area</DropdownItem>
-                      <DropdownItem>Add Technical Area</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-medkit  icon-color"></i>
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                        {/* <i className="icon-settings"></i> */}
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>View Technical Area</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/healthArea/addHealthArea")}>Add Technical Area</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Technical Area </div>
                 <div className="text-count">20</div>
                 <div className="chart-wrapper mt-4 pb-2" >
@@ -322,22 +325,22 @@ class RealmDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="icon-location-pin icon-color"></i>
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Region</DropdownItem>
-                      <DropdownItem>Add Region</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="icon-location-pin icon-color"></i>
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                        {/* <i className="icon-settings"></i> */}
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>View Region</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>Add Region</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Region </div>
                 <div className="text-count">10</div>
                 <div className="chart-wrapper mt-4 pb-2" >
@@ -349,25 +352,25 @@ class RealmDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-sitemap icon-color"></i>
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card5' isOpen={this.state.card5} toggle={() => { this.setState({ card5: !this.state.card5 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Organisation</DropdownItem>
-                      <DropdownItem>Add Organisation</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-sitemap icon-color"></i>
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card5' isOpen={this.state.card5} toggle={() => { this.setState({ card5: !this.state.card5 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>View Organisation</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/organisation/addOrganisation")}>Add Organisation</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Organisation </div>
                 <div className="text-count">15</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                 
+
                 </div>
               </CardBody>
             </Card>
@@ -376,76 +379,76 @@ class RealmDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-list-alt icon-color"></i>
-              
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card8' isOpen={this.state.card8} toggle={() => { this.setState({ card8: !this.state.card8 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                     
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Total Programs</DropdownItem>
-                      
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-list-alt icon-color"></i>
+
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card8' isOpen={this.state.card8} toggle={() => { this.setState({ card8: !this.state.card8 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>View Total Programs</DropdownItem>
+
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Total Programs </div>
                 <div className="text-count">07</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                
+
                 </div>
               </CardBody>
             </Card>
           </Col>
-        <Col xs="12" sm="6" lg="3">
+          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-file-text-o icon-color"></i>
-              <ButtonGroup className="float-right">
-                  <Dropdown id='card6' isOpen={this.state.card6} toggle={() => { this.setState({ card6: !this.state.card6 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Setup Program</DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-file-text-o icon-color"></i>
+                  <ButtonGroup className="float-right">
+                    <Dropdown id='card6' isOpen={this.state.card6} toggle={() => { this.setState({ card6: !this.state.card6 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/program/programOnboarding")}>Setup Program</DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Setup Program </div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 </div>
               </CardBody>
             </Card>
-          </Col> 
-           <Col xs="12" sm="6" lg="3">
+          </Col>
+          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-calculator  icon-color"></i>
-               <ButtonGroup className="float-right">
-                  <Dropdown id='card7' isOpen={this.state.card7} toggle={() => { this.setState({ card7: !this.state.card7 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Supply Plans Waiting for Approval</DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-calculator  icon-color"></i>
+                  <ButtonGroup className="float-right">
+                    <Dropdown id='card7' isOpen={this.state.card7} toggle={() => { this.setState({ card7: !this.state.card7 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Supply Plans waiting for Approval </div>
                 <div className="text-count">05</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 </div>
               </CardBody>
             </Card>
-          </Col> 
+          </Col>
 
           {/* <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
