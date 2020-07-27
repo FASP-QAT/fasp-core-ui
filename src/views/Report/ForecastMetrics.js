@@ -180,10 +180,10 @@ class ForecastMetrics extends Component {
   }
 
   formatValue(cell, row) {
-    // console.log("celll----", cell);
+     console.log("cell----", cell);
     if (cell != null && cell != "") {
       return this.roundN(cell) + '%';
-    } else if (cell == "0" && row.months == 0) {
+    } else if ((cell == "0" && row.months == 0)||cell==null) {
       return "No data points containing both actual and forecast consumption ";
     } else {
       return "0%"
@@ -277,17 +277,17 @@ class ForecastMetrics extends Component {
             align: 'left'
         })
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 100, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
 
           planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text(doc.internal.pageSize.width / 8, 120, planningText)
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 140, {
+          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 180 : 150, {
             align: 'left'
           })
           planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 160, planningText)
+          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 200 : 170, planningText)
         }
 
       }
@@ -309,7 +309,7 @@ class ForecastMetrics extends Component {
     const data = this.state.consumptions.map(elt => [ getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
     elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError ) + '%', elt.monthCount]);
-    let startY = this.state.planningUnitLabels.length > 15 ? 250 : 200
+    let startY = this.state.planningUnitLabels.length > 15 ? 250 : 210
     let content = {
       margin: { top: 80 },
       startY: startY,
@@ -433,13 +433,13 @@ class ForecastMetrics extends Component {
     } else if (programIds.length == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-    } else if (productCategoryId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
-
-    } else {
+    } else if(planningUnitIds.length==0){
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
-    }
+    }else if (productCategoryId == -1) {
+      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
+
+    } 
   }
 
   getCountrys() {

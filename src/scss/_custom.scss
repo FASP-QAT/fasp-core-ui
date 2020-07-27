@@ -608,7 +608,9 @@ label.arrow_label:after {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
-}
+} 
+
+
 
 .forInlinebtnMapping{ display: flex;}
 .forInlinebtnMapping .btn-info {
@@ -806,6 +808,26 @@ label.arrow_label:after {
   position: absolute;
     top: 75px;
     right: 20px;
+}
+
+
+.Consumptionsearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+.AddInventorysearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+.Shipmentsearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
@@ -1684,59 +1706,92 @@ input::placeholder {
   position: absolute;
 }
 .progressbartext1 {
-  left: 7px;
+  // left: 7px;
+  left: 0%;
+  transform: translateX(18%) scale(1);
 }
 .progressbartext2 {
-  left: 16%;
+  // left: 16%;
+  left: 16.6667%;
+  transform: translateX(-14%) scale(1);
 }
 .progressbartext3 {
-  left: 31%;
+  // left: 31%;
+  left: 33.3333%;
+  transform: translateX(-40%) scale(1);
 }
 .progressbartext4 {
-  left: 47%;
+  // left: 47%;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
 }
 .progressbartext5 {
-  left: 64%;
+  // left: 64%;
+  left: 66.6667%;
+  transform: translateX(-68%) scale(1);
 }
 .progressbartext6 {
-  // left: 78.79%;
-  left:78%;
+  // left:78%;
+  left: 83.3333%;
+  transform: translateX(-67%) scale(1);
 }
 .progressbartext7 {
-  left: 94.95%;
+  // left: 94.95%;
+  left: 100%;
+  transform: translateX(-99%) scale(1);
 }
 ////pipelinesetup progress bar
 
 .progressetuptext1 {
-  left: -11px;
+  // left: -11px;
+  left: 0%;
+  transform: translateX(-15%) scale(1);
 }
 .progressetuptext2 {
-  left: 22%;
+  // left: 22%;
+  left: 25%;
+  transform: translateX(-35%) scale(1);
 }
 .progressetuptext3 {
-  left: 46.46%;
+  // left: 46.46%;
+  left: 50%;
+  transform: translateX(-45%) scale(1);
 }
 .progressetuptext4 {
-  left: 71.46%;
+  // left: 71.46%;
+  left: 75%;
+  transform: translateX(-70%) scale(1);
 }
 .progressetuptext5 {
-  left: 94.95%;
+  // left: 94.95%;
+  left: 100%;
+  transform: translateX(-97%) scale(1);
 }
 ///data setup
 .progresdatatext1 {
-  left: 7px;
+  // left: 7px;
+  left: 0%;
+  transform: translateX(7%) scale(1);
 }
 .progresdatatext2 {
-  left: 23%;
+  // left: 23%;
+  left: 25%;
+  transform: translateX(-32%) scale(1);
 }
 .progresdatatext3 {
-  left: 47%;
+  // left: 47%;
+  left: 50%;
+  transform: translateX(-49%) scale(1);
 }
 .progresdatatext4 {
-  left:72%;
+  // left:72%;
+  left: 75%;
+  transform: translateX(-78%) scale(1);
 }
 .progresdatatext5 {
-  left: 95%;
+  // left: 95%;
+  left: 100%;
+  transform: translateX(-104%) scale(1);
 }
 .progresdatatext6 {
   left: 94.79%;
@@ -1745,124 +1800,124 @@ input::placeholder {
 
 
 @media only screen and (max-width: 1024px) {
-  .progressbartext1 {
-    left: 7px;
-  }
-  .progressbartext2 {
-    left: 16%;
-  }
-  .progressbartext3 {
-    left: 30%;
-  }
-  .progressbartext4 {
-    left: 45.45%;
-  }
-  .progressbartext5 {
-    left: 63%;
-  }
-  .progressbartext6 {
-    left: 76.79%;
-  }
-  .progressbartext7 {
-    left: 92.95%;
-  }
+  // .progressbartext1 {
+  //   left: 7px;
+  // }
+  // .progressbartext2 {
+  //   left: 16%;
+  // }
+  // .progressbartext3 {
+  //   left: 30%;
+  // }
+  // .progressbartext4 {
+  //   left: 45.45%;
+  // }
+  // .progressbartext5 {
+  //   left: 63%;
+  // }
+  // .progressbartext6 {
+  //   left: 76.79%;
+  // }
+  // .progressbartext7 {
+  //   left: 92.95%;
+  // }
 
   ///pipeline setup program
-  .progressetuptext1 {
-    left: -11px;
-  }
-  .progressetuptext2 {
-    left: 21%;
-  }
-  .progressetuptext3 {
-    left: 45%;
-  }
-  .progressetuptext4 {
-    left: 70%;
-  }
-  .progressetuptext5 {
-    left: 93%;
-  }
+  // .progressetuptext1 {
+  //   left: -11px;
+  // }
+  // .progressetuptext2 {
+  //   left: 21%;
+  // }
+  // .progressetuptext3 {
+  //   left: 45%;
+  // }
+  // .progressetuptext4 {
+  //   left: 70%;
+  // }
+  // .progressetuptext5 {
+  //   left: 93%;
+  // }
  ///data setup
-.progresdatatext1 {
-  left: 7px;
-}
-.progresdatatext2 {
-  left: 19%;
-}
-.progresdatatext3 {
-  left: 36%;
-}
-.progresdatatext4 {
-  left: 54.46%;
-}
-.progresdatatext5 {
-  left: 75%;
-}
-.progresdatatext6 {
-  left: 92.79%;
-}
+// .progresdatatext1 {
+//   left: 7px;
+// }
+// .progresdatatext2 {
+//   left: 19%;
+// }
+// .progresdatatext3 {
+//   left: 36%;
+// }
+// .progresdatatext4 {
+//   left: 54.46%;
+// }
+// .progresdatatext5 {
+//   left: 75%;
+// }
+// .progresdatatext6 {
+//   left: 92.79%;
+// }
 
 }
 
 @media (max-width: 768px) {
-  .progressbartext1 {
-    left: 7px;
-  }
-  .progressbartext2 {
-    left: 16%;
-  }
-  .progressbartext3 {
-    left: 30%;
-  }
-  .progressbartext4 {
-    left: 44.46%;
-  }
-  .progressbartext5 {
-    left: 63%;
-  }
-  .progressbartext6 {
-    left: 76.79%;
-  }
-  .progressbartext7 {
-    left: 92.95%;
-  }
+  // .progressbartext1 {
+  //   left: 7px;
+  // }
+  // .progressbartext2 {
+  //   left: 16%;
+  // }
+  // .progressbartext3 {
+  //   left: 30%;
+  // }
+  // .progressbartext4 {
+  //   left: 44.46%;
+  // }
+  // .progressbartext5 {
+  //   left: 63%;
+  // }
+  // .progressbartext6 {
+  //   left: 76.79%;
+  // }
+  // .progressbartext7 {
+  //   left: 92.95%;
+  // }
 
   ///pipeline setup program
-  .progressetuptext1 {
-    left: -11px;
-  }
-  .progressetuptext2 {
-    left: 21%;
-  }
-  .progressetuptext3 {
-    left: 44.46%;
-  }
-  .progressetuptext4 {
-    left: 69.46%;
-  }
-  .progressetuptext5 {
-    left: 92%;
-  }
+  // .progressetuptext1 {
+  //   left: -11px;
+  // }
+  // .progressetuptext2 {
+  //   left: 21%;
+  // }
+  // .progressetuptext3 {
+  //   left: 44.46%;
+  // }
+  // .progressetuptext4 {
+  //   left: 69.46%;
+  // }
+  // .progressetuptext5 {
+  //   left: 92%;
+  // }
   ///data setup
-.progresdatatext1 {
-  left: 7px;
-}
-.progresdatatext2 {
-  left: 19%;
-}
-.progresdatatext3 {
-  left: 35%;
-}
-.progresdatatext4 {
-  left: 53.46%;
-}
-.progresdatatext5 {
-  left: 74%;
-}
-.progresdatatext6 {
-  left:91.79%
-}
+// .progresdatatext1 {
+//   left: 7px;
+// }
+// .progresdatatext2 {
+//   left: 19%;
+// }
+// .progresdatatext3 {
+//   left: 35%;
+// }
+// .progresdatatext4 {
+//   left: 53.46%;
+// }
+// .progresdatatext5 {
+//   left: 74%;
+// }
+// .progresdatatext6 {
+//   left:91.79%
+// }
 }
 
 
@@ -1901,7 +1956,7 @@ input::placeholder {
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 9%;
+  margin-left: 315px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2057,6 +2112,13 @@ input::placeholder {
     right: 23px;
     color: 697069;
   }
+//    .reportdown-box-icon {
+//   position: relative;
+//   top: 30px;
+//   z-index: 2;
+//   right: -90px;
+//   color: 697069;
+// }
   .reportsmalldropdown-box-icon {
   position: absolute;
     top: 32px;
@@ -2097,6 +2159,9 @@ input::placeholder {
         position: absolute;
         margin-left: -11px!important;
         z-index: 2;
+    }
+    .card{
+      margin: 1px -1% 1.5em -1%;
     }
     
     
@@ -2181,7 +2246,8 @@ input::placeholder {
   
   .card-header
   {
-    padding: 10px 20px 10px 20px!important;
+    // padding: 10px 20px 10px 20px!important;
+    padding: 5px 20px 5px 20px!important;
   } 
     
   .costinventryinput{
@@ -2718,7 +2784,7 @@ input::placeholder {
 .sidebar .nav-dropdown.open .nav-link {
   color: #fff;
   border-left: 0;
-  display: flex;
+  // display: flex;
 }
 ////user agreement css
 .userAgrementP{
@@ -2746,19 +2812,19 @@ input::placeholder {
 /* list */
 .rounded-list ol 
 {
-counter-reset:li; /* Initiate a counter */
-margin-left:34px; /* Remove the default left margin */
-padding-left:0; /* Remove the default left padding */
+counter-reset:li; 
+margin-left:34px;
+padding-left:0;
 }
 
 /* item  */
 .rounded-list ol > li
 {
-position:relative; /* Create a positioning context */
-list-style:none; /* Disable the normal item numbering */
+position:relative; 
+list-style:none; 
 // background:#f6f6f6; /* Item background color */
-margin:0; /* Give each list item a left margin to make room for the numbers */
-padding-left: 15px; /* Add some spacing around the content */
+margin:0; 
+padding-left: 15px;
 padding-bottom:0px;
 padding-top:0px;
 margin-bottom: -14px;

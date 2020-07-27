@@ -14,6 +14,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('downloadedProgramData')) {
             storeOS = db1.createObjectStore('downloadedProgramData', { keyPath: 'id' });
         }
+        if (!db1.objectStoreNames.contains('whatIfProgramData')) {
+            storeOS = db1.createObjectStore('whatIfProgramData', { keyPath: 'id' });
+        }
         if (!db1.objectStoreNames.contains('program')) {
             storeOS = db1.createObjectStore('program', { keyPath: 'programId', autoIncrement: true });
         }
@@ -112,6 +115,12 @@ export function getDatabase() {
         }
         if (!db1.objectStoreNames.contains('procurementAgentProcurementUnit')) {
             storeOS = db1.createObjectStore('procurementAgentProcurementUnit', { keyPath: 'procurementAgentProcurementUnitId', autoIncrement: true });
+        }
+        if (!db1.objectStoreNames.contains('problem')) {
+            storeOS = db1.createObjectStore('problem', { keyPath: 'problemId', autoIncrement: true });
+        }
+        if (!db1.objectStoreNames.contains('problemStatus')) {
+            storeOS = db1.createObjectStore('problemStatus', { keyPath: 'problemStatusId', autoIncrement: true });
         }
     };
 }

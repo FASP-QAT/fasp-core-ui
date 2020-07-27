@@ -1404,7 +1404,7 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this);
+    // this.getProductCategories = this.getProductCategories.bind(this);
     this.storeProduct = this.storeProduct.bind(this);
     this.toggleView = this.toggleView.bind(this);
     //this.pickRange = React.createRef()
@@ -1412,38 +1412,26 @@ class Consumption extends Component {
   }
 
   toggleView() {
+    console.log("In toggle view");
     var tempConsumptionList = [];
     var tempConsumptionList1 = [];
     var multiplier = this.state.multiplier;
-    if (navigator.onLine) {
-      tempConsumptionList = this.state.consumptions;
-
-      for (let i = 0; i < tempConsumptionList.length; i++) {
-        let json = {
-          consumption_date: tempConsumptionList[i].consumption_date,
-          Actual: tempConsumptionList[i].Actual * multiplier,
-          forcast: tempConsumptionList[i].forcast * multiplier
-        }
-        tempConsumptionList1.push(json);
+    // if (!navigator.onLine) {
+    tempConsumptionList = this.state.offlineConsumptionList;
+    for (let i = 0; i < tempConsumptionList.length; i++) {
+      let json = {
+        "transDate": tempConsumptionList[i].transDate,
+        "actualConsumption": tempConsumptionList[i].actualConsumption * multiplier,
+        "forecastedConsumption": tempConsumptionList[i].forecastedConsumption * multiplier
       }
-      this.setState({
-        consumptions: tempConsumptionList1,
-      })
-
-    } else {
-      tempConsumptionList = this.state.offlineConsumptionList;
-      for (let i = 0; i < tempConsumptionList.length; i++) {
-        let json = {
-          consumption_date: tempConsumptionList[i].consumption_date,
-          Actual: tempConsumptionList[i].Actual * multiplier,
-          forcast: tempConsumptionList[i].forcast * multiplier
-        }
-        tempConsumptionList1.push(json);
-      }
-      this.setState({
-        offlineConsumptionList: tempConsumptionList1,
-      })
+      tempConsumptionList1.push(json);
     }
+    this.setState({
+      offlineConsumptionList: tempConsumptionList1,
+      consumptions: tempConsumptionList1
+    })
+
+    // }
 
   }
 
@@ -1539,6 +1527,7 @@ class Consumption extends Component {
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.common.display')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
     var re;
@@ -1575,9 +1564,9 @@ class Consumption extends Component {
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forcast);
-        row2.push(consumptionArray[i].Actual);
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption);
       }
     }
     var A = [];
@@ -1656,13 +1645,13 @@ class Consumption extends Component {
           doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          //   align: 'left'
+          // })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
-            align: 'left'
-          })
-          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
             align: 'left'
           })
 
@@ -1694,7 +1683,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.finalOfflineConsumption.map(elt => [elt.consumption_date, this.formatter(elt.forcast), this.formatter(elt.Actual)]);
+    const data = navigator.onLine ? this.state.consumptions.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
     // let content = {
     //   margin: { top: 80 },
     //   startY: height,
@@ -1721,14 +1710,14 @@ class Consumption extends Component {
         row2.push(consumptionArray[i].actualConsumption);
       }
     } else {
-      let consumptionArray = this.state.finalOfflineConsumption;
+      let consumptionArray = this.state.offlineConsumptionList;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].consumption_date, 'MM-YYYY').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forcast);
-        row2.push(consumptionArray[i].Actual);
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
+        row1.push(consumptionArray[i].forecastedConsumption);
+        row2.push(consumptionArray[i].actualConsumption);
       }
     }
     head1[0] = head;
@@ -1921,13 +1910,14 @@ class Consumption extends Component {
     let programId = document.getElementById("programId").value;
     let viewById = document.getElementById("viewById").value;
     let versionId = document.getElementById("versionId").value;
-    let productCategoryId = document.getElementById("productCategoryId").value;
+    // let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-    if (productCategoryId >= 0 && planningUnitId > 0 && programId > 0 && versionId != 0) {
+    if (planningUnitId > 0 && programId > 0) {
       if (versionId.includes('Local')) {
+        console.log("------------OFFLINE PART------------");
         var db1;
         var storeOS;
         getDatabase();
@@ -1964,64 +1954,141 @@ class Consumption extends Component {
             var programJson = JSON.parse(programData);
 
             // var shipmentList = (programJson.shipmentList);
-            // console.log("shipmentList----*********----", shipmentList);
+            console.log("consumptionList----*********----", (programJson.consumptionList));
 
             var offlineConsumptionList = (programJson.consumptionList);
 
             const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
 
             const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-            const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-
+            // const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
+            console.log("planningUnit------->>>", planningUnitId);
+            console.log("planningUnitFilter------->>>", planningUnitFilter);
             // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-            const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
+            const dateFilter = planningUnitFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
-            const sorted = dateFilter.sort((a, b) => {
+            console.log("dateFilter------->>>", dateFilter);
+            // const sorted = dateFilter.sort((a, b) => {
+            //   var dateA = new Date(a.consumptionDate).getTime();
+            //   var dateB = new Date(b.consumptionDate).getTime();
+            //   return dateA > dateB ? 1 : -1;
+            // });
+
+            const flagTrue = dateFilter.filter(c => c.actualFlag == true);
+            console.log("flagTrue---->", flagTrue);
+            const flagFalse = dateFilter.filter(c => c.actualFlag == false);
+            console.log("flagFalse---->", flagFalse);
+            //logic for add same date data
+            //True
+            let resultTrue = Object.values(flagTrue.reduce((a, { consumptionId, consumptionDate, actualFlag, consumptionQty }) => {
+              if (!a[consumptionDate])
+                a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
+              else
+                a[consumptionDate].consumptionQty += consumptionQty;
+              return a;
+            }, {}));
+            console.log("resultTrue---->", resultTrue);
+
+
+            //Flase
+            let resultFalse = Object.values(flagFalse.reduce((a, { consumptionId, consumptionDate, actualFlag, consumptionQty }) => {
+              if (!a[consumptionDate])
+                a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
+              else
+                a[consumptionDate].consumptionQty += consumptionQty;
+              return a;
+            }, {}));
+            console.log("resultFalse---->", resultFalse);
+
+
+            let result = resultTrue.concat(resultFalse);
+            console.log("result------->>>", result);
+            const sorted = result.sort((a, b) => {
               var dateA = new Date(a.consumptionDate).getTime();
               var dateB = new Date(b.consumptionDate).getTime();
               return dateA > dateB ? 1 : -1;
             });
-            let previousDate = "";
+            console.log("sorted------->>>", sorted);
+
+            // console.log("CHECK----->>", dateFilter.filter(c => c.consumptionQty == 1800));
+
+            let dateArray = [...new Set(sorted.map(ele => (moment(ele.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
             let finalOfflineConsumption = [];
-            var json;
+            for (var j = 0; j < dateArray.length; j++) {
+              let objActual = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == true);
+              let objForecast = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == false);
 
-            for (let i = 0; i <= sorted.length; i++) {
-              let forcast = 0;
-              let actual = 0;
-              if (sorted[i] != null && sorted[i] != "") {
-                previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
-                for (let j = 0; j <= sorted.length; j++) {
-                  if (sorted[j] != null && sorted[j] != "") {
-                    if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
-                      if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
-                        forcast = forcast + parseFloat(sorted[j].consumptionQty);
-                      }
-                      if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
-                        actual = actual + parseFloat(sorted[j].consumptionQty);
-                      }
-                    }
-                  }
-                }
+              let actualValue = 0;
+              let forecastValue = 0;
+              let transDate = '';
 
-                let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
-                json = {
-                  consumption_date: date,
-                  Actual: actual,
-                  forcast: forcast
-                }
-
-                if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
-                  finalOfflineConsumption.push(json);
-                }
-
-                // console.log("finalOfflineConsumption---", finalOfflineConsumption);
-
+              if (objActual.length > 0) {
+                actualValue = objActual[0].consumptionQty;
+                transDate = objActual[0].consumptionDate;
               }
+              if (objForecast.length > 0) {
+                forecastValue = objForecast[0].consumptionQty;
+                transDate = objForecast[0].consumptionDate;
+              }
+
+              let json = {
+                "transDate": transDate,
+                "actualConsumption": actualValue,
+                "forecastedConsumption": forecastValue
+              }
+              finalOfflineConsumption.push(json);
+
             }
+
+
+            // let previousDate = "";
+            // let finalOfflineConsumption = [];
+            // var json;
+
+            // for (let i = 0; i <= sorted.length; i++) {
+            //   let forcast = 0;
+            //   let actual = 0;
+            //   if (sorted[i] != null && sorted[i] != "") {
+            //     previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+            //     for (let j = 0; j <= sorted.length; j++) {
+            //       if (sorted[j] != null && sorted[j] != "") {
+            //         if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+            //           if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
+            //             forcast = forcast + parseFloat(sorted[j].consumptionQty);
+            //           }
+            //           if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
+            //             actual = actual + parseFloat(sorted[j].consumptionQty);
+            //           }
+            //         }
+            //       }
+            //     }
+
+            //     let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
+            //     // json = {
+            //     //   consumption_date: date,
+            //     //   Actual: actual,
+            //     //   forcast: forcast
+            //     // }
+
+            //     let json = {
+            //       "transDate": sorted[i].consumptionDate,
+            //       "actualConsumption": actual,
+            //       "forecastedConsumption": forcast
+            //     }
+
+            //     if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+            //       finalOfflineConsumption.push(json);
+            //     }
+
+            //   }
+            // }
+
+
             console.log("final consumption---", finalOfflineConsumption);
             this.setState({
               offlineConsumptionList: finalOfflineConsumption,
-              consumptions: finalOfflineConsumption
+              consumptions: finalOfflineConsumption,
+              message: '',
 
             },
               () => {
@@ -2059,21 +2126,15 @@ class Consumption extends Component {
             },
               () => {
                 this.storeProduct(planningUnitId);
-                if (viewById == 2) {
-                  this.toggleView();
-                }
+                // if (viewById == 2) {
+                //   this.toggleView();
+                // }
               })
           })
       }
 
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
-
-    } else if (versionId == -1) {
-      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
-
-    } else if (productCategoryId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
 
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
@@ -2102,12 +2163,12 @@ class Consumption extends Component {
           console.log(JSON.stringify(response.data))
           this.setState({
             programs: response.data
-          })
+          }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
             this.setState({
               programs: []
-            })
+            }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
             } else {
@@ -2128,53 +2189,73 @@ class Consumption extends Component {
         );
 
     } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-        var proList = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
+      this.consolidatedProgramList()
+    }
+  }
+
+  consolidatedProgramList = () => {
+    const lan = 'en';
+    const { programs } = this.state
+    var proList = programs;
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+
+      getRequest.onerror = function (event) {
+        // Handle errors!
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+            console.log(programNameLabel)
+
+            var f = 0
+            for (var k = 0; k < this.state.programs.length; k++) {
+              if (this.state.programs[k].programId == programData.programId) {
+                f = 1;
+                console.log('already exist')
               }
-              proList[i] = programJson
+            }
+            if (f == 0) {
+              proList.push(programData)
             }
           }
-          this.setState({
-            programs: proList
-          })
 
-        }.bind(this);
 
-      }
+        }
 
-    }
+        this.setState({
+          programs: proList
+        })
+
+      }.bind(this);
+
+    }.bind(this);
 
 
   }
+
   getPlanningUnit() {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
+
       let programId = document.getElementById("programId").value;
-      let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
+      let versionId = document.getElementById("versionId").value;
+      // let productCategoryId = document.getElementById("productCategoryId").value;
+      ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
         // console.log('RESP----------', response.data);
         this.setState({
           planningUnits: response.data
@@ -2243,91 +2324,91 @@ class Consumption extends Component {
     }
 
   }
-  getProductCategories() {
-    let programId = document.getElementById("programId").value;
-    let realmId = AuthenticationService.getRealmId();
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      ProductService.getProductCategoryListByProgram(realmId, programId)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          }, () => {
-            this.filterData();
-          })
-        }).catch(
-          error => {
-            this.setState({
-              productCategories: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-    } else {
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
+  // getProductCategories() {
+  //   let programId = document.getElementById("programId").value;
+  //   let realmId = AuthenticationService.getRealmId();
+  //   if (navigator.onLine) {
 
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var programRequest = programTransaction.get(programId);
+  //     ProductService.getProductCategoryListByProgram(realmId, programId)
+  //       .then(response => {
+  //         console.log(JSON.stringify(response.data))
+  //         this.setState({
+  //           productCategories: response.data
+  //         }, () => {
+  //           this.filterData();
+  //         })
+  //       }).catch(
+  //         error => {
+  //           this.setState({
+  //             productCategories: []
+  //           })
+  //           if (error.message === "Network Error") {
+  //             this.setState({ message: error.message });
+  //           } else {
+  //             switch (error.response ? error.response.status : "") {
+  //               case 500:
+  //               case 401:
+  //               case 404:
+  //               case 406:
+  //               case 412:
+  //                 this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+  //                 break;
+  //               default:
+  //                 this.setState({ message: 'static.unkownError' });
+  //                 break;
+  //             }
+  //           }
+  //         }
+  //       );
+  //   } else {
+  //     var db1;
+  //     getDatabase();
+  //     var openRequest = indexedDB.open('fasp', 1);
+  //     openRequest.onsuccess = function (e) {
+  //       db1 = e.target.result;
 
-        programRequest.onsuccess = function (event) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          var offlineConsumptionList = (programJson.consumptionList);
+  //       var transaction = db1.transaction(['programData'], 'readwrite');
+  //       var programTransaction = transaction.objectStore('programData');
+  //       var programRequest = programTransaction.get(programId);
 
-          let offlineProductCategoryList = [];
-          var json;
+  //       programRequest.onsuccess = function (event) {
+  //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+  //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+  //         var programJson = JSON.parse(programData);
+  //         var offlineConsumptionList = (programJson.consumptionList);
 
-          for (let i = 0; i <= offlineConsumptionList.length; i++) {
-            let count = 0;
-            if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
-              for (let j = 0; j <= offlineProductCategoryList.length; j++) {
-                if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
-                  count++;
-                }
-              }
-              if (count == 0 || i == 0) {
-                offlineProductCategoryList.push({
-                  id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
-                  name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
-                });
-              }
-            }
-          }
-          this.setState({
-            offlineProductCategoryList
-          });
+  //         let offlineProductCategoryList = [];
+  //         var json;
 
-        }.bind(this)
+  //         for (let i = 0; i <= offlineConsumptionList.length; i++) {
+  //           let count = 0;
+  //           if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
+  //             for (let j = 0; j <= offlineProductCategoryList.length; j++) {
+  //               if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
+  //                 count++;
+  //               }
+  //             }
+  //             if (count == 0 || i == 0) {
+  //               offlineProductCategoryList.push({
+  //                 id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
+  //                 name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
+  //               });
+  //             }
+  //           }
+  //         }
+  //         this.setState({
+  //           offlineProductCategoryList
+  //         });
 
-      }.bind(this)
+  //       }.bind(this)
 
-    }
-    this.getPlanningUnit();
-    this.filterVersion();
+  //     }.bind(this)
 
-  }
+  //   }
+  //   this.getPlanningUnit();
+  //   this.filterVersion();
+
+  // }
 
 
   filterVersion = () => {
@@ -2417,49 +2498,7 @@ class Consumption extends Component {
 
 
   componentDidMount() {
-    if (navigator.onLine) {
-      this.getPrograms();
-
-
-    } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-        var proList = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              proList[i] = programJson
-            }
-          }
-          this.setState({
-            offlinePrograms: proList
-          })
-
-        }.bind(this);
-      }.bind(this);
-
-    }
+    this.getPrograms();
   }
 
   toggle() {
@@ -2499,12 +2538,31 @@ class Consumption extends Component {
     const { planningUnits } = this.state;
     const { offlinePlanningUnitList } = this.state;
 
-    const { programs } = this.state;
-    const { offlinePrograms } = this.state;
+    // const { programs } = this.state;
+    // const { offlinePrograms } = this.state;
 
     const { productCategories } = this.state;
     const { offlineProductCategoryList } = this.state;
 
+    // const { versions } = this.state;
+    // let versionList = versions.length > 0
+    //   && versions.map((item, i) => {
+    //     return (
+    //       <option key={i} value={item.versionId}>
+    //         {item.versionId}
+    //       </option>
+    //     )
+    //   }, this);
+
+    const { programs } = this.state;
+    let programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+          <option key={i} value={item.programId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
     const { versions } = this.state;
     let versionList = versions.length > 0
       && versions.map((item, i) => {
@@ -2514,6 +2572,8 @@ class Consumption extends Component {
           </option>
         )
       }, this);
+
+
 
     let bar = "";
     if (navigator.onLine) {
@@ -2554,9 +2614,10 @@ class Consumption extends Component {
       }
     }
     if (!navigator.onLine) {
+
       bar = {
 
-        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
+        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YYYY'))),
         datasets: [
           {
             type: "line",
@@ -2573,7 +2634,7 @@ class Consumption extends Component {
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "$#,##0",
-            data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
+            data: this.state.offlineConsumptionList.map((item, index) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
@@ -2582,10 +2643,9 @@ class Consumption extends Component {
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
-            data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
+            data: this.state.offlineConsumptionList.map((item, index) => (item.actualConsumption)),
           }
         ],
-
       }
     }
     const pickerLang = {
@@ -2677,62 +2737,26 @@ class Consumption extends Component {
                         </div>
                       </FormGroup>
 
-                      <Online>
-                        <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input
-                                type="select"
-                                name="programId"
-                                id="programId"
-                                bsSize="sm"
-                                onChange={this.getProductCategories}
 
-                              >
-                                <option value="-1">{i18n.t('static.common.select')}</option>
-                                {programs.length > 0
-                                  && programs.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.programId}>
-                                        {getLabelText(item.label, this.state.lang)}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
+                      <FormGroup className="col-md-3">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                        <div className="controls ">
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="programId"
+                              id="programId"
+                              bsSize="sm"
+                              onChange={this.filterVersion}
 
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                      </Online>
-                      <Offline>
-                        <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                          <div className="controls">
-                            <InputGroup>
-                              <Input
-                                type="select"
-                                name="programId"
-                                id="programId"
-                                bsSize="sm"
-                                onChange={this.getProductCategories}
+                            >
+                              <option value="-1">{i18n.t('static.common.select')}</option>
+                              {programList}
+                            </Input>
 
-                              >
-                                <option value="0">{i18n.t('static.common.select')}</option>
-                                {offlinePrograms.length > 0
-                                  && offlinePrograms.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.id}>
-                                        {item.name}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
-
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                      </Offline>
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
 
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
@@ -2743,7 +2767,8 @@ class Consumption extends Component {
                               name="versionId"
                               id="versionId"
                               bsSize="sm"
-                              onChange={this.filterData}
+                              // onChange={this.filterData}
+                              onChange={this.getPlanningUnit}
                             >
                               <option value="-1">{i18n.t('static.common.select')}</option>
                               {versionList}
@@ -2753,7 +2778,7 @@ class Consumption extends Component {
                         </div>
                       </FormGroup>
 
-                      <Online>
+                      {/* <Online>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                           <div className="controls ">
@@ -2778,8 +2803,9 @@ class Consumption extends Component {
                             </InputGroup></div>
 
                         </FormGroup>
-                      </Online>
-                      <Offline>
+                      </Online> */}
+
+                      {/* <Offline>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                           <div className="controls">
@@ -2804,7 +2830,7 @@ class Consumption extends Component {
                             </InputGroup></div>
 
                         </FormGroup>
-                      </Offline>
+                      </Offline> */}
 
                       <Online>
                         <FormGroup className="col-md-3">
@@ -2940,7 +2966,7 @@ class Consumption extends Component {
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
                       <Online>
-                        {this.state.show &&
+                        {this.state.show && this.state.consumptions.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -2989,7 +3015,7 @@ class Consumption extends Component {
                           </Table>}
                       </Online>
                       <Offline>
-                        {this.state.show &&
+                        {this.state.show && this.state.offlineConsumptionList.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -3001,7 +3027,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}
+                                        {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YYYY')}
                                       </td>
                                     )
                                   }
@@ -3014,7 +3040,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.offlineConsumptionList[idx].forcast)}
+                                        {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
                                       </td>
                                     )
                                   }
@@ -3027,7 +3053,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.offlineConsumptionList[idx].Actual)}
+                                        {this.formatter(this.state.offlineConsumptionList[idx].actualConsumption)}
                                       </td>
                                     )
                                   }
