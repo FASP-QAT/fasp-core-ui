@@ -462,6 +462,10 @@ class Budgets extends Component {
     }
 
 
+    roundN = num => {
+        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    
+      }
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         document.getElementById("versionId").value=0
@@ -646,10 +650,10 @@ class Budgets extends Component {
         let data3 = []
         for (var i = 0; i < budgets.length; i++) {
             console.log(this.state.selBudget.filter(c => c.budget.id = budgets[i].id))
-            data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => (ele.orderedBudgetAmt)))
-            data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => (ele.plannedBudgetAmt)))
+            data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
+            data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
 
-            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => (ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
+            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
         }
 
         const bar = {
@@ -774,7 +778,7 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.addCommas
+                formatter: this.roundN
             },
             {
                 dataField: 'plannedBudgetAmt',
@@ -783,7 +787,7 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.addCommas
+                formatter: this.roundN
             },
             {
                 dataField: 'orderedBudgetAmt',
@@ -792,7 +796,7 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.addCommas
+                formatter: this.roundN
             },
             {
                 dataField: 'orderedBudgetAmt',
@@ -802,7 +806,7 @@ class Budgets extends Component {
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
                 formatter: (cell, row) => {
-                    return this.addCommas(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                    return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
                 }
             },
 

@@ -484,7 +484,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView'),
+                            name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
                             url: '/report/stockStatusAccrossPlanningUnitGlobalView',
                             icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
