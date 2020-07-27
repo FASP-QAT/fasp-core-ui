@@ -446,6 +446,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                 planningUnitId: planningUnitId,
                 reorderFrequencyInMonths: map.get("4"),
                 minMonthsOfStock: map.get("5"),
+                monthsInFutureForAmc: map.get("6"),
+                monthsInPastForAmc: map.get("7"),
                 programPlanningUnitId: map.get("8"),
                 localProcurmentLeadTime: map.get("9"),
                 shelfLife: map.get("10"),

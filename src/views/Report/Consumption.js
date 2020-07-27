@@ -1404,7 +1404,7 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this);
+    // this.getProductCategories = this.getProductCategories.bind(this);
     this.storeProduct = this.storeProduct.bind(this);
     this.toggleView = this.toggleView.bind(this);
     //this.pickRange = React.createRef()
@@ -1645,13 +1645,13 @@ class Consumption extends Component {
           doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          //   align: 'left'
+          // })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
-            align: 'left'
-          })
-          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+          doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
             align: 'left'
           })
 
@@ -1910,12 +1910,12 @@ class Consumption extends Component {
     let programId = document.getElementById("programId").value;
     let viewById = document.getElementById("viewById").value;
     let versionId = document.getElementById("versionId").value;
-    let productCategoryId = document.getElementById("productCategoryId").value;
+    // let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-    if (productCategoryId >= 0 && planningUnitId > 0 && programId > 0) {
+    if (planningUnitId > 0 && programId > 0) {
       if (versionId.includes('Local')) {
         console.log("------------OFFLINE PART------------");
         var db1;
@@ -1962,7 +1962,8 @@ class Consumption extends Component {
 
             const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
             // const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-
+            console.log("planningUnit------->>>", planningUnitId);
+            console.log("planningUnitFilter------->>>", planningUnitFilter);
             // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
             const dateFilter = planningUnitFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
@@ -2135,9 +2136,6 @@ class Consumption extends Component {
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-    } else if (productCategoryId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
-
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
@@ -2255,8 +2253,9 @@ class Consumption extends Component {
     if (navigator.onLine) {
 
       let programId = document.getElementById("programId").value;
-      let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
+      let versionId = document.getElementById("versionId").value;
+      // let productCategoryId = document.getElementById("productCategoryId").value;
+      ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
         // console.log('RESP----------', response.data);
         this.setState({
           planningUnits: response.data
@@ -2325,91 +2324,91 @@ class Consumption extends Component {
     }
 
   }
-  getProductCategories() {
-    let programId = document.getElementById("programId").value;
-    let realmId = AuthenticationService.getRealmId();
-    if (navigator.onLine) {
+  // getProductCategories() {
+  //   let programId = document.getElementById("programId").value;
+  //   let realmId = AuthenticationService.getRealmId();
+  //   if (navigator.onLine) {
 
-      ProductService.getProductCategoryListByProgram(realmId, programId)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          }, () => {
-            this.filterData();
-          })
-        }).catch(
-          error => {
-            this.setState({
-              productCategories: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-    } else {
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
+  //     ProductService.getProductCategoryListByProgram(realmId, programId)
+  //       .then(response => {
+  //         console.log(JSON.stringify(response.data))
+  //         this.setState({
+  //           productCategories: response.data
+  //         }, () => {
+  //           this.filterData();
+  //         })
+  //       }).catch(
+  //         error => {
+  //           this.setState({
+  //             productCategories: []
+  //           })
+  //           if (error.message === "Network Error") {
+  //             this.setState({ message: error.message });
+  //           } else {
+  //             switch (error.response ? error.response.status : "") {
+  //               case 500:
+  //               case 401:
+  //               case 404:
+  //               case 406:
+  //               case 412:
+  //                 this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+  //                 break;
+  //               default:
+  //                 this.setState({ message: 'static.unkownError' });
+  //                 break;
+  //             }
+  //           }
+  //         }
+  //       );
+  //   } else {
+  //     var db1;
+  //     getDatabase();
+  //     var openRequest = indexedDB.open('fasp', 1);
+  //     openRequest.onsuccess = function (e) {
+  //       db1 = e.target.result;
 
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var programRequest = programTransaction.get(programId);
+  //       var transaction = db1.transaction(['programData'], 'readwrite');
+  //       var programTransaction = transaction.objectStore('programData');
+  //       var programRequest = programTransaction.get(programId);
 
-        programRequest.onsuccess = function (event) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          var offlineConsumptionList = (programJson.consumptionList);
+  //       programRequest.onsuccess = function (event) {
+  //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+  //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+  //         var programJson = JSON.parse(programData);
+  //         var offlineConsumptionList = (programJson.consumptionList);
 
-          let offlineProductCategoryList = [];
-          var json;
+  //         let offlineProductCategoryList = [];
+  //         var json;
 
-          for (let i = 0; i <= offlineConsumptionList.length; i++) {
-            let count = 0;
-            if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
-              for (let j = 0; j <= offlineProductCategoryList.length; j++) {
-                if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
-                  count++;
-                }
-              }
-              if (count == 0 || i == 0) {
-                offlineProductCategoryList.push({
-                  id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
-                  name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
-                });
-              }
-            }
-          }
-          this.setState({
-            offlineProductCategoryList
-          });
+  //         for (let i = 0; i <= offlineConsumptionList.length; i++) {
+  //           let count = 0;
+  //           if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
+  //             for (let j = 0; j <= offlineProductCategoryList.length; j++) {
+  //               if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
+  //                 count++;
+  //               }
+  //             }
+  //             if (count == 0 || i == 0) {
+  //               offlineProductCategoryList.push({
+  //                 id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
+  //                 name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
+  //               });
+  //             }
+  //           }
+  //         }
+  //         this.setState({
+  //           offlineProductCategoryList
+  //         });
 
-        }.bind(this)
+  //       }.bind(this)
 
-      }.bind(this)
+  //     }.bind(this)
 
-    }
-    this.getPlanningUnit();
-    this.filterVersion();
+  //   }
+  //   this.getPlanningUnit();
+  //   this.filterVersion();
 
-  }
+  // }
 
 
   filterVersion = () => {
@@ -2748,7 +2747,7 @@ class Consumption extends Component {
                               name="programId"
                               id="programId"
                               bsSize="sm"
-                              onChange={this.getProductCategories}
+                              onChange={this.filterVersion}
 
                             >
                               <option value="-1">{i18n.t('static.common.select')}</option>
@@ -2768,7 +2767,8 @@ class Consumption extends Component {
                               name="versionId"
                               id="versionId"
                               bsSize="sm"
-                              onChange={this.filterData}
+                              // onChange={this.filterData}
+                              onChange={this.getPlanningUnit}
                             >
                               <option value="-1">{i18n.t('static.common.select')}</option>
                               {versionList}
@@ -2778,7 +2778,7 @@ class Consumption extends Component {
                         </div>
                       </FormGroup>
 
-                      <Online>
+                      {/* <Online>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                           <div className="controls ">
@@ -2803,8 +2803,9 @@ class Consumption extends Component {
                             </InputGroup></div>
 
                         </FormGroup>
-                      </Online>
-                      <Offline>
+                      </Online> */}
+
+                      {/* <Offline>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                           <div className="controls">
@@ -2829,7 +2830,7 @@ class Consumption extends Component {
                             </InputGroup></div>
 
                         </FormGroup>
-                      </Offline>
+                      </Offline> */}
 
                       <Online>
                         <FormGroup className="col-md-3">
