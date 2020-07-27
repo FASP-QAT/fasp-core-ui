@@ -312,6 +312,7 @@ export default class UpdateCountryComponent extends Component {
                                 initialValues={{
                                     label: getLabelText(this.state.country.label, this.state.lang),
                                     countryCode: this.state.country.countryCode,
+                                    countryCode2: this.state.country.countryCode2,
                                     // languageId: this.state.country.language.languageId,
                                     currencyId: this.state.country.currency.id
                                 }}
@@ -356,7 +357,7 @@ export default class UpdateCountryComponent extends Component {
                                                             id="label"
                                                             valid={!errors.label}
                                                             bsSize="sm"
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.country.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.label.label_en}
@@ -373,7 +374,7 @@ export default class UpdateCountryComponent extends Component {
                                                             id="countryCode"
                                                             bsSize="sm"
                                                             valid={!errors.countryCode}
-                                                            invalid={touched.countryCode && !!errors.countryCode}
+                                                            invalid={touched.countryCode && !!errors.countryCode || this.state.country.countryCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode}
@@ -390,11 +391,21 @@ export default class UpdateCountryComponent extends Component {
                                                             id="countryCode2"
                                                             bsSize="sm"
                                                             valid={!errors.countryCode2}
-                                                            invalid={touched.countryCode2 && !!errors.countryCode2}
+                                                            invalid={touched.countryCode2 && !!errors.countryCode2 || this.state.country.countryCode2 == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode2}
                                                             required />
+                                                        {/* <Input type="text"
+                                                            name="countryCode2"
+                                                            id="countryCode2"
+                                                            bsSize="sm"
+                                                            valid={!errors.countryCode2}
+                                                            invalid={touched.countryCode2 && !!errors.countryCode2 || this.state.country.countryCode2 == ''}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.country.countryCode2}
+                                                            required /> */}
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
                                                     </FormGroup>
@@ -430,7 +441,7 @@ export default class UpdateCountryComponent extends Component {
                                                             id="currencyId"
                                                             bsSize="sm"
                                                             valid={!errors.currencyId}
-                                                            invalid={touched.currencyId && !!errors.currencyId}
+                                                            invalid={touched.currencyId && !!errors.currencyId || this.state.country.currency.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required

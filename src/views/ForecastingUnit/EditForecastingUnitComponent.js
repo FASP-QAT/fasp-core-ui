@@ -326,7 +326,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.forecastingUnit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.forecastingUnit.label.label_en}
@@ -340,7 +340,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             id="genericLabel"
                                                             bsSize="sm"
                                                             valid={!errors.genericLabel}
-                                                            invalid={touched.genericLabel && !!errors.genericLabel}
+                                                            invalid={touched.genericLabel && !!errors.genericLabel || this.state.forecastingUnit.genericLabel.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.forecastingUnit.genericLabel.label_en}
