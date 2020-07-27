@@ -1697,7 +1697,6 @@ class ShipmentGlobalView extends Component {
                     }
 
                 }
-
             }
         }
         const unit = "pt";

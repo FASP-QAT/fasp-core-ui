@@ -999,5 +999,6 @@
     "static.report.shipmentCostReport":"Shipment Cost Report",
     "static.dashboard.shipmentdetails": "Shipment Details",
     "static.inventory.inventorydetils": "Inventory Details",
-     "static.report.shipmentDetailReport": "Shipment Details Report"
+     "static.report.shipmentDetailReport": "Shipment Details Report",
+     "static.report.totalUnit": "Total Units"
 }

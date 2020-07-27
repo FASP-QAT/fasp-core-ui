@@ -1351,7 +1351,7 @@ class GlobalConsumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
+    // this.getProductCategories = this.getProductCategories.bind(this)
     this.getPrograms = this.getPrograms.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.getRandomColor = this.getRandomColor.bind(this)
@@ -1375,7 +1375,7 @@ class GlobalConsumption extends Component {
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.programLabels.map(ele =>
       csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     this.state.planningUnitLabels.map(ele =>
       csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push('')
@@ -1476,14 +1476,14 @@ class GlobalConsumption extends Component {
           doc.text(doc.internal.pageSize.width / 8, 110, planningText)
 
           planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
-            align: 'left'
-          })
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
+          // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
+          //   align: 'left'
+          // })
+
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 150, planningText)
         }
 
       }
@@ -1534,15 +1534,6 @@ class GlobalConsumption extends Component {
       doc.save('canvas.pdf');*/
   }
 
-
-
-
-
-
-
-
-
-
   handleChange(countrysId) {
 
     this.setState({
@@ -1561,6 +1552,7 @@ class GlobalConsumption extends Component {
     }, () => {
 
       this.filterData(this.state.rangeValue)
+      this.getPlanningUnit();
     })
 
   }
@@ -1594,7 +1586,7 @@ class GlobalConsumption extends Component {
   filterData(rangeValue) {
 
     setTimeout('', 10000);
-    let productCategoryId = document.getElementById("productCategoryId").value;
+    // let productCategoryId = document.getElementById("productCategoryId").value;
     let CountryIds = this.state.countryValues;
     let planningUnitIds = this.state.planningUnitValues;
     let programIds = this.state.programValues;
@@ -1725,9 +1717,6 @@ class GlobalConsumption extends Component {
     } else if (programIds.length == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-    } else if (productCategoryId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
-
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
@@ -1807,43 +1796,55 @@ class GlobalConsumption extends Component {
 
     }
 
-
   }
+
   getPlanningUnit() {
     if (navigator.onLine) {
       console.log('changed')
-      let productCategoryId = document.getElementById("productCategoryId").value;
 
-      if (productCategoryId != -1) {
-        PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-          this.setState({
-            planningUnits: response.data,
+      // let productCategoryId = document.getElementById("productCategoryId").value;
+      // if (productCategoryId != -1) {
+      // PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
+      //     this.setState({
+      //       planningUnits: response.data,
+      //     })
+      //   })
+      //     .catch(
+      //       error => {
+      //         this.setState({
+      //           planningUnits: [],
+      //         })
+      //         if (error.message === "Network Error") {
+      //           this.setState({ message: error.message });
+      //         } else {
+      //           switch (error.response ? error.response.status : "") {
+      //             case 500:
+      //             case 401:
+      //             case 404:
+      //             case 406:
+      //             case 412:
+      //               //  this.setState({ message: error.response.data.messageCode });
+      //               break;
+      //             default:
+      //               this.setState({ message: 'static.unkownError' });
+      //               break;
+      //           }
+      //         }
+      //       }
+      //     );
+      // }
+      let programValues = this.state.programValues;
+      // console.log("programValues----->", programValues);
+      if (programValues.length > 0) {
+        PlanningUnitService.getPlanningUnitByProgramIds(programValues)
+          .then(response => {
+            console.log("getPlanningUnitByProgramIds---", response.data);
+            this.setState({
+              planningUnits: response.data,
+            })
           })
-        })
-          .catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    //  this.setState({ message: error.response.data.messageCode });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
-                }
-              }
-            }
-          );
       }
+
     } else {
       const lan = 'en';
       var db1;
@@ -1917,46 +1918,46 @@ class GlobalConsumption extends Component {
       );
   }
 
-  getProductCategories() {
+  // getProductCategories() {
 
-    let realmId = AuthenticationService.getRealmId();
-    ProductService.getProductCategoryList(realmId)
-      .then(response => {
-        console.log(response.data)
-        this.setState({
-          productCategories: response.data
-        })
-      }).catch(
-        error => {
-          this.setState({
-            productCategories: []
-          })
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
-    this.getPlanningUnit();
+  //   let realmId = AuthenticationService.getRealmId();
+  //   ProductService.getProductCategoryList(realmId)
+  //     .then(response => {
+  //       console.log(response.data)
+  //       this.setState({
+  //         productCategories: response.data
+  //       })
+  //     }).catch(
+  //       error => {
+  //         this.setState({
+  //           productCategories: []
+  //         })
+  //         if (error.message === "Network Error") {
+  //           this.setState({ message: error.message });
+  //         } else {
+  //           switch (error.response ? error.response.status : "") {
+  //             case 500:
+  //             case 401:
+  //             case 404:
+  //             case 406:
+  //             case 412:
+  //               this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+  //               break;
+  //             default:
+  //               this.setState({ message: 'static.unkownError' });
+  //               break;
+  //           }
+  //         }
+  //       }
+  //     );
+  //   this.getPlanningUnit();
+  // }
 
-  }
   componentDidMount() {
 
     this.getPrograms()
     this.getCountrys();
-    this.getProductCategories()
+    // this.getProductCategories()
 
   }
 
@@ -1998,7 +1999,7 @@ class GlobalConsumption extends Component {
       && planningUnits.map((item, i) => {
         return (
 
-          { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+          { label: getLabelText(item.label, this.state.lang), value: item.id }
 
         )
       }, this);
@@ -2018,15 +2019,15 @@ class GlobalConsumption extends Component {
       return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
     }, this);
 
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
-        return (
-          <option key={i} value={item.payload.productCategoryId}>
-            {getLabelText(item.payload.label, this.state.lang)}
-          </option>
-        )
-      }, this);
+    // const { productCategories } = this.state;
+    // let productCategoryList = productCategories.length > 0
+    //   && productCategories.map((item, i) => {
+    //     return (
+    //       <option key={i} value={item.payload.productCategoryId}>
+    //         {getLabelText(item.payload.label, this.state.lang)}
+    //       </option>
+    //     )
+    //   }, this);
 
     const backgroundColor = [
       '#002f6c',
@@ -2208,7 +2209,7 @@ class GlobalConsumption extends Component {
                       </InputGroup>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    {/* <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                       <div className="controls ">
                         <InputGroup>
@@ -2231,7 +2232,7 @@ class GlobalConsumption extends Component {
                           </Input>
                         </InputGroup>
                       </div>
-                    </FormGroup>
+                    </FormGroup> */}
 
                     <FormGroup className="col-sm-3" id="hideDiv">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
