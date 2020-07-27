@@ -28,10 +28,12 @@ const validationSchema = function (values) {
         label: Yup.string()
             .required(i18n.t('static.country.countrytext')),
         countryCode: Yup.string()
-            .max(3, i18n.t('static.country.countrycodemax3digittext'))
+            // .max(3, i18n.t('static.country.countrycodemax3digittext'))
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.country.countrycodetext')),
         countryCode2: Yup.string()
-            .max(2, 'Country code 2 is 2 digit number')
+            // .max(2, 'Country code 2 is 2 digit number')
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.country.countrycodetext')),
         // languageId: Yup.string()
         //     .required(i18n.t('static.country.languagetext')),
@@ -347,7 +349,7 @@ export default class UpdateCountryComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='countryForm'>
-                                                <CardBody className="pt-2 pb-0"> 
+                                                <CardBody className="pt-2 pb-0">
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -378,7 +380,9 @@ export default class UpdateCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode}
-                                                            required />
+                                                            required
+                                                            maxLength={3}
+                                                        />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
@@ -395,7 +399,9 @@ export default class UpdateCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode2}
-                                                            required />
+                                                            required
+                                                            maxLength={2}
+                                                        />
                                                         {/* <Input type="text"
                                                             name="countryCode2"
                                                             id="countryCode2"
