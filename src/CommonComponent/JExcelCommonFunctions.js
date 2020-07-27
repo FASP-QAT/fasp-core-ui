@@ -60,6 +60,7 @@ export function jExcelLoadedFunction(instance) {
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
+    filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
 
 
