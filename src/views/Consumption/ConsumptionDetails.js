@@ -425,6 +425,7 @@ export default class ConsumptionDetails extends React.Component {
                         onchange: this.changed,
                         oneditionend: this.onedit,
                         copyCompatibility: true,
+                        allowExport: false,
                         paginationOptions: [10, 25, 50, 100],
                         position: 'top',
                         updateTable: function (el, cell, x, y, source, value, id) {
@@ -552,6 +553,7 @@ export default class ConsumptionDetails extends React.Component {
                                             copyCompatibility: true,
                                             allowInsertRow: true,
                                             allowManualInsertRow: false,
+                                            allowExport: false,
                                             onchange: this.batchInfoChangedConsumption,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -830,6 +832,7 @@ export default class ConsumptionDetails extends React.Component {
                         }.bind(this)
                     };
                     var consumptionEl = jexcel(document.getElementById("consumptiontableDiv"), options);
+                    document.getElementById("consumptiontableDiv").classList.add('Consumptionsearchinline');
                     this.el = consumptionEl;
                     this.setState({
                         consumptionEl: consumptionEl
@@ -1588,7 +1591,7 @@ export default class ConsumptionDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 pl-0">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>

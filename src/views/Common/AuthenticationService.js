@@ -849,6 +849,7 @@ class AuthenticationService {
                     break;
                 case "/supplyPlan":
                 case "/supplyPlanFormulas":
+                case "/report/whatIf":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                         return true;
                     }

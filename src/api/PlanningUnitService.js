@@ -43,5 +43,9 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/all`, {}
         );
     }
+    getPlanningUnitByProgramIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();

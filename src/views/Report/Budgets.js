@@ -865,16 +865,16 @@ class Budgets extends Component {
                             <div className="card-header-action">
                                 <a className="card-header-action">
                                     {this.state.selBudget.length > 0 && <div className="card-header-actions">
-                                        <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                        <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                     </div>}
                                 </a>
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0">
 
-                        <Col md="12 pl-0">
+                        <Col md="10 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Program</Label>

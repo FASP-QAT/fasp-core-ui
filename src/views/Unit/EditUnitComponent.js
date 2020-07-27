@@ -219,7 +219,7 @@ export default class EditUnitComponent extends Component {
                                                             name="dimensionId"
                                                             id="dimensionId"
                                                             valid={!errors.dimensionId}
-                                                            invalid={touched.dimensionId && !!errors.dimensionId}
+                                                            invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly={true}
@@ -238,7 +238,7 @@ export default class EditUnitComponent extends Component {
                                                             id="unitName"
                                                             bsSize="sm"
                                                             valid={!errors.unitName}
-                                                            invalid={touched.unitName && !!errors.unitName}
+                                                            invalid={touched.unitName && !!errors.unitName  || this.state.unit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.unit.label.label_en}
@@ -252,7 +252,7 @@ export default class EditUnitComponent extends Component {
                                                             id="unitCode"
                                                             bsSize="sm"
                                                             valid={!errors.unitCode}
-                                                            invalid={touched.unitCode && !!errors.unitCode}
+                                                            invalid={touched.unitCode && !!errors.unitCode  || this.state.unit.unitCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             required

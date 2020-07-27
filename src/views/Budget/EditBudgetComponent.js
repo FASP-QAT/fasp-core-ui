@@ -389,7 +389,7 @@ class EditBudgetComponent extends Component {
                                                             id="budget"
                                                             bsSize="sm"
                                                             valid={!errors.budgetName}
-                                                            invalid={touched.budgetName && !!errors.budgetName}
+                                                            invalid={touched.budgetName && !!errors.budgetName || this.state.budget.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.budget.label.label_en}
@@ -404,7 +404,7 @@ class EditBudgetComponent extends Component {
                                                             id="budgetCode"
                                                             bsSize="sm"
                                                             valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
-                                                            invalid={touched.budgetCode && !!errors.budgetCode}
+                                                            invalid={touched.budgetCode && !!errors.budgetCode || this.state.budget.budgetCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.budget.budgetCode}
@@ -454,7 +454,7 @@ class EditBudgetComponent extends Component {
                                                             id="budgetAmt"
                                                             bsSize="sm"
                                                             valid={!errors.budgetAmt}
-                                                            invalid={touched.budgetAmt && !!errors.budgetAmt}
+                                                            invalid={touched.budgetAmt && !!errors.budgetAmt || this.state.budget.budgetAmt == ''}
                                                             onChange={(e) => { this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="text"
@@ -624,10 +624,10 @@ class EditBudgetComponent extends Component {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.data.startDate != null && response.data.startDate != "") {
-                    response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                    // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
                 }
                 if (response.data.stopDate != null && response.data.stopDate != "") {
-                    response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                    // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
                 }
                 var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 response.data.budgetAmt = getBudgetAmount;

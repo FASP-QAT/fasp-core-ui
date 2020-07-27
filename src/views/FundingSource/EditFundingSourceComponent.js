@@ -224,7 +224,7 @@ class EditFundingSourceComponent extends Component {
                                                             id="fundingSource"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSource}
-                                                            invalid={touched.fundingSource && !!errors.fundingSource}
+                                                            invalid={touched.fundingSource && !!errors.fundingSource || this.state.fundingSource.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
@@ -238,7 +238,7 @@ class EditFundingSourceComponent extends Component {
                                                             id="fundingSourceCode"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                            invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
+                                                            invalid={touched.fundingSourceCode && !!errors.fundingSourceCode || this.state.fundingSource.fundingSourceCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.fundingSourceCode}

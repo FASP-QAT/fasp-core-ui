@@ -1796,7 +1796,7 @@ class ProcurementAgentExport extends Component {
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         this.state.planningUnitLabels.map(ele =>
             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push(i18n.t('static.program.isincludeplannedshipment') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.program.isincludeplannedshipment').replaceAll(' ', '%20') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
@@ -2983,7 +2983,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3 mb-lg-0">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -3002,7 +3002,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3 mb-lg-0">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -3023,7 +3023,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3 mb-lg-0" id="procurementAgentDiv">
+                                <FormGroup className="col-md-3" id="procurementAgentDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
