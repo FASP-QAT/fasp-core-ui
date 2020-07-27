@@ -195,6 +195,7 @@ export default class AddInventory extends Component {
 
         } else {
             this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+            document.getElementById("inventorytableDiv").classList.add('AddInventorysearchinline');
             this.el.destroy();
 
             this.setState({
@@ -1831,7 +1832,7 @@ export default class AddInventory extends Component {
 
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 pl-0">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
@@ -1916,7 +1917,4 @@ export default class AddInventory extends Component {
         this.toggleLarge();
     }
 }
-
-
-
 

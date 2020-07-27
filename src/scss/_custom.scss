@@ -608,7 +608,9 @@ label.arrow_label:after {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
-}
+} 
+
+
 
 .forInlinebtnMapping{ display: flex;}
 .forInlinebtnMapping .btn-info {
@@ -806,6 +808,26 @@ label.arrow_label:after {
   position: absolute;
     top: 75px;
     right: 20px;
+}
+
+
+.Consumptionsearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+.AddInventorysearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+.Shipmentsearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
@@ -2090,6 +2112,13 @@ input::placeholder {
     right: 23px;
     color: 697069;
   }
+//    .reportdown-box-icon {
+//   position: relative;
+//   top: 30px;
+//   z-index: 2;
+//   right: -90px;
+//   color: 697069;
+// }
   .reportsmalldropdown-box-icon {
   position: absolute;
     top: 32px;
