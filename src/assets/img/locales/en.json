@@ -1000,5 +1000,16 @@
     "static.dashboard.shipmentdetails": "Shipment Details",
     "static.inventory.inventorydetils": "Inventory Details",
     "static.report.shipmentDetailReport": "Shipment Details Report",
-    "static.report.totalUnit": "Total Units"
+    "static.report.totalUnit": "Total Units",
+    "static.report.selectProblemStatus": "Please select problem status",
+    "static.report.selectProblemType": "Please select problem type",
+    "static.program.versionId": "Version ID",
+    "static.report.createdDate": "Created Date",
+    "static.report.problemDescription": "Problem Description",
+    "static.report.problemStatus": "Problem Status",
+    "static.report.problemType": "Problem Type",
+    "static.report.Criticality": "Criticality",
+    "static.report.problem": "Problem",
+    "static.report.problemTrans": "Problem Trans",
+    "static.report.createdBy": "Created By"
 }
