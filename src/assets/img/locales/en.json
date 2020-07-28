@@ -1002,6 +1002,18 @@
     "static.dashboard.shipmentdetails": "Shipment Details",
     "static.inventory.inventorydetils": "Inventory Details",
     "static.report.shipmentDetailReport": "Shipment Details Report",
+    "static.report.totalUnit": "Total Units",
+    "static.report.selectProblemStatus": "Please select problem status",
+    "static.report.selectProblemType": "Please select problem type",
+    "static.program.versionId": "Version ID",
+    "static.report.createdDate": "Created Date",
+    "static.report.problemDescription": "Problem Description",
+    "static.report.problemStatus": "Problem Status",
+    "static.report.problemType": "Problem Type",
+    "static.report.Criticality": "Criticality",
+    "static.report.problem": "Problem",
+    "static.report.problemTrans": "Problem Trans",
+    "static.report.createdBy": "Created By",
     "static.supplyPlan.plannedDate": "Planned Date",
     "static.supplyPlan.shipmentsDateObject":"Shipment dates",
     "static.supplyPlan.showShipmentDates":"Show shipment dates",
@@ -1013,6 +1025,5 @@
     "static.supplyPlan.date":"Date",
     "static.whatIf.removePlannedShipmentsNotInLeadTimes":"Remove all planned shipments that are not within lead time",
     "static.whatIf.removeApprovedShipmentsNotInLeadTimes":"Remove all approved shipments that are not within lead time",
-    "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time",
-    "static.report.totalUnit": "Total Units"
+    "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time"
 }
