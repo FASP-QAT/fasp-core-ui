@@ -1956,7 +1956,7 @@ input::placeholder {
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 315px !important;
+  margin-left: 337px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -1971,7 +1971,7 @@ input::placeholder {
 
 .supplyplan-larrow-dataentry {
   float: left;
-  margin-left: 17px !important;
+  margin-left: 77px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -1983,7 +1983,17 @@ input::placeholder {
   cursor: pointer;
   // margin-right: 9%;
 }
+.supplyplan-larrow-dataentry-adjustment{
+  float: left;
+  margin-left: 91px !important;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+}
 
+.Supplyfeild {
+  width: 230px;
+}
 .legend-supplypln {
   margin-bottom: 0px;
   margin-top: -4px;
