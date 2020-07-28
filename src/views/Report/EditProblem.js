@@ -215,6 +215,7 @@ export default class EditLanguageComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getProblemStatusById = this.getProblemStatusById.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
@@ -224,10 +225,14 @@ export default class EditLanguageComponent extends Component {
 
         if (event.target.name === "problemStatusId") {
             let problemStatusId = event.target.value;
+
             this.setState(
                 {
                     problemStatusId: problemStatusId,
-                })
+                },
+                () => {
+                    this.getProblemStatusById(problemStatusId);
+                });
         }
         if (event.target.name === "notes") {
             let notes = event.target.value;
@@ -245,6 +250,52 @@ export default class EditLanguageComponent extends Component {
         }, 8000);
     }
 
+    getProblemStatusById(problemStatusId) {
+        var problemStatusObject = {};
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(this.state.programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                var problemStatusRequest = problemStatusOs.getAll();
+
+
+                problemStatusRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = problemStatusRequest.result;
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].id == problemStatusId) {
+                            problemStatusObject = {
+                                "id": myResult[i].id,
+                                "label": myResult[i].label
+                            }
+                        }
+                    }
+                    this.setState(
+                        {
+                            problemStatusObject: problemStatusObject
+                        },
+                        () => {
+                            console.log("problemStatusObject------>", this.state.problemStatusObject)
+                        });
+
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+
+    }
     touchAll(setTouched, errors) {
         setTouched({
             problemStatusId: true,
@@ -433,12 +484,8 @@ export default class EditLanguageComponent extends Component {
                                         var programTransaction = transaction.objectStore('programData');
                                         var programId = this.state.programId;
                                         var programRequest = programTransaction.get(programId);
-                                        programRequest.onerror = function (event) {
-                                            this.setState({
-                                                message: i18n.t('static.program.errortext'),
-                                                color: 'red'
-                                            })
-                                        }.bind(this);
+
+
                                         programRequest.onsuccess = function (event) {
 
                                             var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
@@ -447,81 +494,83 @@ export default class EditLanguageComponent extends Component {
 
                                             var problemReportList = (programJson.problemReportList);
 
-                                            var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
-                                            var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
-                                            var problemStatusRequest = problemStatusOs.getAll();
-                                            let problemStatusObject = {};
-                                            problemStatusRequest.onerror = function (event) {
-                                                // Handle errors!
+                                            // var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                                            // var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                                            // var problemStatusRequest = problemStatusOs.getAll();
+                                            // let problemStatusObject = {};
+
+                                            // problemStatusRequest.onsuccess = function (e) {
+                                            //     var myResult = [];
+                                            //     myResult = problemStatusRequest.result;
+                                            //     for (var i = 0; i < myResult.length; i++) {
+                                            //         if (myResult[i].id == this.state.problemStatusId) {
+                                            //             problemStatusObject = {
+                                            //                 "id": myResult[i].id,
+                                            //                 "label": myResult[i].label
+                                            //             }
+                                            //         }
+                                            //     }
+
+
+                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                                            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                                            let username = decryptedUser.username;
+
+
+                                            let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
+
+                                            let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
+
+                                            // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                            // var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                                            filterObj.lastModifiedBy = { userId: userId, username: username }
+                                            filterObj.lastModifiedDate = moment();
+
+                                            let tempProblemTransList = filterObj.problemTransList;
+
+                                            let tempProblemTransObj = {
+                                                "problemReportTransId": '',
+                                                "problemStatus": this.state.problemStatusObject,
+                                                "notes": this.state.notes,
+                                                "createdBy": {
+                                                    "userId": userId,
+                                                    "username": username
+                                                },
+                                                "createdDate": moment()
+                                            }
+
+                                            tempProblemTransList.push(tempProblemTransObj);
+
+                                            filterObj.problemTransList = tempProblemTransList;
+
+
+                                            otherProblemReport.push(filterObj);
+                                            programJson.problemReportList = otherProblemReport;
+                                            programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                            var putRequest = programTransaction.put(programRequest.result);
+
+                                            putRequest.onerror = function (event) {
+                                                this.setState({
+                                                    message: i18n.t('static.program.errortext'),
+                                                    color: 'red'
+                                                })
                                             };
-                                            problemStatusRequest.onsuccess = function (e) {
-                                                var myResult = [];
-                                                myResult = problemStatusRequest.result;
 
-                                                for (var i = 0; i < myResult.length; i++) {
-                                                    if (myResult[i].id == this.state.problemReportId) {
-                                                        problemStatusObject = myResult[i];
-                                                    }
-                                                }
-                                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                            putRequest.onsuccess = function (event) {
+                                                this.setState({
+                                                    // message: 'static.message.consumptionSaved',
+                                                    changedFlag: 0,
+                                                    color: 'green'
+                                                })
 
-                                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                                                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                                let username = decryptedUser.username;
+                                                this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
+                                            }.bind(this)
 
-
-                                                let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
-
-                                                let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
-
-                                                // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                // var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-                                                filterObj.lastModifiedBy = { userId: userId, username: username }
-                                                filterObj.lastModifiedDate = moment();
-
-                                                let tempProblemTransList = filterObj.problemTransList;
-
-                                                let tempProblemTransObj = {
-                                                    "problemReportTransId": '',
-                                                    "problemStatus": problemStatusObject,
-                                                    "notes": this.state.notes,
-                                                    "createdBy": {
-                                                        "userId": userId,
-                                                        "username": username
-                                                    },
-                                                    "createdDate": moment()
-                                                }
-
-                                                tempProblemTransList.push(tempProblemTransObj);
-
-                                                filterObj.problemTransList = tempProblemTransList;
-
-
-                                                otherProblemReport.push(filterObj);
-                                                programJson.problemReportList = otherProblemReport;
-                                                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                                                var putRequest = programTransaction.put(programRequest.result);
-
-                                                putRequest.onerror = function (event) {
-                                                    this.setState({
-                                                        message: i18n.t('static.program.errortext'),
-                                                        color: 'red'
-                                                    })
-                                                };
-
-                                                putRequest.onsuccess = function (event) {
-                                                    this.setState({
-                                                        // message: 'static.message.consumptionSaved',
-                                                        changedFlag: 0,
-                                                        color: 'green'
-                                                    })
-
-                                                    this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
-                                                }.bind(this)
-
-                                            }.bind(this);
+                                            // }.bind(this);
                                         }.bind(this);
                                     }.bind(this);
 
