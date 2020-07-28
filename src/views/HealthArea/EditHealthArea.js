@@ -182,11 +182,11 @@ export default class EditHealthAreaComponent extends Component {
                     })
             }
 
-            initialValues = {
-                healthAreaName: this.state.healthArea.label.label_en,
-                healthAreaCode: this.state.healthArea.healthAreaCode,
-                realmId: this.state.healthArea.realm.id
-            }
+            // initialValues = {
+            //     healthAreaName: this.state.healthArea.label.label_en,
+            //     healthAreaCode: this.state.healthArea.healthAreaCode,
+            //     realmId: this.state.healthArea.realm.id
+            // }
 
             UserService.getRealmList()
                 .then(response => {
@@ -268,7 +268,11 @@ export default class EditHealthAreaComponent extends Component {
                             </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    healthAreaName: this.state.healthArea.label.label_en,
+                                    healthAreaCode: this.state.healthArea.healthAreaCode,
+                                    realmId: this.state.healthArea.realm.id
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     console.log("-------------------->" + this.state.healthArea);
@@ -309,7 +313,7 @@ export default class EditHealthAreaComponent extends Component {
                                                             bsSize="sm"
                                                             value={this.state.healthArea.realm.id}
                                                             valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId || this.state.healthArea.realm.realmId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             disabled
@@ -325,7 +329,7 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Select
                                                             bsSize="sm"
                                                             valid={!errors.realmCountryId}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                            invalid={touched.realmCountryId && !!errors.realmCountryId || this.state.healthArea.realmCountryArray == ''}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
                                                             onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
                                                             multi
@@ -340,7 +344,7 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="healthAreaName" valid={!errors.healthAreaName}
-                                                            invalid={touched.healthAreaName && !!errors.healthAreaName}
+                                                            invalid={touched.healthAreaName && !!errors.healthAreaName || this.state.healthArea.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.label.label_en}
@@ -353,7 +357,7 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
-                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode}
+                                                            invalid={touched.healthAreaCode && !!errors.healthAreaCode || this.state.healthArea.healthAreaCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.healthAreaCode}

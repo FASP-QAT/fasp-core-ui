@@ -1969,6 +1969,21 @@ input::placeholder {
   // margin-right: 9%;
 }
 
+.supplyplan-larrow-dataentry {
+  float: left;
+  margin-left: 17px !important;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+}
+.supplyplan-rarrow-dataentry {
+  float: right;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+  // margin-right: 9%;
+}
+
 .legend-supplypln {
   margin-bottom: 0px;
   margin-top: -4px;

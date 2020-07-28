@@ -207,7 +207,7 @@ class EditSupplierComponent extends Component {
                                                             id="supplier"
                                                             bsSize="sm"
                                                             valid={!errors.supplier}
-                                                            invalid={touched.supplier && !!errors.supplier}
+                                                            invalid={touched.supplier && !!errors.supplier || this.state.supplier.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.supplier.label.label_en}

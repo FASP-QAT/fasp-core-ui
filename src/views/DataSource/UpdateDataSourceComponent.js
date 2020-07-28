@@ -282,7 +282,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.dataSource.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.dataSource.label.label_en}

@@ -24,10 +24,10 @@ import {
   PaginationLink,
   Row,
   CardColumns,
-  Carousel, 
-  CarouselCaption, 
-  CarouselControl, 
-  CarouselIndicators, 
+  Carousel,
+  CarouselCaption,
+  CarouselControl,
+  CarouselIndicators,
   CarouselItem,
   Table,
 } from 'reactstrap';
@@ -177,47 +177,47 @@ const items = [
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'TOTAL USERS',
-     caption: '06'
+    header: 'TOTAL USERS',
+    caption: '06'
   },
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'APPLICATION LEVEL ADMIN',
-     caption: '02'
+    header: 'APPLICATION LEVEL ADMIN',
+    caption: '02'
   },
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'REALM LEVEL ADMIN',
-     caption: '04'
+    header: 'REALM LEVEL ADMIN',
+    caption: '04'
   },
-  
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'PROGRAM LEVEL ADMIN',
-     caption: '03'
+    header: 'PROGRAM LEVEL ADMIN',
+    caption: '03'
   },
-  
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'PROGRAM USER',
-     caption: '05'
+    header: 'PROGRAM USER',
+    caption: '05'
   },
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'SUPPLY PLAN REVIEWER',
-     caption: '02'
+    header: 'SUPPLY PLAN REVIEWER',
+    caption: '02'
   },
- 
+
   {
     src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
     //  altText: 'Image alt Text',
-     header: 'GUEST USER',
-     caption: '05'
+    header: 'GUEST USER',
+    caption: '05'
   },
 ];
 
@@ -231,6 +231,8 @@ class ApplicationDashboard extends Component {
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
 
+
+
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
@@ -238,12 +240,17 @@ class ApplicationDashboard extends Component {
     this.state = {
       activeIndex: 0,
     };
-  
+
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
+    // this.redirectToCrud = this.redirectToCrud.bind(this);
+  }
+
+  redirectToCrud = (url) => {
+    this.props.history.push(url);
   }
   hideFirstComponent() {
     setTimeout(function () {
@@ -266,7 +273,7 @@ class ApplicationDashboard extends Component {
 
     this.hideFirstComponent();
   }
-  
+
   onExiting() {
     this.animating = true;
   }
@@ -277,15 +284,15 @@ class ApplicationDashboard extends Component {
 
   next() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndex === items.length - 1 ? 0 : 
-    this.state.activeIndex + 1;
+    const nextIndex = this.state.activeIndex === items.length - 1 ? 0 :
+      this.state.activeIndex + 1;
     this.setState({ activeIndex: nextIndex });
   }
 
   previous() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndex === 0 ? items.length - 1 : 
-    this.state.activeIndex - 1;
+    const nextIndex = this.state.activeIndex === 0 ? items.length - 1 :
+      this.state.activeIndex - 1;
     this.setState({ activeIndex: nextIndex });
   }
 
@@ -293,29 +300,29 @@ class ApplicationDashboard extends Component {
     if (this.animating) return;
     this.setState({ activeIndex: newIndex });
   }
-  
+
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
     const { activeIndex } = this.state;
     const slides = items.map((item) => {
 
-    return (
-      <CarouselItem
-        onExiting={this.onExiting}
-        onExited={this.onExited}
-       key={item.src}
-      >
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={item.src}
+        >
 
-        <div className='carouselCont'>
-          <div className='ImgCont'>
-            <img width='100%' src={item.src}  />
+          <div className='carouselCont'>
+            <div className='ImgCont'>
+              <img width='100%' src={item.src} />
+            </div>
+            <div className='TextCont'>
+              <CarouselCaption captionHeader={item.header} captionText={item.caption} />
+            </div>
           </div>
-          <div className='TextCont'>
-            <CarouselCaption captionHeader={item.header}  captionText={item.caption}  />
-          </div>
-        </div>
-      </CarouselItem>
+        </CarouselItem>
       );
     });
 
@@ -326,30 +333,30 @@ class ApplicationDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="p-0">
-              <div class="h1 text-muted text-left mb-0 m-3">
-                <i class="icon-people icon-color"></i>
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                    <DropdownItem>View User</DropdownItem>
-                      <DropdownItem>Add User</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              <Carousel className='trustedMechCarousel' defaultWait={1000}  activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
-          <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
-          {slides}
-          {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
+                <div class="h1 text-muted text-left mb-0 m-3">
+                  <i class="icon-people icon-color"></i>
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                        {/* <i className="icon-settings"></i> */}
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>View User</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                  <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
+                    <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                    {slides}
+                    {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
            <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />  */}
-        </Carousel>
-        <div className="chart-wrapper " >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
-              </div>
+                  </Carousel>
+                  <div className="chart-wrapper " >
+                    {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -357,79 +364,79 @@ class ApplicationDashboard extends Component {
           <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="icon-grid icon-color"></i>
-              
-                <ButtonGroup className="float-right BtnZindex">
-                  <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                      {/* <i className="icon-settings"></i> */}
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                    <DropdownItem>Realm List</DropdownItem>
-                      <DropdownItem>Add Realm</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="icon-grid icon-color"></i>
+
+                  <ButtonGroup className="float-right BtnZindex">
+                    <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                        {/* <i className="icon-settings"></i> */}
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem  onClick={() => this.redirectToCrud("/realm/realmlist")}>Realm List</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">TOTAL REALMS </div>
                 <div className="text-count">03</div>
                 <div className="chart-wrapper mt-4 pb-2" >
-                {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
-              </div>
+                  {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
+                </div>
               </CardBody>
             </Card>
           </Col>
 
-           <Col xs="12" sm="6" lg="3">
+          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-language icon-color"></i>
-              
-                <ButtonGroup className="float-right">
-                  <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                    <DropdownItem>Add Language</DropdownItem>
-                      <DropdownItem>View Language</DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-language icon-color"></i>
+
+                  <ButtonGroup className="float-right">
+                    <Dropdown id='card3' isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem  onClick={() => this.redirectToCrud("/language/addLanguage")}>Add Language</DropdownItem>
+                        <DropdownItem  onClick={() => this.redirectToCrud("/language/listLanguage")}>View Language</DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Languages </div>
                 <div className="text-count">04</div>
-               <div className="chart-wrapper mt-4 pb-2" >
-              </div>
+                <div className="chart-wrapper mt-4 pb-2" >
+                </div>
               </CardBody>
             </Card>
-          </Col> 
-         <Col xs="12" sm="6" lg="3">
+          </Col>
+          <Col xs="12" sm="6" lg="3">
             <Card className=" CardHeight">
               <CardBody className="box-p">
-              <div class="h1 text-muted text-left mb-2  ">
-                <i class="fa fa-calculator  icon-color"></i>
-              
-                <ButtonGroup className="float-right">
-                  <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
-                  <DropdownToggle caret className="p-0" color="transparent">
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>View Supply Plans Waiting for Approval</DropdownItem>
-                     
-                    </DropdownMenu>
-                  </Dropdown>
-                </ButtonGroup>
-              </div>
-               
+                <div class="h1 text-muted text-left mb-2  ">
+                  <i class="fa fa-calculator  icon-color"></i>
+
+                  <ButtonGroup className="float-right">
+                    <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                      <DropdownToggle caret className="p-0" color="transparent">
+                      </DropdownToggle>
+                      <DropdownMenu right>
+                        <DropdownItem  onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
+
+                      </DropdownMenu>
+                    </Dropdown>
+                  </ButtonGroup>
+                </div>
+
                 <div className="TextTittle ">Supply Plans Waiting for Approval </div>
                 <div className="text-count">05</div>
-               <div className="chart-wrapper mt-4 pb-2" >
-               </div>
+                <div className="chart-wrapper mt-4 pb-2" >
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -437,7 +444,7 @@ class ApplicationDashboard extends Component {
         {/* <Row className="mt-2">
           <Col md="12">
             <Card> */}
-              {/* <CardHeader className="text-center">
+        {/* <CardHeader className="text-center">
                 <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
                 <div className="card-header-actions">
                 <a className="card-header-action">
@@ -445,12 +452,12 @@ class ApplicationDashboard extends Component {
                   </a>
                 </div>
               </CardHeader> */}
-              {/* <CardBody>
+        {/* <CardBody>
                 <div className="chart-wrapper chart-graph">
                   <Bar data={bar} options={options} />
                 </div>
               </CardBody> */}
-            {/* </Card>
+        {/* </Card>
           </Col>
         </Row> */}
         {/* <Row>
