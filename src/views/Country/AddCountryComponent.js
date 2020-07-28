@@ -26,6 +26,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.country.countrytext')),
         countryCode2: Yup.string()
             // .max(2, 'Country code 2 is 2 digit number')
@@ -349,7 +350,7 @@ export default class AddCountryComponent extends Component {
                                                             value={this.state.country.countryCode}
                                                             required
                                                             maxLength={3}
-                                                             />
+                                                        />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
@@ -366,9 +367,9 @@ export default class AddCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode2}
-                                                            required 
+                                                            required
                                                             maxLength={2}
-                                                            />
+                                                        />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
                                                     </FormGroup>

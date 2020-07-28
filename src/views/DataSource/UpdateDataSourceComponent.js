@@ -18,6 +18,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
             .required(i18n.t('static.datasource.datasourcetypetext'))
@@ -158,14 +159,15 @@ export default class UpdateDataSourceComponent extends Component {
     componentDidMount() {
 
         AuthenticationService.setupAxiosInterceptors();
-       
+
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
-            if (response.status == 200) { 
+            if (response.status == 200) {
                 this.setState({
-                dataSource: response.data
-            });}
-            else{
-                
+                    dataSource: response.data
+                });
+            }
+            else {
+
                 this.setState({
                     message: response.data.messageCode
                 },
@@ -173,7 +175,7 @@ export default class UpdateDataSourceComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-           
+
 
         })
 
@@ -213,7 +215,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     DataSourceService.editDataSource(this.state.dataSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/dataSource/listDataSource/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/dataSource/listDataSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -251,18 +253,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="dataSourceTypeId"
-                                                            id="dataSourceTypeId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.dataSource.dataSourceType.label.label_en}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                         <Input
                                                             type="text"
@@ -274,6 +264,19 @@ export default class UpdateDataSourceComponent extends Component {
                                                         >
                                                         </Input>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="dataSourceTypeId"
+                                                            id="dataSourceTypeId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSource.dataSourceType.label.label_en}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
+
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
