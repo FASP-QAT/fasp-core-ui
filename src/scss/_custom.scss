@@ -793,6 +793,10 @@ label.arrow_label:after {
 
 .listPrportFundingAlignThtd .react-bootstrap-table .table td{width: 150px !important;}
 
+
+.listprocurementagent .react-bootstrap-table .table td:nth-child(9){width: 70px !important;}
+.listprocurementagent .react-bootstrap-table .table td:nth-child(10){width: 70px !important;}
+
 .Region-box-icon {
   position: absolute;
   top: 33px;
@@ -828,6 +832,10 @@ label.arrow_label:after {
   top: -53px;
   right: 0%;
 
+}
+
+.jexcel_content{
+  max-height: 540px !important;
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
