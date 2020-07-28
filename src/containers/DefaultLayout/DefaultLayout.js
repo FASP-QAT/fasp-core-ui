@@ -405,6 +405,12 @@ class DefaultLayout extends Component {
                             url: '/shipment/shipmentDetails',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
+                            name: 'Manual Tagging',
+                            url: '/shipment/manualTagging',
+                            icon: 'fa fa-truck',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }
                         ]
                       },

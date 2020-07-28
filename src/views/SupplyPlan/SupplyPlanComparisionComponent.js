@@ -273,7 +273,7 @@ export default class SupplyPlanComponent extends React.Component {
         var A = [header]
 
         var openningArr = [...[i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20')], ... this.state.openingBalanceArray]
-        var consumptionArr = [...[("-" + i18n.t('static.dashboard.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
+        var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
         var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20')], ...this.state.shipmentsTotalData]
         var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20')], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
         var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20')], ...this.state.manualShipmentsTotalData]
@@ -416,7 +416,7 @@ export default class SupplyPlanComponent extends React.Component {
 
         const headers = [header];
         var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray]
-        var consumptionArr = [...[("-" + i18n.t('static.dashboard.consumption'))], ...this.state.consumptionTotalData]
+        var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
         var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
         var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
         var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
@@ -3906,7 +3906,7 @@ export default class SupplyPlanComponent extends React.Component {
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
-                        label: i18n.t('static.dashboard.consumption'),
+                        label: i18n.t('static.supplyPlan.consumption'),
                         type: 'line',
                         stack: 3,
                         yAxisID: 'A',
@@ -4023,7 +4023,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </tr>
                             <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
                                 <td className="BorderNoneSupplyPlan"></td>
-                                <td align="left"><b>- {i18n.t('static.dashboard.consumption')}</b></td>
+                                <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                 {
                                     this.state.consumptionTotalData.map(item1 => (
                                         <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>

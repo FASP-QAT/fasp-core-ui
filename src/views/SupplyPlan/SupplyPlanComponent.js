@@ -213,7 +213,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.checkValidationForShipmentDates = this.checkValidationForShipmentDates.bind(this);
         this.shipmentDatesChanged = this.shipmentDatesChanged.bind(this);
     }
-    
+
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
@@ -307,7 +307,7 @@ export default class SupplyPlanComponent extends React.Component {
             var A = [header]
 
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20')], ... this.state.openingBalanceArray]
-            var consumptionArr = [...[("-" + i18n.t('static.dashboard.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
+            var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
             var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20')], ...this.state.shipmentsTotalData]
             var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20')], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
             var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20')], ...this.state.manualShipmentsTotalData]
@@ -450,7 +450,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             const headers = [header];
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray]
-            var consumptionArr = [...[("-" + i18n.t('static.dashboard.consumption'))], ...this.state.consumptionTotalData]
+            var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
             var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
             var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
             var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
@@ -560,7 +560,7 @@ export default class SupplyPlanComponent extends React.Component {
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
-                        label: i18n.t('static.dashboard.consumption'),
+                        label: i18n.t('static.supplyPlan.consumption'),
                         type: 'line',
                         stack: 3,
                         yAxisID: 'A',
@@ -679,7 +679,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                                 <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
                                     <td className="BorderNoneSupplyPlan"></td>
-                                    <td align="left"><b>- {i18n.t('static.dashboard.consumption')}</b></td>
+                                    <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                     {
                                         this.state.consumptionTotalData.map(item1 => (
                                             <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -3849,7 +3849,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var countrySKUResult = [];
                         countrySKUResult = countrySKURequest.result;
                         for (var k = 0; k < countrySKUResult.length; k++) {
-                            if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && countrySKUResult[k].active == true && countrySKUResult[k].planningUnit.id==document.getElementById("planningUnitId").value) {
+                            if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && countrySKUResult[k].active == true && countrySKUResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
                                 var countrySKUJson = {
                                     name: getLabelText(countrySKUResult[k].label, this.state.lang),
                                     id: countrySKUResult[k].realmCountryPlanningUnitId
@@ -5061,7 +5061,7 @@ export default class SupplyPlanComponent extends React.Component {
             mapArray.push(map);
 
             var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("4") == map.get("4")
+                c.get("3") == map.get("3")
             )
             if (checkDuplicateInMap.length > 1) {
                 var colArr = ['D'];
@@ -5620,7 +5620,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                             },
                                                             {
@@ -5628,7 +5628,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5637,7 +5637,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5646,7 +5646,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5655,7 +5655,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5664,7 +5664,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -8428,8 +8428,14 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     } else {
                                                                         var cell = elInstance.getCell(`S${parseInt(y) + 1}`)
                                                                         cell.classList.remove('readonly');
-                                                                        var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
-                                                                        cell.classList.remove('readonly');
+                                                                        var orderBasedOn = elInstance.getRowData(y)[18];
+                                                                        if (orderBasedOn == 1 || orderBasedOn == 4 || orderBasedOn == 5) {
+                                                                            var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
+                                                                            cell.classList.remove('readonly');
+                                                                        } else {
+                                                                            var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
+                                                                            cell.classList.add('readonly');
+                                                                        }
                                                                         var cell = elInstance.getCell(`U${parseInt(y) + 1}`)
                                                                         cell.classList.remove('readonly');
                                                                     }
@@ -8476,7 +8482,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != PLANNED_SHIPMENT_STATUS
                                                                                     },
@@ -8485,7 +8491,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != SUBMITTED_SHIPMENT_STATUS
                                                                                     },
@@ -8494,7 +8500,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != APPROVED_SHIPMENT_STATUS
                                                                                     },
@@ -8503,7 +8509,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != SHIPPED_SHIPMENT_STATUS
                                                                                     },
@@ -8512,7 +8518,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != ARRIVED_SHIPMENT_STATUS
                                                                                     },
@@ -8521,7 +8527,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: true
                                                                                     },
@@ -9656,6 +9662,10 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
             }
+        }
+
+        if (x == 18) {
+            elInstance.setValueFromCoords(19, y, "", true);
         }
 
         if (x == 26) {
