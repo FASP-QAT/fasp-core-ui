@@ -128,7 +128,7 @@ class AddProcurementAgentComponent extends Component {
             procurementAgent.colorHtmlCode = event.target.value.toUpperCase();
         }
         if (event.target.name == "procurementAgentCode") {
-            procurementAgent.procurementAgentCode = event.target.value;
+            procurementAgent.procurementAgentCode = event.target.value.toUpperCase();
         }
         if (event.target.name == "procurementAgentName") {
             procurementAgent.label.label_en = event.target.value;
@@ -275,6 +275,24 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            bsSize="sm"
+                                                            name="procurementAgentName"
+                                                            id="procurementAgentName"
+                                                            valid={!errors.procurementAgentName && this.state.procurementAgent.label.label_en != ''}
+                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.Capitalize(this.state.procurementAgent.label.label_en)}
+                                                        />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
@@ -309,24 +327,7 @@ class AddProcurementAgentComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName && this.state.procurementAgent.label.label_en != ''}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.Capitalize(this.state.procurementAgent.label.label_en)}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
-                                                    </FormGroup>
+
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
