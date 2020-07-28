@@ -17,9 +17,10 @@ const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
-            .max(6, i18n.t('static.common.max6digittext'))
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
@@ -86,7 +87,7 @@ class EditFundingSourceComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
-                console.log("RESP----",response.data);
+                console.log("RESP----", response.data);
                 this.setState({
                     fundingSource: response.data
                 });
@@ -170,12 +171,12 @@ class EditFundingSourceComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     fundingSource: this.state.fundingSource.label.label_en,
-                                    fundingSourceCode:this.state.fundingSource.fundingSourceCode
+                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
-                                    console.log("FUNDING_SOURCE----",this.state.fundingSource);
+                                    console.log("FUNDING_SOURCE----", this.state.fundingSource);
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -204,7 +205,7 @@ class EditFundingSourceComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
-                                                <CardBody  className="pb-0">
+                                                <CardBody className="pb-0">
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
                                                         <Input
@@ -242,7 +243,9 @@ class EditFundingSourceComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.fundingSourceCode}
-                                                            required />
+                                                            required
+                                                            maxLength={6}
+                                                        />
                                                         <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                                                     </FormGroup>
 
