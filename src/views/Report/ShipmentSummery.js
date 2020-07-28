@@ -1111,15 +1111,20 @@ class ShipmentSummery extends Component {
         let mainData = this.state.data;
         let tempDataTable = mainData.map((item) => { return { shipmentId: item.shipmentId, fundingSource: item.fundingSource, shipmentQty: item.shipmentQty, totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
 
-        let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
-            if (!a[fundingSource.id])
-                a[fundingSource.id] = Object.assign({}, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost });
-            else
-                a[fundingSource.id].totalCost += totalCost;
-            a[fundingSource.id].shipmentQty += shipmentQty;
-            a[fundingSource.id].forecastCost += forecastCost;
-            return a;
-        }, {}));
+        var result1 = tempDataTable.reduce(function (tempDataTable, val) {
+            var o = tempDataTable.filter(function (obj) {
+                return obj.fundingSource.id == val.fundingSource.id;
+            }).pop() || { fundingSource: val.fundingSource, shipmentId: val.shipmentId, shipmentQty: 0, totalCost: 0, forecastCost: 0 };
+
+            o.shipmentQty += val.shipmentQty;
+            o.totalCost += val.totalCost;
+            o.forecastCost += val.forecastCost;
+            tempDataTable.push(o);
+            return tempDataTable;
+        }, []);
+        var result = result1.filter(function (itm, i, a) {
+            return i == a.indexOf(itm);
+        });
 
         let perResult = [];
         for (var k = 0; k < result.length; k++) {
@@ -1134,7 +1139,7 @@ class ShipmentSummery extends Component {
                 fundingSource: result[k].fundingSource,
                 shipmentQty: result[k].shipmentQty,
                 totalCost: viewById == 1 ? result[k].totalCost : result[k].forecastCost,
-                orders: 1
+                orders: count
             }
             perResult.push(json);
         }
@@ -1876,14 +1881,30 @@ class ShipmentSummery extends Component {
             let data1 = mainData.filter(c => shipmentStatus[i].localeCompare(getLabelText(c.shipmentStatus.label, this.state.lang)) == 0).map((item) => { return { shipmentId: item.shipmentId, expectedDeliveryDate: (moment(item.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY')), totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
 
             //logic for add same date data
-            let result = Object.values(data1.reduce((a, { shipmentId, totalCost, expectedDeliveryDate, forecastCost }) => {
-                if (!a[expectedDeliveryDate])
-                    a[expectedDeliveryDate] = Object.assign({}, { shipmentId, totalCost, expectedDeliveryDate, forecastCost });
-                else
-                    a[expectedDeliveryDate].totalCost += totalCost;
-                a[expectedDeliveryDate].forecastCost += forecastCost;
-                return a;
-            }, {}));
+            // let result = Object.values(data1.reduce((a, { shipmentId, totalCost, expectedDeliveryDate, forecastCost }) => {
+            //     if (!a[expectedDeliveryDate])
+            //         a[expectedDeliveryDate] = Object.assign({}, { shipmentId, totalCost, expectedDeliveryDate, forecastCost });
+            //     else
+            //         a[expectedDeliveryDate].totalCost += totalCost;
+            //     a[expectedDeliveryDate].forecastCost += forecastCost;
+            //     return a;
+            // }, {}));
+
+
+            var result1 = data1.reduce(function (data1, val) {
+                var o = data1.filter(function (obj) {
+                    return obj.expectedDeliveryDate == val.expectedDeliveryDate;
+                }).pop() || { expectedDeliveryDate: val.expectedDeliveryDate, shipmentId: val.shipmentId, totalCost: 0, forecastCost: 0 };
+
+                o.totalCost += val.totalCost;
+                o.forecastCost += val.forecastCost;
+                data1.push(o);
+                return data1;
+            }, []);
+            var result = result1.filter(function (itm, i, a) {
+                return i == a.indexOf(itm);
+            });
+
 
 
             let tempdata = [];
@@ -1904,14 +1925,6 @@ class ShipmentSummery extends Component {
 
             shipmentSummerydata.push(tempdata);
 
-            // console.log(new Date().format('MM-yyyy'));
-            // var data1 = [{ Date: "01-01-2000", Banana: 10 }, { Date: "01-01-2000", Apple: 15 }, { Date: "01-01-2000", Orange: 20 }, { Date: "01-02-2000", Banana: 25 }, { Date: "01-02-2000", Apple: 30 }, { Date: "01-02-2000", Orange: 35 }],
-            //     result = Object.values(data1.reduce((a, c) => {
-            //         a[c.Date] = Object.assign(a[c.Date] || {}, c);
-            //         return a;
-            //     }, {}));
-
-            // console.log("result------->", result);
         }
 
         const bar = {
@@ -1924,17 +1937,60 @@ class ShipmentSummery extends Component {
 
         let tempDataTable = mainData.map((item) => { return { shipmentId: item.shipmentId, fundingSource: item.fundingSource, shipmentQty: item.shipmentQty, totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
 
-        let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
-            if (!a[fundingSource.id])
-                a[fundingSource.id] = Object.assign({}, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost });
-            else
-                a[fundingSource.id].totalCost += totalCost;
-            a[fundingSource.id].shipmentQty += shipmentQty;
-            a[fundingSource.id].forecastCost += forecastCost;
-            return a;
-        }, {}));
+        // console.log("tempDataTable------>>", tempDataTable);
 
+        var result1 = tempDataTable.reduce(function (tempDataTable, val) {
+            var o = tempDataTable.filter(function (obj) {
+                return obj.fundingSource.id == val.fundingSource.id;
+            }).pop() || { fundingSource: val.fundingSource, shipmentId: val.shipmentId, shipmentQty: 0, totalCost: 0, forecastCost: 0 };
+
+            o.shipmentQty += val.shipmentQty;
+            o.totalCost += val.totalCost;
+            o.forecastCost += val.forecastCost;
+            tempDataTable.push(o);
+            return tempDataTable;
+        }, []);
+        var result = result1.filter(function (itm, i, a) {
+            return i == a.indexOf(itm);
+        });
+
+        // console.log("RESULT------->", result);
+
+        // let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
+        //     if (!a[fundingSource.id])
+        //         a[fundingSource.id] = Object.assign({}, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost });
+        //     else
+        //         a[fundingSource.id].totalCost += totalCost;
+        //     a[fundingSource.id].shipmentQty += shipmentQty;
+        //     a[fundingSource.id].forecastCost += forecastCost;
+        //     return a;
+        // }, {}));
         // console.log("RESULT------>>", result);
+
+
+        //yessolution
+        // var arr = [
+        //     { 'name': 'P1', 'value': 150, 'value1': 150 },
+        //     { 'name': 'P1', 'value': 150, 'value1': 150 },
+        //     { 'name': 'P2', 'value': 200, 'value1': 150 },
+        //     { 'name': 'P3', 'value': 450, 'value1': 150 }
+        // ];
+        // var result1 = arr.reduce(function (acc, val) {
+        //     var o = acc.filter(function (obj) {
+        //         return obj.name == val.name;
+        //     }).pop() || { name: val.name, value: 0, value1: 0 };
+
+        //     o.value += val.value;
+        //     o.value1 += val.value1;
+        //     acc.push(o);
+        //     return acc;
+        // }, []);
+        // var finalresult = result1.filter(function (itm, i, a) {
+        //     return i == a.indexOf(itm);
+        // });
+        // console.log("result1------->>>>>>>>>>", finalresult);
+
+
 
         let perResult = [];
         for (var k = 0; k < result.length; k++) {
@@ -1949,7 +2005,7 @@ class ShipmentSummery extends Component {
                 fundingSource: result[k].fundingSource,
                 shipmentQty: result[k].shipmentQty,
                 totalCost: viewById == 1 ? result[k].totalCost : result[k].forecastCost,
-                orders: 1
+                orders: count
             }
             perResult.push(json);
         }

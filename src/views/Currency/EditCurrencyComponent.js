@@ -167,7 +167,7 @@ export default class UpdateCurrencyComponent extends Component {
                     })
             }
 
-           
+
         })
 
     }
@@ -212,14 +212,14 @@ export default class UpdateCurrencyComponent extends Component {
                                         .then(response => {
                                             if (response.status == 200) {
                                                 // console.log("after update--",response.data);
-                                                this.props.history.push(`/currency/listCurrency/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/currency/listCurrency/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                message: response.data.messageCode
-                                            },
-                                                () => {
-                                                    this.hideSecondComponent();
-                                                })
+                                                    message: response.data.messageCode
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                 }}
@@ -248,7 +248,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.currency.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.label.label_en}
@@ -265,7 +265,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="currencyCode"
                                                             bsSize="sm"
                                                             valid={!errors.currencyCode}
-                                                            invalid={touched.currencyCode && !!errors.currencyCode}
+                                                            invalid={touched.currencyCode && !!errors.currencyCode || this.state.currency.currencyCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.currencyCode}
@@ -296,7 +296,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             id="conversionRate"
                                                             bsSize="sm"
                                                             valid={!errors.conversionRate}
-                                                            invalid={touched.conversionRate && !!errors.conversionRate}
+                                                            invalid={touched.conversionRate && !!errors.conversionRate || this.state.currency.conversionRateToUsd == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currency.conversionRateToUsd}

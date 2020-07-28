@@ -832,6 +832,7 @@ export default class ConsumptionDetails extends React.Component {
                         }.bind(this)
                     };
                     var consumptionEl = jexcel(document.getElementById("consumptiontableDiv"), options);
+                    document.getElementById("consumptiontableDiv").classList.add('Consumptionsearchinline');
                     this.el = consumptionEl;
                     this.setState({
                         consumptionEl: consumptionEl
@@ -1590,7 +1591,7 @@ export default class ConsumptionDetails extends React.Component {
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 pl-0">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>

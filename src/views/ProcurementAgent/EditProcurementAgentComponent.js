@@ -279,7 +279,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="colorHtmlCode"
                                                             id="colorHtmlCode"
                                                             valid={!errors.colorHtmlCode && this.state.procurementAgent.colorHtmlCode != ''}
-                                                            invalid={touched.colorHtmlCode && !!errors.colorHtmlCode}
+                                                            invalid={touched.colorHtmlCode && !!errors.colorHtmlCode || this.state.procurementAgent.colorHtmlCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -297,7 +297,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName || this.state.procurementAgent.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -315,7 +315,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
                                                             valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime || this.state.procurementAgent.submittedToApprovedLeadTime == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -334,7 +334,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="approvedToShippedLeadTime"
                                                             id="approvedToShippedLeadTime"
                                                             valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
-                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.procurementAgent.approvedToShippedLeadTime == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required

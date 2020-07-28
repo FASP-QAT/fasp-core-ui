@@ -262,7 +262,14 @@ export default class EditOrganisationComponent extends Component {
                             </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+
+                                    // label: this.props.location.state.healthArea.label.label_en,
+                                    organisationName: this.state.organisation.label.label_en,
+                                    organisationCode: this.state.organisation.organisationCode,
+                                    realmId: this.state.organisation.realm.id
+
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     // console.log("-------------------->" + this.state.healthArea);
@@ -319,7 +326,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <Select
                                                             bsSize="sm"
                                                             valid={!errors.realmCountryId}
-                                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                            invalid={touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray == ''}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
                                                             onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
                                                             multi
@@ -348,7 +355,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="organisationName" valid={!errors.organisationName}
-                                                            invalid={touched.organisationName && !!errors.organisationName}
+                                                            invalid={touched.organisationName && !!errors.organisationName || this.state.organisation.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.label.label_en}
@@ -425,12 +432,12 @@ export default class EditOrganisationComponent extends Component {
             this.setState({
                 organisation: response.data
             })
-            initialValues = {
-                // label: this.props.location.state.healthArea.label.label_en,
-                organisationName: this.state.organisation.label.label_en,
-                organisationCode: this.state.organisation.organisationCode,
-                realmId: this.state.organisation.realm.id
-            }
+            // initialValues = {
+            //     // label: this.props.location.state.healthArea.label.label_en,
+            //     organisationName: this.state.organisation.label.label_en,
+            //     organisationCode: this.state.organisation.organisationCode,
+            //     realmId: this.state.organisation.realm.id
+            // }
             UserService.getRealmList()
                 .then(response => {
                     console.log("realm list---", response.data);

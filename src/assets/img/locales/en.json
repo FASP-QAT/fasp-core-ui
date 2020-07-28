@@ -454,6 +454,7 @@
     "static.user.forgotpassword": "Forgot Password",
     "static.message.user.duplicateacl": "Duplicate access controls found",
     "static.message.rolenamevalidtext": "Only alphabets and spaces allowed",
+    "static.common.alphabetsOnly": "Only alphabets allowed",
     "static.dashboard.procurementUnit": "Procurement Units",
     "static.dashboard.procurementUnitheader": "Procurement Unit",
     "static.procurementUnit.validProcurementUnitText": "Please enter procurement unit name.",
@@ -600,7 +601,7 @@
     "static.user.confirmNewPasswordLabel": "Confirm New Password",
     "static.common.logout": "Logout",
     "static.common.profile": "Profile",
-    "static.dashboard.consumption": "Consumption",
+    "static.dashboard.consumption": "Consumption - Forecast vs Actual",
     "static.dashboard.stockstatusmatrix": "Stock Status Matrix",
     "static.common.year": "Year",
     "static.common.jan": "Jan",
@@ -1011,5 +1012,6 @@
     "static.supplyPlan.date":"Date",
     "static.whatIf.removePlannedShipmentsNotInLeadTimes":"Remove all planned shipments that are not within lead time",
     "static.whatIf.removeApprovedShipmentsNotInLeadTimes":"Remove all approved shipments that are not within lead time",
-    "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time"
+    "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time",
+    "static.report.totalUnit": "Total Units"
 }

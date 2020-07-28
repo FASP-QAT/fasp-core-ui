@@ -169,7 +169,7 @@ class PlanningUnitCountry extends Component {
                                                     data[1] = parseInt(papuList[j].planningUnit.id);
                                                     data[2] = papuList[j].label.label_en;
                                                     data[3] = papuList[j].skuCode;
-                                                    data[4] = parseInt(papuList[j].unit.id);
+                                                    data[4] = parseInt(papuList[j].unit.unitId);
                                                     data[5] = papuList[j].multiplier;
                                                     data[6] = papuList[j].active;
                                                     data[7] = this.props.match.params.realmCountryId;
@@ -273,7 +273,7 @@ class PlanningUnitCountry extends Component {
                                                     show: '',
                                                     entries: '',
                                                 },
-                                                // onload: this.loaded,
+                                                onload: this.loaded,
 
                                             };
 

@@ -433,7 +433,7 @@ class EditUserComponent extends Component {
                                                             id="username"
                                                             bsSize="sm"
                                                             valid={!errors.username}
-                                                            invalid={touched.username && !!errors.username}
+                                                            invalid={touched.username && !!errors.username || this.state.user.username == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -447,7 +447,7 @@ class EditUserComponent extends Component {
                                                             id="emailId"
                                                             bsSize="sm"
                                                             valid={!errors.emailId}
-                                                            invalid={touched.emailId && !!errors.emailId}
+                                                            invalid={touched.emailId && !!errors.emailId || this.state.user.emailId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -462,7 +462,7 @@ class EditUserComponent extends Component {
                                                             id="phoneNumber"
                                                             bsSize="sm"
                                                             valid={!errors.phoneNumber}
-                                                            invalid={touched.phoneNumber && !!errors.phoneNumber}
+                                                            invalid={touched.phoneNumber && !!errors.phoneNumber || this.state.user.phoneNumber == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -475,7 +475,7 @@ class EditUserComponent extends Component {
                                                         <Select
                                                             valid={!errors.roleId}
                                                             bsSize="sm"
-                                                            invalid={touched.roleId && !!errors.roleId}
+                                                            invalid={touched.roleId && !!errors.roleId || this.state.user.roleId == ''}
                                                             onChange={(e) => { handleChange(e); this.roleChange(e) }}
                                                             onBlur={handleBlur}
                                                             name="roleId"
@@ -510,7 +510,7 @@ class EditUserComponent extends Component {
                                                             id="languageId"
                                                             bsSize="sm"
                                                             valid={!errors.languageId}
-                                                            invalid={touched.languageId && !!errors.languageId}
+                                                            invalid={touched.languageId && !!errors.languageId || this.state.user.language.languageId == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required

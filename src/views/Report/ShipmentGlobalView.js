@@ -1697,7 +1697,6 @@ class ShipmentGlobalView extends Component {
                     }
 
                 }
-
             }
         }
         const unit = "pt";
@@ -2178,7 +2177,7 @@ class ShipmentGlobalView extends Component {
             })
             let realmId = AuthenticationService.getRealmId();
             var inputjson = {
-                realmId: 1,
+                realmId: realmId,
                 startDate: new moment(startDate),
                 stopDate: new moment(endDate),
                 realmCountryIds: CountryIds,
