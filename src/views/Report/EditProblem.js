@@ -215,6 +215,7 @@ export default class EditLanguageComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getProblemStatusById = this.getProblemStatusById.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
@@ -224,10 +225,14 @@ export default class EditLanguageComponent extends Component {
 
         if (event.target.name === "problemStatusId") {
             let problemStatusId = event.target.value;
+
             this.setState(
                 {
                     problemStatusId: problemStatusId,
-                })
+                },
+                () => {
+                    this.getProblemStatusById(problemStatusId);
+                });
         }
         if (event.target.name === "notes") {
             let notes = event.target.value;
@@ -245,6 +250,52 @@ export default class EditLanguageComponent extends Component {
         }, 8000);
     }
 
+    getProblemStatusById(problemStatusId) {
+        var problemStatusObject = {};
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(this.state.programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                var problemStatusRequest = problemStatusOs.getAll();
+
+
+                problemStatusRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = problemStatusRequest.result;
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].id == problemStatusId) {
+                            problemStatusObject = {
+                                "id": myResult[i].id,
+                                "label": myResult[i].label
+                            }
+                        }
+                    }
+                    this.setState(
+                        {
+                            problemStatusObject: problemStatusObject
+                        },
+                        () => {
+                            console.log("problemStatusObject------>", this.state.problemStatusObject)
+                        });
+
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+
+    }
     touchAll(setTouched, errors) {
         setTouched({
             problemStatusId: true,
@@ -363,7 +414,7 @@ export default class EditLanguageComponent extends Component {
                 headerAlign: 'center',
                 style: { width: '80px' },
                 formatter: (cell, row) => {
-                    return new moment(cell).format('MMM YYYY');
+                    return new moment(cell).format('yyyy-MM-DD');
                 }
             },
 
@@ -433,12 +484,8 @@ export default class EditLanguageComponent extends Component {
                                         var programTransaction = transaction.objectStore('programData');
                                         var programId = this.state.programId;
                                         var programRequest = programTransaction.get(programId);
-                                        programRequest.onerror = function (event) {
-                                            this.setState({
-                                                message: i18n.t('static.program.errortext'),
-                                                color: 'red'
-                                            })
-                                        }.bind(this);
+
+
                                         programRequest.onsuccess = function (event) {
 
                                             var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
@@ -447,6 +494,32 @@ export default class EditLanguageComponent extends Component {
 
                                             var problemReportList = (programJson.problemReportList);
 
+                                            // var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                                            // var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                                            // var problemStatusRequest = problemStatusOs.getAll();
+                                            // let problemStatusObject = {};
+
+                                            // problemStatusRequest.onsuccess = function (e) {
+                                            //     var myResult = [];
+                                            //     myResult = problemStatusRequest.result;
+                                            //     for (var i = 0; i < myResult.length; i++) {
+                                            //         if (myResult[i].id == this.state.problemStatusId) {
+                                            //             problemStatusObject = {
+                                            //                 "id": myResult[i].id,
+                                            //                 "label": myResult[i].label
+                                            //             }
+                                            //         }
+                                            //     }
+
+
+                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                                            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                                            let username = decryptedUser.username;
+
+
                                             let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
 
                                             let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
@@ -454,28 +527,18 @@ export default class EditLanguageComponent extends Component {
                                             // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                             // var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-                                            filterObj.lastModifiedBy = { userId: 1, username: "anchal" }
+                                            filterObj.lastModifiedBy = { userId: userId, username: username }
                                             filterObj.lastModifiedDate = moment();
 
                                             let tempProblemTransList = filterObj.problemTransList;
 
                                             let tempProblemTransObj = {
                                                 "problemReportTransId": '',
-                                                "problemStatus": {
-                                                    "id": 1,
-                                                    "label": {
-                                                        "active": true,
-                                                        "labelId": 461,
-                                                        "label_en": "Open",
-                                                        "label_sp": null,
-                                                        "label_fr": null,
-                                                        "label_pr": null
-                                                    }
-                                                },
+                                                "problemStatus": this.state.problemStatusObject,
                                                 "notes": this.state.notes,
                                                 "createdBy": {
-                                                    "userId": 1,
-                                                    "username": "anchal"
+                                                    "userId": userId,
+                                                    "username": username
                                                 },
                                                 "createdDate": moment()
                                             }
@@ -495,7 +558,8 @@ export default class EditLanguageComponent extends Component {
                                                     message: i18n.t('static.program.errortext'),
                                                     color: 'red'
                                                 })
-                                            }.bind(this);
+                                            };
+
                                             putRequest.onsuccess = function (event) {
                                                 this.setState({
                                                     // message: 'static.message.consumptionSaved',
@@ -506,6 +570,7 @@ export default class EditLanguageComponent extends Component {
                                                 this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
                                             }.bind(this)
 
+                                            // }.bind(this);
                                         }.bind(this);
                                     }.bind(this);
 
@@ -687,7 +752,7 @@ export default class EditLanguageComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label htmlFor="action">Problem Status</Label>
+                                                        <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input type="select"
                                                             bsSize="sm"
@@ -744,7 +809,7 @@ export default class EditLanguageComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
