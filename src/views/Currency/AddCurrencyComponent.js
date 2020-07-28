@@ -20,14 +20,16 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
-            .required(i18n.t('static.currency.currencycodetext')).
-            max(4, i18n.t('static.currency.currencycodemax4digittext')),
+            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            .required(i18n.t('static.currency.currencycodetext')),
+        // max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
         //     .required(i18n.t('static.currency.currencysymboltext')).
         //     max(3, i18n.t('static.country.countrycodemax3digittext')).
         //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
@@ -150,7 +152,7 @@ export default class AddCurrencyComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-               <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -169,11 +171,11 @@ export default class AddCurrencyComponent extends Component {
                                                 this.props.history.push(`/currency/listCurrency/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                message: response.data.messageCode
-                                            },
-                                                () => {
-                                                    this.hideSecondComponent();
-                                                })
+                                                    message: response.data.messageCode
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -225,7 +227,9 @@ export default class AddCurrencyComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.currencyCode}
-                                                            required />
+                                                            required
+                                                            maxLength={4}
+                                                        />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
@@ -319,7 +323,7 @@ export default class AddCurrencyComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/currency/listCurrency/` + 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/currency/listCurrency/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
