@@ -363,7 +363,7 @@ export default class EditLanguageComponent extends Component {
                 headerAlign: 'center',
                 style: { width: '80px' },
                 formatter: (cell, row) => {
-                    return new moment(cell).format('MMM YYYY');
+                    return new moment(cell).format('yyyy-MM-DD');
                 }
             },
 
@@ -447,65 +447,81 @@ export default class EditLanguageComponent extends Component {
 
                                             var problemReportList = (programJson.problemReportList);
 
-                                            let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
+                                            var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                                            var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                                            var problemStatusRequest = problemStatusOs.getAll();
+                                            let problemStatusObject = {};
+                                            problemStatusRequest.onerror = function (event) {
+                                                // Handle errors!
+                                            };
+                                            problemStatusRequest.onsuccess = function (e) {
+                                                var myResult = [];
+                                                myResult = problemStatusRequest.result;
 
-                                            let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
-
-                                            // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                            // var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-                                            filterObj.lastModifiedBy = { userId: 1, username: "anchal" }
-                                            filterObj.lastModifiedDate = moment();
-
-                                            let tempProblemTransList = filterObj.problemTransList;
-
-                                            let tempProblemTransObj = {
-                                                "problemReportTransId": '',
-                                                "problemStatus": {
-                                                    "id": 1,
-                                                    "label": {
-                                                        "active": true,
-                                                        "labelId": 461,
-                                                        "label_en": "Open",
-                                                        "label_sp": null,
-                                                        "label_fr": null,
-                                                        "label_pr": null
+                                                for (var i = 0; i < myResult.length; i++) {
+                                                    if (myResult[i].id == this.state.problemReportId) {
+                                                        problemStatusObject = myResult[i];
                                                     }
-                                                },
-                                                "notes": this.state.notes,
-                                                "createdBy": {
-                                                    "userId": 1,
-                                                    "username": "anchal"
-                                                },
-                                                "createdDate": moment()
-                                            }
+                                                }
+                                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-                                            tempProblemTransList.push(tempProblemTransObj);
-
-                                            filterObj.problemTransList = tempProblemTransList;
+                                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                                                let username = decryptedUser.username;
 
 
-                                            otherProblemReport.push(filterObj);
-                                            programJson.problemReportList = otherProblemReport;
-                                            programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                                            var putRequest = programTransaction.put(programRequest.result);
+                                                let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
 
-                                            putRequest.onerror = function (event) {
-                                                this.setState({
-                                                    message: i18n.t('static.program.errortext'),
-                                                    color: 'red'
-                                                })
+                                                let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
+
+                                                // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                // var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                                                filterObj.lastModifiedBy = { userId: userId, username: username }
+                                                filterObj.lastModifiedDate = moment();
+
+                                                let tempProblemTransList = filterObj.problemTransList;
+
+                                                let tempProblemTransObj = {
+                                                    "problemReportTransId": '',
+                                                    "problemStatus": problemStatusObject,
+                                                    "notes": this.state.notes,
+                                                    "createdBy": {
+                                                        "userId": userId,
+                                                        "username": username
+                                                    },
+                                                    "createdDate": moment()
+                                                }
+
+                                                tempProblemTransList.push(tempProblemTransObj);
+
+                                                filterObj.problemTransList = tempProblemTransList;
+
+
+                                                otherProblemReport.push(filterObj);
+                                                programJson.problemReportList = otherProblemReport;
+                                                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                var putRequest = programTransaction.put(programRequest.result);
+
+                                                putRequest.onerror = function (event) {
+                                                    this.setState({
+                                                        message: i18n.t('static.program.errortext'),
+                                                        color: 'red'
+                                                    })
+                                                };
+
+                                                putRequest.onsuccess = function (event) {
+                                                    this.setState({
+                                                        // message: 'static.message.consumptionSaved',
+                                                        changedFlag: 0,
+                                                        color: 'green'
+                                                    })
+
+                                                    this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
+                                                }.bind(this)
+
                                             }.bind(this);
-                                            putRequest.onsuccess = function (event) {
-                                                this.setState({
-                                                    // message: 'static.message.consumptionSaved',
-                                                    changedFlag: 0,
-                                                    color: 'green'
-                                                })
-
-                                                this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
-                                            }.bind(this)
-
                                         }.bind(this);
                                     }.bind(this);
 
@@ -687,7 +703,7 @@ export default class EditLanguageComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label htmlFor="action">Problem Status</Label>
+                                                        <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input type="select"
                                                             bsSize="sm"
@@ -744,7 +760,7 @@ export default class EditLanguageComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

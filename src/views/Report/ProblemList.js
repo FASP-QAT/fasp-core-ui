@@ -65,6 +65,7 @@ export default class ConsumptionDetails extends React.Component {
             planningUnitList: [],
             procurementUnitList: [],
             supplierList: [],
+            problemStatusList: [],
             data: [],
             message: '',
             planningUnitId: ''
@@ -113,6 +114,32 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList
                 })
+
+
+                var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                var problemStatusRequest = problemStatusOs.getAll();
+
+                problemStatusRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                problemStatusRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = problemStatusRequest.result;
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
+                        var Json = {
+                            name: getLabelText(myResult[i].label, lan),
+                            id: myResult[i].id
+                        }
+                        proList[i] = Json
+                    }
+                    this.setState({
+                        problemStatusList: proList
+                    })
+
+
+                }.bind(this);
             }.bind(this);
         }.bind(this);
 
@@ -202,6 +229,14 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
 
+        const { problemStatusList } = this.state;
+        let problemStatus = problemStatusList.length > 0
+            && problemStatusList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
         const columns = [
             {
                 dataField: 'program.code',
@@ -242,6 +277,17 @@ export default class ConsumptionDetails extends React.Component {
                 }
             },
             {
+                dataField: 'realmProblem.criticality.label',
+                text: i18n.t('static.report.Criticality'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '100px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
                 dataField: 'problemStatus.label',
                 text: i18n.t('static.report.problemStatus'),
                 sort: true,
@@ -271,17 +317,7 @@ export default class ConsumptionDetails extends React.Component {
                 headerAlign: 'center',
                 style: { width: '100px' },
             },
-            {
-                dataField: 'realmProblem.criticality.label',
-                text: i18n.t('static.report.Criticality'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            }
+
 
         ];
         const options = {
@@ -376,9 +412,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     onChange={this.fetchData}
                                                                 >
                                                                     <option value="0">Please select</option>
-                                                                    <option value="1">Open</option>
-                                                                    <option value="2">Closed</option>
-                                                                    <option value="3">Received</option>
+                                                                    {problemStatus}
                                                                 </Input>
                                                             </InputGroup>
                                                         </div>
@@ -449,7 +483,6 @@ export default class ConsumptionDetails extends React.Component {
             </div >
         );
     }
-
 
     cancelClicked() {
         this.props.history.push(`/ApplicationDashboard/`);
