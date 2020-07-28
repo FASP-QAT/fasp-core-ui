@@ -793,6 +793,10 @@ label.arrow_label:after {
 
 .listPrportFundingAlignThtd .react-bootstrap-table .table td{width: 150px !important;}
 
+
+.listprocurementagent .react-bootstrap-table .table td:nth-child(9){width: 70px !important;}
+.listprocurementagent .react-bootstrap-table .table td:nth-child(10){width: 70px !important;}
+
 .Region-box-icon {
   position: absolute;
   top: 33px;
@@ -828,6 +832,10 @@ label.arrow_label:after {
   top: -53px;
   right: 0%;
 
+}
+
+.jexcel_content{
+      max-height: 540px;
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
@@ -1956,7 +1964,7 @@ input::placeholder {
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 315px !important;
+  margin-left: 337px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -1971,7 +1979,7 @@ input::placeholder {
 
 .supplyplan-larrow-dataentry {
   float: left;
-  margin-left: 17px !important;
+  margin-left: 77px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -1983,7 +1991,17 @@ input::placeholder {
   cursor: pointer;
   // margin-right: 9%;
 }
+.supplyplan-larrow-dataentry-adjustment{
+  float: left;
+  margin-left: 91px !important;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+}
 
+.Supplyfeild {
+  width: 230px;
+}
 .legend-supplypln {
   margin-bottom: 0px;
   margin-top: -4px;
