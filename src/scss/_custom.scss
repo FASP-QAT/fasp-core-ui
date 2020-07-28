@@ -2043,9 +2043,10 @@ input::placeholder {
   text-overflow: ellipsis;
   align-items: stretch!important;
   width: 160px!important;
+  // width: 237px!important;
   min-width: 100%!important;
   width: 0 auto!important;
-  height: calc(0.5em + 0.5rem + 2px)!important;
+  height: calc(0.5em + 0.5rem + 8px)!important;
   background-clip: padding-box!important;
   font-size: 0.76562rem!important;
   line-height: 1.5!important;
@@ -2072,13 +2073,14 @@ input::placeholder {
       display: flex!important;
       align-items: stretch!important;
       width: 160px!important;
+      // width: 237px!important;
       min-width: 100%!important;
       width: 0 auto!important;
       overflow: hidden;
     word-wrap: normal !important;
     white-space: normal;
     text-overflow: ellipsis;
-      height: calc(0.5em + 0.5rem + 2px)!important;
+      height: calc(0.5em + 0.5rem + 8px)!important;
       background-clip: padding-box!important;
       font-size: 0.76562rem!important;
       line-height: 1.5!important;
@@ -2104,11 +2106,15 @@ input::placeholder {
       z-index: 2;
       
   }
+  // .css-1v99tuv{
+   
+  //   max-width: 188px!important;
+  // }
   
   .reportdown-box-icon {
     position: absolute;
     top: 32px;
-    z-index: 2;
+    // z-index: 2;
     right: 23px;
     color: 697069;
   }
