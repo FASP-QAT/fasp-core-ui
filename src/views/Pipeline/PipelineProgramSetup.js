@@ -781,7 +781,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <ul>
                                                         {/* <li className="progresdatatext1">Realm</li> */}
                                                         <li className="progresdatatext1">Country</li>
-                                                        <li className="progresdatatext2">Health Area</li>
+                                                        <li className="progresdatatext2">Technical Area</li>
                                                         <li className="progresdatatext3">Organisation</li>
                                                         <li className="progresdatatext4">Region</li>
                                                         <li className="progresdatatext5">Program Data</li>

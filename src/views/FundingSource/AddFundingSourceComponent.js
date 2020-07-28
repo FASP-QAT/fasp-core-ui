@@ -21,9 +21,11 @@ const validationSchema = function (values) {
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
     fundingSource: Yup.string()
+      .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
       .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSourceCode: Yup.string()
-      .max(6, i18n.t('static.common.max6digittext'))
+      // .max(6, i18n.t('static.common.max6digittext'))
+      .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
       .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
   })
 }
@@ -61,7 +63,7 @@ class AddFundingSourceComponent extends Component {
         label: {
           label_en: ''
         },
-        fundingSourceCode:''
+        fundingSourceCode: ''
       },
       message: '',
       lang: localStorage.getItem('lang')
@@ -94,7 +96,7 @@ class AddFundingSourceComponent extends Component {
     setTouched({
       realmId: true,
       fundingSource: true,
-      fundingSourceCode:true,
+      fundingSourceCode: true,
     }
     );
     this.validateForm(errors);
@@ -237,7 +239,9 @@ class AddFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               value={this.Capitalize(this.state.fundingSource.fundingSourceCode)}
-                              required />
+                              required 
+                              maxLength={6}
+                              />
                             <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                           </FormGroup>
                         </CardBody>

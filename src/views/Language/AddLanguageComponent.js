@@ -22,8 +22,12 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         languageName: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2, i18n.t('static.language.languageCodemax3digittext'))
+        languageCode: Yup.string()
+        .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+        .required(i18n.t('static.language.languagecodetext'))
+        // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -224,7 +228,9 @@ class AddLanguageComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
-                                                            required />
+                                                            required 
+                                                            maxLength={2}
+                                                            />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>

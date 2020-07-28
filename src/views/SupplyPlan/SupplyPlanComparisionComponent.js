@@ -4369,7 +4369,7 @@ export default class SupplyPlanComponent extends React.Component {
                     <ModalBody>
                         <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
                         <div className="col-md-12">
-                            <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                            <span className="supplyplan-larrow-dataentry-adjustment" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
                             <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
@@ -4496,6 +4496,9 @@ export default class SupplyPlanComponent extends React.Component {
                         <div className="table-responsive">
                             <div id="shipmentDatesTable"></div>
                         </div>
+                        <div>
+                                <span><strong>Note :</strong> If Suggested order quantity is selected, then it overrides system calculations.</span>
+                            </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                         </div>
                     </ModalBody>

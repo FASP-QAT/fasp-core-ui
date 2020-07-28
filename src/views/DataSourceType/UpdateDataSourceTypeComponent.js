@@ -15,6 +15,7 @@ const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
@@ -208,6 +209,18 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
                                                 <CardBody className="pb-0">
                                                     <FormGroup>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSourceType.realm.label.label_en}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
@@ -221,18 +234,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.dataSourceType.realm.label.label_en}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
+
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')} </Label>
                                                         <FormGroup check inline>
