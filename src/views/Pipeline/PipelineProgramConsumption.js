@@ -248,6 +248,7 @@ export default class PipelineProgramConsumption extends Component {
                                     allowDeleteRow: false,
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
+                                    allowInsertRow: false,
                                     copyCompatibility: true,
                                     // paginationOptions: [10, 25, 50, 100],
                                     // position: 'top',

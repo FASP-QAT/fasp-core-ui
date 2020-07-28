@@ -276,7 +276,7 @@ export default class ForecastingUnitListComponent extends Component {
             && productCategories.map((item, i) => {
                 console.log(JSON.stringify(item))
                 return (
-                    <option key={i} value={item.productCategoryId}>
+                    <option key={i} value={item.payload.productCategoryId}>
                         {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )

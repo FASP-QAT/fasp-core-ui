@@ -849,6 +849,7 @@ class AuthenticationService {
                     break;
                 case "/supplyPlan":
                 case "/supplyPlanFormulas":
+                case "/report/whatIf":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                         return true;
                     }
@@ -1052,6 +1053,8 @@ class AuthenticationService {
                 case "/logout/:message":
                 case "/logout":
                     return true;
+                    break;
+                case "/problem/editProblem": return true
                     break;
                 default:
                     console.log("Inside default-");

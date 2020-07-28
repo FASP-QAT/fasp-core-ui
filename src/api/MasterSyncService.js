@@ -141,5 +141,15 @@ class MasterSyncService {
         });
     }
 
+    getProblemListForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/problem/realmId/1/${lastSyncDate}`, {
+        });
+    }
+
+    getProblemStatusListForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/problemStatus/${lastSyncDate}`, {
+        });
+    }
+
 }
 export default new MasterSyncService()

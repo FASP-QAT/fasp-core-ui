@@ -1272,10 +1272,11 @@ class ShipmentSummery extends Component {
 
         doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
+        //Table1
         let content1 = {
-            margin: { top: 40 },
-            startY: 200,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            margin: { top: 80 },
+            startY: height,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 190.5, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
             },
@@ -1293,11 +1294,12 @@ class ShipmentSummery extends Component {
         };
         doc.autoTable(content1);
 
+        //Table2
         let content2 = {
-            margin: { top: 80, left: 100 },
+            margin: { top: 80 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
             },
@@ -1314,8 +1316,9 @@ class ShipmentSummery extends Component {
             }
         };
 
-        //doc.text(title, marginLeft, 40);
         doc.autoTable(content2);
+
+
         addHeaders(doc)
         addFooters(doc)
         doc.save(i18n.t('static.report.shipmentDetailReport') + ".pdf")
@@ -1966,7 +1969,7 @@ class ShipmentSummery extends Component {
                     this.setState({ message: message })
                 }} /> */}
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5  className="red">{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -2135,12 +2138,12 @@ class ShipmentSummery extends Component {
                                                             <Bar id="cool-canvas" data={bar} options={options} />
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-12">
+                                                    {/* <div className="col-md-12">
                                                         <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
                                                         </button>
 
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             }
 
@@ -2158,11 +2161,11 @@ class ShipmentSummery extends Component {
 
                                                         </div>
                                                     </div><br />
-                                                    <div className="col-md-12">
+                                                    {/* <div className="col-md-12">
                                                         <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
                                                         </button>
-                                                    </div>
+                                                    </div> */}
                                                 </div>}
 
                                         </Offline>
@@ -2171,7 +2174,7 @@ class ShipmentSummery extends Component {
 
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.show &&
+                                            {this.state.data.length > 0 &&
                                                 <Table id="mytable1" responsive className="table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>
@@ -2214,7 +2217,7 @@ class ShipmentSummery extends Component {
 
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.show &&
+                                            {this.state.data.length > 0 &&
                                                 <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>
                                                         <tr>

@@ -54,6 +54,7 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
+import TracerCategoryService from '../../api/TracerCategoryService';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -143,7 +144,7 @@ for (var i = 0; i <= elements; i++) {
 
 
 
-class GlobalConsumption extends Component {
+class StockStatusAccrossPlanningUnitGlobalView extends Component {
   constructor(props) {
     super(props);
 
@@ -155,66 +156,105 @@ class GlobalConsumption extends Component {
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
       countrys: [],
-      planningUnits: [],
-      consumptions: [],
-      productCategories: [],
       countryValues: [],
       countryLabels: [],
-      planningUnitValues: [],
-      planningUnitLabels: [],
-      programValues: [],
-      programLabels: [],
+      realmList: [],
       programs: [],
+      planningUnits: [],
       message: '',
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      data: [],
+      tracerCategories: [],
+      singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
 
 
 
     };
-    this.getCountrys = this.getCountrys.bind(this);
-    this.filterData = this.filterData.bind(this);
-    this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-    this.handleRangeChange = this.handleRangeChange.bind(this);
-    this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
-    this.getPrograms = this.getPrograms.bind(this)
-    this.handleChange = this.handleChange.bind(this)
-    this.getRandomColor = this.getRandomColor.bind(this)
-    this.handleChangeProgram = this.handleChangeProgram.bind(this)
-    this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
-    this.hideDiv = this.hideDiv.bind(this)
   }
 
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
+  handleClickMonthBox2 = (e) => {
+    this.refs.pickAMonth2.show()
+  }
+  handleAMonthChange2 = (value, text) => {
+    //
+    //
+  }
+  handleAMonthDissmis2 = (value) => {
+
+    this.setState({ singleValue2: value }, () => {
+      this.filterData();
+    })
+
+  }
+  getRelamList = () => {
+    AuthenticationService.setupAxiosInterceptors();
+    RealmService.getRealmListAll()
+      .then(response => {
+        if (response.status == 200) {
+          this.setState({
+            realmList: response.data
+          })
+        } else {
+          this.setState({
+            message: response.data.messageCode
+          })
+        }
+      }).catch(
+        error => {
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                console.log("Error code unkown");
+                break;
+            }
+          }
+        }
+      );
+
+  }
+
+  roundN = num => {
+    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+}
+round = num => {
+    return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+}
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.program.realm')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("realmId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     this.state.countryLabels.map(ele =>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    this.state.programLabels.map(ele =>
-      csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    this.state.planningUnitLabels.map(ele =>
-      csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+    csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
+    var A = [[i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance').replaceAll(',', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(',', '%20')]]
 
-    re = this.state.consumptions
+    re = this.state.data
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
-    }
+      re[item].programData.map(p=>
+      A.push([[(getLabelText(re[item].planningUnit.label,this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label,this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos]])
+       ) }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
     }
@@ -222,7 +262,7 @@ class GlobalConsumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.globalconsumption') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView') + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -243,7 +283,17 @@ class GlobalConsumption extends Component {
     return x1 + x2;
   }
 
-
+  cellstyleWithData = (item) => {
+    if (item.outputString == 'OUT') {
+      return { backgroundColor: 'red' }
+    } else if (item.outputString == 'excess') {
+      return { backgroundColor: 'yellow' }
+    } else if (item.outputString == 'low') {
+      return { backgroundColor: '#f0910c' }
+    } else {
+      return { backgroundColor: '#00c596' }
+    }
+  }
 
   exportPDF = () => {
     const addFooters = doc => {
@@ -270,14 +320,6 @@ class GlobalConsumption extends Component {
 
       const pageCount = doc.internal.getNumberOfPages()
 
-
-      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-      // var reader = new FileReader();
-
-      //var data='';
-      // Use fs.readFile() method to read the file 
-      //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-      //}); 
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12)
         doc.setFont('helvetica', 'bold')
@@ -287,27 +329,24 @@ class GlobalConsumption extends Component {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.dashboard.globalconsumption'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
           doc.setFont('helvetica', 'normal')
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
-          })
-          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-
-          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-
+        })
+        doc.text(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          align: 'left'
+        })
+          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
+
+          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.countryLabels.size > 10 ? 170 : 150, {
             align: 'left'
           })
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
         }
 
       }
@@ -321,27 +360,22 @@ class GlobalConsumption extends Component {
 
     doc.setFontSize(10);
 
-    const title = "Consumption Report";
-    var canvas = document.getElementById("cool-canvas");
-    //creates image
 
-    var canvasImg = canvas.toDataURL("image/png", 1.0);
-    var width = doc.internal.pageSize.width;
+
+    const headers = [[i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance'), i18n.t('static.supplyPlan.monthsOfStock'), i18n.t('static.supplyPlan.minStock'), i18n.t('static.supplyPlan.maxStock')]]
+    var data =[];
+     this.state.data.map(elt => elt.programData.map(p=>data.push([getLabelText(elt.planningUnit.label,this.state.lang), getLabelText(p.program.label,this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
-    var h1 = 50;
-    var aspectwidth1 = (width - h1);
-
-    doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
-
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
-
     let content = {
       margin: { top: 80 },
-      startY: height,
+      startY: 180,
       head: headers,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+      styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 80 },
+      columnStyles: {
+        0: { cellWidth: 181.89},
+        1: { cellWidth: 180 },
+      }
 
     };
 
@@ -350,12 +384,7 @@ class GlobalConsumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("GlobalConsumption.pdf")
-    //creates PDF from img
-    /*  var doc = new jsPDF('landscape');
-      doc.setFontSize(20);
-      doc.text(15, 15, "Cool Chart");
-      doc.save('canvas.pdf');*/
+    doc.save(i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView') + ".pdf")
   }
 
 
@@ -374,29 +403,7 @@ class GlobalConsumption extends Component {
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
-    })
-  }
-  handleChangeProgram(programIds) {
-
-    this.setState({
-      programValues: programIds.map(ele => ele.value),
-      programLabels: programIds.map(ele => ele.label)
-    }, () => {
-
-      this.filterData(this.state.rangeValue)
-    })
-
-  }
-
-  handlePlanningUnitChange(planningUnitIds) {
-
-    this.setState({
-      planningUnitValues: planningUnitIds.map(ele => ele.value),
-      planningUnitLabels: planningUnitIds.map(ele => ele.label)
-    }, () => {
-
-      this.filterData(this.state.rangeValue)
+      this.filterData()
     })
   }
 
@@ -411,32 +418,55 @@ class GlobalConsumption extends Component {
   }
 
 
-  filterData(rangeValue) {
-    this.setState({
-      consumptions: [
-        {
+  filterData = () => {
+    let countrysId = this.state.countryValues
+    let tracercategory = document.getElementById('tracerCategoryId').value
+    let realmId = document.getElementById('realmId').value
+    let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
+    if (realmId > 0 && countrysId.length > 0 && tracercategory != 0) {
+      var inputjson = {
+        "realmCountryIds": countrysId,
+        "tracerCategoryId": tracercategory,
+        "realmId": realmId,
+        "dt": date
 
-        },
-      ],
-      message: ''
-    })
-
-  }
-
-  getCountrys() {
-    if (navigator.onLine) {
+      }
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
-      RealmCountryService.getRealmCountryrealmIdById(realmId)
+      ReportService.stockStatusAcrossProducts(inputjson)
         .then(response => {
+          console.log('response', JSON.stringify(response.data));
+          let planningUnits = [...new Set(response.data.map(ele => ele.planningUnit))]
+          console.log('planningUnits', JSON.stringify(planningUnits));
+          //let programs=[...new Set((response.data.map(ele=> ele.programData.program.code)).flat(1))]
+          let programs = [...new Set((response.data.map(ele => ele.programData.map(ele1 => ele1.program.code))).flat(1))]
+          console.log('programs', JSON.stringify(programs));
+          // let data=programs.map(p=>{
+          //   planningUnits.map(pu=>
+          //     response.data.filter(c=> c.planningUnit.id=pu.planningUnit.id &&c.programData.program.id==p.id)).map(ele=>
+          //       {
+          //         if(ele.programData.mos>ele.programData.maxMos){
+          //           return 'Excess'
+          //         }else if(ele.programData.mos>0 && ele.programData.mos<ele.programData.minMos){
+          //           return 'Low'
+          //         }else if(ele.programData.minMos==0 && ele.programData.maxMos==0){
+          //           return ''
+          //         }else{
+          //           return 'out'
+          //         }
+          //       })
+          //      } )
+          //console.log('data',data);
           this.setState({
-            countrys: response.data
+            data: response.data, message: '',
+            programs: programs,
+            planningUnits: planningUnits
           })
         }).catch(
           error => {
             this.setState({
-              countrys: []
+              data: []
             })
+
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
             } else {
@@ -446,145 +476,41 @@ class GlobalConsumption extends Component {
                 case 404:
                 case 406:
                 case 412:
-                default:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                   break;
+                default:
                   this.setState({ message: 'static.unkownError' });
                   break;
               }
             }
           }
         );
+    }
+    else if (realmId <= 0) {
+      this.setState({ message: i18n.t('static.common.realmtext'), data: [] });
+
+    } else if (countrysId.length == 0) {
+      this.setState({ message: i18n.t('static.program.validcountrytext'), data: [] });
 
     } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['CountryData'], 'readwrite');
-        var Country = transaction.objectStore('CountryData');
-        var getRequest = Country.getAll();
-        var proList = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
-              var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var CountryJson = {
-                name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              proList[i] = CountryJson
-            }
-          }
-          this.setState({
-            countrys: proList
-          })
-
-        }.bind(this);
-
-      }
-
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [] });
     }
 
 
   }
-  getPlanningUnit() {
-    if (navigator.onLine) {
-      console.log('changed')
-      let productCategoryId = document.getElementById("productCategoryId").value;
-      AuthenticationService.setupAxiosInterceptors();
-      if (productCategoryId != -1) {
-        PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-          this.setState({
-            planningUnits: response.data,
-          })
-        })
-          .catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    //  this.setState({ message: error.response.data.messageCode });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
-                }
-              }
-            }
-          );
-      }
-    } else {
-      const lan = 'en';
-      var db1;
-      var storeOS;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(['CountryPlanningUnit'], 'readwrite');
-        var planningunitOs = planningunitTransaction.objectStore('CountryPlanningUnit');
-        var planningunitRequest = planningunitOs.getAll();
-        var planningList = []
-        planningunitRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        planningunitRequest.onsuccess = function (e) {
-          var myResult = [];
-          myResult = planningunitRequest.result;
-          var CountryId = (document.getElementById("CountryId").value).split("_")[0];
-          var proList = []
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].Country.id == CountryId) {
-              var productJson = {
-                name: getLabelText(myResult[i].planningUnit.label, lan),
-                id: myResult[i].planningUnit.id
-              }
-              proList[i] = productJson
-            }
-          }
-          this.setState({
-            planningUnitList: proList
-          })
-        }.bind(this);
-      }.bind(this)
 
-    }
-
-  }
-
-  getPrograms() {
+  getCountrys = () => {
     AuthenticationService.setupAxiosInterceptors();
-    let realmId = AuthenticationService.getRealmId();
-    ProgramService.getProgramByRealmId(realmId)
+    let realmId = document.getElementById('realmId').value
+    RealmCountryService.getRealmCountryrealmIdById(realmId)
       .then(response => {
-        console.log(JSON.stringify(response.data))
         this.setState({
-          programs: response.data
+          countrys: response.data
         })
       }).catch(
         error => {
           this.setState({
-            programs: []
+            countrys: []
           })
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
@@ -595,57 +521,55 @@ class GlobalConsumption extends Component {
               case 404:
               case 406:
               case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                break;
               default:
+                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                break;
                 this.setState({ message: 'static.unkownError' });
                 break;
             }
           }
         }
       );
+
   }
 
-  getProductCategories() {
+  getTracerCategoryList() {
+
     AuthenticationService.setupAxiosInterceptors();
-    let realmId = AuthenticationService.getRealmId();
-    ProductService.getProductCategoryList(realmId)
-      .then(response => {
-        console.log(response.data)
+    let realmId = document.getElementById('realmId').value
+    TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
+
+      if (response.status == 200) {
         this.setState({
-          productCategories: response.data
+          tracerCategories: response.data
         })
-      }).catch(
-        error => {
-          this.setState({
-            productCategories: []
-          })
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
+      }
+
+    }).catch(error => {
+      if (error.message === "Network Error") {
+        this.setState({ message: error.message });
+      } else {
+        switch (error.response ? error.response.status : "") {
+          case 500:
+          case 401:
+          case 404:
+          case 406:
+          case 412:
+            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+            break;
+          default:
+            this.setState({ message: 'static.unkownError' });
+            break;
         }
-      );
-    this.getPlanningUnit();
+      }
+    }
+    );
 
   }
+
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
-    this.getPrograms()
-    this.getCountrys();
-    this.getProductCategories()
+    this.getRelamList();
 
   }
 
@@ -668,7 +592,7 @@ class GlobalConsumption extends Component {
   }
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value })
-    this.filterData(value);
+    this.filterData();
   }
 
   _handleClickRangeBox(e) {
@@ -685,38 +609,18 @@ class GlobalConsumption extends Component {
     return color;
   }
   render() {
-    const { planningUnits } = this.state;
-    let planningUnitList = [];
-    planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item, i) => {
-        return (
-
-          { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
-
-        )
-      }, this);
-    const { programs } = this.state;
-    let programList = [];
-    programList = programs.length > 0
-      && programs.map((item, i) => {
-        return (
-
-          { label: getLabelText(item.label, this.state.lang), value: item.programId }
-
-        )
-      }, this);
+    const { singleValue2 } = this.state
     const { countrys } = this.state;
-    // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      // console.log(JSON.stringify(item))
       return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
     }, this);
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
+    const { tracerCategories } = this.state;
+    const { realmList } = this.state;
+    let realms = realmList.length > 0
+      && realmList.map((item, i) => {
         return (
-          <option key={i} value={item.payload.productCategoryId}>
-            {getLabelText(item.payload.label, this.state.lang)}
+          <option key={i} value={item.realmId}>
+            {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
@@ -729,7 +633,7 @@ class GlobalConsumption extends Component {
         <Card>
           <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView')}</strong> */}
-            {this.state.consumptions.length > 0 && <div className="card-header-actions">
+            {this.state.data.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
@@ -743,7 +647,40 @@ class GlobalConsumption extends Component {
               <Form >
                 <Col md="12 pl-0">
                   <div className="row">
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <div className="controls edit">
+                        <Picker
+                          ref="pickAMonth2"
+                          years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                          value={singleValue2}
+                          lang={pickerLang.months}
+                          theme="dark"
+                          onChange={this.handleAMonthChange2}
+                          onDismiss={this.handleAMonthDissmis2}
+                        >
+                          <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                        </Picker>
+                      </div>
 
+                    </FormGroup>
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            bsSize="sm"
+                            onChange={(e) => { this.dataChange(e) }}
+                            type="select" name="realmId" id="realmId"
+                            onChange={(e) => { this.getCountrys(); this.getTracerCategoryList() }}
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {realms}
+                          </Input>
+
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -766,32 +703,30 @@ class GlobalConsumption extends Component {
                     </FormGroup>
 
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <div className="controls ">
                         <InputGroup>
                           <Input
                             type="select"
-                            name="productCategoryId"
-                            id="productCategoryId"
+                            name="tracerCategoryId"
+                            id="tracerCategoryId"
                             bsSize="sm"
                             onChange={this.filterData}
                           >
-                            <option value="-1">{i18n.t('static.common.select')}</option>
-                            <option value="1" selected>7 selected</option>
-                            {/* {productCategories.length > 0
-                              && productCategories.map((item, i) => {
+                            <option value="0">{i18n.t('static.common.select')}</option>
+                            {tracerCategories.length > 0
+                              && tracerCategories.map((item, i) => {
                                 return (
-                                  <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                  <option key={i} value={item.tracerCategoryId}>
+                                    {getLabelText(item.label, this.state.lang)}
                                   </option>
                                 )
-                              }, this)} */}
+                              }, this)}
+
                           </Input>
                         </InputGroup>
                       </div>
-
                     </FormGroup>
-
                   </div>
                 </Col>
               </Form>
@@ -804,91 +739,37 @@ class GlobalConsumption extends Component {
                     <div className="col-md-12">
                       <div className="table-responsive ">
 
-                        <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
+                        {this.state.data.length > 0 && <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
 
 
                           <thead>
                             <tr>
-                              <th className="text-center" style={{ width: '27%' }}> {i18n.t('static.dashboard.product')} </th>
-                              <th className="text-center " style={{ width: '7%' }}> MOZ </th>
-                              <th className="text-center" style={{ width: '7%' }}>TAZ</th>
-                              <th className="text-center" style={{ width: '7%' }}>ZAM</th>
-                              <th className="text-center" style={{ width: '7%' }}>KEN</th>
-                              <th className="text-center" style={{ width: '7%' }}>AIA</th>
-                              <th className="text-center" style={{ width: '7%' }}>AFG</th>
+                              <th className="text-center" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
+                              {
+                                this.state.programs.map(ele => { return (<th className="text-center" style={{ width: '27%' }}>{ele}</th>) })}
                             </tr>
                           </thead>
 
                           <tbody>
+                            {
+                              this.state.planningUnits.map(
+                                ele => {
+                                return <tr><td>{getLabelText(ele.label,this.state.lang)}</td>{
+                                    this.state.programs.map(ele1 => {
+                                      return(this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
+                                        item => { 
+                                           return(item.programData.filter(c=>c.program.code===ele1).length==0?<td></td>:<td className="text-center" style={this.cellstyleWithData(item.programData.filter(c=>c.program.code==ele1)[0])}>{item.programData.filter(c=>c.program.code==ele1)[0].outputString}</td>)
+                                      }
 
+                                    )})
+                                    }</tr>
 
-                            <tr>
-                              <td>CC 1: HIV / AIDS Pharmaceuticals</td>
-                              <td style={{backgroundColor: '#f5771a'}}>low</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                            </tr>
-                            <tr>
-                              <td>HIV/AIDS Pharmaceuticals</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: '#f5771a'}}>low</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                            </tr>
-                            <tr>
-                              <td>CC 2: Laboratory Commodities, VMMC</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: '#f2ff00'}}>excess</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                            </tr>
-                            <tr>
-                              <td>HIV Rapid Test Kits (RTKs)</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: '#ff0000'}}>out</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                            </tr>
-                            <tr>
-                              <td>Laboratory Consumables</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: '#f5771a'}}>low</td>
-                            </tr>
-                            <tr>
-                              <td>Laboratory Equipment</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: '#f2ff00'}}>excess</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                            </tr>
-                            <tr>
-                              <td>Voluntary Male Circumcision (VMMC) Kits</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: '#f5771a'}}>low</td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                              <td style={{backgroundColor: "#4dbd74"}}></td>
-                            </tr>
+                                }
+                              )}
 
 
                           </tbody>
-                        </Table>
+                        </Table>}
 
                       </div>
 
@@ -908,4 +789,4 @@ class GlobalConsumption extends Component {
   }
 }
 
-export default GlobalConsumption;
+export default StockStatusAccrossPlanningUnitGlobalView;

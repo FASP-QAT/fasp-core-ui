@@ -1636,26 +1636,23 @@ class ShipmentGlobalDemandView extends Component {
 
         if (this.state.procurementAgentSplit.length > 0) {
             var A = [];
-            A[0] = this.state.table1Headers;
+
+            let tableHead = this.state.table1Headers;
+            let tableHeadTemp = [];
+            for (var i = 0; i < tableHead.length; i++) {
+                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
+            }
+
+            A[0] = tableHeadTemp;
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
-                let item = Object.values(re[item].procurementAgentQty);
-                A.push([[getLabelText(re[item].planningUnit.label, this.state.lang), item, re[item].total]])
+                let item1 = Object.values(re[item].procurementAgentQty);
+                A.push([[(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), item1, re[item].total]])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
             }
         }
-
-        var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
-        re = this.state.consumptions
-        for (var item = 0; item < re.length; item++) {
-            A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
-        }
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
-        }
-
 
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
@@ -1790,13 +1787,16 @@ class ShipmentGlobalDemandView extends Component {
         canvasImg = canvas.toDataURL("image/png", 1.0);
         doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
 
+        // let tableHeadLength = this.state.table1Headers.length;
+        let length = this.state.table1Headers.length + 1;
+
         //Tables
         let content1 = {
-            margin: { top: 80, left: 100 },
-            startY: height + 90,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            margin: { top: 80 },
+            startY: height,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
             columnStyles: {
-                // 0: { cellWidth: 100 },
+                0: { cellWidth: 70 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
                 // 3: { cellWidth: 100 },
@@ -1805,7 +1805,7 @@ class ShipmentGlobalDemandView extends Component {
             html: '#mytable1',
 
             didDrawCell: function (data) {
-                if (data.column.index === this.state.table1Headers.length && data.cell.section === 'body') {
+                if (data.column.index === length && data.cell.section === 'body') {
                     var td = data.cell.raw;
                     var img = td.getElementsByTagName('img')[0];
                     var dim = data.cell.height - data.cell.padding('vertical');
@@ -3015,7 +3015,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
                             </Col>
-                            {
+                            {/* {
                                 this.state.procurementAgentSplit.length > 0 &&
                                 <Col md="12 pl-0">
                                     <div className="col-md-12 p-0">
@@ -3026,7 +3026,7 @@ class ShipmentGlobalDemandView extends Component {
                                         </div>
                                     </div>
                                 </Col>
-                            }
+                            } */}
 
                             <br></br>
 
@@ -3034,9 +3034,9 @@ class ShipmentGlobalDemandView extends Component {
                                 <div className="globalviwe-scroll">
                                     <div className="row">
                                         <div className="col-md-12">
-                                            {this.state.show && this.state.procurementAgentSplit.length > 0 &&
-                                                < div className="table-responsive ">
-                                                    <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                            {this.state.procurementAgentSplit.length > 0 &&
+                                                <div className="table-responsive ">
+                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
                                                         <thead>
                                                             <tr>
@@ -3071,77 +3071,6 @@ class ShipmentGlobalDemandView extends Component {
 
                                                         </tbody>
                                                     </Table>
-
-                                                    {/* <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
-
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="text-left" style={{ width: '300px' }} rowSpan="2"> Planning Unit </th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">GF</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">Govt</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">Local</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">PSM</th>
-                                                                <th className="text-center" style={{ width: '200px' }} colSpan="2">Total</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Amount (USD) </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Total Units </th>
-                                                                <th className="text-right" style={{ width: '100px' }}> Total Amount (USD) </th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                            <tr id="addr0" key={1} >
-
-                                                                <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 1000 Units</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>15,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
-                                                            </tr>
-                                                            <tr id="addr0" key={2} >
-
-                                                                <td className="text-left">Female Condom (Nitrile) Lubricated, 17 cm, 20 Units</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,100,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>8,500,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>11,900,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}>15,000 </td>
-                                                                <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
-                                                            </tr>
-                                                            <tr id="addr0" key={3} >
-
-                                                                <td className="text-left">Male Condom (Latex) Lubricated,Be Safe, 53 mm, 3000 Units</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>3,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,100,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>5,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>8,500,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}></td>
-                                                                <td className="text-right" style={{ width: '100px' }}>7,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>11,900,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>15,000</td>
-                                                                <td className="text-right" style={{ width: '100px' }}>25,500,000</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </Table> */}
 
                                                 </div>
 

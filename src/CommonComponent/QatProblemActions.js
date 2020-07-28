@@ -33,7 +33,7 @@ export function qatProblemActions() {
                 var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                // console.log("QPA 2====>", programJson);
+                console.log("QPA 2====>", programJson);
                 programList.push(programJson);
             }
             if (realmId == -1) {

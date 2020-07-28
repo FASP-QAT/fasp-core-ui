@@ -357,7 +357,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
 
             //Local procurement lead time
-            var col = ("I").concat(parseInt(y) + 1);
+            var col = ("J").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(9, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -377,7 +377,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             }
 
-            var col = ("J").concat(parseInt(y) + 1);
+            var col = ("K").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(10, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -397,7 +397,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             }
 
-            var col = ("K").concat(parseInt(y) + 1);
+            var col = ("L").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(11, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -558,7 +558,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [190, 290, 200, 290, 170, 170, 100, 100 ,100 ,170,100,100],
+                                                colWidths: [190, 290, 200, 290, 170, 170, 100, 100, 100, 170, 100, 100],
                                                 columns: [
 
                                                     {
@@ -629,6 +629,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                allowInsertRow: false,
                                                 text: {
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',

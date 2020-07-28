@@ -133,13 +133,13 @@ export default class PipelineProgramList extends Component {
                 headerAlign: 'center',
                 formatter: this.formatDate
             },
-            {
-                dataField: 'STATUS',
-                text: 'Status',
-                align: 'center',
-                headerAlign: 'center',
+            // {
+            //     dataField: 'STATUS',
+            //     text: 'Status',
+            //     align: 'center',
+            //     headerAlign: 'center',
 
-            }
+            // }
         ];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -177,7 +177,7 @@ export default class PipelineProgramList extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <div className="Card-header-addicon">
+                    <div  style={{padding:'4px 20px 2px 20px'}}>
                         {/* <i className="icon-menu"></i><strong>Programs</strong>{' '} */}
 
                         <div className="card-header-actions">
@@ -186,7 +186,7 @@ export default class PipelineProgramList extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-0">
                         <ToolkitProvider
                             keyField="pipelineId"
                             data={this.state.pipelineProgramList}

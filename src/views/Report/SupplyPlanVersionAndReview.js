@@ -264,13 +264,14 @@ class SupplyPlanVersionAndReview extends Component {
         let versionStatusId = document.getElementById("versionStatusId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-
+if(programId!=0&& countryId!=0){
         AuthenticationService.setupAxiosInterceptors();
         ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
-                    matricsList: response.data
+                    matricsList: response.data,
+                    message:''
                 })
             }).catch(
                 error => {
@@ -295,7 +296,13 @@ class SupplyPlanVersionAndReview extends Component {
                     }
                 }
             );
-
+            }
+            else if (countryId == 0){
+                this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext') });
+            }
+            else {
+                this.setState({ matricsList: [], message: i18n.t('static.common.selectProgram') });
+            }   
 
     }
 
@@ -319,7 +326,7 @@ class SupplyPlanVersionAndReview extends Component {
 
         var A = [headers]
 
-        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), ( moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20')
+        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), ( moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', elt.notes!=null?(elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20'):''
         ]));
 
 
@@ -344,7 +351,7 @@ class SupplyPlanVersionAndReview extends Component {
             const pageCount = doc.internal.getNumberOfPages()
 
             doc.setFont('helvetica', 'bold')
-            doc.setFontSize(10)
+            doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
 
@@ -383,7 +390,8 @@ class SupplyPlanVersionAndReview extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFontSize(9)
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
@@ -693,7 +701,7 @@ class SupplyPlanVersionAndReview extends Component {
 
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="countryId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="countryId">{i18n.t('static.program.realmcountry')}</Label>
                                             <InputGroup>
                                                 <Input
                                                     type="select"

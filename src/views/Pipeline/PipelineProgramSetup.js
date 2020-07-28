@@ -207,6 +207,12 @@ export default class PipelineProgramSetup extends Component {
                     }
                     else {
                         alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        // this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
+                        // document.getElementById('stepOne').style.display = 'none';
+                        // document.getElementById('stepTwo').style.display = 'none';
+                        // document.getElementById('stepThree').style.display = 'block';
+                        // document.getElementById('stepFour').style.display = 'none';
+                        // document.getElementById('stepFive').style.display = 'none';
                     }
 
                     // } else {
@@ -246,6 +252,12 @@ export default class PipelineProgramSetup extends Component {
                     }
                     else {
                         alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        // this.setState({ pipelineProgramSetupPer: 75, inventoryStatus: true });
+                        // document.getElementById('stepOne').style.display = 'none';
+                        // document.getElementById('stepTwo').style.display = 'none';
+                        // document.getElementById('stepThree').style.display = 'none';
+                        // document.getElementById('stepFour').style.display = 'block';
+                        // document.getElementById('stepFive').style.display = 'none';
                     }
                 } else {
                     this.setState({
@@ -263,7 +275,7 @@ export default class PipelineProgramSetup extends Component {
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
-
+                    console.log("save indentory date====>", response);
                     if (checkValidation == true) {
                         this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
 
@@ -274,6 +286,12 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepFive').style.display = 'block';
                     } else {
                         alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        // this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
+                        // document.getElementById('stepOne').style.display = 'none';
+                        // document.getElementById('stepTwo').style.display = 'none';
+                        // document.getElementById('stepThree').style.display = 'none';
+                        // document.getElementById('stepFour').style.display = 'none';
+                        // document.getElementById('stepFive').style.display = 'block';
                     }
 
                 } else {
@@ -493,7 +511,8 @@ export default class PipelineProgramSetup extends Component {
                         PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
                             .then(response => {
                                 if (response.status == 200) {
-                                    let { program } = this.state
+                                    let { program } = this.state;
+                                    console.log("============>",response.data);
                                     if (isNaN(parseInt(response.data.countryname))) {
                                         program.realmCountry.realmCountryId = '';
                                         this.setState({ validationFailedMessage: `Country ${response.data.countryname} does not exist please create ticket.` })
@@ -600,7 +619,7 @@ export default class PipelineProgramSetup extends Component {
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card className="mt-1">
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>Setup Program</strong>{' '}
                             </CardHeader> */}
@@ -713,7 +732,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Program Info</strong>{' '}
+                                                <strong>Program Info</strong>{' '}
                                             </CardHeader>
                                             <CardBody>
                                                 <ProgressBar
@@ -781,7 +800,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <ul>
                                                         {/* <li className="progresdatatext1">Realm</li> */}
                                                         <li className="progresdatatext1">Country</li>
-                                                        <li className="progresdatatext2">Health Area</li>
+                                                        <li className="progresdatatext2">Technical Area</li>
                                                         <li className="progresdatatext3">Organisation</li>
                                                         <li className="progresdatatext4">Region</li>
                                                         <li className="progresdatatext5">Program Data</li>
@@ -824,7 +843,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         {/* <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Program Planning Units</strong>{' '}
+                                               <strong>Program Planning Units</strong>{' '}
                                             </CardHeader>
                                             <CardBody  className="pt-0"> */}
                                         {/* <h3>Program Planning Units</h3> */}
@@ -855,7 +874,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         {/* <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Consumption Details</strong>{' '}
+                                               <strong>Consumption Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0"> */}
                                         {/* <h3>Consumption</h3> */}
@@ -881,7 +900,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         {/* <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Inventory Details</strong>{' '}
+                                                <strong>Inventory Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0"> */}
                                         {/* <h3>Inventory</h3> */}
@@ -906,7 +925,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         {/* <Card>
                                             <CardHeader>
-                                                <i className="icon-note"></i><strong>Shipment Details</strong>{' '}
+                                                <strong>Shipment Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0"> */}
                                         {/*<h3>Shipments</h3>*/}
