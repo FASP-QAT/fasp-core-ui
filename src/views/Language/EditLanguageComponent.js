@@ -19,8 +19,12 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         languageName: Yup.string()
+            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2, i18n.t('static.language.languageCodemax3digittext'))
+        languageCode: Yup.string()
+        .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+        .required(i18n.t('static.language.languagecodetext'))
+        // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -200,7 +204,7 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageName"
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
-                                                            invalid={(touched.languageName && !!errors.languageName || this.state.language.languageName == '')}
+                                                            invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
@@ -214,11 +218,13 @@ export default class EditLanguageComponent extends Component {
                                                             id="languageCode"
                                                             bsSize="sm"
                                                             valid={!errors.languageCode}
-                                                            invalid={(touched.languageCode && !!errors.languageCode || this.state.language.languageCode == '')}
+                                                            invalid={touched.languageCode && !!errors.languageCode || this.state.language.languageCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
-                                                            required />
+                                                            required 
+                                                            maxLength={2}
+                                                            />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
