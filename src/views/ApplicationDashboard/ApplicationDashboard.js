@@ -263,12 +263,12 @@ class ApplicationDashboard extends Component {
     // rowIdx is index of row
     // console.log('in rowClassNameFormat')
     // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
-    if (row.criticality.id == 3) {
-      return row.criticality.id == 3 && row.isFound == 1 ? 'background-red' : '';
-    } else if (row.criticality.id == 2) {
-      return row.criticality.id == 2 && row.isFound == 1 ? 'background-orange' : '';
+    if (row.realmProblem.criticality.id == 3) {
+      return row.realmProblem.criticality.id == 3 && row.problemStatus.id ==1 ? 'background-red' : '';
+    } else if (row.realmProblem.criticality.id == 2) {
+      return row.realmProblem.criticality.id == 2 && row.problemStatus.id ==1 ? 'background-orange' : '';
     } else {
-      return row.criticality.id == 1 && row.isFound == 1 ? 'background-yellow' : '';
+      return row.realmProblem.criticality.id == 1 && row.problemStatus.id ==1 ? 'background-yellow' : '';
     }
   }
 
@@ -392,14 +392,19 @@ class ApplicationDashboard extends Component {
         }
       },
       {
-        dataField: 'problemId',
-        text: 'Problem Id',
+        dataField: 'realmProblem.problem.label',
+        text: 'Problem',
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
       },
       {
-        dataField: 'month',
+        dataField: 'data1',
         text: 'Month',
         sort: true,
         align: 'center',
@@ -411,28 +416,28 @@ class ApplicationDashboard extends Component {
           }
         }
       },
+      // {
+      //   dataField: 'isFound',
+      //   text: 'Is Found',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   // formatter: this.formatLabel
+      // },
       {
-        dataField: 'isFound',
-        text: 'Is Found',
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        // formatter: this.formatLabel
-      },
-      {
-        dataField: 'actionName.label',
+        dataField: 'realmProblem.problem.actionUrl',
         text: 'Action',
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
+        // formatter: (cell, row) => {
+        //   if (cell != null && cell != "") {
+        //     return getLabelText(cell, this.state.lang);
+        //   }
+        // }
       },
       {
-        dataField: 'criticality.label',
+        dataField: 'realmProblem.criticality.label',
         text: 'Criticality',
         sort: true,
         align: 'center',
@@ -445,7 +450,7 @@ class ApplicationDashboard extends Component {
       },
       {
         dataField: 'problemStatus.label',
-        text: 'HQ Review Status',
+        text: 'Status',
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -455,13 +460,13 @@ class ApplicationDashboard extends Component {
           }
         }
       },
-      {
-        dataField: 'note',
-        text: 'HQ Note',
-        sort: true,
-        align: 'center',
-        headerAlign: 'center'
-      }
+      // {
+      //   dataField: 'note',
+      //   text: 'Note',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center'
+      // }
     ];
     const options = {
       hidePageListOnlyOnePage: true,
