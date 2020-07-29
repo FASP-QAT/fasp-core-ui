@@ -353,27 +353,14 @@ export default class ConsumptionDetails extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
 
                     <div className="Card-header-reporticon">
                         {/* <strong>QAT PROBLEM PLUS ACTION REPORT</strong> */}
                         {
                             // this.state.matricsList.length > 0 &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" />
-
-                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
- 
- {({ toPdf }) =>
- <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
-
- }
- </Pdf>*/}
-                                </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} />
-                            </div>
+                            
                         }
                     </div>
                     <CardBody className=" pt-lg-0">
@@ -385,7 +372,7 @@ export default class ConsumptionDetails extends React.Component {
 
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 pl-md-0">
                                                         <Label htmlFor="appendedInputButton">Program</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
@@ -451,7 +438,7 @@ export default class ConsumptionDetails extends React.Component {
                                 props => (
 
                                     <div className="TableCust">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left ProblemlistSearchposition">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>

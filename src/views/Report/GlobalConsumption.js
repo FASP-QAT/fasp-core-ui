@@ -1966,7 +1966,6 @@ class GlobalConsumption extends Component {
     // this.getCountrys();
     this.getRelamList();
     // this.getProductCategories()
-
   }
 
   getRelamList = () => {
