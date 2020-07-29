@@ -41,3 +41,5 @@ export const TBD_FUNDING_SOURCE=8
 export const TOTAL_NO_OF_MASTERS_IN_SYNC=29
 export const DECIMAL_NO_REGEX=/^\d+(\.\d{1,5})?$/
 export const INTEGER_NO_REGEX=/^[0-9\b]+$/
+export const LABEL_REGEX=/^([a-zA-Z]+\s)*[a-zA-Z]+$/
+export const ALPHABETS_REGEX=/^[a-zA-Z]+$/

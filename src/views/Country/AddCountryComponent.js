@@ -10,6 +10,7 @@ import CountryService from '../../api/CountryService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import {LABEL_REGEX,ALPHABETS_REGEX} from '../../Constants.js';
 
 
 const entityname = i18n.t('static.country.countryMaster');
@@ -26,15 +27,15 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.country.countrytext')),
         countryCode2: Yup.string()
             // .max(2, 'Country code 2 is 2 digit number')
-            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.country.countrycodetext')),
         countryCode: Yup.string()
             // .max(3, i18n.t('static.country.countrycodemax3digittext'))
-            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.country.countrycodetext')),
         // languageId: Yup.string()
         //     .required(i18n.t('static.country.languagetext')),
