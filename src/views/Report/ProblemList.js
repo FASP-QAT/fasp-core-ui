@@ -360,20 +360,7 @@ export default class ConsumptionDetails extends React.Component {
                         {/* <strong>QAT PROBLEM PLUS ACTION REPORT</strong> */}
                         {
                             // this.state.matricsList.length > 0 &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" />
-
-                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
- 
- {({ toPdf }) =>
- <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
-
- }
- </Pdf>*/}
-                                </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} />
-                            </div>
+                            
                         }
                     </div>
                     <CardBody className=" pt-lg-0">

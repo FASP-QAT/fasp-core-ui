@@ -321,50 +321,52 @@ export default class EditLanguageComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         let problemReportId = this.props.match.params.problemReportId;
-        // let programId = this.props.match.params.programId;
+        let programId = this.props.match.params.programId;
+        programId = programId.trim();
 
-        let programId = '3_v2_uId_1';
+        // console.log("programId1--*****--->", programId);
+
+        // let programId = '3_v2_uId_1';
         this.setState({
             programId: programId,
             problemReportId: problemReportId
         })
 
-        console.log("programId----->", programId);
-        console.log("programId param ----->", this.props.match.params.programId);
+        if (programId != null) {
+            const lan = 'en';
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
 
-        const lan = 'en';
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
 
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
 
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                    var problemReportList = (programJson.problemReportList);
 
-                var problemReportList = (programJson.problemReportList);
+                    console.log("EDIT problemReportList---->", problemReportList);
 
-                console.log("EDIT problemReportList---->", problemReportList);
+                    const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
+                    console.log("problemReport--->", problemReport);
+                    this.setState({
+                        problemReport: problemReport,
+                        data: problemReport.problemTransList
+                    },
+                        () => {
 
-                const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
-                console.log("problemReport--->", problemReport);
-                this.setState({
-                    problemReport: problemReport,
-                    data: problemReport.problemTransList
-                },
-                    () => {
-
-                    });
+                        });
 
 
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        }
 
     }
 
