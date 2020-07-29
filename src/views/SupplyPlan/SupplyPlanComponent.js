@@ -11,7 +11,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, QAT_REALM_COUNTRY_PLANNING_UNIT } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -1130,7 +1130,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="table-responsive">
                                 <div id="shipmentDatesTable"></div>
                             </div>
-                            
+
                             <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                                 {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveShipmentsDate('suggested')} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                             </div>
@@ -5285,7 +5285,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             inventoryDataList.push(inventoryJson);
                         }
-                        var invList = inventoryDataList.filter(c => c.inventoryDate == map.get("14") && c.realmCountryPlanningUnit.id == map.get("3") && c.region != null);
+                        var invList = inventoryDataList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("14")).format("YYYY-MM") && c.region != null && c.planningUnit.id==document.getElementById("planningUnitId").value);
                         var actualQty = 0;
                         var adjustmentQty = 0;
                         var actualQtyCount = 0;
@@ -5305,9 +5305,9 @@ export default class SupplyPlanComponent extends React.Component {
                             var index = this.state.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
                             var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]);
                             var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
-                            nationalAdjustment = Math.round(parseFloat(nationalAdjustment) / parseFloat(map.get("4")));
+                            nationalAdjustment = (nationalAdjustment);
                             if (nationalAdjustment != 0) {
-                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
+                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && moment(c.inventoryDate).format("YYYY-MM")==moment(map.get("14")).format("YYYY-MM"));
                                 if (nationAdjustmentIndex == -1) {
                                     var inventoryJson = {
                                         inventoryId: 0,
@@ -5320,9 +5320,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         actualQty: "",
                                         active: true,
                                         realmCountryPlanningUnit: {
-                                            id: map.get("3"),
+                                            id: QAT_REALM_COUNTRY_PLANNING_UNIT,
                                         },
-                                        multiplier: map.get("4"),
+                                        multiplier: 1,
                                         planningUnit: {
                                             id: planningUnitId
                                         },
@@ -8355,7 +8355,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), width: 80, mask: '#,##.00', decimal: '.' },
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), width: 80, mask: '#,##.00', decimal: '.' },
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfContainers'), width: 80, mask: '#,##.00', decimal: '.' },
-                                                                { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: [{ id: 1, name: i18n.t('static.supplyPlan.container') }, { id: 2, name: i18n.t('static.supplyPlan.suggestedOrderQty') }, { id: 3, name: i18n.t('static.procurementAgentPlanningUnit.moq') }, { id: 4, name: i18n.t('static.supplyPlan.palletEuro1') }, { id: 5, name: i18n.t('static.supplyPlan.palletEuro2') }], width: 120, filter: this.filterOrderBasedOn },
+                                                                { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: [{ id: 1, name: i18n.t('static.supplyPlan.container') }, { id: 2, name: i18n.t('static.supplyPlan.userQty') }, { id: 3, name: i18n.t('static.procurementAgentPlanningUnit.moq') }, { id: 4, name: i18n.t('static.supplyPlan.palletEuro1') }, { id: 5, name: i18n.t('static.supplyPlan.palletEuro2') }], width: 120, filter: this.filterOrderBasedOn },
                                                                 { type: 'dropdown', title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundUp') }, { id: 2, name: i18n.t('static.supplyPlan.roundDown') }], width: 120 },
                                                                 { type: 'numeric', title: i18n.t('static.supplyPlan.userQty'), width: 80, mask: '#,##' },
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.adjustesOrderQty'), width: 80, mask: '#,##' },
@@ -9670,7 +9670,11 @@ export default class SupplyPlanComponent extends React.Component {
         }
 
         if (x == 18) {
-            elInstance.setValueFromCoords(19, y, "", true);
+            if (value == 1 || value == 4 || value == 5) {
+                elInstance.setValueFromCoords(19, y, 2, true);
+            } else {
+                elInstance.setValueFromCoords(19, y, "", true);
+            }
         }
 
         if (x == 26) {
