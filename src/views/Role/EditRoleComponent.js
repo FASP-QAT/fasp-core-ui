@@ -21,7 +21,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
             .required(i18n.t('static.role.roletext'))
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext')),
         // businessFunctions: Yup.string()
         //     .required('Please select business functions'),
         // canCreateRole: Yup.string()
