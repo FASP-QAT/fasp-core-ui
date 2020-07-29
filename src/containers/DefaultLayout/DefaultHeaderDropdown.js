@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, ListGroup, ListGroupItem, Progress } from 'reactstrap';
+import { Badge, Button,Dropdown, DropdownItem, DropdownMenu,FormGroup, DropdownToggle,Input,Label, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row,Progress } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import i18n from '../../i18n';
@@ -35,6 +35,17 @@ class DefaultHeaderDropdown extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      modal: false,
+      large: false,
+      small: false,
+      primary: false,
+      success: false,
+      warning: false,
+      danger: false,
+      info: false,
+    };
+
     this.toggle = this.toggle.bind(this);
     this.changeLanguage = this.changeLanguage.bind(this);
     this.state = {
@@ -43,7 +54,13 @@ class DefaultHeaderDropdown extends Component {
       lang: localStorage.getItem('lang'),
       message: ""
     };
+
+    this.toggle = this.toggle.bind(this);
+    this.toggleLarge = this.toggleLarge.bind(this);
+    this.toggleSmall = this.toggleSmall.bind(this);
+    this.toggleInfo = this.toggleInfo.bind(this);
   }
+
 
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
@@ -80,46 +97,69 @@ class DefaultHeaderDropdown extends Component {
     });
   }
 
-  dropNotif() {
-    const itemsCount = 5;
-    return (
-      <Dropdown nav className="d-md-down-none" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle nav>
-          <i className="icon-bell"></i><Badge pill color="danger">{itemsCount}</Badge>
-        </DropdownToggle>
-        <DropdownMenu right>
-          <DropdownItem header tag="div" className="text-center"><strong>You have {itemsCount} notifications</strong></DropdownItem>
-          <DropdownItem><i className="icon-user-follow text-success"></i> New user registered</DropdownItem>
-          <DropdownItem><i className="icon-user-unfollow text-danger"></i> User deleted</DropdownItem>
-          <DropdownItem><i className="icon-chart text-info"></i> Sales report is ready</DropdownItem>
-          <DropdownItem><i className="icon-basket-loaded text-primary"></i> New client</DropdownItem>
-          <DropdownItem><i className="icon-speedometer text-warning"></i> Server overloaded</DropdownItem>
-          <DropdownItem header tag="div" className="text-center"><strong>Server</strong></DropdownItem>
-          <DropdownItem>
-            <div className="text-uppercase mb-1">
-              <small><b>CPU Usage</b></small>
-            </div>
-            <Progress className="progress-xs" color="info" value="25" />
-            <small className="text-muted">348 Processes. 1/4 Cores.</small>
-          </DropdownItem>
-          <DropdownItem>
-            <div className="text-uppercase mb-1">
-              <small><b>Memory Usage</b></small>
-            </div>
-            <Progress className="progress-xs" color="warning" value={70} />
-            <small className="text-muted">11444GB/16384MB</small>
-          </DropdownItem>
-          <DropdownItem>
-            <div className="text-uppercase mb-1">
-              <small><b>SSD 1 Usage</b></small>
-            </div>
-            <Progress className="progress-xs" color="danger" value={90} />
-            <small className="text-muted">243GB/256GB</small>
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
+  toggle() {
+    this.setState({
+      modal: !this.state.modal,
+    });
   }
+
+  toggleLarge() {
+    this.setState({
+      large: !this.state.large,
+    });
+  }
+
+  toggleSmall() {
+    this.setState({
+      small: !this.state.small,
+    });
+  }
+
+  toggleInfo() {
+    this.setState({
+      info: !this.state.info,
+    });
+  }
+  // dropNotif() {
+  //   const itemsCount = 5;
+  //   return (
+  //     <Dropdown nav className="d-md-down-none" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+  //       <DropdownToggle nav>
+  //         <i className="icon-bell"></i><Badge pill color="danger">{itemsCount}</Badge>
+  //       </DropdownToggle>
+  //       <DropdownMenu right>
+  //         <DropdownItem header tag="div" className="text-center"><strong>You have {itemsCount} notifications</strong></DropdownItem>
+  //         <DropdownItem><i className="icon-user-follow text-success"></i> New user registered</DropdownItem>
+  //         <DropdownItem><i className="icon-user-unfollow text-danger"></i> User deleted</DropdownItem>
+  //         <DropdownItem><i className="icon-chart text-info"></i> Sales report is ready</DropdownItem>
+  //         <DropdownItem><i className="icon-basket-loaded text-primary"></i> New client</DropdownItem>
+  //         <DropdownItem><i className="icon-speedometer text-warning"></i> Server overloaded</DropdownItem>
+  //         <DropdownItem header tag="div" className="text-center"><strong>Server</strong></DropdownItem>
+  //         <DropdownItem>
+  //           <div className="text-uppercase mb-1">
+  //             <small><b>CPU Usage</b></small>
+  //           </div>
+  //           <Progress className="progress-xs" color="info" value="25" />
+  //           <small className="text-muted">348 Processes. 1/4 Cores.</small>
+  //         </DropdownItem>
+  //         <DropdownItem>
+  //           <div className="text-uppercase mb-1">
+  //             <small><b>Memory Usage</b></small>
+  //           </div>
+  //           <Progress className="progress-xs" color="warning" value={70} />
+  //           <small className="text-muted">11444GB/16384MB</small>
+  //         </DropdownItem>
+  //         <DropdownItem>
+  //           <div className="text-uppercase mb-1">
+  //             <small><b>SSD 1 Usage</b></small>
+  //           </div>
+  //           <Progress className="progress-xs" color="danger" value={90} />
+  //           <small className="text-muted">243GB/256GB</small>
+  //         </DropdownItem>
+  //       </DropdownMenu>
+  //     </Dropdown>
+  //   );
+  // }
 
   dropAccnt() {
     return (
@@ -169,53 +209,97 @@ class DefaultHeaderDropdown extends Component {
 
 
 
-  dropTasks() {
-    const itemsCount = 15;
-    return (
-      <Dropdown nav className="d-md-down-none" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle nav>
-          <i className="icon-list"></i><Badge pill color="warning">{itemsCount}</Badge>
-        </DropdownToggle>
-        <DropdownMenu right className="dropdown-menu-lg">
-          <DropdownItem header tag="div" className="text-center"><strong>You have {itemsCount} pending tasks</strong></DropdownItem>
-          <DropdownItem>
-            <div className="small mb-1">Upgrade NPM &amp; Bower <span
-              className="float-right"><strong>0%</strong></span></div>
-            <Progress className="progress-xs" color="info" value={0} />
-          </DropdownItem>
-          <DropdownItem>
-            <div className="small mb-1">ReactJS Version <span className="float-right"><strong>25%</strong></span>
-            </div>
-            <Progress className="progress-xs" color="danger" value={25} />
-          </DropdownItem>
-          <DropdownItem>
-            <div className="small mb-1">VueJS Version <span className="float-right"><strong>50%</strong></span>
-            </div>
-            <Progress className="progress-xs" color="warning" value={50} />
-          </DropdownItem>
-          <DropdownItem>
-            <div className="small mb-1">Add new layouts <span className="float-right"><strong>75%</strong></span>
-            </div>
-            <Progress className="progress-xs" color="info" value={75} />
-          </DropdownItem>
-          <DropdownItem>
-            <div className="small mb-1">Angular 2 Cli Version <span className="float-right"><strong>100%</strong></span></div>
-            <Progress className="progress-xs" color="success" value={100} />
-          </DropdownItem>
-          <DropdownItem className="text-center"><strong>View all tasks</strong></DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
+  // dropTasks() {
+  //   const itemsCount = 15;
+  //   return (
+  //     <Dropdown nav className="d-md-down-none" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+  //       <DropdownToggle nav>
+  //         <i className="icon-list"></i><Badge pill color="warning">{itemsCount}</Badge>
+  //       </DropdownToggle>
+  //       <DropdownMenu right className="dropdown-menu-lg">
+  //         <DropdownItem header tag="div" className="text-center"><strong>You have {itemsCount} pending tasks</strong></DropdownItem>
+  //         <DropdownItem>
+  //           <div className="small mb-1">Upgrade NPM &amp; Bower <span
+  //             className="float-right"><strong>0%</strong></span></div>
+  //           <Progress className="progress-xs" color="info" value={0} />
+  //         </DropdownItem>
+  //         <DropdownItem>
+  //           <div className="small mb-1">ReactJS Version <span className="float-right"><strong>25%</strong></span>
+  //           </div>
+  //           <Progress className="progress-xs" color="danger" value={25} />
+  //         </DropdownItem>
+  //         <DropdownItem>
+  //           <div className="small mb-1">VueJS Version <span className="float-right"><strong>50%</strong></span>
+  //           </div>
+  //           <Progress className="progress-xs" color="warning" value={50} />
+  //         </DropdownItem>
+  //         <DropdownItem>
+  //           <div className="small mb-1">Add new layouts <span className="float-right"><strong>75%</strong></span>
+  //           </div>
+  //           <Progress className="progress-xs" color="info" value={75} />
+  //         </DropdownItem>
+  //         <DropdownItem>
+  //           <div className="small mb-1">Angular 2 Cli Version <span className="float-right"><strong>100%</strong></span></div>
+  //           <Progress className="progress-xs" color="success" value={100} />
+  //         </DropdownItem>
+  //         <DropdownItem className="text-center"><strong>View all tasks</strong></DropdownItem>
+  //       </DropdownMenu>
+  //     </Dropdown>
+  //   );
+  // }
 
   dropMssgs() {
     const itemsCount = 7;
     return (
-      <Dropdown nav className="d-md-down-none" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle nav>
-          <i className="icon-envelope-letter"></i><Badge pill color="info">{itemsCount}</Badge>
-        </DropdownToggle>
-        <DropdownMenu right className="dropdown-menu-lg">
+      <Dropdown nav  >
+          <i className="fa fa-question-circle HelpIcon" title="Help" onClick={this.toggle} ></i>
+        <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+                       {/* className={'modal-info ' + this.props.className}> */}
+                  <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">Ticketing System</ModalHeader>
+                  <ModalBody>
+                    <div><h4>What do yo want to do?</h4>Please click here you want to sign </div>
+                    <div>
+                    <FormGroup>
+                         <Button type="button" size="sm" className="float-left mr-1 " onClick={this.toggleInfo} className="mr-1" >Bug Report</Button>
+                         {/* <Button type="button" size="sm" className="float-left mr-1 " className="mr-1" >Bug Report</Button> */}
+                         <Button type="reset" size="sm" className="float-left mr-1" > Change Additional Master</Button>
+                       
+                    </FormGroup>
+                    </div>
+                  </ModalBody>
+                  <ModalFooter>
+                    {/* <Button color="primary" onClick={this.toggleInfo}>Do Something</Button>{' '} */}
+                    <Button color="danger" toggle={this.toggle}> <i className="fa fa-times"></i> Cancel</Button>
+                  </ModalFooter>
+                </Modal>
+
+
+                <Modal isOpen={this.state.info} toggle={this.toggleInfo}
+                       className={'modal-info ' + this.props.className}>
+                  <ModalHeader toggle={this.toggleInfo}>Modal title</ModalHeader>
+                  <ModalBody>
+                   <div>
+                   <FormGroup>
+                  <Label htmlFor="company">Company</Label>
+                  <Input type="text" id="company" placeholder="Enter your company name" />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="vat">VAT</Label>
+                  <Input type="text" id="vat" placeholder="DE1234567890" />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="street">Street</Label>
+                  <Input type="text" id="street" placeholder="Enter street name" />
+                </FormGroup>
+                   </div>
+                  </ModalBody>
+                  <ModalFooter>
+                   
+                    <Button color="success" onClick={this.toggleInfo}>Submit</Button>
+                  </ModalFooter>
+                </Modal>
+               
+        {/* <DropdownMenu right className="dropdown-menu-lg">
           <DropdownItem header tag="div"><strong>You have {itemsCount} messages</strong></DropdownItem>
           <DropdownItem href="#">
             <div className="message">
@@ -286,7 +370,7 @@ class DefaultHeaderDropdown extends Component {
             </div>
           </DropdownItem>
           <DropdownItem href="#" className="text-center"><strong>View all messages</strong></DropdownItem>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </Dropdown>
     );
   }
