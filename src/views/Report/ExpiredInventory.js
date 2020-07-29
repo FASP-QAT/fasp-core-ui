@@ -919,7 +919,7 @@ export default class ExpiredInventory extends Component {
                                     props => (
 
                                         <div className="TableCust">
-                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left expiredInventorySearchposition">
                                                 <SearchBar {...props.searchProps} />
                                                 <ClearSearchButton {...props.searchProps} />
                                             </div>
