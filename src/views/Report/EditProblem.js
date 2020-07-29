@@ -451,7 +451,7 @@ export default class EditLanguageComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="EditproblemCard">
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
@@ -592,7 +592,7 @@ export default class EditLanguageComponent extends Component {
                                                     <div className="col-md-12 bg-white pb-1  mb-2">
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Section1</b></a></li></ul>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="programCode">{i18n.t('static.program.programCode')}</Label>
                                                             <Input type="text"
                                                                 name="programCode"
@@ -607,7 +607,7 @@ export default class EditLanguageComponent extends Component {
                                                                 required />
                                                             <FormFeedback className="red">{errors.programCode}</FormFeedback>
                                                         </FormGroup>
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="versionId">{i18n.t('static.program.versionId')}</Label>
                                                             <Input type="text"
                                                                 name="versionId"
@@ -623,7 +623,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.versionId}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="createdDate">{i18n.t('static.report.createdDate')}</Label>
                                                             <Input type="text"
                                                                 name="createdDate"
@@ -641,7 +641,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.createdDate}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="problemDescription">{i18n.t('static.report.problemDescription')}</Label>
                                                             <Input type="text"
                                                                 name="problemDescription"
@@ -657,7 +657,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="problemDescription">{i18n.t('static.report.problemStatus')}</Label>
                                                             <Input type="text"
                                                                 name="problemDescription"
@@ -674,7 +674,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
                                                             <Input type="text"
                                                                 name="problemType"
@@ -690,7 +690,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.problemType}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="action">{i18n.t('static.common.action')}</Label>
                                                             <Input type="text"
                                                                 name="action"
@@ -706,7 +706,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.action}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="criticality">{i18n.t('static.report.Criticality')}</Label>
                                                             <Input type="text"
                                                                 name="criticality"
@@ -759,11 +759,11 @@ export default class EditLanguageComponent extends Component {
                                                     </ToolkitProvider>
 
                                                     
-                                                    <div className="col-md-12 bg-white pb-1  mb-2">
+                                                    <div className="col-md-12 bg-white pb-1">
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Section3</b></a></li></ul>
 
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-0">
                                                             <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
 
                                                             <Input type="select"
@@ -784,7 +784,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormFeedback className="red">{errors.problemStatusId}</FormFeedback>
                                                         </FormGroup>
 
-                                                        <FormGroup>
+                                                        <FormGroup className="col-md-6 pl-0">
                                                             <Label for="notes">{i18n.t('static.program.notes')}</Label>
                                                             <Input type="text"
                                                                 name="notes"
@@ -802,7 +802,7 @@ export default class EditLanguageComponent extends Component {
                                                         </FormGroup>
                                                     </div>
 
-                                                    <div className="col-md-12">
+                                                    <div className="col-md-12 card-footer">
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
@@ -812,6 +812,7 @@ export default class EditLanguageComponent extends Component {
                                                         </div>
 
                                                 </CardBody>
+                                                
                                                 
                                             </Form>
 

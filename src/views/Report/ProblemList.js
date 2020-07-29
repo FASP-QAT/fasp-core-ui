@@ -353,7 +353,7 @@ export default class ConsumptionDetails extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
 
                     <div className="Card-header-reporticon">
@@ -385,7 +385,7 @@ export default class ConsumptionDetails extends React.Component {
 
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 pl-md-0">
                                                         <Label htmlFor="appendedInputButton">Program</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
