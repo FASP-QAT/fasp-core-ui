@@ -1512,7 +1512,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     valid = false;
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                    if (isNaN(Number.parseFloat(value)) || value < 0) {
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
