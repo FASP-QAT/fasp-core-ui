@@ -52,144 +52,167 @@ class AddRoleComponent extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             problemReport: {
-                "problemReportId": '',
+                "problemReportId": "",
                 "program": {
-                    "id": '',
+                  "id": "",
+                  "label": {
+                    "active": true,
+                    "labelId": "",
+                    "label_en": "",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  }
+                },
+                "versionId": "",
+                "realmProblem": {
+                  "active": true,
+                  "realmProblemId": "",
+                  "realm": {
+                    "id": "",
                     "label": {
-                        "active": true,
-                        "labelId": '',
-                        "label_en": "",
-                        "label_sp": "",
-                        "label_fr": "",
-                        "label_pr": ""
+                      "active": true,
+                      "labelId": "",
+                      "label_en": "",
+                      "label_sp": "",
+                      "label_fr": "",
+                      "label_pr": ""
                     },
                     "code": ""
-                },
-                "versionId": '',
-                "realmProblem": {
+                  },
+                  "problem": {
                     "active": true,
-                    "realmProblemId": '',
-                    "realm": {
-                        "id": '',
-                        "label": {
-                            "active": true,
-                            "labelId": '',
-                            "label_en": "",
-                            "label_sp": "",
-                            "label_fr": "",
-                            "label_pr": ""
-                        },
-                        "code": ""
+                    "problemId": "",
+                    "label": {
+                      "active": true,
+                      "labelId": "",
+                      "label_en": "",
+                      "label_sp": null,
+                      "label_fr": null,
+                      "label_pr": null
                     },
-                    "problem": {
-                        "active": true,
-                        "problemId": '',
-                        "label": {
-                            "active": true,
-                            "labelId": '',
-                            "label_en": "",
-                            "label_sp": null,
-                            "label_fr": null,
-                            "label_pr": null
-                        },
-                        "actionUrl": ""
+                    "actionUrl": "",
+                    "actionLabel": {
+                      "active": true,
+                      "labelId": "",
+                      "label_en": "",
+                      "label_sp": null,
+                      "label_fr": null,
+                      "label_pr": null
+                    }
+                  },
+                  "criticality": {
+                    "id": "",
+                    "label": {
+                      "active": true,
+                      "labelId": "",
+                      "label_en": "",
+                      "label_sp": null,
+                      "label_fr": null,
+                      "label_pr": null
                     },
-                    "criticality": {
-                        "id": '',
-                        "label": {
-                            "active": true,
-                            "labelId": '',
-                            "label_en": "",
-                            "label_sp": null,
-                            "label_fr": null,
-                            "label_pr": null
-                        },
-                        "colorHtmlCode": ""
-                    },
-                    "data1": "",
-                    "data2": null,
-                    "data3": null
+                    "colorHtmlCode": ""
+                  },
+                  "data1": "",
+                  "data2": null,
+                  "data3": null,
+                  "problemId": ""
                 },
-                "data1": "",
-                "data2": "",
-                "data3": "",
-                "data4": "",
+                "dt": "",
+                "region": {
+                  "id": "",
+                  "label": {
+                    "active": true,
+                    "labelId": "",
+                    "label_en": "",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                  }
+                },
+                "planningUnit": {
+                  "id": "",
+                  "label": {
+                    "active": true,
+                    "labelId": "",
+                    "label_en": "",
+                    "label_sp": null,
+                    "label_fr": null,
+                    "label_pr": null
+                  }
+                },
+                "shipmentId": "",
                 "data5": "",
                 "problemStatus": {
-                    "id": '',
-                    "label": {
-                        "active": true,
-                        "labelId": '',
-                        "label_en": "",
-                        "label_sp": null,
-                        "label_fr": null,
-                        "label_pr": null
-                    }
+                  "id": "",
+                  "label": {
+                    "active": true,
+                    "labelId": "",
+                    "label_en": "",
+                    "label_sp": null,
+                    "label_fr": null,
+                    "label_pr": null
+                  }
                 },
                 "problemType": {
-                    "id": '',
-                    "label": {
-                        "active": true,
-                        "labelId": '',
-                        "label_en": "",
-                        "label_sp": null,
-                        "label_fr": null,
-                        "label_pr": null
-                    }
+                  "id": "",
+                  "label": {
+                    "label_en": ""
+                  }
                 },
                 "createdBy": {
-                    "userId": '',
-                    "username": ""
+                  "userId": "",
+                  "username": ""
                 },
                 "createdDate": "",
                 "lastModifiedBy": {
-                    "userId": '',
-                    "username": ""
+                  "userId": "",
+                  "username": ""
                 },
                 "lastModifiedDate": "",
                 "problemTransList": [
-                    {
-                        "problemReportTransId": '',
-                        "problemStatus": {
-                            "id": '',
-                            "label": {
-                                "active": true,
-                                "labelId": '',
-                                "label_en": "",
-                                "label_sp": null,
-                                "label_fr": null,
-                                "label_pr": null
-                            }
-                        },
-                        "notes": "",
-                        "createdBy": {
-                            "userId": '',
-                            "username": ""
-                        },
-                        "createdDate": ""
+                  {
+                    "problemReportTransId": "",
+                    "problemStatus": {
+                      "id": "",
+                      "label": {
+                        "active": true,
+                        "labelId": "",
+                        "label_en": "",
+                        "label_sp": null,
+                        "label_fr": null,
+                        "label_pr": null
+                      }
                     },
-                    {
-                        "problemReportTransId": '',
-                        "problemStatus": {
-                            "id": '',
-                            "label": {
-                                "active": true,
-                                "labelId": '',
-                                "label_en": "",
-                                "label_sp": null,
-                                "label_fr": null,
-                                "label_pr": null
-                            }
-                        },
-                        "notes": "",
-                        "createdBy": {
-                            "userId": '',
-                            "username": ""
-                        },
-                        "createdDate": ""
-                    }
+                    "notes": "",
+                    "createdBy": {
+                      "userId": "",
+                      "username": ""
+                    },
+                    "createdDate": ""
+                  },
+                  {
+                    "problemReportTransId": "",
+                    "problemStatus": {
+                      "id": '',
+                      "label": {
+                        "active": true,
+                        "labelId": '',
+                        "label_en": "",
+                        "label_sp": null,
+                        "label_fr": null,
+                        "label_pr": null
+                      }
+                    },
+                    "notes": "",
+                    "createdBy": {
+                      "userId": "",
+                      "username": ""
+                    },
+                    "createdDate": ""
+                  }
                 ]
-            },
+              },
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);

@@ -71,28 +71,27 @@ export default class EditLanguageComponent extends Component {
             message: '',
             data: [],
             problemReport: {
-                "problemReportId": '',
+                "problemReportId": "",
                 "program": {
-                    "id": '',
+                    "id": "",
                     "label": {
                         "active": true,
-                        "labelId": '',
+                        "labelId": "",
                         "label_en": "",
                         "label_sp": "",
                         "label_fr": "",
                         "label_pr": ""
-                    },
-                    "code": ""
+                    }
                 },
-                "versionId": '',
+                "versionId": "",
                 "realmProblem": {
                     "active": true,
-                    "realmProblemId": '',
+                    "realmProblemId": "",
                     "realm": {
-                        "id": '',
+                        "id": "",
                         "label": {
                             "active": true,
-                            "labelId": '',
+                            "labelId": "",
                             "label_en": "",
                             "label_sp": "",
                             "label_fr": "",
@@ -102,22 +101,30 @@ export default class EditLanguageComponent extends Component {
                     },
                     "problem": {
                         "active": true,
-                        "problemId": '',
+                        "problemId": "",
                         "label": {
                             "active": true,
-                            "labelId": '',
+                            "labelId": "",
                             "label_en": "",
                             "label_sp": null,
                             "label_fr": null,
                             "label_pr": null
                         },
-                        "actionUrl": ""
+                        "actionUrl": "",
+                        "actionLabel": {
+                            "active": true,
+                            "labelId": "",
+                            "label_en": "",
+                            "label_sp": null,
+                            "label_fr": null,
+                            "label_pr": null
+                        }
                     },
                     "criticality": {
-                        "id": '',
+                        "id": "",
                         "label": {
                             "active": true,
-                            "labelId": '',
+                            "labelId": "",
                             "label_en": "",
                             "label_sp": null,
                             "label_fr": null,
@@ -127,18 +134,39 @@ export default class EditLanguageComponent extends Component {
                     },
                     "data1": "",
                     "data2": null,
-                    "data3": null
+                    "data3": null,
+                    "problemId": ""
                 },
-                "data1": "",
-                "data2": "",
-                "data3": "",
-                "data4": "",
-                "data5": "",
-                "problemStatus": {
-                    "id": '',
+                "dt": "",
+                "region": {
+                    "id": "",
                     "label": {
                         "active": true,
-                        "labelId": '',
+                        "labelId": "",
+                        "label_en": "",
+                        "label_sp": "",
+                        "label_fr": "",
+                        "label_pr": ""
+                    }
+                },
+                "planningUnit": {
+                    "id": "",
+                    "label": {
+                        "active": true,
+                        "labelId": "",
+                        "label_en": "",
+                        "label_sp": null,
+                        "label_fr": null,
+                        "label_pr": null
+                    }
+                },
+                "shipmentId": "",
+                "data5": "",
+                "problemStatus": {
+                    "id": "",
+                    "label": {
+                        "active": true,
+                        "labelId": "",
                         "label_en": "",
                         "label_sp": null,
                         "label_fr": null,
@@ -146,34 +174,29 @@ export default class EditLanguageComponent extends Component {
                     }
                 },
                 "problemType": {
-                    "id": '',
+                    "id": "",
                     "label": {
-                        "active": true,
-                        "labelId": '',
-                        "label_en": "",
-                        "label_sp": null,
-                        "label_fr": null,
-                        "label_pr": null
+                        "label_en": ""
                     }
                 },
                 "createdBy": {
-                    "userId": '',
+                    "userId": "",
                     "username": ""
                 },
                 "createdDate": "",
                 "lastModifiedBy": {
-                    "userId": '',
+                    "userId": "",
                     "username": ""
                 },
                 "lastModifiedDate": "",
                 "problemTransList": [
                     {
-                        "problemReportTransId": '',
+                        "problemReportTransId": "",
                         "problemStatus": {
-                            "id": '',
+                            "id": "",
                             "label": {
                                 "active": true,
-                                "labelId": '',
+                                "labelId": "",
                                 "label_en": "",
                                 "label_sp": null,
                                 "label_fr": null,
@@ -182,13 +205,13 @@ export default class EditLanguageComponent extends Component {
                         },
                         "notes": "",
                         "createdBy": {
-                            "userId": '',
+                            "userId": "",
                             "username": ""
                         },
                         "createdDate": ""
                     },
                     {
-                        "problemReportTransId": '',
+                        "problemReportTransId": "",
                         "problemStatus": {
                             "id": '',
                             "label": {
@@ -202,13 +225,13 @@ export default class EditLanguageComponent extends Component {
                         },
                         "notes": "",
                         "createdBy": {
-                            "userId": '',
+                            "userId": "",
                             "username": ""
                         },
                         "createdDate": ""
                     }
                 ]
-            }
+            },
 
         }
 
@@ -597,20 +620,54 @@ export default class EditLanguageComponent extends Component {
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
 
                                                         <FormGroup className="col-md-6 pl-md-0">
-                                                            <Label for="programCode">{i18n.t('static.program.programCode')}</Label>
+                                                            <Label for="program">{i18n.t('static.program.program')}</Label>
                                                             <Input type="text"
-                                                                name="programCode"
-                                                                id="programCode"
+                                                                name="program"
+                                                                id="program"
                                                                 bsSize="sm"
                                                                 readOnly
-                                                                valid={!errors.programCode}
-                                                                invalid={(touched.programCode && !!errors.programCode)}
+                                                                valid={!errors.program}
+                                                                invalid={(touched.program && !!errors.program)}
                                                                 onChange={(e) => { handleChange(e); }}
                                                                 onBlur={handleBlur}
-                                                                value={this.state.problemReport.program.code}
+                                                                // value={this.state.problemReport.program.code}
+                                                                value={getLabelText(this.state.problemReport.program.label, this.state.lang)}
                                                                 required />
-                                                            <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                            <FormFeedback className="red">{errors.program}</FormFeedback>
                                                         </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="planningunit">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                            <Input type="text"
+                                                                name="planningunit"
+                                                                id="planningunit"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.planningunit}
+                                                                invalid={(touched.planningunit && !!errors.planningunit)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={getLabelText(this.state.problemReport.planningUnit.label, this.state.lang)}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.program}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="month">{i18n.t('static.report.month')}</Label>
+                                                            <Input type="text"
+                                                                name="month"
+                                                                id="month"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.month}
+                                                                invalid={(touched.month && !!errors.month)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={moment(this.state.problemReport.dt).format('yyyy-MM-DD')}
+                                                                className="form-control-sm form-control date-color"
+                                                            />
+                                                            <FormFeedback className="red">{errors.month}</FormFeedback>
+                                                        </FormGroup>
+
+
                                                         <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="versionId">{i18n.t('static.program.versionId')}</Label>
                                                             <Input type="text"
