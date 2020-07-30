@@ -320,9 +320,12 @@ export function qatProblemActions() {
                                     if (problemList[prob].problemId == 3) {
                                         // 3 shipment which have delivered date in past but status is not yet delivered
                                         var shipmentList = programList[pp].shipmentList;
+                                        // console.log("shipmentList=======>", shipmentList);
+
                                         var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                        var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < myDateShipment && c.shipmentStatus.id != 7);
-                                        // console.log("$$$$$$$$$======",filteredShipmentList);
+                                        // console.log("daaaaaaaaaaaaaaaaaat==========>", moment(myDateShipment).add(7, 'days').format('YYYY-MM-DD'));
+                                        var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7);
+                                        // console.log("$$$$$$$$$======", filteredShipmentList);
                                         if (filteredShipmentList.length > 0) {
                                             for (var s = 0; s < filteredShipmentList.length; s++) {
                                                 var indexShipment = 0;
@@ -355,8 +358,8 @@ export function qatProblemActions() {
                                                         dt: '',
                                                         region: '',
                                                         planningUnit: {
-                                                            id: planningUnitList[p].planningUnit.id,
-                                                            label: planningUnitList[p].planningUnit.label,
+                                                            id: filteredShipmentList[s].id,
+                                                            label: filteredShipmentList[s].label,
 
                                                         },
                                                         shipmentId: filteredShipmentList[s].shipmentId,
