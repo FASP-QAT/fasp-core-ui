@@ -197,6 +197,7 @@ class StockAdjustmentComponent extends Component {
                 versions: []
             })
         }
+        this.fetchData();
     }
     consolidatedVersionList = (programId) => {
         const lan = 'en';
@@ -511,7 +512,7 @@ class StockAdjustmentComponent extends Component {
         console.log("planningUnitIds---", planningUnitIds);
 
 
-        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+        if (programId > 0 && versionId > 0 && planningUnitIds.length > 0) {
             console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
                 var db1;
@@ -630,7 +631,7 @@ class StockAdjustmentComponent extends Component {
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
 
-        } else if (versionId == 0) {
+        } else if (versionId == -1) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
         } else {

@@ -241,7 +241,7 @@ class RealmCountry extends Component {
                                                     show: '',
                                                     entries: '',
                                                 },
-                                                // onload: this.loaded,
+                                                onload: this.loaded,
 
                                             };
 

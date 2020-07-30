@@ -1,4 +1,10 @@
 import React, { Component, lazy, Suspense } from 'react';
+
+import { SECRET_KEY } from '../../Constants';
+import CryptoJS from 'crypto-js';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import AuthenticationService from '../../views/Common/AuthenticationService';
+
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
@@ -230,7 +236,7 @@ const items = [
 ];
 
 
-let problemActionlist = [];
+// let problemActionlist = [];
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
@@ -239,15 +245,18 @@ class ApplicationDashboard extends Component {
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
 
+
+
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
+      activeIndex: 0,
+      problemActionList: []
 
     };
-    this.state = {
-      activeIndex: 0,
-      // problemActionlist: []
-    };
+    // this.state = {
+
+    // };
 
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -264,20 +273,25 @@ class ApplicationDashboard extends Component {
     // console.log('in rowClassNameFormat')
     // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
     if (row.realmProblem.criticality.id == 3) {
-      return row.realmProblem.criticality.id == 3 && row.problemStatus.id ==1 ? 'background-red' : '';
+      return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
     } else if (row.realmProblem.criticality.id == 2) {
-      return row.realmProblem.criticality.id == 2 && row.problemStatus.id ==1 ? 'background-orange' : '';
+      return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
     } else {
-      return row.realmProblem.criticality.id == 1 && row.problemStatus.id ==1 ? 'background-yellow' : '';
+      return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
     }
   }
 
   problemAction(problemAction) {
-    console.log("actionUrl============>", problemAction.actionUrl);
+    console.log("actionUrl============>", problemAction.realmProblem.problem.actionUrl);
     this.props.history.push({
-      pathname: `${problemAction.actionUrl}`,
+      pathname: `${problemAction.realmProblem.problem.actionUrl}`,
       // state: { budget }
     });
+    // this.redirectToCrud = this.redirectToCrud.bind(this);
+  }
+
+  redirectToCrud = (url) => {
+    this.props.history.push(url);
   }
 
   hideFirstComponent() {
@@ -301,10 +315,53 @@ class ApplicationDashboard extends Component {
 
     this.hideFirstComponent();
     console.log("====== in application dasboard =======");
+    var problemActionList = [];
+    var db1;
+    var storeOS;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      var realmId = AuthenticationService.getRealmId();
+      var programList = [];
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+        this.setState({
+          supplyPlanError: i18n.t('static.program.errortext')
+        })
+      };
+      getRequest.onsuccess = function (event) {
+        qatProblemActions();
+        var latestVersionProgramList = [];
+        for (var i = 0; i < getRequest.result.length; i++) {
+          var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson = JSON.parse(programData);
+          programList.push(programJson);
 
-    problemActionlist = qatProblemActions();
-    console.log("problemActionlist ==========", problemActionlist);
+        }
+        for (var d = 0; d < programList.length; d++) {
+          var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
+          if (index == -1) {
+            latestVersionProgramList.push(programList[d]);
+          } else {
+            var versionId = latestVersionProgramList[index].currentVersion.versionId;
+            if (versionId < programList[d].currentVersion.versionId) {
+              latestVersionProgramList[index] = programList[d];
+            }
+          }
 
+        }
+        programList = latestVersionProgramList;
+        for (var pp = 0; pp < programList.length; pp++) {
+          problemActionList = programList[pp].problemReportList;
+        }
+        this.setState({ problemActionList: problemActionList });
+      }.bind(this);
+    }.bind(this);
+    // console.log("problemActionlist ==========", problemActionList);
   }
 
 
@@ -404,7 +461,7 @@ class ApplicationDashboard extends Component {
         }
       },
       {
-        dataField: 'data1',
+        dataField: 'dt',
         text: 'Month',
         sort: true,
         align: 'center',
@@ -491,7 +548,7 @@ class ApplicationDashboard extends Component {
         text: '50', value: 50
       },
       {
-        text: 'All', value: problemActionlist.length
+        text: 'All', value: this.state.problemActionList.length
       }]
     }
 
@@ -532,8 +589,8 @@ class ApplicationDashboard extends Component {
                         {/* <i className="icon-settings"></i> */}
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem>View User</DropdownItem>
-                        <DropdownItem>Add User</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>View User</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
 
                       </DropdownMenu>
                     </Dropdown>
@@ -564,8 +621,8 @@ class ApplicationDashboard extends Component {
                         {/* <i className="icon-settings"></i> */}
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem>Realm List</DropdownItem>
-                        <DropdownItem>Add Realm</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/realm/realmlist")}>Realm List</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
 
                       </DropdownMenu>
                     </Dropdown>
@@ -592,8 +649,8 @@ class ApplicationDashboard extends Component {
                       <DropdownToggle caret className="p-0" color="transparent">
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem>Add Language</DropdownItem>
-                        <DropdownItem>View Language</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/language/addLanguage")}>Add Language</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/language/listLanguage")}>View Language</DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
                   </ButtonGroup>
@@ -617,7 +674,7 @@ class ApplicationDashboard extends Component {
                       <DropdownToggle caret className="p-0" color="transparent">
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem>View Supply Plans Waiting for Approval</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
 
                       </DropdownMenu>
                     </Dropdown>
@@ -639,7 +696,7 @@ class ApplicationDashboard extends Component {
               <CardBody>
                 <ToolkitProvider
                   keyField="programId"
-                  data={problemActionlist}
+                  data={this.state.problemActionList}
                   columns={columns}
                   search={{ searchFormatted: true }}
                   hover

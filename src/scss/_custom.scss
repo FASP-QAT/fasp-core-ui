@@ -608,7 +608,9 @@ label.arrow_label:after {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
-}
+} 
+
+
 
 .forInlinebtnMapping{ display: flex;}
 .forInlinebtnMapping .btn-info {
@@ -791,6 +793,10 @@ label.arrow_label:after {
 
 .listPrportFundingAlignThtd .react-bootstrap-table .table td{width: 150px !important;}
 
+
+.listprocurementagent .react-bootstrap-table .table td:nth-child(9){width: 70px !important;}
+.listprocurementagent .react-bootstrap-table .table td:nth-child(10){width: 70px !important;}
+
 .Region-box-icon {
   position: absolute;
   top: 33px;
@@ -806,6 +812,30 @@ label.arrow_label:after {
   position: absolute;
     top: 75px;
     right: 20px;
+}
+
+
+.Consumptionsearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+.AddInventorysearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+.Shipmentsearchinline .jexcel_filter{
+  position: absolute;
+  top: -53px;
+  right: 0%;
+
+}
+
+.jexcel_content{
+      max-height: 540px;
 }
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
@@ -1942,7 +1972,7 @@ input::placeholder {
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 315px !important;
+  margin-left: 337px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -1955,6 +1985,31 @@ input::placeholder {
   // margin-right: 9%;
 }
 
+.supplyplan-larrow-dataentry {
+  float: left;
+  margin-left: 77px !important;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+}
+.supplyplan-rarrow-dataentry {
+  float: right;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+  // margin-right: 9%;
+}
+.supplyplan-larrow-dataentry-adjustment{
+  float: left;
+  margin-left: 91px !important;
+  color: #20a8d8;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.Supplyfeild {
+  width: 230px;
+}
 .legend-supplypln {
   margin-bottom: 0px;
   margin-top: -4px;
@@ -2029,9 +2084,10 @@ input::placeholder {
   text-overflow: ellipsis;
   align-items: stretch!important;
   width: 160px!important;
+  // width: 237px!important;
   min-width: 100%!important;
   width: 0 auto!important;
-  height: calc(0.5em + 0.5rem + 2px)!important;
+  height: calc(0.5em + 0.5rem + 8px)!important;
   background-clip: padding-box!important;
   font-size: 0.76562rem!important;
   line-height: 1.5!important;
@@ -2058,13 +2114,14 @@ input::placeholder {
       display: flex!important;
       align-items: stretch!important;
       width: 160px!important;
+      // width: 237px!important;
       min-width: 100%!important;
       width: 0 auto!important;
       overflow: hidden;
     word-wrap: normal !important;
     white-space: normal;
     text-overflow: ellipsis;
-      height: calc(0.5em + 0.5rem + 2px)!important;
+      height: calc(0.5em + 0.5rem + 8px)!important;
       background-clip: padding-box!important;
       font-size: 0.76562rem!important;
       line-height: 1.5!important;
@@ -2090,14 +2147,25 @@ input::placeholder {
       z-index: 2;
       
   }
+  // .css-1v99tuv{
+   
+  //   max-width: 188px!important;
+  // }
   
   .reportdown-box-icon {
     position: absolute;
     top: 32px;
-    z-index: 2;
+    // z-index: 2;
     right: 23px;
     color: 697069;
   }
+//    .reportdown-box-icon {
+//   position: relative;
+//   top: 30px;
+//   z-index: 2;
+//   right: -90px;
+//   color: 697069;
+// }
   .reportsmalldropdown-box-icon {
   position: absolute;
     top: 32px;
@@ -2791,19 +2859,19 @@ input::placeholder {
 /* list */
 .rounded-list ol 
 {
-counter-reset:li; /* Initiate a counter */
-margin-left:34px; /* Remove the default left margin */
-padding-left:0; /* Remove the default left padding */
+counter-reset:li; 
+margin-left:34px;
+padding-left:0;
 }
 
 /* item  */
 .rounded-list ol > li
 {
-position:relative; /* Create a positioning context */
-list-style:none; /* Disable the normal item numbering */
+position:relative; 
+list-style:none; 
 // background:#f6f6f6; /* Item background color */
-margin:0; /* Give each list item a left margin to make room for the numbers */
-padding-left: 15px; /* Add some spacing around the content */
+margin:0; 
+padding-left: 15px;
 padding-bottom:0px;
 padding-top:0px;
 margin-bottom: -14px;

@@ -264,7 +264,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
+                                                            invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.label.label_en}
@@ -280,7 +280,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             id="multiplier"
                                                             bsSize="sm"
                                                             valid={!errors.multiplier}
-                                                            invalid={touched.multiplier && !!errors.multiplier}
+                                                            invalid={touched.multiplier && !!errors.multiplier || this.state.planningUnit.multiplier == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.multiplier}

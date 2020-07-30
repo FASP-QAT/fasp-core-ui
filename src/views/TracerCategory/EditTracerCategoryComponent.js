@@ -237,7 +237,7 @@ class EditTracerCategoryComponent extends Component {
                                                             name="tracerCategoryName"
                                                             id="tracerCategoryName"
                                                             valid={!errors.tracerCategoryName}
-                                                            invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
+                                                            invalid={touched.tracerCategoryName && !!errors.tracerCategoryName || this.state.tracerCategory.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             required

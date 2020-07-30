@@ -900,6 +900,18 @@ class AuthenticationService {
                     }
                     break;
 
+                case "/report/problemList":
+                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
+                        return true;
+                    }
+                    break;
+
+                case "/report/editProblem/:problemReportId/:programId":
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
+
                 case "/report/qatProblemPlusActionReport":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;

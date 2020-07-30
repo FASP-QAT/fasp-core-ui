@@ -196,8 +196,8 @@ the distributor make the software available in source code format. The Software
       <div className="rounded-list list-group">
         <ol className="list-group">
     <li class=""> &nbsp;&nbsp;<p>If you configure the Software to work with one or more accounts 
-        on the QuantificationAnalytics.org website or with an instance of QAT Desktop, your use 
-        of the Software will also be governed by the QuantificationAnalytics.org website Terms of
+        on the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website or with an instance of QAT Desktop, your use 
+        of the Software will also be governed by the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website Terms of
          Service and/or the license agreement applicable to your instance of QAT Desktop.</p>
          </li>
     <li class=" ">&nbsp; &nbsp; <p>The failure of QAT to exercise or enforce any right or
@@ -207,7 +207,7 @@ the distributor make the software available in source code format. The Software
          agreements between you, the Owner and Administrator (including, but not limited to, 
          any prior versions of the EULA). Further, Administrator fully and completely indemnifies
           Owner from any and all individual and aggregate claims for damages that may be brought 
-          against Owner with regard to or arising from the aforementioned conditions in this 
+          against Owner with regard to or arising from the above mentioned conditions in this 
           clause (Incorporations by Reference: ADS 318 Intellectual Property Rights.
            48 CFR 752.227-14 Rights in Data (general)).</p></li>
     <li class=" "> &nbsp; &nbsp;<p>You agree that this EULA and your use of the Software are 

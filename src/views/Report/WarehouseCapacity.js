@@ -561,6 +561,8 @@ class warehouseCapacity extends Component {
             data: [],
             offlinePrograms: [],
             lang: localStorage.getItem('lang'),
+            programValues: [],
+            programLabels: [],
 
         };
         this.getCountrylist = this.getCountrylist.bind(this);
@@ -822,6 +824,7 @@ class warehouseCapacity extends Component {
                 });
             }
         }
+        this.fetchData();
     }
 
     handleChangeProgram(programIds) {
@@ -918,95 +921,113 @@ class warehouseCapacity extends Component {
             let programId = this.state.programValues;
             let countryId = document.getElementById("countryId").value;
 
-            AuthenticationService.setupAxiosInterceptors();
-            let inputjson = {
-                realmCountryId: countryId,
-                programIds: programId
-            }
-            ReportService.wareHouseCapacityExporttList(inputjson)
-                .then(response => {
-                    console.log("RESP-------->>", response.data)
-                    this.setState({
-                        data: response.data
-                    })
-                }).catch(
-                    error => {
+            console.log("programId---", programId);
+            console.log("countryId---", countryId);
+            if (programId.length > 0 && countryId > 0) {
+                AuthenticationService.setupAxiosInterceptors();
+                let inputjson = {
+                    realmCountryId: countryId,
+                    programIds: programId
+                }
+                ReportService.wareHouseCapacityExporttList(inputjson)
+                    .then(response => {
+                        console.log("RESP-------->>", response.data)
                         this.setState({
-                            data: []
+                            data: response.data,
+                            message: ''
                         })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
+                    }).catch(
+                        error => {
+                            this.setState({
+                                data: []
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+
+            } else if (programId.length == 0) {
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+            } else if (countryId == 0) {
+                this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] });
+            }
+
+
         } else {
             let programId = document.getElementById("programIdOffline").value;
             console.log("offline ProgramId---", programId);
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
 
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
+            if (programId != 0) {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
 
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var regionList = (programJson.regionList);
-                    var realmCountry = (programJson.realmCountry);
-                    var programName = (document.getElementById("programIdOffline").selectedOptions[0].text);
-                    let offlineData = [];
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var programRequest = programTransaction.get(programId);
 
-                    for (var i = 0; i < regionList.length; i++) {
-                        let json = {
-                            "realmCountry": realmCountry.country,
-                            "programList": [
-                                {
-                                    "id": 3,
-                                    "label": {
-                                        "active": false,
-                                        "labelId": 136,
-                                        "label_en": programName,
-                                        "label_sp": programName,
-                                        "label_fr": programName,
-                                        "label_pr": programName,
+                    programRequest.onsuccess = function (event) {
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+                        var regionList = (programJson.regionList);
+                        var realmCountry = (programJson.realmCountry);
+                        var programName = (document.getElementById("programIdOffline").selectedOptions[0].text);
+                        let offlineData = [];
+
+                        for (var i = 0; i < regionList.length; i++) {
+                            let json = {
+                                "realmCountry": realmCountry.country,
+                                "programList": [
+                                    {
+                                        "id": 3,
+                                        "label": {
+                                            "active": false,
+                                            "labelId": 136,
+                                            "label_en": programName,
+                                            "label_sp": programName,
+                                            "label_fr": programName,
+                                            "label_pr": programName,
+                                        },
+                                        "code": "MWI-FRH-MOH"
                                     },
-                                    "code": "MWI-FRH-MOH"
-                                },
-                            ],
-                            "region": regionList[i],
-                            "gln": regionList[i].gln,
-                            "capacityCbm": regionList[i].capacityCbm,
+                                ],
+                                "region": regionList[i],
+                                "gln": regionList[i].gln,
+                                "capacityCbm": regionList[i].capacityCbm,
+                            }
+                            offlineData.push(json);
                         }
-                        offlineData.push(json);
-                    }
 
-                    console.log("offlineData--4-", offlineData);
-                    console.log("final wareHouseCapacity Report---", regionList);
-                    this.setState({
-                        data: offlineData
-                    });
-
+                        console.log("offlineData--4-", offlineData);
+                        console.log("final wareHouseCapacity Report---", regionList);
+                        this.setState({
+                            data: offlineData
+                        });
+                    }.bind(this)
                 }.bind(this)
+            } else {
+                this.setState({
+                    data: []
+                });
+            }
 
-            }.bind(this)
 
         }
 

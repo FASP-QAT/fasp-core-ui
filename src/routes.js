@@ -131,6 +131,7 @@ const ConsumptionDetails = React.lazy(() => import('./views/Consumption/Consumpt
 const AddLanguage = React.lazy(() => import('./views/Language/AddLanguageComponent'));
 const ListLanguage = React.lazy(() => import('./views/Language/LanguageListComponent'));
 const EditLanguage = React.lazy(() => import('./views/Language/EditLanguageComponent'));
+const EditProblem = React.lazy(() => import('./views/Report/EditProblem'));
 
 const AddUnit = React.lazy(() => import('./views/Unit/AddUnitComponent'));
 const ListUnit = React.lazy(() => import('./views/Unit/UnitListComponent'));
@@ -200,6 +201,7 @@ const SupplyPlanFormulas = React.lazy(() => import('./views/SupplyPlan/SupplyPla
 const ForecastMetrics = React.lazy(() => import('./views/Report/ForecastMetrics'));
 
 const QatProblemPlusActionReport = React.lazy(() => import('./views/Report/QatProblemPlusActionReport'));
+const ProblemList = React.lazy(() => import('./views/Report/ProblemList'));
 const FunderExport = React.lazy(() => import('./views/Report/FunderExport'));
 const ProcurementAgentExport = React.lazy(() => import('./views/Report/ProcurementAgentExport'));
 const SupplierLeadTimes = React.lazy(() => import('./views/Report/SupplierLeadTimes'));
@@ -225,7 +227,7 @@ const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
-const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
+// const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -380,6 +382,7 @@ const routes = [
   { path: '/language/listLanguage', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
   { path: '/language/listLanguage/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
   { path: '/language/editLanguage/:languageId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.languageheader') }), component: EditLanguage },
+  { path: '/report/editProblem/:problemReportId/:programId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.report.problem') }), component: EditProblem },
 
   { path: '/unit/addUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.unit') }), component: AddUnit },
   { path: '/unit/listUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.unit') }), component: ListUnit },
@@ -454,6 +457,7 @@ const routes = [
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
 
   { path: '/report/qatProblemPlusActionReport', name: 'Qat Problem Plus Action Report', component: QatProblemPlusActionReport },
+  { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/report/funderExport', name: i18n.t('static.dashboard.funderExport'), component: FunderExport },
   { path: '/report/procurementAgentExport', name: i18n.t('static.report.shipmentCostReport'), component: ProcurementAgentExport },

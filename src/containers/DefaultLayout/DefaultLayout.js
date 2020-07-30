@@ -490,7 +490,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView'),
+                            name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
                             url: '/report/stockStatusAccrossPlanningUnitGlobalView',
                             icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
@@ -512,6 +512,12 @@ class DefaultLayout extends Component {
                             url: '/report/inventoryTurns',
                             // icon: 'fa fa-exchange'
                             icon: 'fa fa-line-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
+                          {
+                            name: 'QAT PROBLEM LIST',
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {

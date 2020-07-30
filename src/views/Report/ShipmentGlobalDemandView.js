@@ -1576,6 +1576,7 @@ class ShipmentGlobalDemandView extends Component {
             programLabels: [],
             programs: [],
             data: [],
+            realmList: [],
             fundingSourceSplit: [],
             planningUnitSplit: [],
             procurementAgentSplit: [],
@@ -1751,10 +1752,10 @@ class ShipmentGlobalDemandView extends Component {
                         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, 150, planningText)
 
-                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, 180, fundingSourceText)
 
-                        var statusText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, 210, statusText)
                     }
 
@@ -1849,17 +1850,18 @@ class ShipmentGlobalDemandView extends Component {
             let planningUnitIds = this.state.planningUnitValues;
             let fundingSourceIds = this.state.fundingSourceValues;
             let shipmentStatusIds = this.state.shipmentStatusValues;
+            let realmId = document.getElementById('realmId').value;
 
 
-            if (productCategoryId != -1 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
+            if (realmId > 0 && productCategoryId != -1 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
                 this.setState({
                     message: ''
                 })
 
-                let realmId = AuthenticationService.getRealmId();
+                // let realmId = AuthenticationService.getRealmId();
 
                 var inputjson = {
-                    realmId: 1,
+                    realmId: realmId,
                     startDate: new moment(startDate),
                     stopDate: new moment(endDate),
                     planningUnitIds: planningUnitIds,
@@ -1874,8 +1876,8 @@ class ShipmentGlobalDemandView extends Component {
 
                         var table1Headers = [];
                         table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
-                        table1Headers.unshift("Plannaning Unit");
-                        table1Headers.push("Total Units");
+                        table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
+                        table1Headers.push(i18n.t('static.report.totalUnit'));
                         this.setState({
                             data: response.data,
                             fundingSourceSplit: response.data.fundingSourceSplit,
@@ -1887,6 +1889,15 @@ class ShipmentGlobalDemandView extends Component {
                         })
                     })
 
+            } else if (realmId <= 0) {
+                this.setState({
+                    message: i18n.t('static.common.realmtext'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: []
+                });
             } else if (planningUnitIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
@@ -1896,7 +1907,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (fundingSourceIds == 0) {
+            } else if (fundingSourceIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
                     data: [],
@@ -1905,7 +1916,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (shipmentStatusIds == 0) {
+            } else if (shipmentStatusIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
                     data: [],
@@ -1925,7 +1936,7 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues;
             console.log("shipmentStatusIds---->", shipmentStatusIds);
 
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -2017,75 +2028,101 @@ class ShipmentGlobalDemandView extends Component {
                             let procurementAgentSplit = [];
 
                             console.log("shipmentStatusFilter--->", shipmentStatusFilter);
+                            console.log("planningUnitIds--->", planningUnitIds);
                             //Table-1
                             for (let i = 0; i < planningUnitIds.length; i++) {
                                 let obj = {};
-                                let planningUnit = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id)).map((item) => { return { planningUnit: item.planningUnit } })[0].planningUnit;
-                                let total = 0;
-                                let buffer = [];
-                                for (let j = 0; j < procurementAgentList.length; j++) {
-                                    let data1 = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id && procurementAgentList[j].id == c.procurementAgent.id)).map((item) => { return { procurementAgent: item.procurementAgent, suggestedQty: item.suggestedQty } });
+                                let planningUnitArray = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id));
 
-                                    let data2 = Object.values(data1.reduce((a, { procurementAgent, suggestedQty }) => {
-                                        if (!a[procurementAgent.id])
-                                            a[procurementAgent.id] = Object.assign({}, { procurementAgent, suggestedQty });
-                                        else
-                                            a[procurementAgent.id].suggestedQty += suggestedQty;
-                                        return a;
-                                    }, {}));
+                                if (planningUnitArray.length > 0) {
 
-                                    if (data2.length > 0) {
-                                        let key = data2[0].procurementAgent.code;
-                                        let value = data2[0].suggestedQty;
-                                        let json = {}
-                                        json[data2[0].procurementAgent.code] = data2[0].suggestedQty;
+                                    let planningUnit = planningUnitArray[0].planningUnit;
 
-                                        buffer.push(json);
-                                        total = total + value;
-                                    } else {
-                                        let key = procurementAgentList[j].code;
-                                        let value = 0;
-                                        let json = {}
-                                        json[procurementAgentList[j].code] = value;
-                                        buffer.push(json);
+                                    let total = 0;
+                                    let buffer = [];
+                                    for (let j = 0; j < procurementAgentList.length; j++) {
+                                        let data1 = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id && procurementAgentList[j].id == c.procurementAgent.id)).map((item) => { return { procurementAgent: item.procurementAgent, shipmentQty: item.shipmentQty } });
+
+                                        let data2 = Object.values(data1.reduce((a, { procurementAgent, shipmentQty }) => {
+                                            if (!a[procurementAgent.id])
+                                                a[procurementAgent.id] = Object.assign({}, { procurementAgent, shipmentQty });
+                                            else
+                                                a[procurementAgent.id].shipmentQty += shipmentQty;
+                                            return a;
+                                        }, {}));
+
+                                        if (data2.length > 0) {
+                                            let key = data2[0].procurementAgent.code;
+                                            let value = data2[0].shipmentQty;
+                                            let json = {}
+                                            json[data2[0].procurementAgent.code] = data2[0].shipmentQty;
+
+                                            buffer.push(json);
+                                            total = total + value;
+                                        } else {
+                                            let key = procurementAgentList[j].code;
+                                            let value = 0;
+                                            let json = {}
+                                            json[procurementAgentList[j].code] = value;
+                                            buffer.push(json);
+                                        }
+
+
+                                        // Object.assign(obj, { name: value });
+
                                     }
 
+                                    for (let j = 0; j < buffer.length; j++) {
+                                        Object.assign(obj, buffer[j]);
+                                    }
 
-                                    // Object.assign(obj, { name: value });
+                                    let json = {
+                                        planningUnit: planningUnit,
+                                        procurementAgentQty: obj,
+                                        total: total
+                                    }
+                                    procurementAgentSplit.push(json);
 
                                 }
 
-                                for (let j = 0; j < buffer.length; j++) {
-                                    Object.assign(obj, buffer[j]);
-                                }
 
-                                let json = {
-                                    planningUnit: planningUnit,
-                                    procurementAgentQty: obj,
-                                    total: total
-                                }
-                                procurementAgentSplit.push(json);
 
                             }
 
                             //Graph-1
-                            let planningUnitSplitForPlanned = shipmentStatusFilter.filter(c => (1 == c.shipmentStatus.id && 2 == c.shipmentStatus.id && 3 == c.shipmentStatus.id && 9 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: item.shipmentQty, orderedShipmentQty: 0 } });
+                            let planningUnitSplitForPlanned = shipmentStatusFilter.filter(c => (1 == c.shipmentStatus.id || 2 == c.shipmentStatus.id || 3 == c.shipmentStatus.id || 9 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: item.shipmentQty, orderedShipmentQty: 0 } });
 
-                            let planningUnitSplitForOrdered = shipmentStatusFilter.filter(c => (4 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: item.shipmentQty } });
+                            let planningUnitSplitForOrdered = shipmentStatusFilter.filter(c => (4 == c.shipmentStatus.id || 5 == c.shipmentStatus.id || 6 == c.shipmentStatus.id || 7 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: item.shipmentQty } });
 
                             let mergedPlanningUnitSplit = planningUnitSplitForPlanned.concat(planningUnitSplitForOrdered);
 
-                            let planningUnitSplit = Object.values(mergedPlanningUnitSplit.reduce((a, { planningUnit, plannedShipmentQty, orderedShipmentQty }) => {
-                                if (!a[planningUnit.id])
-                                    a[planningUnit.id] = Object.assign({}, { planningUnit, plannedShipmentQty, orderedShipmentQty });
-                                else
-                                    a[planningUnit.id].plannedShipmentQty += plannedShipmentQty;
-                                a[planningUnit.id].orderedShipmentQty += orderedShipmentQty;
-                                return a;
-                            }, {}));
+                            // let planningUnitSplit = Object.values(mergedPlanningUnitSplit.reduce((a, { planningUnit, plannedShipmentQty, orderedShipmentQty }) => {
+                            //     if (!a[planningUnit.id])
+                            //         a[planningUnit.id] = Object.assign({}, { planningUnit, plannedShipmentQty, orderedShipmentQty });
+                            //     else
+                            //         a[planningUnit.id].plannedShipmentQty += plannedShipmentQty;
+                            //     a[planningUnit.id].orderedShipmentQty += orderedShipmentQty;
+                            //     return a;
+                            // }, {}));
+
+
+                            var result1 = mergedPlanningUnitSplit.reduce(function (mergedPlanningUnitSplit, val) {
+                                var o = mergedPlanningUnitSplit.filter(function (obj) {
+                                    return obj.planningUnit.id == val.planningUnit.id;
+                                }).pop() || { planningUnit: val.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: 0 };
+
+                                o.plannedShipmentQty += val.plannedShipmentQty;
+                                o.orderedShipmentQty += val.orderedShipmentQty;
+
+                                mergedPlanningUnitSplit.push(o);
+                                return mergedPlanningUnitSplit;
+                            }, []);
+                            var planningUnitSplit = result1.filter(function (itm, i, a) {
+                                return i == a.indexOf(itm);
+                            });
 
                             //Graph-2
-                            let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: item.productCost } });
+                            let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: (item.productCost * item.currency.conversionRateToUsd) + (item.freightCost * item.currency.conversionRateToUsd) } });
 
                             let fundingSourceSplit = Object.values(preFundingSourceSplit.reduce((a, { fundingSource, amount }) => {
                                 if (!a[fundingSource.id])
@@ -2097,8 +2134,8 @@ class ShipmentGlobalDemandView extends Component {
 
                             var table1Headers = [];
                             table1Headers = Object.keys(procurementAgentSplit[0].procurementAgentQty);
-                            table1Headers.unshift("Plannaning Unit");
-                            table1Headers.push("Total Units");
+                            table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
+                            table1Headers.push(i18n.t('static.report.totalUnit'));
 
 
 
@@ -2154,7 +2191,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (fundingSourceIds == 0) {
+            } else if (fundingSourceIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
                     data: [],
@@ -2163,7 +2200,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (shipmentStatusIds == 0) {
+            } else if (shipmentStatusIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
                     data: [],
@@ -2188,12 +2225,49 @@ class ShipmentGlobalDemandView extends Component {
             this.getProductCategories();
             this.getFundingSource();
             this.getShipmentStatusList();
+            this.getRelamList();
         } else {
             this.getPrograms();
             this.getShipmentStatusList();
             this.getFundingSource();
         }
 
+    }
+
+    getRelamList = () => {
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     getShipmentStatusList() {
@@ -2725,6 +2799,16 @@ class ShipmentGlobalDemandView extends Component {
             )
         }, this);
 
+        const { realmList } = this.state;
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         // const { shipmentStatuses } = this.state;
         // let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
         //     return (
@@ -2841,6 +2925,24 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </div>
                                         </FormGroup>
+                                        <Online>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="select" name="realmId" id="realmId"
+                                                            onChange={(e) => { this.fetchData(); }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {realms}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                        </Online>
                                         <Online>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>

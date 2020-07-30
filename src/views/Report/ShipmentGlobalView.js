@@ -1510,6 +1510,7 @@ class ShipmentGlobalView extends Component {
             },
             lab: [],
             val: [],
+            realmList: [],
             table1Body: [],
             table1Headers: [],
             viewby: 1,
@@ -1697,7 +1698,6 @@ class ShipmentGlobalView extends Component {
                     }
 
                 }
-
             }
         }
         const unit = "pt";
@@ -1932,6 +1932,7 @@ class ShipmentGlobalView extends Component {
                     }
                 }
             );
+        this.fetchData();
     }
     getPlanningUnit() {
 
@@ -2000,12 +2001,49 @@ class ShipmentGlobalView extends Component {
 
     componentDidMount() {
 
-        this.getCountrys();
+        // this.getCountrys();
+        this.getRelamList();
         this.getProductCategories();
         this.getProcurementAgent();
         this.getFundingSource();
         document.getElementById("procurementAgentDiv").style.display = "none";
 
+    }
+
+    getRelamList = () => {
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     getProcurementAgent = () => {
@@ -2150,6 +2188,7 @@ class ShipmentGlobalView extends Component {
     fetchData = () => {
 
         let viewby = document.getElementById("viewById").value;
+        let realmId = document.getElementById('realmId').value;
         let procurementAgentIds = this.state.procurementAgentValues;
         let fundingSourceIds = this.state.fundingSourceValues;
         let productCategoryId = document.getElementById("productCategoryId").value;
@@ -2171,14 +2210,14 @@ class ShipmentGlobalView extends Component {
         // console.log("startDate-----", startDate);
         // console.log("endDate-----", endDate);
 
-        if (planningUnitId != 0 && productCategoryId != -1 && CountryIds.length > 0 && ((viewby == 2 && procurementAgentIds.length > 0) || (viewby == 1 && fundingSourceIds.length > 0))) {
+        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && CountryIds.length > 0 && ((viewby == 2 && procurementAgentIds.length > 0) || (viewby == 1 && fundingSourceIds.length > 0))) {
 
             this.setState({
                 message: ''
             })
-            let realmId = AuthenticationService.getRealmId();
+            // let realmId = AuthenticationService.getRealmId();
             var inputjson = {
-                realmId: 1,
+                realmId: realmId,
                 startDate: new moment(startDate),
                 stopDate: new moment(endDate),
                 realmCountryIds: CountryIds,
@@ -2243,7 +2282,19 @@ class ShipmentGlobalView extends Component {
                     })
                 })
 
-
+        } else if (realmId <= 0) {
+            this.setState({
+                message: i18n.t('static.common.realmtext'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
 
         } else if (CountryIds.length == 0) {
             this.setState({
@@ -2392,6 +2443,16 @@ class ShipmentGlobalView extends Component {
         }, this);
 
         const { productCategories } = this.state;
+
+        const { realmList } = this.state;
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
 
         const backgroundColor = [
             '#4dbd74',
@@ -2557,6 +2618,25 @@ class ShipmentGlobalView extends Component {
                                             </div>
 
                                         </FormGroup>
+
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        // onChange={(e) => { this.dataChange(e) }}
+                                                        type="select" name="realmId" id="realmId"
+                                                        onChange={(e) => { this.getCountrys(); }}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {realms}
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
                                             <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
