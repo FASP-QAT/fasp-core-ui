@@ -743,6 +743,8 @@
     "static.dashboard.supplyPlan": "Supply Plan",
     "static.supplyPlan.index": "Index",
     "static.supplyPlan.addNewConsumption": "Add new consumption",
+    "static.common.insertNewRowBefore": "Insert New Row Before",
+    "static.common.insertNewRowAfter": "Insert New Row After",
     "static.supplyPlan.exportAsCsv": "Export as csv",
     "static.supplyPlan.saveDataFirst": "You need to save the data first.",
     "static.supplyPlan.duplicateConsumption": "Duplicate consumption",
