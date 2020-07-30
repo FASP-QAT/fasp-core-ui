@@ -94,9 +94,11 @@ export function qatProblemActions() {
                     planningUnitResult = planningunitRequest.result;
                     // console.log("QPA 5====>", planningUnitResult);
                     for (var pp = 0; pp < programList.length; pp++) {
-
+                        var problemActionIndex = 0;
                         problemActionList = programList[pp].problemReportList;
-                        console.log("problemActionreport=======>", problemActionList);
+                        problemActionIndex = programList[pp].problemReportList.length;
+
+                        console.log("problemActionreport=======>", problemActionList, "====problemActionIndex", problemActionIndex);
 
                         var regionList = programList[pp].regionList;
                         // console.log("QPA 6====>", regionList)
@@ -149,6 +151,9 @@ export function qatProblemActions() {
                                                         },
                                                         shipmentId: '',
                                                         data5: '',
+
+                                                        problemActionIndex: problemActionIndex,
+
                                                         problemStatus: {
                                                             id: 1,
                                                             label: { label_en: 'Open' }
@@ -192,6 +197,7 @@ export function qatProblemActions() {
                                                         ]
                                                     }
                                                     problemActionList.push(json);
+                                                    problemActionIndex++;
                                                 } else {
                                                     // problemActionList[index].isFound = 1;
                                                 }
@@ -250,6 +256,9 @@ export function qatProblemActions() {
                                                         },
                                                         shipmentId: '',
                                                         data5: '',
+
+                                                        problemActionIndex: problemActionIndex,
+
                                                         problemStatus: {
                                                             id: 1,
                                                             label: { label_en: 'Open' }
@@ -294,6 +303,7 @@ export function qatProblemActions() {
 
                                                     }
                                                     problemActionList.push(json);
+                                                    problemActionIndex++;
                                                 } else {
                                                     // problemActionList[index].isFound = 1;
                                                 }
@@ -309,7 +319,102 @@ export function qatProblemActions() {
 
                                     if (problemList[prob].problemId == 3) {
                                         // 3 shipment which have delivered date in past but status is not yet delivered
-                                        // var shipmentList = programList[pp].shipmentList;
+                                        var shipmentList = programList[pp].shipmentList;
+                                        var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
+                                        var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < myDateShipment && c.shipmentStatus.id != 7);
+                                        // console.log("$$$$$$$$$======",filteredShipmentList);
+                                        if (filteredShipmentList.length > 0) {
+                                            for (var s = 0; s < filteredShipmentList.length; s++) {
+                                                var indexShipment = 0;
+                                                if (filteredShipmentList[s].shipmentId > 0) {
+                                                    indexShipment = problemActionList.findIndex(
+                                                        c => c.program.id == programList[pp].programId
+                                                            && c.shipmentId == filteredShipmentList[s].shipmentId
+                                                            && c.realmProblem.problem.problemId == 3);
+                                                } else {
+                                                    indexShipment = problemActionList.findIndex(
+                                                        c => c.program.id == programList[pp].programId
+                                                            && c.index == filteredShipmentList[s].index
+                                                            && c.realmProblem.problem.problemId == 3);
+                                                }
+
+                                                if (indexShipment == -1) {
+                                                    var index = 0;
+                                                    if (filteredShipmentList[s].shipmentId == 0) {
+                                                        index = filteredShipmentList[s].index;
+                                                    }
+                                                    var json = {
+                                                        problemReportId: 0,
+                                                        program: {
+                                                            id: programList[pp].programId,
+                                                            label: programList[pp].label
+                                                        },
+                                                        versionId: programList[pp].currentVersion.versionId,
+                                                        realmProblem: problemList[prob],
+
+                                                        dt: '',
+                                                        region: '',
+                                                        planningUnit: {
+                                                            id: planningUnitList[p].planningUnit.id,
+                                                            label: planningUnitList[p].planningUnit.label,
+
+                                                        },
+                                                        shipmentId: filteredShipmentList[s].shipmentId,
+                                                        data5: '',
+
+                                                        problemActionIndex: problemActionIndex,
+
+                                                        index: index,
+                                                        problemStatus: {
+                                                            id: 1,
+                                                            label: { label_en: 'Open' }
+                                                        },
+                                                        problemType: {
+                                                            id: 1,
+                                                            label: {
+                                                                label_en: 'Automatic'
+                                                            }
+                                                        }, createdBy: {
+                                                            userId: 1,
+                                                            username: "anchal"
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                        lastModifiedBy: {
+                                                            userId: 1,
+                                                            username: "anchal"
+                                                        },
+                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                        problemTransList: [
+                                                            {
+                                                                problemReportTransId: '',
+                                                                problemStatus: {
+                                                                    id: 1,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 461,
+                                                                        label_en: "Open",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                },
+                                                                notes: "Second test",
+                                                                createdBy: {
+                                                                    userId: 1,
+                                                                    username: "anchal"
+                                                                },
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            }
+                                                        ]
+
+                                                    }
+                                                    problemActionList.push(json);
+                                                    problemActionIndex++;
+                                                } else {
+
+                                                }
+                                            }
+                                        }
                                         // shipmentList = shipmentList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                         // console.log("shipment list ====>", shipmentList);
                                         // var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
@@ -417,6 +522,7 @@ export function qatProblemActions() {
                                                         },
                                                         shipmentId: '',
                                                         data5: '',
+                                                        problemActionIndex: problemActionIndex,
                                                         problemStatus: {
                                                             id: 1,
                                                             label: { label_en: 'Open' }
@@ -460,6 +566,7 @@ export function qatProblemActions() {
                                                         ]
                                                     }
                                                     problemActionList.push(json);
+                                                    problemActionIndex++;
                                                 } else {
                                                     // problemActionList[index].isFound = 1;
                                                 }
