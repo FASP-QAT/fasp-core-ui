@@ -11,7 +11,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, NOTES_FOR_QAT_ADJUSTMENTS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, QAT_REALM_COUNTRY_PLANNING_UNIT } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -166,7 +166,9 @@ export default class SupplyPlanComponent extends React.Component {
             showTotalShipment: false,
             showManualShipment: false,
             showErpShipment: false,
-            expiredStockArr: []
+            expiredStockArr: [],
+            expiredStockDetails: [],
+            expiredStockDetailsTotal: 0
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -213,7 +215,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.checkValidationForShipmentDates = this.checkValidationForShipmentDates.bind(this);
         this.shipmentDatesChanged = this.shipmentDatesChanged.bind(this);
     }
-    
+
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
@@ -307,7 +309,7 @@ export default class SupplyPlanComponent extends React.Component {
             var A = [header]
 
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20')], ... this.state.openingBalanceArray]
-            var consumptionArr = [...[("-" + i18n.t('static.dashboard.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
+            var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20')], ...this.state.consumptionTotalData]
             var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20')], ...this.state.shipmentsTotalData]
             var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20')], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
             var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20')], ...this.state.manualShipmentsTotalData]
@@ -450,7 +452,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             const headers = [header];
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray]
-            var consumptionArr = [...[("-" + i18n.t('static.dashboard.consumption'))], ...this.state.consumptionTotalData]
+            var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
             var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
             var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
             var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
@@ -560,7 +562,7 @@ export default class SupplyPlanComponent extends React.Component {
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
-                        label: i18n.t('static.dashboard.consumption'),
+                        label: i18n.t('static.supplyPlan.consumption'),
                         type: 'line',
                         stack: 3,
                         yAxisID: 'A',
@@ -679,7 +681,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                                 <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
                                     <td className="BorderNoneSupplyPlan"></td>
-                                    <td align="left"><b>- {i18n.t('static.dashboard.consumption')}</b></td>
+                                    <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                     {
                                         this.state.consumptionTotalData.map(item1 => (
                                             <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -866,9 +868,13 @@ export default class SupplyPlanComponent extends React.Component {
                                     <td className="BorderNoneSupplyPlan"></td>
                                     <td align="left"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                     {
-                                        this.state.expiredStockArr.map(item1 => (
-                                            <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                        ))
+                                        this.state.expiredStockArr.map(item1 => {
+                                            if (item1.toString() != "") {
+                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                            } else {
+                                                return (<td align="right">{item1}</td>)
+                                            }
+                                        })
                                     }
                                 </tr>
                                 <tr bgcolor='#d9d9d9'>
@@ -1130,7 +1136,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="table-responsive">
                                 <div id="shipmentDatesTable"></div>
                             </div>
-                            
+
                             <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                                 {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveShipmentsDate('suggested')} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                             </div>
@@ -1181,6 +1187,44 @@ export default class SupplyPlanComponent extends React.Component {
                         </ModalFooter>
                     </Modal>
                     {/* Shipments modal */}
+                    {/* Expired Stock modal */}
+                    <Modal isOpen={this.state.expiredStockModal}
+                        className={'modal-md ' + this.props.className}>
+                        <ModalHeader toggle={() => this.toggleLarge('expiredStock')} className="modalHeaderSupplyPlan">
+                            <strong>{i18n.t('static.dashboard.expiryDetails')}</strong>
+                        </ModalHeader>
+                        <ModalBody>
+                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                <thead>
+                                    <tr>
+                                        <th>{i18n.t('static.inventory.batchNumber')}</th>
+                                        <th>{i18n.t('static.inventory.expireDate')}</th>
+                                        <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        this.state.expiredStockDetails.map(item => (
+                                            <tr>
+                                                <td align="left">{item.batchNo}</td>
+                                                <td align="left">{item.expiryDate}</td>
+                                                <td align="left">{item.remainingQty}</td>
+                                            </tr>
+                                        )
+                                        )
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
+                                        <th style={{ textAlign: 'left' }}></th>
+                                        <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
+                                    </tr>
+                                </tfoot>
+                            </Table>
+                        </ModalBody>
+                    </Modal>
+                    {/* Expired stock modal */}
                 </TabPane>
                 <TabPane tabId="2">
                     {this.state.planningUnitChange && <SupplyPlanComparisionComponent ref="compareChild" />}
@@ -1234,7 +1278,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
+                            name: programJson1.programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -1839,10 +1883,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     deliveredShipmentsDetailsArr.push(shipmentDetail);
                                     deliveredShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1850,10 +1903,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     shippedShipmentsDetailsArr.push(shipmentDetail);
                                     shippedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1861,10 +1923,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     orderedShipmentsDetailsArr.push(shipmentDetail);
                                     orderedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1872,10 +1943,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     plannedShipmentsDetailsArr.push(shipmentDetail);
                                     plannedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1930,10 +2010,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     deliveredErpShipmentsDetailsArr.push(shipmentDetail);
                                     deliveredErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -1941,10 +2030,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     shippedErpShipmentsDetailsArr.push(shipmentDetail);
                                     shippedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -1952,10 +2050,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     orderedErpShipmentsDetailsArr.push(shipmentDetail);
                                     orderedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -1963,10 +2070,19 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     plannedErpShipmentsDetailsArr.push(shipmentDetail);
                                     plannedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -2320,10 +2436,12 @@ export default class SupplyPlanComponent extends React.Component {
                             console.log("M[i].startDate", m[i - 1].startDate);
                             var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(m[i - 1].startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(m[i - 1].endDate).format("YYYY-MM-DD"))));
                             var expiredStockQty = 0;
+                            var expiredStockJsonArr = []
                             for (var j = 0; j < expiredStock.length; j++) {
+                                expiredStockJsonArr.push({ remainingQty: parseInt((expiredStock[j].remainingQty)), batchNo: (expiredStock[j].batchNo), expiryDate: (expiredStock[j].expiryDate) })
                                 expiredStockQty += parseInt((expiredStock[j].remainingQty));
                             }
-                            totalExpiredStockArr.push(expiredStockQty);
+                            totalExpiredStockArr.push({ qty: expiredStockQty, details: expiredStockJsonArr, month: m[i - 1] });
                             // Suggested shipments part
                             var s = i - 1;
                             var month = m[s].startDate;
@@ -2578,6 +2696,20 @@ export default class SupplyPlanComponent extends React.Component {
                 monthCountAdjustments: monthCountAdjustments
             });
             this.formSubmit(monthCountAdjustments);
+        } else if (supplyPlanType == 'expiredStock') {
+            var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
+            console.log("startDate", startDate)
+            if (startDate != undefined) {
+                this.setState({
+                    expiredStockModal: !this.state.expiredStockModal,
+                    expiredStockDetails: details[0].details,
+                    expiredStockDetailsTotal: details[0].qty
+                })
+            } else {
+                this.setState({
+                    expiredStockModal: !this.state.expiredStockModal
+                })
+            }
         }
     }
 
@@ -3854,7 +3986,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var countrySKUResult = [];
                         countrySKUResult = countrySKURequest.result;
                         for (var k = 0; k < countrySKUResult.length; k++) {
-                            if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && countrySKUResult[k].active == true && countrySKUResult[k].planningUnit.id==document.getElementById("planningUnitId").value) {
+                            if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && countrySKUResult[k].active == true && countrySKUResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
                                 var countrySKUJson = {
                                     name: getLabelText(countrySKUResult[k].label, this.state.lang),
                                     id: countrySKUResult[k].realmCountryPlanningUnitId
@@ -5066,7 +5198,7 @@ export default class SupplyPlanComponent extends React.Component {
             mapArray.push(map);
 
             var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("4") == map.get("4")
+                c.get("3") == map.get("3")
             )
             if (checkDuplicateInMap.length > 1) {
                 var colArr = ['D'];
@@ -5285,7 +5417,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             inventoryDataList.push(inventoryJson);
                         }
-                        var invList = inventoryDataList.filter(c => c.inventoryDate == map.get("14") && c.realmCountryPlanningUnit.id == map.get("3") && c.region != null);
+                        var invList = inventoryDataList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("14")).format("YYYY-MM") && c.region != null && c.planningUnit.id == document.getElementById("planningUnitId").value);
                         var actualQty = 0;
                         var adjustmentQty = 0;
                         var actualQtyCount = 0;
@@ -5305,9 +5437,9 @@ export default class SupplyPlanComponent extends React.Component {
                             var index = this.state.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
                             var closingBalance = parseInt(this.state.openingBalanceArray[index]) + parseInt(this.state.shipmentsTotalData[index]) - parseInt(this.state.consumptionTotalData[index]);
                             var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
-                            nationalAdjustment = Math.round(parseFloat(nationalAdjustment) / parseFloat(map.get("4")));
+                            nationalAdjustment = (nationalAdjustment);
                             if (nationalAdjustment != 0) {
-                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
+                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("14")).format("YYYY-MM"));
                                 if (nationAdjustmentIndex == -1) {
                                     var inventoryJson = {
                                         inventoryId: 0,
@@ -5320,9 +5452,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         actualQty: "",
                                         active: true,
                                         realmCountryPlanningUnit: {
-                                            id: map.get("3"),
+                                            id: QAT_REALM_COUNTRY_PLANNING_UNIT,
                                         },
-                                        multiplier: map.get("4"),
+                                        multiplier: 1,
                                         planningUnit: {
                                             id: planningUnitId
                                         },
@@ -5435,7 +5567,7 @@ export default class SupplyPlanComponent extends React.Component {
                     for (var k = 0; k < papuResult.length; k++) {
                         if (papuResult[k].planningUnit.id == planningUnitId && papuResult[k].active == true) {
                             var papuJson = {
-                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang) + "-" + papuResult[k].procurementAgent.code,
+                                name: papuResult[k].procurementAgent.code,
                                 id: papuResult[k].procurementAgent.id
                             }
                             procurementAgentList.push(papuJson);
@@ -5456,7 +5588,7 @@ export default class SupplyPlanComponent extends React.Component {
                         for (var k = 0; k < currencyResult.length; k++) {
 
                             var currencyJson = {
-                                name: getLabelText(currencyResult[k].label, this.state.lang) + "-" + currencyResult[k].currencyCode,
+                                name: currencyResult[k].currencyCode,
                                 id: currencyResult[k].currencyId
                             }
                             currencyList.push(currencyJson);
@@ -5480,7 +5612,7 @@ export default class SupplyPlanComponent extends React.Component {
                             for (var k = 0; k < fsResult.length; k++) {
                                 if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
                                     var fsJson = {
-                                        name: getLabelText(fsResult[k].label, this.state.lang) + " - " + fsResult[k].fundingSourceCode,
+                                        name: fsResult[k].fundingSourceCode,
                                         id: fsResult[k].fundingSourceId
                                     }
                                     fundingSourceList.push(fsJson);
@@ -5625,7 +5757,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                             },
                                                             {
@@ -5633,7 +5765,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5642,7 +5774,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5651,7 +5783,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5660,7 +5792,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -5669,7 +5801,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 type: 'calendar',
                                                                 options: {
                                                                     format: 'MM-DD-YYYY',
-                                                                    validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                    validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                 },
                                                                 readOnly: !emergencyOrder
                                                             },
@@ -7584,7 +7716,7 @@ export default class SupplyPlanComponent extends React.Component {
         var value = (instance.jexcel.getJson()[r])[7];
         if (value != "") {
             var budgetList = this.state.budgetList;
-            var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
+            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
         }
         return mylist;
     }
@@ -7882,7 +8014,7 @@ export default class SupplyPlanComponent extends React.Component {
                     for (var k = 0; k < papuResult.length; k++) {
                         if (papuResult[k].planningUnit.id == planningUnitId && papuResult[k].active == true) {
                             var papuJson = {
-                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang) + "-" + papuResult[k].procurementAgent.code,
+                                name: papuResult[k].procurementAgent.code,
                                 id: papuResult[k].procurementAgent.id
                             }
                             procurementAgentList.push(papuJson);
@@ -7904,7 +8036,7 @@ export default class SupplyPlanComponent extends React.Component {
                         for (var k = 0; k < fsResult.length; k++) {
                             if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
                                 var fsJson = {
-                                    name: getLabelText(fsResult[k].label, this.state.lang) + " - " + fsResult[k].fundingSourceCode,
+                                    name: fsResult[k].fundingSourceCode,
                                     id: fsResult[k].fundingSourceId
                                 }
                                 fundingSourceList.push(fsJson);
@@ -8040,12 +8172,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                     for (var k = 0; k < bResult.length; k++) {
                                                         if (bResult[k].program.id == programJson.programId && bResult[k].active == true) {
                                                             var bJson = {
-                                                                name: getLabelText(bResult[k].label, this.state.lang) + " - " + bResult[k].budgetCode,
+                                                                name: bResult[k].budgetCode,
                                                                 id: bResult[k].budgetId
                                                             }
                                                             budgetList.push(bJson);
                                                             budgetListAll.push({
-                                                                name: getLabelText(bResult[k].label, this.state.lang),
+                                                                name: bResult[k].budgetCode,
                                                                 id: bResult[k].budgetId,
                                                                 fundingSource: bResult[k].fundingSource
                                                             })
@@ -8355,7 +8487,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), width: 80, mask: '#,##.00', decimal: '.' },
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), width: 80, mask: '#,##.00', decimal: '.' },
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfContainers'), width: 80, mask: '#,##.00', decimal: '.' },
-                                                                { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: [{ id: 1, name: i18n.t('static.supplyPlan.container') }, { id: 2, name: i18n.t('static.supplyPlan.suggestedOrderQty') }, { id: 3, name: i18n.t('static.procurementAgentPlanningUnit.moq') }, { id: 4, name: i18n.t('static.supplyPlan.palletEuro1') }, { id: 5, name: i18n.t('static.supplyPlan.palletEuro2') }], width: 120, filter: this.filterOrderBasedOn },
+                                                                { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: [{ id: 1, name: i18n.t('static.supplyPlan.container') }, { id: 2, name: i18n.t('static.supplyPlan.userQty') }, { id: 3, name: i18n.t('static.procurementAgentPlanningUnit.moq') }, { id: 4, name: i18n.t('static.supplyPlan.palletEuro1') }, { id: 5, name: i18n.t('static.supplyPlan.palletEuro2') }], width: 120, filter: this.filterOrderBasedOn },
                                                                 { type: 'dropdown', title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundUp') }, { id: 2, name: i18n.t('static.supplyPlan.roundDown') }], width: 120 },
                                                                 { type: 'numeric', title: i18n.t('static.supplyPlan.userQty'), width: 80, mask: '#,##' },
                                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.adjustesOrderQty'), width: 80, mask: '#,##' },
@@ -8433,8 +8565,14 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     } else {
                                                                         var cell = elInstance.getCell(`S${parseInt(y) + 1}`)
                                                                         cell.classList.remove('readonly');
-                                                                        var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
-                                                                        cell.classList.remove('readonly');
+                                                                        var orderBasedOn = elInstance.getRowData(y)[18];
+                                                                        if (orderBasedOn == 1 || orderBasedOn == 4 || orderBasedOn == 5) {
+                                                                            var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
+                                                                            cell.classList.remove('readonly');
+                                                                        } else {
+                                                                            var cell = elInstance.getCell(`T${parseInt(y) + 1}`)
+                                                                            cell.classList.add('readonly');
+                                                                        }
                                                                         var cell = elInstance.getCell(`U${parseInt(y) + 1}`)
                                                                         cell.classList.remove('readonly');
                                                                     }
@@ -8481,7 +8619,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != PLANNED_SHIPMENT_STATUS
                                                                                     },
@@ -8490,7 +8628,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != SUBMITTED_SHIPMENT_STATUS
                                                                                     },
@@ -8499,7 +8637,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != APPROVED_SHIPMENT_STATUS
                                                                                     },
@@ -8508,7 +8646,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != SHIPPED_SHIPMENT_STATUS
                                                                                     },
@@ -8517,7 +8655,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: shipmentStatus != ARRIVED_SHIPMENT_STATUS
                                                                                     },
@@ -8526,7 +8664,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                                         type: 'calendar',
                                                                                         options: {
                                                                                             format: 'MM-DD-YYYY',
-                                                                                            validRange: [moment(Date.now()).subtract(1,'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
+                                                                                            validRange: [moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD"), moment(Date.now()).format("YYYY-MM-DD")]
                                                                                         },
                                                                                         readOnly: true
                                                                                     },
@@ -9660,6 +9798,14 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, "");
                 }
 
+            }
+        }
+
+        if (x == 18) {
+            if (value == 1 || value == 4 || value == 5) {
+                elInstance.setValueFromCoords(19, y, 2, true);
+            } else {
+                elInstance.setValueFromCoords(19, y, "", true);
             }
         }
 

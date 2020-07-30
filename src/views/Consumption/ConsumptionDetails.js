@@ -364,6 +364,7 @@ export default class ConsumptionDetails extends React.Component {
                         data: data,
                         columnDrag: true,
                         colWidths: [80, 120, 150, 80, 80, 180, 100, 80],
+                        colHeaderClasses: ["Reqasterisk"],
                         columns: [
                             {
                                 title: i18n.t('static.report.consumptionDate'),
