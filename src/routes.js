@@ -383,7 +383,7 @@ const routes = [
   { path: '/language/listLanguage', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
   { path: '/language/listLanguage/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
   { path: '/language/editLanguage/:languageId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.languageheader') }), component: EditLanguage },
-  { path: '/report/editProblem/:problemReportId/:programId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.report.problem') }), component: EditProblem },
+  { path: '/report/editProblem/:problemReportId/:programId/:index/:problemStatusId/:problemTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.report.problem') }), component: EditProblem },
   { path: '/report/addProblem', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
 
   { path: '/unit/addUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.unit') }), component: AddUnit },

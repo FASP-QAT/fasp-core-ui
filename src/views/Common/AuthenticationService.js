@@ -911,7 +911,7 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/report/editProblem/:problemReportId/:programId":
+                case "/report/editProblem/:problemReportId/:programId/:index/:problemStatusId/:problemTypeId":
                     if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;
                     }

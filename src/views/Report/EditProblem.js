@@ -62,11 +62,10 @@ export default class EditLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // language: this.props.location.state.language,
-            // language: {
-            //     languageName: ''
-            // },
             problemStatusId: '',
+            problemActionIndex: '',
+            problemStatusId: '',
+            problemTypeId: '',
             notes: '',
             message: '',
             data: [],
@@ -345,6 +344,10 @@ export default class EditLanguageComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         let problemReportId = this.props.match.params.problemReportId;
         let programId = this.props.match.params.programId;
+        let problemActionIndex = this.props.match.params.index;
+        let problemStatusId = this.props.match.params.problemStatusId;
+        let problemTypeId = this.props.match.params.problemTypeId;
+
         programId = programId.trim();
 
         // console.log("programId1--*****--->", programId);
@@ -352,7 +355,10 @@ export default class EditLanguageComponent extends Component {
         // let programId = '3_v2_uId_1';
         this.setState({
             programId: programId,
-            problemReportId: problemReportId
+            problemReportId: problemReportId,
+            problemActionIndex: problemActionIndex,
+            problemStatusId: problemStatusId,
+            problemTypeId: problemTypeId
         })
 
         if (programId != null) {
@@ -373,18 +379,30 @@ export default class EditLanguageComponent extends Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
-
                     console.log("EDIT problemReportList---->", problemReportList);
 
-                    const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
-                    console.log("problemReport--->", problemReport);
-                    this.setState({
-                        problemReport: problemReport,
-                        data: problemReport.problemTransList
-                    },
-                        () => {
+                    // const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
+                    if (problemReportId != 0) {
+                        const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
+                        console.log("problemReport--->", problemReport);
+                        this.setState({
+                            problemReport: problemReport,
+                            data: problemReport.problemTransList
+                        },
+                            () => {
 
-                        });
+                            });
+                    } else {
+                        const problemReport = problemReportList.filter(c => c.problemActionIndex == problemActionIndex)[0];
+                        console.log("problemReport--->", problemReport);
+                        this.setState({
+                            problemReport: problemReport,
+                            data: problemReport.problemTransList
+                        },
+                            () => {
+
+                            });
+                    }
 
 
                 }.bind(this)
@@ -519,24 +537,6 @@ export default class EditLanguageComponent extends Component {
 
                                             var problemReportList = (programJson.problemReportList);
 
-                                            // var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
-                                            // var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
-                                            // var problemStatusRequest = problemStatusOs.getAll();
-                                            // let problemStatusObject = {};
-
-                                            // problemStatusRequest.onsuccess = function (e) {
-                                            //     var myResult = [];
-                                            //     myResult = problemStatusRequest.result;
-                                            //     for (var i = 0; i < myResult.length; i++) {
-                                            //         if (myResult[i].id == this.state.problemStatusId) {
-                                            //             problemStatusObject = {
-                                            //                 "id": myResult[i].id,
-                                            //                 "label": myResult[i].label
-                                            //             }
-                                            //         }
-                                            //     }
-
-
                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
@@ -545,12 +545,22 @@ export default class EditLanguageComponent extends Component {
                                             let username = decryptedUser.username;
 
 
-                                            let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
 
-                                            let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
 
-                                            // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                            // var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                            // let otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
+                                            // let filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
+                                            let otherProblemReport = [];
+                                            let filterObj = {};
+
+                                            if (this.state.problemReportId != 0) {
+                                                otherProblemReport = problemReportList.filter(c => c.problemReportId != this.state.problemReportId);
+                                                filterObj = problemReportList.filter(c => c.problemReportId == this.state.problemReportId)[0];
+                                            } else {
+                                                otherProblemReport = problemReportList.filter(c => c.problemActionIndex != this.state.problemActionIndex);
+                                                filterObj = problemReportList.filter(c => c.problemActionIndex == this.state.problemActionIndex)[0];
+
+                                            }
+
 
                                             filterObj.lastModifiedBy = { userId: userId, username: username }
                                             filterObj.lastModifiedDate = moment();
