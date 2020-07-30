@@ -906,6 +906,11 @@ class AuthenticationService {
                     }
                     break;
 
+                case "/report/addProblem":
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
                 case "/report/editProblem/:problemReportId/:programId":
                     if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;

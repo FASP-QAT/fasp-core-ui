@@ -742,6 +742,14 @@ label.arrow_label:after {
 // loader css
 .spinner-border{color:#20a8d8; height: 2.5rem;width: 2.5rem;}
 
+
+// border for edit problem
+
+.bdr-btm-2blue{border-bottom:2px solid #20a8d8; }
+.EditproblemCard{
+  background: transparent !important;
+  border: none !important;
+}
 // margin-left ml-120 procurement agent radio
 .ml-12 {margin-left: 120px;}
 
@@ -834,6 +842,8 @@ label.arrow_label:after {
 
 }
 
+
+
 .jexcel_content{
       max-height: 540px;
 }
@@ -920,6 +930,18 @@ label.arrow_label:after {
     position: fixed;
     width: 100%;
   }
+
+ .expiredInventorySearchposition{
+  position: absolute;
+  top: 60px;
+  right: 2%;
+ } 
+
+ .ProblemlistSearchposition{
+  position: absolute;
+  top: 34px;
+  right: 2%;
+}
   
 }
 .main-content {

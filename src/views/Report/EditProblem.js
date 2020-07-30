@@ -453,8 +453,8 @@ export default class EditLanguageComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                        <Card className="EditproblemCard">
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
@@ -549,6 +549,8 @@ export default class EditLanguageComponent extends Component {
 
                                             filterObj.problemTransList = tempProblemTransList;
 
+                                            filterObj.problemStatus = this.state.problemStatusObject;
+
 
                                             otherProblemReport.push(filterObj);
                                             programJson.problemReportList = otherProblemReport;
@@ -591,135 +593,139 @@ export default class EditLanguageComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody className="pb-0">
-                                                    <FormGroup>
-                                                        <Label for="programCode">{i18n.t('static.program.programCode')}</Label>
-                                                        <Input type="text"
-                                                            name="programCode"
-                                                            id="programCode"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.programCode}
-                                                            invalid={(touched.programCode && !!errors.programCode)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.problemReport.program.code}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.programCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="versionId">{i18n.t('static.program.versionId')}</Label>
-                                                        <Input type="text"
-                                                            name="versionId"
-                                                            id="versionId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.versionId}
-                                                            invalid={(touched.versionId && !!errors.versionId)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.problemReport.versionId}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.versionId}</FormFeedback>
-                                                    </FormGroup>
+                                                    <div className="col-md-12 bg-white pb-1  mb-2">
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
 
-                                                    <FormGroup>
-                                                        <Label for="createdDate">{i18n.t('static.report.createdDate')}</Label>
-                                                        <Input type="text"
-                                                            name="createdDate"
-                                                            id="createdDate"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.createdDate}
-                                                            invalid={(touched.createdDate && !!errors.createdDate)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={moment(this.state.problemReport.createdDate).format('yyyy-MM-DD')}
-                                                            // selected={new moment(this.state.problemReport.createdDate)}
-                                                            className="form-control-sm form-control date-color"
-                                                        />
-                                                        <FormFeedback className="red">{errors.createdDate}</FormFeedback>
-                                                    </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="programCode">{i18n.t('static.program.programCode')}</Label>
+                                                            <Input type="text"
+                                                                name="programCode"
+                                                                id="programCode"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.programCode}
+                                                                invalid={(touched.programCode && !!errors.programCode)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.problemReport.program.code}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="versionId">{i18n.t('static.program.versionId')}</Label>
+                                                            <Input type="text"
+                                                                name="versionId"
+                                                                id="versionId"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.versionId}
+                                                                invalid={(touched.versionId && !!errors.versionId)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.problemReport.versionId}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.versionId}</FormFeedback>
+                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="problemDescription">{i18n.t('static.report.problemDescription')}</Label>
-                                                        <Input type="text"
-                                                            name="problemDescription"
-                                                            id="problemDescription"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.problemDescription}
-                                                            invalid={(touched.problemDescription && !!errors.problemDescription)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={getLabelText(this.state.problemReport.realmProblem.problem.label, this.state.lang)}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
-                                                    </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="createdDate">{i18n.t('static.report.createdDate')}</Label>
+                                                            <Input type="text"
+                                                                name="createdDate"
+                                                                id="createdDate"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.createdDate}
+                                                                invalid={(touched.createdDate && !!errors.createdDate)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={moment(this.state.problemReport.createdDate).format('yyyy-MM-DD')}
+                                                                // selected={new moment(this.state.problemReport.createdDate)}
+                                                                className="form-control-sm form-control date-color"
+                                                            />
+                                                            <FormFeedback className="red">{errors.createdDate}</FormFeedback>
+                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="problemDescription">{i18n.t('static.report.problemStatus')}</Label>
-                                                        <Input type="text"
-                                                            name="problemDescription"
-                                                            id="problemDescription"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.problemDescription}
-                                                            invalid={(touched.problemDescription && !!errors.problemDescription)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.problemReport.problemStatus.label}
-                                                            value={getLabelText(this.state.problemReport.problemStatus.label, this.state.lang)}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
-                                                    </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="problemDescription">{i18n.t('static.report.problemDescription')}</Label>
+                                                            <Input type="text"
+                                                                name="problemDescription"
+                                                                id="problemDescription"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.problemDescription}
+                                                                invalid={(touched.problemDescription && !!errors.problemDescription)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={getLabelText(this.state.problemReport.realmProblem.problem.label, this.state.lang)}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
+                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
-                                                        <Input type="text"
-                                                            name="problemType"
-                                                            id="problemType"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.problemType}
-                                                            invalid={(touched.problemType && !!errors.problemType)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={getLabelText(this.state.problemReport.problemType.label, this.state.lang)}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.problemType}</FormFeedback>
-                                                    </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="problemDescription">{i18n.t('static.report.problemStatus')}</Label>
+                                                            <Input type="text"
+                                                                name="problemDescription"
+                                                                id="problemDescription"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.problemDescription}
+                                                                invalid={(touched.problemDescription && !!errors.problemDescription)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.problemReport.problemStatus.label}
+                                                                value={getLabelText(this.state.problemReport.problemStatus.label, this.state.lang)}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
+                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="action">{i18n.t('static.common.action')}</Label>
-                                                        <Input type="text"
-                                                            name="action"
-                                                            id="action"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.action}
-                                                            invalid={(touched.action && !!errors.action)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.problemReport.realmProblem.problem.actionUrl}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.action}</FormFeedback>
-                                                    </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
+                                                            <Input type="text"
+                                                                name="problemType"
+                                                                id="problemType"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.problemType}
+                                                                invalid={(touched.problemType && !!errors.problemType)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={getLabelText(this.state.problemReport.problemType.label, this.state.lang)}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.problemType}</FormFeedback>
+                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="criticality">{i18n.t('static.report.Criticality')}</Label>
-                                                        <Input type="text"
-                                                            name="criticality"
-                                                            id="criticality"
-                                                            readOnly
-                                                            bsSize="sm"
-                                                            valid={!errors.criticality}
-                                                            invalid={(touched.criticality && !!errors.criticality)}
-                                                            onChange={(e) => { handleChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={getLabelText(this.state.problemReport.realmProblem.criticality.label, this.state.lang)}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.criticality}</FormFeedback>
-                                                    </FormGroup>
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="action">{i18n.t('static.common.action')}</Label>
+                                                            <Input type="text"
+                                                                name="action"
+                                                                id="action"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                valid={!errors.action}
+                                                                invalid={(touched.action && !!errors.action)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.problemReport.realmProblem.problem.actionUrl}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.action}</FormFeedback>
+                                                        </FormGroup>
+
+                                                        <FormGroup className="col-md-6 pl-md-0">
+                                                            <Label for="criticality">{i18n.t('static.report.Criticality')}</Label>
+                                                            <Input type="text"
+                                                                name="criticality"
+                                                                id="criticality"
+                                                                readOnly
+                                                                bsSize="sm"
+                                                                valid={!errors.criticality}
+                                                                invalid={(touched.criticality && !!errors.criticality)}
+                                                                onChange={(e) => { handleChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={getLabelText(this.state.problemReport.realmProblem.criticality.label, this.state.lang)}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.criticality}</FormFeedback>
+                                                        </FormGroup>
+                                                    </div>
 
                                                     <ToolkitProvider
                                                         keyField="problemReportId"
@@ -731,75 +737,87 @@ export default class EditLanguageComponent extends Component {
                                                     >
                                                         {
                                                             props => (
+                                                                <div className="col-md-12 bg-white pb-1 mb-2">
+                                                                    <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>Problem Trans Details</b></a></li></ul>
+                                                                    <div className="TableCust">
+                                                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
-                                                                <div className="TableCust">
-                                                                    <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
-                                                                        <SearchBar {...props.searchProps} />
-                                                                        <ClearSearchButton {...props.searchProps} />
+                                                                            <SearchBar {...props.searchProps} />
+                                                                            <ClearSearchButton {...props.searchProps} />
+                                                                        </div>
+                                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                            pagination={paginationFactory(options)}
+                                                                            rowEvents={{
+                                                                                onClick: (e, row, rowIndex) => {
+                                                                                    this.editProblem(row);
+                                                                                }
+                                                                            }}
+                                                                            {...props.baseProps}
+                                                                        />
+
+
                                                                     </div>
-                                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                                        pagination={paginationFactory(options)}
-                                                                        rowEvents={{
-                                                                            onClick: (e, row, rowIndex) => {
-                                                                                this.editProblem(row);
-                                                                            }
-                                                                        }}
-                                                                        {...props.baseProps}
-                                                                    />
                                                                 </div>
                                                             )
                                                         }
                                                     </ToolkitProvider>
 
 
+                                                    <div className="col-md-12 bg-white pb-1">
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Update Status</b></a></li></ul>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
 
-                                                        <Input type="select"
-                                                            bsSize="sm"
-                                                            name="problemStatusId" id="problemStatusId"
-                                                            valid={!errors.problemStatusId && this.state.problemStatusId != ''}
-                                                            invalid={(touched.problemStatusId && !!errors.problemStatusId)}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.problemStatusId}
-                                                        >
-                                                            <option value="">Please select</option>
-                                                            <option value="1">Open</option>
-                                                            <option value="2">Closed</option>
-                                                            <option value="3">Received</option>
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.problemStatusId}</FormFeedback>
+                                                        <FormGroup className="col-md-6 pl-0">
+                                                            <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
+
+                                                            <Input type="select"
+                                                                bsSize="sm"
+                                                                name="problemStatusId" id="problemStatusId"
+                                                                valid={!errors.problemStatusId && this.state.problemStatusId != ''}
+                                                                invalid={(touched.problemStatusId && !!errors.problemStatusId)}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.problemStatusId}
+                                                            >
+                                                                <option value="">Please select</option>
+                                                                <option value="1">Open</option>
+                                                                <option value="2">Closed</option>
+                                                                <option value="3">Received</option>
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.problemStatusId}</FormFeedback>
+                                                        </FormGroup>
+
+                                                        <FormGroup className="col-md-6 pl-0">
+                                                            <Label for="notes">{i18n.t('static.program.notes')}</Label>
+                                                            <Input type="text"
+                                                                name="notes"
+                                                                id="notes"
+                                                                bsSize="sm"
+                                                                valid={!errors.notes && this.state.notes != ''}
+                                                                invalid={(touched.notes && !!errors.notes)}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.notes}
+                                                            />
+                                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                                        </FormGroup>
+                                                    </div>
+
+                                                    <div className="col-md-12 card-footer">
+                                                        <FormGroup>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                            &nbsp;
                                                     </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
-                                                        <Input type="text"
-                                                            name="notes"
-                                                            id="notes"
-                                                            bsSize="sm"
-                                                            valid={!errors.notes && this.state.notes != ''}
-                                                            invalid={(touched.notes && !!errors.notes)}
-                                                            onBlur={handleBlur}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.notes}
-                                                        />
-                                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                                    </FormGroup>
+                                                    </div>
 
                                                 </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
+
+
                                             </Form>
 
                                         )} />
