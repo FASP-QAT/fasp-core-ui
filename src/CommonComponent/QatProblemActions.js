@@ -325,7 +325,7 @@ export function qatProblemActions() {
                                         var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                         // console.log("daaaaaaaaaaaaaaaaaat==========>", moment(myDateShipment).add(7, 'days').format('YYYY-MM-DD'));
                                         var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7);
-                                        // console.log("$$$$$$$$$======", filteredShipmentList);
+                                        console.log("$$$$$$$$$======", filteredShipmentList);
                                         if (filteredShipmentList.length > 0) {
                                             for (var s = 0; s < filteredShipmentList.length; s++) {
                                                 var indexShipment = 0;
@@ -358,8 +358,8 @@ export function qatProblemActions() {
                                                         dt: '',
                                                         region: '',
                                                         planningUnit: {
-                                                            id: filteredShipmentList[s].id,
-                                                            label: filteredShipmentList[s].label,
+                                                            id: filteredShipmentList[s].planningUnit.id,
+                                                            label: filteredShipmentList[s].planningUnit.label,
 
                                                         },
                                                         shipmentId: filteredShipmentList[s].shipmentId,
