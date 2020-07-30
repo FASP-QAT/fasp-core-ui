@@ -482,16 +482,16 @@ class ApplicationDashboard extends Component {
       //   // formatter: this.formatLabel
       // },
       {
-        dataField: 'realmProblem.problem.actionUrl',
+        dataField: 'realmProblem.problem.actionLabel',
         text: 'Action',
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        // formatter: (cell, row) => {
-        //   if (cell != null && cell != "") {
-        //     return getLabelText(cell, this.state.lang);
-        //   }
-        // }
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
       },
       {
         dataField: 'realmProblem.criticality.label',
