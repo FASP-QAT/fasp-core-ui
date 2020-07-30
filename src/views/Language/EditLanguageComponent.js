@@ -8,6 +8,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import {LABEL_REGEX,ALPHABETS_REGEX} from '../../Constants.js';
 
 
 let initialValues = {
@@ -19,10 +20,10 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         languageName: Yup.string()
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
-        .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+        .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
         .required(i18n.t('static.language.languagecodetext'))
         // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 

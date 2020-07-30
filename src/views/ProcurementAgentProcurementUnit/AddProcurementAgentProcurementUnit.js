@@ -12,7 +12,10 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
+import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
+
+
 
 export default class AddProcurementAgentProcurementUnit extends Component {
     constructor(props) {
@@ -39,7 +42,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             procurementAgentId: this.props.match.params.procurementAgentId,
             updateRowStatus: 0,
             loading: true,
-            isValidData:true
+            isValidData: true
         }
         // this.addRow = this.addRow.bind(this);
         // this.deleteLastRow = this.deleteLastRow.bind(this);
@@ -133,7 +136,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             .then(response => {
                 if (response.status == "200") {
                     this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                   
+
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -295,24 +298,36 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         }
 
         if (x == 3) {
-            // var json = this.el.getJson();
+            var reg = DECIMAL_NO_REGEX;
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                this.el.setValueFromCoords(7, y, 1, true);
+                valid = true;
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
                 // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.el.setValueFromCoords(7, y, 1, true);
                 // valid = false;
             } else {
-                // this.el.setStyle(col, "background-color", "transparent");
-                // this.el.setComments(col, "");
-                this.el.setValueFromCoords(7, y, 1, true);
-                // valid = true;
+                if (isNaN(Number.parseFloat(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(7, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(7, y, 1, true);
+                    valid = true;
+                }
             }
         }
 
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
+            var reg = DECIMAL_NO_REGEX;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -321,7 +336,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 this.el.setValueFromCoords(7, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(Number.parseFloat(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -495,8 +510,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     };
                                     var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                     this.el = elVar;
-                                    this.setState({ mapPlanningUnitEl: elVar,loading: false });
-                                  
+                                    this.setState({ mapPlanningUnitEl: elVar, loading: false });
+
 
                                 } else {
                                     this.setState({
@@ -597,36 +612,36 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-               <div style={{ display: this.state.loading ? "none" : "block" }}>
-                   
-                        <Card  >
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
 
-                            {/* <CardHeader>
+                    <Card  >
+
+                        {/* <CardHeader>
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
                             </CardHeader> */}
-                            <CardBody className="p-0">
+                        <CardBody className="p-0">
                             <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="table-responsive" >
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
-                                </Col>
-                            </CardBody>
-                            <CardFooter>
-                                <FormGroup>
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
-                                    &nbsp;
+                            </Col>
+                        </CardBody>
+                        <CardFooter>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                                &nbsp;
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
-                                    &nbsp;
+                                &nbsp;
                                 </FormGroup>
 
-                            </CardFooter>
-                        </Card>
-                  
+                        </CardFooter>
+                    </Card>
+
                 </div>
-                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>Loading...</strong></h4></div>

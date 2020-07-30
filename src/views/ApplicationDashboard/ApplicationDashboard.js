@@ -1,6 +1,7 @@
 import React, { Component, lazy, Suspense } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import {
   Badge,
   Button,
@@ -34,6 +35,7 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
+import DashboardService from "../../api/DashboardService";
 import Widget01 from '../../views/Widgets/Widget01';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -173,53 +175,7 @@ const mainChart = {
   ],
 };
 
-const items = [
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'TOTAL USERS',
-    caption: '06'
-  },
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'APPLICATION LEVEL ADMIN',
-    caption: '02'
-  },
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'REALM LEVEL ADMIN',
-    caption: '04'
-  },
 
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'PROGRAM LEVEL ADMIN',
-    caption: '03'
-  },
-
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'PROGRAM USER',
-    caption: '05'
-  },
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'SUPPLY PLAN REVIEWER',
-    caption: '02'
-  },
-
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-    //  altText: 'Image alt Text',
-    header: 'GUEST USER',
-    caption: '05'
-  },
-];
 
 
 
@@ -236,9 +192,10 @@ class ApplicationDashboard extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-    };
-    this.state = {
       activeIndex: 0,
+      message: '',
+      dashboard: '',
+      users: []
     };
 
     this.next = this.next.bind(this);
@@ -270,7 +227,20 @@ class ApplicationDashboard extends Component {
     });
   }
   componentDidMount() {
-
+    DashboardService.applicationLevelDashboard()
+      .then(response => {
+        console.log("dashboard response===", response);
+        this.setState({
+          dashboard: response.data
+        })
+      })
+    DashboardService.applicationLevelDashboardUserList()
+      .then(response => {
+        console.log("users response===", response);
+        this.setState({
+          users: response.data
+        })
+      })
     this.hideFirstComponent();
   }
 
@@ -284,14 +254,14 @@ class ApplicationDashboard extends Component {
 
   next() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndex === items.length - 1 ? 0 :
+    const nextIndex = this.state.activeIndex === this.state.users.length - 1 ? 0 :
       this.state.activeIndex + 1;
     this.setState({ activeIndex: nextIndex });
   }
 
   previous() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndex === 0 ? items.length - 1 :
+    const nextIndex = this.state.activeIndex === 0 ? this.state.users.length - 1 :
       this.state.activeIndex - 1;
     this.setState({ activeIndex: nextIndex });
   }
@@ -305,21 +275,40 @@ class ApplicationDashboard extends Component {
 
   render() {
     const { activeIndex } = this.state;
-    const slides = items.map((item) => {
+
+    // const items = [
+    //   // {
+    //   //   src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
+    //   //   //  altText: 'Image alt Text',
+    //   //   header: 'TOTAL USERS',
+    //   //   caption: '06'
+    //   // },
+
+    //   this.state.users.map(item1 => (
+    //     {
+    //       src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
+    //       //  altText: 'Image alt Text',
+    //       header: item1.LABEL_EN,
+    //       caption: item1.COUNT
+    //     }
+    //   ))
+
+    // ];
+    const slides = this.state.users.map((item) => {
 
       return (
         <CarouselItem
           onExiting={this.onExiting}
           onExited={this.onExited}
-          key={item.src}
+          key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
 
           <div className='carouselCont'>
             <div className='ImgCont'>
-              <img width='100%' src={item.src} />
+              <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
             </div>
             <div className='TextCont'>
-              <CarouselCaption captionHeader={item.header} captionText={item.caption} />
+              <CarouselCaption captionHeader={item.LABEL_EN} captionText={item.COUNT} />
             </div>
           </div>
         </CarouselItem>
@@ -328,6 +317,9 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
         <Row className="mt-2">
           <Col xs="12" sm="6" lg="3">
@@ -348,7 +340,7 @@ class ApplicationDashboard extends Component {
                     </Dropdown>
                   </ButtonGroup>
                   <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
-                    <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                    <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
                     {slides}
                     {/* <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} /> 
            <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />  */}
@@ -373,7 +365,7 @@ class ApplicationDashboard extends Component {
                         {/* <i className="icon-settings"></i> */}
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem  onClick={() => this.redirectToCrud("/realm/realmlist")}>Realm List</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/realm/realmlist")}>Realm List</DropdownItem>
                         <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
 
                       </DropdownMenu>
@@ -382,7 +374,7 @@ class ApplicationDashboard extends Component {
                 </div>
 
                 <div className="TextTittle ">TOTAL REALMS </div>
-                <div className="text-count">03</div>
+                <div className="text-count">{this.state.dashboard.REALM_COUNT}</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                   {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}
                 </div>
@@ -401,15 +393,15 @@ class ApplicationDashboard extends Component {
                       <DropdownToggle caret className="p-0" color="transparent">
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem  onClick={() => this.redirectToCrud("/language/addLanguage")}>Add Language</DropdownItem>
-                        <DropdownItem  onClick={() => this.redirectToCrud("/language/listLanguage")}>View Language</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/language/addLanguage")}>Add Language</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/language/listLanguage")}>View Language</DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
                   </ButtonGroup>
                 </div>
 
                 <div className="TextTittle ">Languages </div>
-                <div className="text-count">04</div>
+                <div className="text-count">{this.state.dashboard.LANGUAGE_COUNT}</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 </div>
               </CardBody>
@@ -426,7 +418,7 @@ class ApplicationDashboard extends Component {
                       <DropdownToggle caret className="p-0" color="transparent">
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem  onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
+                        <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
 
                       </DropdownMenu>
                     </Dropdown>
@@ -434,7 +426,7 @@ class ApplicationDashboard extends Component {
                 </div>
 
                 <div className="TextTittle ">Supply Plans Waiting for Approval </div>
-                <div className="text-count">05</div>
+                <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
                 <div className="chart-wrapper mt-4 pb-2" >
                 </div>
               </CardBody>

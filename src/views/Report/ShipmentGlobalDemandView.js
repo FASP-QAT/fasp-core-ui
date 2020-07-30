@@ -1576,6 +1576,7 @@ class ShipmentGlobalDemandView extends Component {
             programLabels: [],
             programs: [],
             data: [],
+            realmList: [],
             fundingSourceSplit: [],
             planningUnitSplit: [],
             procurementAgentSplit: [],
@@ -1849,14 +1850,15 @@ class ShipmentGlobalDemandView extends Component {
             let planningUnitIds = this.state.planningUnitValues;
             let fundingSourceIds = this.state.fundingSourceValues;
             let shipmentStatusIds = this.state.shipmentStatusValues;
+            let realmId = document.getElementById('realmId').value;
 
 
-            if (productCategoryId != -1 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
+            if (realmId > 0 && productCategoryId != -1 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
                 this.setState({
                     message: ''
                 })
 
-                let realmId = AuthenticationService.getRealmId();
+                // let realmId = AuthenticationService.getRealmId();
 
                 var inputjson = {
                     realmId: realmId,
@@ -1887,6 +1889,15 @@ class ShipmentGlobalDemandView extends Component {
                         })
                     })
 
+            } else if (realmId <= 0) {
+                this.setState({
+                    message: i18n.t('static.common.realmtext'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: []
+                });
             } else if (planningUnitIds.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
@@ -2111,7 +2122,7 @@ class ShipmentGlobalDemandView extends Component {
                             });
 
                             //Graph-2
-                            let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: item.productCost + item.freightCost } });
+                            let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: (item.productCost * item.currency.conversionRateToUsd) + (item.freightCost * item.currency.conversionRateToUsd) } });
 
                             let fundingSourceSplit = Object.values(preFundingSourceSplit.reduce((a, { fundingSource, amount }) => {
                                 if (!a[fundingSource.id])
@@ -2214,12 +2225,49 @@ class ShipmentGlobalDemandView extends Component {
             this.getProductCategories();
             this.getFundingSource();
             this.getShipmentStatusList();
+            this.getRelamList();
         } else {
             this.getPrograms();
             this.getShipmentStatusList();
             this.getFundingSource();
         }
 
+    }
+
+    getRelamList = () => {
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     getShipmentStatusList() {
@@ -2751,6 +2799,16 @@ class ShipmentGlobalDemandView extends Component {
             )
         }, this);
 
+        const { realmList } = this.state;
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         // const { shipmentStatuses } = this.state;
         // let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
         //     return (
@@ -2867,6 +2925,24 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </div>
                                         </FormGroup>
+                                        <Online>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            bsSize="sm"
+                                                            type="select" name="realmId" id="realmId"
+                                                            onChange={(e) => { this.fetchData(); }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {realms}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                        </Online>
                                         <Online>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>

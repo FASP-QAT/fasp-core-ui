@@ -521,6 +521,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
+                            name: 'QAT PROBLEM LIST',
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
+                          {
                             name: 'QAT PROBLEM+ACTION REPORT',
                             url: '/report/qatProblemPlusActionReport',
                             icon: 'fa fa-file-text-o',

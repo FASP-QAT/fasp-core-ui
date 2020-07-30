@@ -1339,6 +1339,7 @@ class GlobalConsumption extends Component {
       programValues: [],
       programLabels: [],
       programs: [],
+      realmList: [],
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
@@ -1591,10 +1592,12 @@ class GlobalConsumption extends Component {
     let planningUnitIds = this.state.planningUnitValues;
     let programIds = this.state.programValues;
     let viewById = document.getElementById("viewById").value;
+    let realmId = document.getElementById('realmId').value;
+    console.log("realmId--------->", realmId);
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-    if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
-      let realmId = AuthenticationService.getRealmId();
+    if (realmId > 0 && CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
+      // let realmId = AuthenticationService.getRealmId();
       var inputjson = {
         "realmId": realmId,
         "realmCountryIds": CountryIds,
@@ -1711,6 +1714,9 @@ class GlobalConsumption extends Component {
 
           });
         })
+    } else if (realmId <= 0) {
+      this.setState({ message: i18n.t('static.common.realmtext'), consumptions: [] });
+
     } else if (CountryIds.length == 0) {
       this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
 
@@ -1726,7 +1732,8 @@ class GlobalConsumption extends Component {
   getCountrys() {
     if (navigator.onLine) {
 
-      let realmId = AuthenticationService.getRealmId();
+      // let realmId = AuthenticationService.getRealmId();
+      let realmId = document.getElementById('realmId').value
       RealmCountryService.getRealmCountryrealmIdById(realmId)
         .then(response => {
           this.setState({
@@ -1795,7 +1802,7 @@ class GlobalConsumption extends Component {
       }
 
     }
-
+    this.filterData(this.state.rangeValue);
   }
 
   getPlanningUnit() {
@@ -1956,9 +1963,45 @@ class GlobalConsumption extends Component {
   componentDidMount() {
 
     this.getPrograms()
-    this.getCountrys();
+    // this.getCountrys();
+    this.getRelamList();
     // this.getProductCategories()
+  }
 
+  getRelamList = () => {
+    AuthenticationService.setupAxiosInterceptors();
+    RealmService.getRealmListAll()
+      .then(response => {
+        if (response.status == 200) {
+          this.setState({
+            realmList: response.data
+          })
+        } else {
+          this.setState({
+            message: response.data.messageCode
+          })
+        }
+      }).catch(
+        error => {
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                console.log("Error code unkown");
+                break;
+            }
+          }
+        }
+      );
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -2018,6 +2061,16 @@ class GlobalConsumption extends Component {
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
     }, this);
+
+    const { realmList } = this.state;
+    let realms = realmList.length > 0
+      && realmList.map((item, i) => {
+        return (
+          <option key={i} value={item.realmId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
 
     // const { productCategories } = this.state;
     // let productCategoryList = productCategories.length > 0
@@ -2166,6 +2219,24 @@ class GlobalConsumption extends Component {
                         </Picker>
                       </div>
 
+                    </FormGroup>
+
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            bsSize="sm"
+                            // onChange={(e) => { this.dataChange(e) }}
+                            type="select" name="realmId" id="realmId"
+                            onChange={(e) => { this.getCountrys(); }}
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {realms}
+                          </Input>
+
+                        </InputGroup>
+                      </div>
                     </FormGroup>
 
                     <FormGroup className="col-md-3">

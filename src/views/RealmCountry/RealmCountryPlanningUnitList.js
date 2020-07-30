@@ -116,65 +116,72 @@ export default class RealmCountryPlanningUnitList extends Component {
             </span>
         );
 
-        const columns = [{
-            dataField: 'label',
-            text: i18n.t('static.dashboad.planningunitcountry'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'realmCountry.label',
-            text: i18n.t('static.dashboard.realmcountry'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'planningUnit.label',
-            text: i18n.t('static.dashboard.planningunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'unit.label',
-            text: i18n.t('static.unit.unit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'skuCode',
-            text: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'multiplier',
-            text: i18n.t('static.unit.multiplier'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            //formatter: this.formatLabel
-        }, {
-            dataField: 'gtin',
-            text: i18n.t('static.procurementAgentProcurementUnit.gtin'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'active',
-            text: i18n.t('static.common.status'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (
-                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                );
-            }
-        }];
+        const columns = [
+            {
+                dataField: 'realmCountry.label',
+                text: i18n.t('static.dashboard.realmcountry'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
+                dataField: 'planningUnit.label',
+                text: i18n.t('static.planningunit.planningunit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
+                dataField: 'label',
+                text: i18n.t('static.planningunit.countrysku'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
+                dataField: 'skuCode',
+                text: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'unit.label',
+                text: i18n.t('static.unit.unit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            }, {
+                dataField: 'multiplier',
+                text: i18n.t('static.unit.multiplier'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                //formatter: this.formatLabel
+            },
+            // {
+            //     dataField: 'gtin',
+            //     text: i18n.t('static.procurementAgentProcurementUnit.gtin'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
+            {
+                dataField: 'active',
+                text: i18n.t('static.common.status'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+                    );
+                }
+            }];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
