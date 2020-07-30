@@ -1,3 +1,4 @@
+import { DATE_FORMAT_CAP } from '../../Constants';
 import React from "react";
 import ReactDOM from 'react-dom';
 import jexcel from 'jexcel';
@@ -24,6 +25,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 const entityname = i18n.t('static.report.problem');
+
 
 
 export default class ConsumptionDetails extends React.Component {
@@ -252,7 +254,10 @@ export default class ConsumptionDetails extends React.Component {
                 headerAlign: 'center',
                 style: { width: '170px' },
                 formatter: (cell, row) => {
-                    return new moment(cell).format('yyyy-MM-DD');
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        return modifiedDate;
+                    }
                 }
             },
             {
@@ -271,7 +276,10 @@ export default class ConsumptionDetails extends React.Component {
                 headerAlign: 'center',
                 style: { width: '80px' },
                 formatter: (cell, row) => {
-                    return new moment(cell).format('MMM YYYY');
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        return modifiedDate;
+                    }
                 }
             },
             {
@@ -319,12 +327,15 @@ export default class ConsumptionDetails extends React.Component {
                 }
             },
             {
-                dataField: 'realmProblem.problem.actionUrl',
+                dataField: 'realmProblem.problem.actionLabel',
                 text: i18n.t('static.common.action'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '100px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
             },
 
 

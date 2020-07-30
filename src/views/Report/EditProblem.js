@@ -671,7 +671,7 @@ export default class EditLanguageComponent extends Component {
                                                                     invalid={(touched.month && !!errors.month)}
                                                                     onChange={(e) => { handleChange(e); }}
                                                                     onBlur={handleBlur}
-                                                                    value={moment(this.state.problemReport.dt).format('yyyy-MM-DD')}
+                                                                    value={this.state.problemReport.dt != '' ? moment(this.state.problemReport.dt).format('yyyy-MM-DD') : ''}
                                                                     className="form-control-sm form-control date-color"
                                                                 />
                                                                 <FormFeedback className="red">{errors.month}</FormFeedback>
@@ -705,7 +705,7 @@ export default class EditLanguageComponent extends Component {
                                                                     invalid={(touched.createdDate && !!errors.createdDate)}
                                                                     onChange={(e) => { handleChange(e); }}
                                                                     onBlur={handleBlur}
-                                                                    value={moment(this.state.problemReport.createdDate).format('yyyy-MM-DD')}
+                                                                    value={this.state.problemReport.createdDate != '' ? moment(this.state.problemReport.createdDate).format('yyyy-MM-DD') : ''}
                                                                     // selected={new moment(this.state.problemReport.createdDate)}
                                                                     className="form-control-sm form-control date-color"
                                                                 />
@@ -761,7 +761,7 @@ export default class EditLanguageComponent extends Component {
                                                                 <FormFeedback className="red">{errors.problemType}</FormFeedback>
                                                             </FormGroup>
 
-                                                            <FormGroup className="col-md-6 ">
+                                                            {/* <FormGroup className="col-md-6 ">
                                                                 <Label for="action">{i18n.t('static.common.action')}</Label>
                                                                 <Input type="text"
                                                                     name="action"
@@ -775,7 +775,7 @@ export default class EditLanguageComponent extends Component {
                                                                     value={this.state.problemReport.realmProblem.problem.actionUrl}
                                                                     required />
                                                                 <FormFeedback className="red">{errors.action}</FormFeedback>
-                                                            </FormGroup>
+                                                            </FormGroup> */}
 
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="criticality">{i18n.t('static.report.Criticality')}</Label>
