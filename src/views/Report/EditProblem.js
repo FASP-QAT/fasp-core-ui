@@ -549,6 +549,8 @@ export default class EditLanguageComponent extends Component {
 
                                             filterObj.problemTransList = tempProblemTransList;
 
+                                            filterObj.problemStatus = this.state.problemStatusObject;
+
 
                                             otherProblemReport.push(filterObj);
                                             programJson.problemReportList = otherProblemReport;
@@ -592,7 +594,7 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody className="pb-0">
                                                     <div className="col-md-12 bg-white pb-1  mb-2">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Section1</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
 
                                                         <FormGroup className="col-md-6 pl-md-0">
                                                             <Label for="programCode">{i18n.t('static.program.programCode')}</Label>
@@ -736,9 +738,9 @@ export default class EditLanguageComponent extends Component {
                                                         {
                                                             props => (
                                                                 <div className="col-md-12 bg-white pb-1 mb-2">
-                                                                     <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>Section2</b></a></li></ul>
+                                                                    <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>Problem Trans Details</b></a></li></ul>
                                                                     <div className="TableCust">
-                                                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
                                                                             <SearchBar {...props.searchProps} />
                                                                             <ClearSearchButton {...props.searchProps} />
@@ -760,9 +762,9 @@ export default class EditLanguageComponent extends Component {
                                                         }
                                                     </ToolkitProvider>
 
-                                                    
+
                                                     <div className="col-md-12 bg-white pb-1">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Section3</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Update Status</b></a></li></ul>
 
 
                                                         <FormGroup className="col-md-6 pl-0">
@@ -805,17 +807,17 @@ export default class EditLanguageComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12 card-footer">
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
+                                                        <FormGroup>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                            &nbsp;
                                                     </FormGroup>
-                                                        </div>
+                                                    </div>
 
                                                 </CardBody>
-                                                
-                                                
+
+
                                             </Form>
 
                                         )} />

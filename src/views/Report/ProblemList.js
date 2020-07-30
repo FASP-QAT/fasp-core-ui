@@ -23,39 +23,14 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+const entityname = i18n.t('static.report.problem');
 
-
-const problemList = [
-    { problemId: 1, type: 'No recent inputs of actual consumption (in the last 3 months)' },
-    { problemId: 2, type: 'No recent inputs of inventory (in the last 3 months)' },
-    { problemId: 3, type: 'Negative ending stock balances' },
-    { problemId: 4, type: 'Actual consumption record replaces forecasted consumption record' },
-    { problemId: 5, type: 'Stock adjustments lack explanatory notes' },
-    { problemId: 6, type: 'Shipments with receive dates in the past have a status that is not received' },
-    { problemId: 7, type: 'PSM shipments lack an RO#' },
-    { problemId: 8, type: 'ARTMIS & supply plan alignment (checking for quantities, product SKU, receive date)' },
-    { problemId: 9, type: 'Supply Plan is not planned for 18 months into the future (forecasted consumption and shipments)' },
-    { problemId: 10, type: 'Shipments are showing a status of planned within the lead time (usually 6 months)' },
-];
-
-const actionList = [
-    { actionId: 1, problemId: 1, action: 'Add consumption data for planning unit' },
-    { actionId: 2, problemId: 2, action: 'Add inventory data for planning unit' },
-    { actionId: 3, problemId: 3, action: 'check why inventory is negative' },
-    { actionId: 4, problemId: 4, action: 'check actual and forecasted consumption record' },
-    { actionId: 5, problemId: 5, action: 'Add notes' },
-    { actionId: 6, problemId: 6, action: 'Add recived date for shipments' },
-    { actionId: 7, problemId: 7, action: 'Add RO' },
-    { actionId: 8, problemId: 8, action: 'Check quantities,SKU,received date' },
-    { actionId: 9, problemId: 9, action: 'Add consumption for planning unit for future 18 months' },
-    { actionId: 10, problemId: 10, action: 'check shipment status' },
-];
 
 export default class ConsumptionDetails extends React.Component {
 
     constructor(props) {
         super(props);
-        this.options = props.options;
+        // this.options = props.options;
         this.state = {
             programList: [],
             categoryList: [],
@@ -76,6 +51,7 @@ export default class ConsumptionDetails extends React.Component {
 
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.addNewProblem = this.addNewProblem.bind(this);
 
     }
 
@@ -187,6 +163,7 @@ export default class ConsumptionDetails extends React.Component {
 
                     this.setState({
                         data: problemReportFilterList,
+                        message: ''
                     },
                         () => {
 
@@ -209,6 +186,12 @@ export default class ConsumptionDetails extends React.Component {
             // state: { language }
         });
 
+    }
+
+    addNewProblem() {
+        console.log("-------------------addNewProblem--------------------");
+        this.props.history.push("/report/addProblem");
+        // this.props.history.push("/role/addRole");
     }
 
     render() {
@@ -355,13 +338,12 @@ export default class ConsumptionDetails extends React.Component {
                 }} />
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-
-                    <div className="Card-header-reporticon">
-                        {/* <strong>QAT PROBLEM PLUS ACTION REPORT</strong> */}
-                        {
-                            // this.state.matricsList.length > 0 &&
-                            
-                        }
+                    <div className="Card-header-addicon">
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProblem}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </div>
                     <CardBody className=" pt-lg-0">
                         <Formik
