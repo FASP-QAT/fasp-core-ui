@@ -272,7 +272,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">Shipped To Arrive By Air Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.shippedToArrivedByAirLeadTime && this.props.items.program.shippedToArrivedByAirLeadTime != ''}
@@ -288,7 +288,7 @@ export default class StepSix extends Component {
             
             
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">Shipped To Arrive By Sea Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.shippedToArrivedBySeaLeadTime && this.props.items.program.shippedToArrivedBySeaLeadTime != ''}

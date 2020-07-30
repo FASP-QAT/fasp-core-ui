@@ -20,7 +20,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }

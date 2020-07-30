@@ -6,7 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-
+import {LABEL_REGEX,ALPHABETS_REGEX} from '../../Constants.js';
 
 const entityname = i18n.t('static.currency.currencyMaster');
 const initialValues = {
@@ -20,7 +20,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
-            .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.currency.currencycodetext')),
         // max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
@@ -29,7 +29,7 @@ const validationSchema = function (values) {
         //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))

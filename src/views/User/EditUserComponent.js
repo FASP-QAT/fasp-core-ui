@@ -11,6 +11,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import {LABEL_REGEX} from '../../Constants.js';
 
 const initialValues = {
     username: "",
@@ -28,7 +29,7 @@ const validationSchema = function (values) {
             // .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             // .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername'))
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext')),
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
