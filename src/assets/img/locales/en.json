@@ -949,7 +949,7 @@
     "static.report.low": "Low Stock",
     "static.report.excess": "Excess Stock",
     "static.report.ok": "Okay",
-    "static.supplyplan.exipredStock": "Expired Stock",
+    "static.supplyplan.exipredStock": "Projected Expired Stock",
     "static.report.expiredInventory": "Expired Inventory",
     "static.report.stockStatusAccrossPlanningUnitGlobalView": "Stock Status Accross PlanningUnit Global View",
     "static.report.updatestatus": "Update Program Status",
@@ -1016,5 +1016,7 @@
     "static.whatIf.removeShippedShipmentsNotInLeadTimes": "Remove all shipped shipments that are not within lead time",
     "static.report.totalUnit": "Total Units",
     "static.supplyPlan.consumption": "Consumption",
-    "static.dashboard.manualTagging": "Manual Tagging"
+    "static.dashboard.manualTagging": "Manual Tagging",
+    "static.dashboard.expiryDetails":"Projected Expired Batch Details",
+    "static.supplyPlan.expiredQty":"Expired Qty"
 }

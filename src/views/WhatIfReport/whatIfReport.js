@@ -210,7 +210,9 @@ export default class WhatIfReportComponent extends React.Component {
             percentage: '',
             startDate: '',
             stopDate: '',
-            rows: rows
+            rows: rows,
+            expiredStockDetails: [],
+            expiredStockDetailsTotal: 0
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -946,7 +948,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
+                            name: programJson1.programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -1570,10 +1572,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     deliveredShipmentsDetailsArr.push(shipmentDetail);
                                     deliveredShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1581,10 +1592,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     shippedShipmentsDetailsArr.push(shipmentDetail);
                                     shippedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1592,10 +1612,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     orderedShipmentsDetailsArr.push(shipmentDetail);
                                     orderedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1603,10 +1632,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (manualShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     plannedShipmentsDetailsArr.push(shipmentDetail);
                                     plannedShipmentsQty += parseInt((manualShipmentArr[j].shipmentQty));
@@ -1661,10 +1699,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     deliveredErpShipmentsDetailsArr.push(shipmentDetail);
                                     deliveredErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -1672,10 +1719,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     shippedErpShipmentsDetailsArr.push(shipmentDetail);
                                     shippedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -1683,10 +1739,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     orderedErpShipmentsDetailsArr.push(shipmentDetail);
                                     orderedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -1694,10 +1759,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                         var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                        var shipmentDetail = getLabelText(procurementAgent.label, this.state.lang) + "-" + procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
                                     } else {
-                                        paColor = "#efefef"
+                                        if (erpShipmentArr[j].procurementAgent.id != "") {
+                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        } else {
+                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
+                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            paColor = "#efefef"
+                                        }
                                     }
                                     plannedErpShipmentsDetailsArr.push(shipmentDetail);
                                     plannedErpShipmentsQty += parseInt((erpShipmentArr[j].shipmentQty));
@@ -2052,10 +2126,12 @@ export default class WhatIfReportComponent extends React.Component {
                             console.log("M[i].startDate", m[i - 1].startDate);
                             var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(m[i - 1].startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(m[i - 1].endDate).format("YYYY-MM-DD"))));
                             var expiredStockQty = 0;
+                            var expiredStockJsonArr = []
                             for (var j = 0; j < expiredStock.length; j++) {
+                                expiredStockJsonArr.push({ remainingQty: parseInt((expiredStock[j].remainingQty)), batchNo: (expiredStock[j].batchNo), expiryDate: (expiredStock[j].expiryDate) })
                                 expiredStockQty += parseInt((expiredStock[j].remainingQty));
                             }
-                            totalExpiredStockArr.push(expiredStockQty);
+                            totalExpiredStockArr.push({ qty: expiredStockQty, details: expiredStockJsonArr, month: m[i - 1] });
                             // Suggested shipments part
                             var s = i - 1;
                             var month = m[s].startDate;
@@ -2311,6 +2387,20 @@ export default class WhatIfReportComponent extends React.Component {
                 monthCountAdjustments: monthCountAdjustments
             });
             this.formSubmit(monthCountAdjustments);
+        } else if (supplyPlanType == 'expiredStock') {
+            var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
+            console.log("startDate", startDate)
+            if (startDate != undefined) {
+                this.setState({
+                    expiredStockModal: !this.state.expiredStockModal,
+                    expiredStockDetails: details[0].details,
+                    expiredStockDetailsTotal: details[0].qty
+                })
+            } else {
+                this.setState({
+                    expiredStockModal: !this.state.expiredStockModal
+                })
+            }
         }
     }
 
@@ -5018,7 +5108,7 @@ export default class WhatIfReportComponent extends React.Component {
                             }
                             inventoryDataList.push(inventoryJson);
                         }
-                        var invList = inventoryDataList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("14")).format("YYYY-MM") && c.region != null && c.planningUnit.id==document.getElementById("planningUnitId").value);
+                        var invList = inventoryDataList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("14")).format("YYYY-MM") && c.region != null && c.planningUnit.id == document.getElementById("planningUnitId").value);
                         var actualQty = 0;
                         var adjustmentQty = 0;
                         var actualQtyCount = 0;
@@ -5040,7 +5130,7 @@ export default class WhatIfReportComponent extends React.Component {
                             var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
                             nationalAdjustment = (nationalAdjustment);
                             if (nationalAdjustment != 0) {
-                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && c.realmCountryPlanningUnit.id == map.get("3"));
+                                var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("14")).format("YYYY-MM"));
                                 if (nationAdjustmentIndex == -1) {
                                     var inventoryJson = {
                                         inventoryId: 0,
@@ -5168,7 +5258,7 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var k = 0; k < papuResult.length; k++) {
                         if (papuResult[k].planningUnit.id == planningUnitId && papuResult[k].active == true) {
                             var papuJson = {
-                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang) + "-" + papuResult[k].procurementAgent.code,
+                                name: papuResult[k].procurementAgent.code,
                                 id: papuResult[k].procurementAgent.id
                             }
                             procurementAgentList.push(papuJson);
@@ -5189,7 +5279,7 @@ export default class WhatIfReportComponent extends React.Component {
                         for (var k = 0; k < currencyResult.length; k++) {
 
                             var currencyJson = {
-                                name: getLabelText(currencyResult[k].label, this.state.lang) + "-" + currencyResult[k].currencyCode,
+                                name: currencyResult[k].currencyCode,
                                 id: currencyResult[k].currencyId
                             }
                             currencyList.push(currencyJson);
@@ -5213,7 +5303,7 @@ export default class WhatIfReportComponent extends React.Component {
                             for (var k = 0; k < fsResult.length; k++) {
                                 if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
                                     var fsJson = {
-                                        name: getLabelText(fsResult[k].label, this.state.lang) + " - " + fsResult[k].fundingSourceCode,
+                                        name: fsResult[k].fundingSourceCode,
                                         id: fsResult[k].fundingSourceId
                                     }
                                     fundingSourceList.push(fsJson);
@@ -7317,7 +7407,7 @@ export default class WhatIfReportComponent extends React.Component {
         var value = (instance.jexcel.getJson()[r])[7];
         if (value != "") {
             var budgetList = this.state.budgetList;
-            var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
+            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
         }
         return mylist;
     }
@@ -7907,9 +7997,13 @@ export default class WhatIfReportComponent extends React.Component {
                                         <td className="BorderNoneSupplyPlan"></td>
                                         <td align="left"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                         {
-                                            this.state.expiredStockArr.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
+                                            this.state.expiredStockArr.map(item1 => {
+                                                if (item1.toString() != "") {
+                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                } else {
+                                                    return (<td align="right">{item1}</td>)
+                                                }
+                                            })
                                         }
                                     </tr>
                                     <tr bgcolor='#d9d9d9'>
@@ -8220,6 +8314,44 @@ export default class WhatIfReportComponent extends React.Component {
                             </ModalFooter>
                         </Modal>
                         {/* Shipments modal */}
+                        {/* Expired Stock modal */}
+                        <Modal isOpen={this.state.expiredStockModal}
+                            className={'modal-md ' + this.props.className}>
+                            <ModalHeader toggle={() => this.toggleLarge('expiredStock')} className="modalHeaderSupplyPlan">
+                                <strong>{i18n.t('static.dashboard.expiryDetails')}</strong>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th>{i18n.t('static.inventory.batchNumber')}</th>
+                                            <th>{i18n.t('static.inventory.expireDate')}</th>
+                                            <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            this.state.expiredStockDetails.map(item => (
+                                                <tr>
+                                                    <td align="left">{item.batchNo}</td>
+                                                    <td align="left">{item.expiryDate}</td>
+                                                    <td align="left">{item.remainingQty}</td>
+                                                </tr>
+                                            )
+                                            )
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
+                                            <th style={{ textAlign: 'left' }}></th>
+                                            <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
+                                        </tr>
+                                    </tfoot>
+                                </Table>
+                            </ModalBody>
+                        </Modal>
+                        {/* Expired stock modal */}
                     </div>
                 </TabPane>
                 <TabPane tabId="2">
@@ -8444,7 +8576,7 @@ export default class WhatIfReportComponent extends React.Component {
                     for (var k = 0; k < papuResult.length; k++) {
                         if (papuResult[k].planningUnit.id == planningUnitId && papuResult[k].active == true) {
                             var papuJson = {
-                                name: getLabelText(papuResult[k].procurementAgent.label, this.state.lang) + "-" + papuResult[k].procurementAgent.code,
+                                name: papuResult[k].procurementAgent.code,
                                 id: papuResult[k].procurementAgent.id
                             }
                             procurementAgentList.push(papuJson);
@@ -8466,7 +8598,7 @@ export default class WhatIfReportComponent extends React.Component {
                         for (var k = 0; k < fsResult.length; k++) {
                             if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
                                 var fsJson = {
-                                    name: getLabelText(fsResult[k].label, this.state.lang) + " - " + fsResult[k].fundingSourceCode,
+                                    name: fsResult[k].fundingSourceCode,
                                     id: fsResult[k].fundingSourceId
                                 }
                                 fundingSourceList.push(fsJson);
@@ -8602,12 +8734,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                     for (var k = 0; k < bResult.length; k++) {
                                                         if (bResult[k].program.id == programJson.programId && bResult[k].active == true) {
                                                             var bJson = {
-                                                                name: getLabelText(bResult[k].label, this.state.lang) + " - " + bResult[k].budgetCode,
+                                                                name: bResult[k].budgetCode,
                                                                 id: bResult[k].budgetId
                                                             }
                                                             budgetList.push(bJson);
                                                             budgetListAll.push({
-                                                                name: getLabelText(bResult[k].label, this.state.lang),
+                                                                name: bResult[k].budgetCode,
                                                                 id: bResult[k].budgetId,
                                                                 fundingSource: bResult[k].fundingSource
                                                             })

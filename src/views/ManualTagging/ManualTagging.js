@@ -10,6 +10,8 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { DATE_FORMAT_CAP } from '../../Constants.js';
+import moment from 'moment';
 
 import i18n from '../../i18n';
 import { boolean } from 'yup';
@@ -237,6 +239,28 @@ export default class ManualTagging extends Component {
         })
     }
 
+    addCommas(cell, row) {
+        console.log("row---------->", row);
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+      }
+
+      formatDate(cell, row) {
+        if (cell != null && cell != "") {
+          var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+          return modifiedDate;
+        } else {
+          return "";
+        }
+      }
+
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
@@ -268,7 +292,8 @@ export default class ManualTagging extends Component {
             text: 'Expected Delivery Date',
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatDate
         }, {
             dataField: 'shipmentStatus',
             text: 'Shipment Status',
@@ -297,14 +322,16 @@ export default class ManualTagging extends Component {
             text: 'Suggested Quantity',
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.addCommas
         },
         {
             dataField: 'totalAmount',
             text: 'Total Amount',
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.addCommas
         }
         ];
         const options = {
@@ -363,7 +390,7 @@ export default class ManualTagging extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
+                                    <Label htmlFor="appendedInputButton">Planning Unit</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input

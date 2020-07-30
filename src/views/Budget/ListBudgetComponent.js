@@ -288,6 +288,7 @@ class ListBudgetComponent extends Component {
         formatter: this.formatLabel
 
       },
+      
       {
         dataField: 'budgetAmt',
         text: i18n.t('static.budget.budgetamount'),
