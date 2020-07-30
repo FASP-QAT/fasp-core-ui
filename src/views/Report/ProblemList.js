@@ -222,12 +222,37 @@ export default class ConsumptionDetails extends React.Component {
 
         const columns = [
             {
-                dataField: 'program.code',
-                text: i18n.t('static.program.programCode'),
+                dataField: 'program.label',
+                text: i18n.t('static.program.program'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'planningUnit.label',
+                text: i18n.t('static.planningunit.planningunit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'dt',
+                text: i18n.t('static.report.month'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return new moment(cell).format('yyyy-MM-DD');
+                }
             },
             {
                 dataField: 'versionId',
