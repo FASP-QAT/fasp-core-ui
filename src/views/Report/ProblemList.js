@@ -179,10 +179,11 @@ export default class ConsumptionDetails extends React.Component {
         }
     }
 
-    editProblem(problem) {
-
+    editProblem(problem, index) {
+        let problemStatusId = document.getElementById('problemStatusId').value;
+        let problemTypeId = document.getElementById('problemTypeId').value;
         this.props.history.push({
-            pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}`,
+            pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
             // state: { language }
         });
 
@@ -363,13 +364,13 @@ export default class ConsumptionDetails extends React.Component {
                 }} />
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <div className="Card-header-addicon">
+                    {/* <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProblem}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                     <CardBody className=" pt-lg-0">
                         <Formik
                             render={
@@ -453,7 +454,7 @@ export default class ConsumptionDetails extends React.Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editProblem(row);
+                                                    this.editProblem(row, rowIndex);
                                                 }
                                             }}
                                             {...props.baseProps}
