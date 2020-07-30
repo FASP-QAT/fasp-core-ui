@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Button,Dropdown, DropdownItem, DropdownMenu,FormGroup, DropdownToggle,Input,Label, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row,Progress } from 'reactstrap';
+import { Badge, Button,Dropdown, DropdownItem, DropdownMenu,FormGroup, DropdownToggle,Input,Label, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row,Col,Progress } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import i18n from '../../i18n';
@@ -10,12 +10,14 @@ import image5 from '../../assets/img/avatars/5.jpg';
 import image6 from '../../assets/img/avatars/6.jpg';
 import image7 from '../../assets/img/avatars/7.jpg';
 import image8 from '../../assets/img/avatars/8.jpg';
+import imageHelp from '../../assets/img/help-icon.png';
 
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import UserService from '../../api/UserService'
 import getLabelText from '../../CommonComponent/getLabelText';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 
 const propTypes = {
   notif: PropTypes.bool,
@@ -35,15 +37,14 @@ class DefaultHeaderDropdown extends Component {
   constructor(props) {
     super(props);
 
+   
     this.state = {
       modal: false,
       large: false,
       small: false,
-      primary: false,
-      success: false,
-      warning: false,
-      danger: false,
-      info: false,
+      bugreport: false,
+      changeadditional: false,
+      changemaster: false,
     };
 
     this.toggle = this.toggle.bind(this);
@@ -58,7 +59,9 @@ class DefaultHeaderDropdown extends Component {
     this.toggle = this.toggle.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
     this.toggleSmall = this.toggleSmall.bind(this);
-    this.toggleInfo = this.toggleInfo.bind(this);
+    this.togglebugreport = this.togglebugreport.bind(this);
+    this.togglechangeadditional = this.togglechangeadditional.bind(this);
+    this.togglechangemaster = this.togglechangemaster.bind(this);
   }
 
 
@@ -115,11 +118,24 @@ class DefaultHeaderDropdown extends Component {
     });
   }
 
-  toggleInfo() {
+  togglebugreport() {
     this.setState({
-      info: !this.state.info,
+      bugreport: !this.state.bugreport,
     });
   }
+
+  togglechangeadditional() {
+    this.setState({
+      changeadditional: !this.state.changeadditional,
+    });
+  }
+  togglechangemaster() {
+    this.setState({
+      changemaster: !this.state.changemaster,
+    });
+  }
+
+ 
   // dropNotif() {
   //   const itemsCount = 5;
   //   return (
@@ -252,50 +268,112 @@ class DefaultHeaderDropdown extends Component {
     const itemsCount = 7;
     return (
       <Dropdown nav  >
-          <i className="fa fa-question-circle HelpIcon" title="Help" onClick={this.toggle} ></i>
+          {/* <i className="fa fa-question-circle HelpIcon" title="Help" onClick={this.toggle} ></i> */}
+          <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.toggle}  />
         <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                        {/* className={'modal-info ' + this.props.className}> */}
-                  <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">Ticketing System</ModalHeader>
+                  <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
                   <ModalBody>
                     <div><h4>What do yo want to do?</h4>Please click here you want to sign </div>
-                    <div>
-                    <FormGroup>
-                         <Button type="button" size="sm" className="float-left mr-1 " onClick={this.toggleInfo} className="mr-1" >Bug Report</Button>
-                         {/* <Button type="button" size="sm" className="float-left mr-1 " className="mr-1" >Bug Report</Button> */}
-                         <Button type="reset" size="sm" className="float-left mr-1" > Change Additional Master</Button>
+                    <div className="mt-2 mb-2">
+                    {/* <FormGroup className="mt-2">
+                         <Button type="button" size="sm" className="float-left mr-1 btn-modal" onClick={this.togglebugreport}  >Bug Report</Button>
+                        
+                         <Button type="reset" size="sm" className="float-left mr-1 btn-modal" onClick={this.togglechangeadditional}> Change Additional Master</Button>
                        
-                    </FormGroup>
+                    </FormGroup> */}
+                    <ListGroup>
+                  <ListGroupItem  className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i> Bug Report</ListGroupItem>
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> Change Additional Master</ListGroupItem>
+                 
+                </ListGroup>
                     </div>
                   </ModalBody>
-                  <ModalFooter>
-                    {/* <Button color="primary" onClick={this.toggleInfo}>Do Something</Button>{' '} */}
+                  {/* <ModalFooter>
+                   
                     <Button color="danger" toggle={this.toggle}> <i className="fa fa-times"></i> Cancel</Button>
-                  </ModalFooter>
+                  </ModalFooter> */}
                 </Modal>
 
+                   {/* Bug Report modal */}
+                <Modal isOpen={this.state.bugreport} toggle={this.togglebugreport}>
+                  <ModalHeader toggle={this.togglebugreport} className="ModalHead modal-info-Headher"><strong>Bug Report</strong></ModalHeader>
+                  <ModalBody>
+                   <div>
+                   <FormGroup className="pr-1 pl-1" >
+                   <Col>
+                                                    <Label className="uploadfilelable" htmlFor="file-input">Upload Screenshot</Label>
+                                                </Col>
+                                                <Col xs="12" className="custom-file">
+                                                    {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
+                                                    <label className="custom-file-label" id="file-input">Choose file</label>
+                                                </Col>
+                  </FormGroup>
+                   {/* <FormGroup>
+                  <Label >Realm</Label>
+                  <Input type="text" />
+                </FormGroup>
+                <FormGroup>
+                  <Label >Name</Label>
+                  <Input type="text"  />
+                </FormGroup>
+                <FormGroup>
+                  <Label >Email Id</Label>
+                  <Input type="text" />
+                </FormGroup> */}
+                   </div>
+                  </ModalBody>
+                  <ModalFooter>
+                   
+                    <Button color="success" onClick={this.togglebugreport}>Submit</Button>
+                  </ModalFooter>
+                </Modal>
+                  
+                 {/* Change Additional Master modal */}
 
-                <Modal isOpen={this.state.info} toggle={this.toggleInfo}
-                       className={'modal-info ' + this.props.className}>
-                  <ModalHeader toggle={this.toggleInfo}>Modal title</ModalHeader>
+                 <Modal isOpen={this.state.changemaster} toggle={this.togglechangemaster} className={this.props.className}>
+                       {/* className={'modal-info ' + this.props.className}> */}
+                  <ModalHeader toggle={this.togglechangemaster} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
+                  <ModalBody>
+                  <div className="mt-2 mb-2">
+                    <ListGroup>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangeadditional} action><i className="icon-note  icons helpclickicon mr-2"></i> Planning Unit</ListGroupItem>
+                  <ListGroupItem  className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-note icons helpclickicon mr-2"></i>Forecasting Units</ListGroupItem>
+                 
+                 
+                </ListGroup>
+                    </div>
+                  </ModalBody>
+                 
+                </Modal>
+
+                 {/*Change Additaion master */}
+                <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
+                  <ModalHeader toggle={this.togglechangeadditional} className="ModalHead modal-info-Headher"><strong>Add/Update Planning Unit</strong></ModalHeader>
                   <ModalBody>
                    <div>
                    <FormGroup>
-                  <Label htmlFor="company">Company</Label>
-                  <Input type="text" id="company" placeholder="Enter your company name" />
+                  <Label >Forecasting Unit</Label>
+                  <Input type="text" />
                 </FormGroup>
                 <FormGroup>
-                  <Label htmlFor="vat">VAT</Label>
-                  <Input type="text" id="vat" placeholder="DE1234567890" />
+                  <Label >Unit</Label>
+                  <Input type="text"  />
                 </FormGroup>
                 <FormGroup>
-                  <Label htmlFor="street">Street</Label>
-                  <Input type="text" id="street" placeholder="Enter street name" />
+                  <Label >Planning Unit</Label>
+                  <Input type="text"  />
+                </FormGroup>
+                <FormGroup>
+                  <Label >Multiplier</Label>
+                  <Input type="text"  />
                 </FormGroup>
                    </div>
                   </ModalBody>
                   <ModalFooter>
                    
-                    <Button color="success" onClick={this.toggleInfo}>Submit</Button>
+                    <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
                   </ModalFooter>
                 </Modal>
                

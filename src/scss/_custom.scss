@@ -2921,6 +2921,7 @@ border-radius: 2em;
   font-size: 27px;
   color: #20a8d8;
   cursor: pointer;
+  // width: 24px;
 }
 .ModalHead{
   padding: 7px 14px!important;
@@ -2933,4 +2934,25 @@ border-radius: 2em;
 .modal-content {
   border: none !important;
   
+}
+.btn-modal {
+  color: #20a8d8 !important;
+  background-color: transparent !important;
+  border-color: #d8d1d1 !important;
+  font-weight: 500;
+}
+.list-group-item-help {
+  margin-bottom: 14px!important;
+  border: none!important;
+  padding: 0.75rem 1.25rem!important;
+  cursor: pointer;
+  color: #73818f !important;
+  background-color: #f0f3f5;
+    font-size: 14px !important;
+    font-weight: 700;
+}
+
+.helpclickicon {
+  color:#20a8d8;
+  font-weight: 700;
 }

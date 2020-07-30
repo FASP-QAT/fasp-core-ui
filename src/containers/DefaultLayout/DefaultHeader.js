@@ -81,6 +81,7 @@ class DefaultHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown> */}
            <DefaultHeaderDropdown mssgs/>
+           {/* <DefaultHeaderDropdown accnt/> */}
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
