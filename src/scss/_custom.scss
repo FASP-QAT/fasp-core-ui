@@ -847,6 +847,35 @@ label.arrow_label:after {
 .jexcel_content{
       max-height: 540px;
 }
+
+// .boxSupplyplanLedgerRed{    width: 19px;background-color: red;
+//   height: 14px;display: inline-block;}
+//   .boxSupplyplanLedgerLightgreen{
+//     background-color: #d9ead3;
+//     width: 19px;
+//     height: 14px;display: inline-block;
+//   }
+//   .boxSupplyplanLedgerGrey{
+//     background-color: #efefee;
+//     width: 19px;
+//     height: 14px;display: inline-block;
+//   }
+//   .supplyledgerbdrtopNone th{
+//     border-top:none !important;
+//   }
+//   .boxUpdated1{
+//     background-color: #000;
+//     width: 19px;
+//     height: 14px;display: inline-block;
+//   }
+
+
+.legendcommitversion .Updated1legend {
+  background-color: transparent;
+  
+}
+
+
 // .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
 
@@ -2021,9 +2050,9 @@ input::placeholder {
   cursor: pointer;
 }
 
-.Supplyfeild {
-  width: 230px;
-}
+// .Supplyfeild {
+//   width: 300px;
+// }
 .legend-supplypln {
   margin-bottom: 0px;
   margin-top: -4px;
