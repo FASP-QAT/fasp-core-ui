@@ -232,7 +232,8 @@ export default class ConsumptionDetails extends React.Component {
 
     buttonFormatter(cell, row) {
         // console.log("-----------", cell);
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+        // return <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+        return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
     }
 
     addMapping(event, cell) {
@@ -279,7 +280,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '80px' },
                 // formatter: (cell, row) => {
                 //     return getLabelText(cell, this.state.lang);
                 // }

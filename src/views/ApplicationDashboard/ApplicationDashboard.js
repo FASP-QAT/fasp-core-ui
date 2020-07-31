@@ -265,6 +265,9 @@ class ApplicationDashboard extends Component {
     this.onExited = this.onExited.bind(this);
     this.problemAction = this.problemAction.bind(this);
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
+    this.buttonFormatter = this.buttonFormatter.bind(this);
+    this.addMapping = this.addMapping.bind(this);
+    this.editProblem = this.editProblem.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -356,7 +359,7 @@ class ApplicationDashboard extends Component {
         }
         programList = latestVersionProgramList;
         for (var pp = 0; pp < programList.length; pp++) {
-          problemActionList=problemActionList.concat(programList[pp].problemReportList);
+          problemActionList = problemActionList.concat(programList[pp].problemReportList);
           // array1.concat(array2)
         }
         // console.log("problemActionList====>", problemActionList);
@@ -374,6 +377,41 @@ class ApplicationDashboard extends Component {
 
   onExited() {
     this.animating = false;
+  }
+  buttonFormatter(cell, row) {
+    // console.log("-----------", cell);
+    // <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>
+    return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
+  }
+
+  addMapping(event, cell) {
+    console.log("-----cell------>>", cell);
+    event.stopPropagation();
+    this.props.history.push({
+      // pathname: `/programProduct/addProgramProduct/${cell}`,
+      // pathname: `/report/addProblem`,
+      pathname: `${cell}`,
+    });
+
+  }
+
+  editProblem(problem, index) {
+    // let problemStatusId = document.getElementById('problemStatusId').value;
+    // let problemTypeId = document.getElementById('problemTypeId').value;
+    // this.props.history.push({
+    //   pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
+    //   // state: { language }
+    // });
+    console.log("problem====>", problem);
+    // 3_v2_uId_1
+    var programId = problem.program.id + "_v" + problem.versionId + "_uId_1";
+    console.log("programId=====>", programId);
+
+    this.props.history.push({
+      pathname: `/report/editProblem/${problem.problemReportId}/ ${programId}/${problem.problemActionIndex}/${problem.problemStatus.id}/${problem.problemType.id}`,
+      // state: { language }
+    });
+
   }
 
   next() {
@@ -467,7 +505,7 @@ class ApplicationDashboard extends Component {
         headerAlign: 'center',
         formatter: (cell, row) => {
           if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+            var modifiedDate = moment(cell).format('MMM-YY');
             return modifiedDate;
           }
         }
@@ -496,7 +534,7 @@ class ApplicationDashboard extends Component {
       // },
       {
         dataField: 'realmProblem.problem.actionLabel',
-        text: i18n.t('static.common.action'),
+        text: 'Suggestion',
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -550,6 +588,14 @@ class ApplicationDashboard extends Component {
       //   align: 'center',
       //   headerAlign: 'center'
       // }
+      {
+        dataField: 'realmProblem.problem.actionUrl',
+        text: i18n.t('static.common.action'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.buttonFormatter
+      }
     ];
     const options = {
       hidePageListOnlyOnePage: true,
@@ -718,7 +764,7 @@ class ApplicationDashboard extends Component {
         <Row className="mt-2">
           <Col md="12">
             <Card>
-              <CardHeader className="text-center">QAT Program Problems And Actions</CardHeader>
+              <CardHeader className="text-center">QAT Problems</CardHeader>
               <CardBody>
                 <ToolkitProvider
                   keyField="programId"
@@ -739,7 +785,7 @@ class ApplicationDashboard extends Component {
                           pagination={paginationFactory(options)}
                           rowEvents={{
                             onClick: (e, row, rowIndex) => {
-                              this.problemAction(row);
+                              this.editProblem(row);
                             }
                           }}
                           {...props.baseProps}
