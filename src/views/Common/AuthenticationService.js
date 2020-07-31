@@ -816,6 +816,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/shipment/shipmentDetails":
+                case "/shipment/manualTagging":
                 case "/shipment/shipmentDetails/:message":
                 case "/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
