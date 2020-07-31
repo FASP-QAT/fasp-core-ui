@@ -1341,6 +1341,7 @@ import ReportService from '../../api/ReportService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
+import MultiSelect from 'react-multi-select-component';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1664,7 +1665,9 @@ class ProcurementAgentExport extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: []
+            planningUnits: [],
+            planningUnitLabels:[],
+            planningUnitValues:[]
         }, () => {
             if (versionId.includes('Local')) {
                 const lan = 'en';
@@ -1744,8 +1747,11 @@ class ProcurementAgentExport extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -1900,14 +1906,14 @@ class ProcurementAgentExport extends Component {
                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-
-                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 170, planningText)
-
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 200, {
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
 
+                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+
+                  
                 }
 
             }
@@ -1939,10 +1945,10 @@ class ProcurementAgentExport extends Component {
             columns.map((item, idx) => { headers[idx] = (item.text) });
             data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         }
-
+       let startY=190+(this.state.planningUnitValues.length*3)
         let content = {
-            margin: { top: 40 ,bottom:50},
-            startY: 220,
+            margin: { top: 80 ,bottom:70},
+            startY: startY,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -1970,13 +1976,14 @@ class ProcurementAgentExport extends Component {
         let fundingSourceId = document.getElementById("fundingSourceId").value;
         let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
 
-        let planningUnitIds = this.state.planningUnitValues;
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
         if (viewby == 1) {
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0) {
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && procurementAgentId > 0) {
                 if (versionId.includes('Local')) {
+                    planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2149,15 +2156,16 @@ class ProcurementAgentExport extends Component {
             } else if (versionId == -1) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
-            } else if (planningUnitIds.length == 0) {
+            } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
             } else if (procurementAgentId == 0) {
                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
             }
         } else if (viewby == 2) {
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0) {
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && fundingSourceId > 0) {
                 if (versionId.includes('Local')) {
+                    planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2331,15 +2339,17 @@ class ProcurementAgentExport extends Component {
             } else if (versionId == -1) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
-            } else if (planningUnitIds.length == 0) {
+            } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
             } else if (fundingSourceId == 0) {
                 this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
             }
         } else {
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
                 if (versionId.includes('Local')) {
+                    planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
+                    
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2504,7 +2514,7 @@ class ProcurementAgentExport extends Component {
             } else if (versionId == -1) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
-            } else if (planningUnitIds.length == 0) {
+            } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
             }
@@ -2970,16 +2980,15 @@ class ProcurementAgentExport extends Component {
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
-                                        <InputGroup className="box">
-                                            <ReactMultiSelectCheckboxes
+                                            <MultiSelect
                                                 name="planningUnitId"
                                                 id="planningUnitId"
                                                 bsSize="md"
+                                                value={this.state.planningUnitValues}
                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                 options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             />
 
-                                        </InputGroup>
                                     </div>
                                 </FormGroup>
 
