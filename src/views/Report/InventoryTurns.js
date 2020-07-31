@@ -403,7 +403,7 @@ export default class InventoryTurns extends Component {
         const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label), this.formatter(ele.totalConsumption), this.formatter(ele.avergeStock), this.formatter(ele.noOfMonths), this.formatterDouble(ele.inventoryTurns)]);
 
         let content = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: 170,
             head: [headers],
             body: data,

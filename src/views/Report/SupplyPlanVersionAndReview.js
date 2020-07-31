@@ -427,6 +427,7 @@ if(programId!=0&& countryId!=0){
         const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '', elt.notes]);
 
         let content = {
+            margin: { top: 80 ,bottom:50},
             startY: 200,
             head: header,
             body: data,

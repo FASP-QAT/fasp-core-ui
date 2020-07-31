@@ -1279,7 +1279,7 @@ class ShipmentSummery extends Component {
 
         //Table1
         let content1 = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 190.5, halign: 'center' },
             columnStyles: {
@@ -1301,7 +1301,7 @@ class ShipmentSummery extends Component {
 
         //Table2
         let content2 = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },

@@ -261,7 +261,7 @@ class ProductCatalog extends Component {
         ]);
 
         let content = {
-            margin: { top: 90 },
+            margin: { top: 90 ,bottom:50},
             startY: 200,
             head: [headers],
             body: data,

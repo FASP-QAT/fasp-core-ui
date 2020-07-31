@@ -1793,7 +1793,7 @@ class ShipmentGlobalDemandView extends Component {
 
         //Tables
         let content1 = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
             columnStyles: {
