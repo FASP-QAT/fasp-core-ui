@@ -148,6 +148,10 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     fetchData() {
+        this.setState({
+            data: [],
+            message: ''
+        });
         let programId = document.getElementById('programId').value;
         let problemStatusId = document.getElementById('problemStatusId').value;
         let problemTypeId = document.getElementById('problemTypeId').value;
@@ -184,8 +188,11 @@ export default class ConsumptionDetails extends React.Component {
                     var problemReportList = (programJson.problemReportList);
 
                     console.log("problemReportList---->", problemReportList);
+                    console.log("problemStatusId ---********------> ", problemStatusId);
 
                     const problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+
+                    console.log("problemReportFilterList---->", problemReportFilterList);
 
                     this.setState({
                         data: problemReportFilterList,
@@ -198,9 +205,11 @@ export default class ConsumptionDetails extends React.Component {
 
                 }.bind(this)
             }.bind(this)
-        } else if (problemStatusId == 0) {
+        }
+        else if (problemStatusId == 0) {
             this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [] });
-        } else if (problemTypeId == 0) {
+        }
+        else if (problemTypeId == 0) {
             this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] });
         }
     }
@@ -498,7 +507,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     name="problemTypeId" id="problemTypeId"
                                                                     onChange={this.fetchData}
                                                                 >
-                                                                    <option value="0">Please select</option>
+                                                                    {/* <option value="0">Please select</option> */}
                                                                     <option value="1">Automatic</option>
                                                                     <option value="2">Manual</option>
                                                                 </Input>
