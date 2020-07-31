@@ -1709,7 +1709,7 @@ class StockStatusOverTime extends Component {
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
 
-                        <div>
+                        <div >
                             <Form >
                                 <Col md="12 pl-0">
                                     <div className="row">
@@ -1774,7 +1774,7 @@ class StockStatusOverTime extends Component {
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
                                             <div className="controls ">
                                                 {/* <InputGroup className="box"> */}
                                                 <MultiSelect
@@ -1785,6 +1785,7 @@ class StockStatusOverTime extends Component {
         onChange={(e) => { this.handlePlanningUnitChange(e) }}
         labelledBy={"Select"}
       />
+        {/* </InputGroup> */}
                                                     {/* <ReactMultiSelectCheckboxes
                                                     className="planningUnitId"
                                                         name="planningUnitId"
@@ -1797,7 +1798,7 @@ class StockStatusOverTime extends Component {
                                                     {/* <InputGroupAddon addonType="append">
                                   <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                 </InputGroupAddon> */}
-                                                {/* </InputGroup> */}
+                                              
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">

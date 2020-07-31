@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Button,Dropdown, DropdownItem, DropdownMenu,FormGroup, DropdownToggle,Input,Label, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row,Col,Progress } from 'reactstrap';
+import { Badge, Button, Dropdown, DropdownItem, DropdownMenu, FormGroup, DropdownToggle, Input, Label, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row, Col, Progress } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import i18n from '../../i18n';
@@ -37,7 +37,7 @@ class DefaultHeaderDropdown extends Component {
   constructor(props) {
     super(props);
 
-   
+
     this.state = {
       modal: false,
       large: false,
@@ -46,6 +46,10 @@ class DefaultHeaderDropdown extends Component {
       changeadditional: false,
       changemaster: false,
       togglehelp: false,
+      initialPage: 1,
+      showOnlyMaster: 0,
+      showBugReport: 0,
+      showAdditionalData: 0
     };
 
     this.toggle = this.toggle.bind(this);
@@ -70,7 +74,7 @@ class DefaultHeaderDropdown extends Component {
     localStorage.setItem('lang', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
-    AuthenticationService.setupAxiosInterceptors();
+      AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {
         }).catch(
@@ -89,9 +93,9 @@ class DefaultHeaderDropdown extends Component {
               ]
             });
           })
-    } 
-      i18n.changeLanguage(lang)
-      window.location.reload();
+    }
+    i18n.changeLanguage(lang)
+    window.location.reload();
 
   }
 
@@ -121,27 +125,35 @@ class DefaultHeaderDropdown extends Component {
 
   togglebugreport() {
     this.setState({
-      bugreport: !this.state.bugreport,
+      initialPage: 0,
+      showBugReport: 1
     });
   }
 
   togglechangeadditional() {
     this.setState({
       changeadditional: !this.state.changeadditional,
+      showOnlyMaster: 0,
+      showBugReport: 0,
+      showAdditionalData: 1
     });
   }
   togglechangemaster() {
     this.setState({
       changemaster: !this.state.changemaster,
+      showOnlyMaster: 1,
+      initialPage: 0,
+      showBugReport: 0
     });
   }
   togglehelp() {
     this.setState({
       help: !this.state.help,
+      initialPage: 1
     });
   }
-  
- 
+
+
   // dropNotif() {
   //   const itemsCount = 5;
   //   return (
@@ -274,96 +286,101 @@ class DefaultHeaderDropdown extends Component {
     const itemsCount = 7;
     return (
       <Dropdown nav  >
-        
-          <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp}  />
+
+        <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className}>
-                       {/* className={'modal-info ' + this.props.className}> */}
-                  <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
-                  <ModalBody>
-                    <div className="col-md-12">
-                    <div><h4>What do yo want to do?</h4>Please click here you want to sign </div>
-                    <div className="mt-2 mb-2">
-                
-                    <ListGroup>
-                  <ListGroupItem  className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i> Bug Report</ListGroupItem>
+          {/* className={'modal-info ' + this.props.className}> */}
+          <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><i class="fa fa-arrow-left" aria-hidden="true"></i> &nbsp;<strong> Help</strong></ModalHeader>
+          <ModalBody className="pb-0">
+            {this.state.initialPage == 1 && <div className="col-md-12">
+              <div><h4>What do yo want to do?</h4>Please click here you want to sign  </div>
+              <div className="mt-2 mb-2">
+
+                <ListGroup>
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i> Bug Report</ListGroupItem>
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> Change Additional Master <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                 
-                </ListGroup>
-                    </div>
-                    <div>
-                      </div>
 
-                       {/* Bug Report modal */}
-                 <div isOpen={this.state.bugreport} toggle={this.togglebugreport}>
-                  {/* <ModalHeader toggle={this.togglebugreport} className="ModalHead modal-info-Headher"><strong>Bug Report</strong></ModalHeader> */}
-                  <h4>Bug Report</h4>
-                  <ModalBody>
-                   <div>
-                   <FormGroup className="pr-1 pl-1" >
-                   <Col>
-                                                    <Label className="uploadfilelable" htmlFor="file-input">Upload Screenshot</Label>
-                                                </Col>
-                                                <Col xs="12" className="custom-file">
-                                                    {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
-                                                    <label className="custom-file-label" id="file-input">Choose file</label>
-                                                </Col>
+                </ListGroup>
+              </div>
+
+            </div>}
+
+            {/* Bug Report modal */}
+            {this.state.initialPage == 0 && this.state.showBugReport == 1 && <div isOpen={this.state.bugreport} toggle={this.togglebugreport}>
+              {/* <ModalHeader toggle={this.togglebugreport} className="ModalHead modal-info-Headher"><strong>Bug Report</strong></ModalHeader> */}
+              <h4>Bug Report</h4>
+              <ModalBody>
+                <div>
+                  <FormGroup className="pr-1 pl-1" >
+                    <Col>
+                      <Label className="uploadfilelable" htmlFor="file-input">Upload Screenshot</Label>
+                    </Col>
+                    <Col xs="12" className="custom-file">
+                      {/* <Input type="file" id="file-input" name="file-input" /> */}
+                      <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
+                      <label className="custom-file-label" id="file-input">Choose file</label>
+                    </Col>
                   </FormGroup>
-                   </div>
-                  </ModalBody>
-                  <ModalFooter>
-                   
-                    <Button color="success" onClick={this.togglebugreport}>Submit</Button>
-                  </ModalFooter>
                 </div>
-                    </div>
-                  </ModalBody>
-                                   
-                </Modal>
+              </ModalBody>
+              <ModalFooter>
 
-                
-                  
-                 {/* Change Additional Master modal */}
+                <Button color="success" onClick={this.togglebugreport}>Submit</Button>
+              </ModalFooter>
+            </div>}
 
-                 <Modal isOpen={this.state.changemaster} toggle={this.togglechangemaster} className={this.props.className}>
-                       {/* className={'modal-info ' + this.props.className}> */}
-                  <ModalHeader toggle={this.togglechangemaster} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
-                  <ModalBody>
-                  <div className="mt-2 mb-2">
-                    <ListGroup>
+
+            {/* Change Additional Master modal */}
+
+            <div isOpen={this.state.changemaster} toggle={this.togglechangemaster} className={this.props.className}>
+              {/* className={'modal-info ' + this.props.className}> */}
+              {/* <ModalHeader toggle={this.togglechangemaster} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader> */}
+              <ModalBody>
+                {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
+                  <ListGroup>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangeadditional} action><i className="icon-note  icons helpclickicon mr-2"></i> Planning Unit <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                  <ListGroupItem  className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-note icons helpclickicon mr-2"></i>Forecasting Units <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                </ListGroup>
-                    </div>
-                    <div className="col-md-12">
-                      <h4>Add/Update Planning Unit</h4>
-                   <FormGroup>
-                  <Label >Forecasting Unit</Label>
-                  <Input type="text" />
-                </FormGroup>
-                <FormGroup>
-                  <Label >Unit</Label>
-                  <Input type="text"  />
-                </FormGroup>
-                <FormGroup>
-                  <Label >Planning Unit</Label>
-                  <Input type="text"  />
-                </FormGroup>
-                <FormGroup>
-                  <Label >Multiplier</Label>
-                  <Input type="text"  />
-                </FormGroup>
-                <FormGroup>
-                <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
-                </FormGroup>
-                   </div>
-                  </ModalBody>
-                 
-                </Modal>
-                 
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangeadditional} action>  <i className="icon-note icons helpclickicon mr-2"></i>Forecasting Units <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                  </ListGroup>
+                </div>}
+                {this.state.showOnlyMaster == 0 && <div className="col-md-12">
+                  <h4>Add/Update Planning Unit</h4>
+                  <FormGroup>
+                    <Label >Forecasting Unit</Label>
+                    <Input type="text" />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label >Unit</Label>
+                    <Input type="text" />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label >Planning Unit</Label>
+                    <Input type="text" />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label >Multiplier</Label>
+                    <Input type="text" />
+                  </FormGroup>
+                  <FormGroup>
+                    <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
+                  </FormGroup>
+                </div>}
+              </ModalBody>
 
-                 {/*Change Additaion master */}
-                {/* <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
+            </div>
+
+
+          </ModalBody>
+
+
+
+        </Modal>
+
+
+
+
+
+        {/*Change Additaion master */}
+        {/* <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
                   <ModalHeader toggle={this.togglechangeadditional} className="ModalHead modal-info-Headher"><strong>Add/Update Planning Unit</strong></ModalHeader>
                   <ModalBody>
                    <div>
@@ -390,7 +407,7 @@ class DefaultHeaderDropdown extends Component {
                     <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
                   </ModalFooter>
                 </Modal> */}
-               
+
         {/* <DropdownMenu right className="dropdown-menu-lg">
           <DropdownItem header tag="div"><strong>You have {itemsCount} messages</strong></DropdownItem>
           <DropdownItem href="#">
@@ -481,4 +498,4 @@ class DefaultHeaderDropdown extends Component {
 DefaultHeaderDropdown.propTypes = propTypes;
 DefaultHeaderDropdown.defaultProps = defaultProps;
 
-export default DefaultHeaderDropdown;
+export default DefaultHeaderDropdown
