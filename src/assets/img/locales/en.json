@@ -491,7 +491,7 @@
     "static.procurementUnit.unitsPerContainerText": "Enter units per container",
     "static.procurementUnit.validNumberText": "Please specify a number",
     "static.procurementAgentProcurementUnit.procurementUnitAlreadyExists": "Procurement unit already exists.",
-    "static.dashboard.programPlanningUnit": "Program planning unit",
+    "static.dashboard.programPlanningUnit": "Program Planning Unit",
     "static.program.mapPlanningUnit": "Map Planning Unit",
     "static.program.reorderFrequencyInMonths": "Reorder Frequency In Months",
     "static.program.programPlanningUnit.reorderFrequencyText": "Enter reorder frequency in months",
