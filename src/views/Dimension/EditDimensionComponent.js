@@ -7,6 +7,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { LABEL_WITH_SPECIAL_SYMBOL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     label: ""
@@ -15,6 +16,7 @@ const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(LABEL_WITH_SPECIAL_SYMBOL_REGEX, i18n.t('static.message.alphaspespacetext'))
             .required('Please enter Dimension')
     })
 }
@@ -134,7 +136,7 @@ export default class UpdateDimensionComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     } render() {
         return (
             <div className="animated fadeIn">
