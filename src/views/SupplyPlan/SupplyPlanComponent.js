@@ -7848,6 +7848,11 @@ export default class SupplyPlanComponent extends React.Component {
                                 <Link ><small className="supplyplanformulas">TEST 1</small></Link>
                             </a>
                         </div> */}
+                        {/* <div className="card-header-actions mr-1">
+                            <a className="card-header-action">
+                                <Link ><small className="supplyplanformulas">TEST 1</small></Link>
+                            </a>
+                        </div> */}
                     </div>
                     {/* <CardHeader>
                         <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
