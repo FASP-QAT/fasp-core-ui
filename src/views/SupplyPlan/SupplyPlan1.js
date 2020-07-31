@@ -370,7 +370,7 @@ export default class SupplyPlanComponent extends React.Component {
             const data = [openningArr, consumptionArr, suggestedArr, psmShipmentArr, artmisShipmentArr, nonPsmShipmentArr, inventoryArr, closingBalanceArr, amcgArr, monthsOfStockArr, minStocArr, maxStockArr];
 
             let content = {
-                margin: { top: 80 },
+                margin: { top: 80  ,bottom:50},
                 startY: height,
                 head: headers,
                 body: data,

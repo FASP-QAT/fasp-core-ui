@@ -1872,7 +1872,7 @@ class FunderExport extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
         let content = {
-            margin: { top: 40 },
+            margin: { top: 40 ,bottom:50},
             startY: 220,
             head: [headers],
             body: data,

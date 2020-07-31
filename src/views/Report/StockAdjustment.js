@@ -479,7 +479,7 @@ class StockAdjustmentComponent extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let content = {
-            margin: { top: 40 },
+            margin: { top: 40 ,bottom:50},
             startY: 200,
             head: [headers],
             body: data,

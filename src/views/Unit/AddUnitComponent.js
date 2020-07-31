@@ -10,6 +10,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { UNIT_LABEL_REGEX } from '../../Constants.js';
 
 
 const initialValues = {
@@ -23,8 +24,11 @@ const validationSchema = function (values) {
         dimensionId: Yup.string()
             .required(i18n.t('static.unit.dimensiontext')),
         unitName: Yup.string()
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
             .required(i18n.t('static.unit.unittext')),
-        unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
+        unitCode: Yup.string()
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            .required(i18n.t('static.unit.unitcodetext'))
 
     })
 }
@@ -138,7 +142,7 @@ class AddUnitComponent extends Component {
                         dimensions: response.data
                     })
                 } else {
-                    
+
                     this.setState({
                         message: response.data.messageCode
                     },
@@ -172,7 +176,7 @@ class AddUnitComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-               <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -185,7 +189,7 @@ class AddUnitComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     UnitService.addUnit(this.state.unit).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/unit/listUnit/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/unit/listUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode

@@ -112,7 +112,7 @@ class Modals extends Component {
                     culpa qui officia deserunt mollit anim id est laborum.
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="primary" onClick={this.toggleLarge}>Do Something</Button>{' '}
+                    {/* <Button color="primary" onClick={this.toggleLarge}>Do Something</Button>{' '} */}
                     <Button color="secondary" onClick={this.toggleLarge}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
