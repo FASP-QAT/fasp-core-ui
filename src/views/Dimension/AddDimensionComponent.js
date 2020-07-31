@@ -10,6 +10,7 @@ import 'react-select/dist/react-select.min.css';
 import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { LABEL_WITH_SPECIAL_SYMBOL_REGEX } from '../../Constants.js';
 
 const initialValues = {
     label: ""
@@ -18,6 +19,7 @@ const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
+            .matches(LABEL_WITH_SPECIAL_SYMBOL_REGEX, i18n.t('static.message.alphaspespacetext'))
             .required('Please enter diamension type')
     })
 }
@@ -120,75 +122,75 @@ export default class AddDimensionComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
-                          
-                                <Formik
-                                    initialValues={initialValues}
-                                    validate={validate(validationSchema)}
 
-                                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        console.log(this.state.dimension)
-                                        DimensionService.addDimension(this.state.dimension).then(response => {
-                                            if (response.status == 200) {
-                                                this.props.history.push(`/diamension/diamensionlist/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
-                                            } else {
-                                                this.setState({
+                            <Formik
+                                initialValues={initialValues}
+                                validate={validate(validationSchema)}
+
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log(this.state.dimension)
+                                    DimensionService.addDimension(this.state.dimension).then(response => {
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/diamension/diamensionlist/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                        } else {
+                                            this.setState({
                                                 message: response.data.messageCode
                                             },
                                                 () => {
                                                     this.hideSecondComponent();
                                                 })
-                                            }
                                         }
-                                        )
-                                            .catch(
-                                                error => {
-                                                    if (error.message === "Network Error") {
-                                                        this.setState({ message: error.message });
-                                                    } else {
-                                                        switch (error.response ? error.response.status : "") {
-                                                            case 500:
-                                                            case 401:
-                                                            case 404:
-                                                            case 406:
-                                                            case 412:
-                                                                this.setState({ message: error.response.data.messageCode });
-                                                                break;
-                                                            default:
-                                                                this.setState({ message: 'static.unkownError' });
-                                                                break;
-                                                        }
-
+                                    }
+                                    )
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
                                                     }
-                                                }
-                                            )
-                                        setTimeout(() => {
-                                            setSubmitting(false)
-                                        }, 2000)
-                                    }
-                                    }
 
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched,
-                                            handleReset
-                                        }) => (
-                                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
-                                                     <CardBody>
+                                                }
+                                            }
+                                        )
+                                    setTimeout(() => {
+                                        setSubmitting(false)
+                                    }, 2000)
+                                }
+                                }
+
+                                render={
+                                    ({
+                                        values,
+                                        errors,
+                                        touched,
+                                        handleChange,
+                                        handleBlur,
+                                        handleSubmit,
+                                        isSubmitting,
+                                        isValid,
+                                        setTouched,
+                                        handleReset
+                                    }) => (
+                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                                <CardBody>
 
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
@@ -204,8 +206,8 @@ export default class AddDimensionComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
-                                                    </CardBody>
-                                                    <CardFooter>
+                                                </CardBody>
+                                                <CardFooter>
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
@@ -213,12 +215,12 @@ export default class AddDimensionComponent extends Component {
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
-                                                    </CardFooter>
-                                                </Form>
-                                            )}
+                                                </CardFooter>
+                                            </Form>
+                                        )}
 
-                                />
-                           
+                            />
+
                         </Card>
                     </Col>
                 </Row>

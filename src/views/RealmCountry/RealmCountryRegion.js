@@ -225,24 +225,24 @@ class RealmCountryRegion extends Component {
                                     }
 
                                     // Delete a column
-                                    if (obj.options.allowDeleteColumn == true) {
-                                        items.push({
-                                            title: obj.options.text.deleteSelectedColumns,
-                                            onclick: function () {
-                                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                            }
-                                        });
-                                    }
+                                    // if (obj.options.allowDeleteColumn == true) {
+                                    //     items.push({
+                                    //         title: obj.options.text.deleteSelectedColumns,
+                                    //         onclick: function () {
+                                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                    //         }
+                                    //     });
+                                    // }
 
                                     // Rename column
-                                    if (obj.options.allowRenameColumn == true) {
-                                        items.push({
-                                            title: obj.options.text.renameThisColumn,
-                                            onclick: function () {
-                                                obj.setHeader(x);
-                                            }
-                                        });
-                                    }
+                                    // if (obj.options.allowRenameColumn == true) {
+                                    //     items.push({
+                                    //         title: obj.options.text.renameThisColumn,
+                                    //         onclick: function () {
+                                    //             obj.setHeader(x);
+                                    //         }
+                                    //     });
+                                    // }
 
                                     // Sorting
                                     if (obj.options.columnSorting == true) {
