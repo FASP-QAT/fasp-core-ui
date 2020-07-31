@@ -404,7 +404,7 @@ export default class CostOfInventory extends Component {
         const data = this.state.costOfInventory.map(ele => [getLabelText(ele.planningUnit.label),  this.formatter(ele.stock), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
 
         let content = {
-            margin: { top: 80 },
+            margin: { top: 80,bottom:50 },
             startY: 170,
             head: [headers],
             body: data,

@@ -160,7 +160,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc), new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)]);
 
         let content = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: 170,
             head: [headers],
             body: data,

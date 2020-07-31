@@ -220,7 +220,7 @@ class Budgets extends Component {
         const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, getLabelText(ele.program.label), ele.program.code, getLabelText(ele.fundingSource.label), getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
 
         let content = {
-            margin: { top: 80 },
+            margin: { top: 80,bottom:50 },
             startY: height,
             head: [headers],
             body: data,
@@ -795,8 +795,10 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN
-            },
+                formatter: this.roundN,
+                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
+            }
+            ,
             {
                 dataField: 'orderedBudgetAmt',
                 text: i18n.t('static.report.orderedBudgetAmt') + i18n.t('static.report.inmillions'),
@@ -804,7 +806,8 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN
+                formatter: this.roundN,
+                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
                 dataField: 'orderedBudgetAmt',
