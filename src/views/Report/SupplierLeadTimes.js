@@ -231,7 +231,7 @@ class SupplierLeadTimes extends Component {
         ]);
 
         let content = {
-            margin: { top: 95 },
+            margin: { top: 95 ,bottom:50},
             startY: 165,
             head: [headers],
             body: data,

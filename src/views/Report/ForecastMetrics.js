@@ -56,6 +56,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
+import MultiSelect from "react-multi-select-component";
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -197,7 +198,7 @@ class ForecastMetrics extends Component {
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.programLabels.map(ele =>
       csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+   // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     this.state.planningUnitLabels.map(ele =>
       csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push('')
@@ -213,7 +214,8 @@ class ForecastMetrics extends Component {
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[ (getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+      console.log(re[item].planningUnit)
+      A.push([[ (getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id==0?'':(getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
       re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError ) + '%', re[item].monthCount]])
     }
@@ -282,12 +284,9 @@ class ForecastMetrics extends Component {
           planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
 
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 180 : 150, {
-            align: 'left'
-          })
           planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 200 : 170, planningText)
+          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 3 ? 180 : 150, planningText)
         }
 
       }
@@ -309,9 +308,9 @@ class ForecastMetrics extends Component {
     const data = this.state.consumptions.map(elt => [ getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
     elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError ) + '%', elt.monthCount]);
-    let startY = this.state.planningUnitLabels.length > 15 ? 250 : 210
+    let startY = 170+(this.state.planningUnitLabels.length*3) 
     let content = {
-      margin: { top: 80 },
+      margin: { top: 80 ,bottom:50},
       startY: startY,
       head: headers,
       body: data,
@@ -349,9 +348,11 @@ class ForecastMetrics extends Component {
 
 
   handleChange(countrysId) {
-
+    countrysId = countrysId.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
     this.setState({
-      countryValues: countrysId.map(ele => ele.value),
+      countryValues: countrysId.map(ele => ele),
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
 
@@ -359,21 +360,25 @@ class ForecastMetrics extends Component {
     })
   }
   handleChangeProgram(programIds) {
-
+    programIds = programIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
     this.setState({
-      programValues: programIds.map(ele => ele.value),
+      programValues: programIds.map(ele => ele),
       programLabels: programIds.map(ele => ele.label)
     }, () => {
-
+      this.getPlanningUnit();
       this.filterData()
     })
 
   }
 
   handlePlanningUnitChange(planningUnitIds) {
-
+    planningUnitIds = planningUnitIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
     this.setState({
-      planningUnitValues: planningUnitIds.map(ele => ele.value),
+      planningUnitValues: planningUnitIds.map(ele => ele),
       planningUnitLabels: planningUnitIds.map(ele => ele.label)
     }, () => {
 
@@ -383,13 +388,12 @@ class ForecastMetrics extends Component {
 
 
   filterData() {
-    let productCategoryId = document.getElementById("productCategoryId").value;
-    let CountryIds = this.state.countryValues;
-    let planningUnitIds = this.state.planningUnitValues;
-    let programIds = this.state.programValues
-    let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
+    let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+    let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
     let monthInCalc=document.getElementById("viewById").value;
-                if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
+                if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
 
       var inputjson = {
         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate,"previousMonths":monthInCalc
@@ -427,19 +431,16 @@ class ForecastMetrics extends Component {
             }
           }
         );
-    } else if (CountryIds.length == 0) {
+    } else if (this.state.countryValues.length == 0) {
       this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
 
-    } else if (programIds.length == 0) {
+    } else if (this.state.programValues.length == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-    } else if(planningUnitIds.length==0){
+    } else if(this.state.planningUnitValues.length == 0){
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
-    }else if (productCategoryId == -1) {
-      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
-
-    } 
+    }
   }
 
   getCountrys() {
@@ -518,76 +519,21 @@ class ForecastMetrics extends Component {
 
   }
   getPlanningUnit() {
-    if (navigator.onLine) {
-      console.log('changed')
-      let productCategoryId = document.getElementById("productCategoryId").value;
-      AuthenticationService.setupAxiosInterceptors();
-      if (productCategoryId != -1) {
-        PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-          this.setState({
-            planningUnits: response.data,
+    let programValues = this.state.programValues;
+    this.setState({
+      planningUnits: [],
+      planningUnitValues: [],
+      planningUnitLabels: []
+    }, () => {
+      if (programValues.length > 0) {
+        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
+          .then(response => {
+            this.setState({
+              planningUnits: response.data,
+            })
           })
-        })
-          .catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
-                this.setState({ message: error.message });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 500:
-                  case 401:
-                  case 404:
-                  case 406:
-                  case 412:
-                    //  this.setState({ message: error.response.data.messageCode });
-                    break;
-                  default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
-                }
-              }
-            }
-          );
       }
-    } else {
-      const lan = 'en';
-      var db1;
-      var storeOS;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(['CountryPlanningUnit'], 'readwrite');
-        var planningunitOs = planningunitTransaction.objectStore('CountryPlanningUnit');
-        var planningunitRequest = planningunitOs.getAll();
-        var planningList = []
-        planningunitRequest.onerror = function (event) {
-          // Handle errors!
-        };
-        planningunitRequest.onsuccess = function (e) {
-          var myResult = [];
-          myResult = planningunitRequest.result;
-          var CountryId = (document.getElementById("CountryId").value).split("_")[0];
-          var proList = []
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].Country.id == CountryId) {
-              var productJson = {
-                name: getLabelText(myResult[i].planningUnit.label, lan),
-                id: myResult[i].planningUnit.id
-              }
-              proList[i] = productJson
-            }
-          }
-          this.setState({
-            planningUnitList: proList
-          })
-        }.bind(this);
-      }.bind(this)
-
-    }
+    })
 
   }
 
@@ -657,15 +603,14 @@ class ForecastMetrics extends Component {
           }
         }
       );
-    this.getPlanningUnit();
+   
 
   }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     this.getPrograms()
     this.getCountrys();
-    this.getProductCategories()
-
+   
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -909,17 +854,17 @@ class ForecastMetrics extends Component {
                         </div>
                       </FormGroup>
 
-
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                      <FormGroup className="col-md-3">
+                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <InputGroup className="box">
 
-                        <ReactMultiSelectCheckboxes
+                      <div className="controls edit">
+                        <MultiSelect
 
                           bsSize="sm"
                           name="countrysId"
                           id="countrysId"
+                          value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
                         />
@@ -927,66 +872,47 @@ class ForecastMetrics extends Component {
                           this.props.touched && (
                             <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
+                      </div>
 
-                      </InputGroup>
                     </FormGroup>
+
+
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                      <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <InputGroup className="box">
-                        <ReactMultiSelectCheckboxes
 
-                          bsSize="sm"
-                          name="programIds"
-                          id="programIds"
-                          onChange={(e) => { this.handleChangeProgram(e) }}
-                          options={programList && programList.length > 0 ? programList : []}
-                        />
-                        {!!this.props.error &&
-                          this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                          )}
-                      </InputGroup>
-                    </FormGroup>
+                      <MultiSelect
 
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
-
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="productCategoryId"
-                          id="productCategoryId"
-                          bsSize="sm"
-                          onChange={this.getPlanningUnit}
-                        >
-                          <option value="-1">{i18n.t('static.common.select')}</option>
-                          {productCategories.length > 0
-                            && productCategories.map((item, i) => {
-                              return (
-                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                  {Array(item.level).fill('  ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                </option>
-                              )
-                            }, this)}
-                        </Input>
-                      </InputGroup>
+                        bsSize="sm"
+                        name="programIds"
+                        id="programIds"
+                        value={this.state.programValues}
+                        onChange={(e) => { this.handleChangeProgram(e) }}
+                        options={programList && programList.length > 0 ? programList : []}
+                      />
+                      {!!this.props.error &&
+                        this.props.touched && (
+                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                        )}
 
                     </FormGroup>
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+
+
+                    <FormGroup className="col-sm-3" id="hideDiv">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <InputGroup className="box">
-                          <ReactMultiSelectCheckboxes
 
-                            name="planningUnitId"
-                            id="planningUnitId"
-                            bsSize="sm"
-                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                          />
-                        </InputGroup>
+                        <MultiSelect
+                          // isLoading={true}
+                          name="planningUnitId"
+                          id="planningUnitId"
+                          bsSize="sm"
+                          value={this.state.planningUnitValues}
+                          onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                          options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                        />
+
                       </div>
                     </FormGroup>
 

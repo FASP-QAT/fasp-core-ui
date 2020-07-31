@@ -887,7 +887,7 @@ export default class WhatIfReportComponent extends React.Component {
         const data = [openningArr, consumptionArr, shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr, closingBalanceArr, monthsOfStockArr, amcgArr, minStocArr, maxStockArr, unmetDemandArr];
 
         let content = {
-            margin: { top: 80 },
+            margin: { top: 80  ,bottom:50   },
             startY: height,
             head: headers,
             body: data,

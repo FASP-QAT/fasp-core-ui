@@ -367,7 +367,7 @@ round = num => {
      this.state.data.map(elt => elt.programData.map(p=>data.push([getLabelText(elt.planningUnit.label,this.state.lang), getLabelText(p.program.label,this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
     let content = {
-      margin: { top: 80 },
+      margin: { top: 80 ,bottom:50},
       startY: 180,
       head: headers,
       body: data,
