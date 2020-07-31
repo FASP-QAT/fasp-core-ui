@@ -317,7 +317,7 @@ export function qatProblemActions() {
 
                                                     }
                                                     json.realmProblem.problem.label.label_en = 'Missing recent inventory inputs (within the last' + " " + numberOfMonthsInventory + " " + 'months)';
-                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Stock count for planning unit.';
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide  inventory details for planning unit.';
                                                     // + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateInventory).format("MMM-YY");
                                                     // {
                                                     //     label_en: 'Missing recent inventory inputs (within the last' + " " + numberOfMonthsInventory + " " + 'months)',

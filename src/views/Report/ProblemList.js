@@ -280,7 +280,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '80px' },
                 // formatter: (cell, row) => {
                 //     return getLabelText(cell, this.state.lang);
                 // }

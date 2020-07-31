@@ -267,7 +267,7 @@ class ApplicationDashboard extends Component {
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.addMapping = this.addMapping.bind(this);
-    this.editProblem=this.editProblem.bind(this);
+    this.editProblem = this.editProblem.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -381,7 +381,7 @@ class ApplicationDashboard extends Component {
   buttonFormatter(cell, row) {
     // console.log("-----------", cell);
     // <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>
-     return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
+    return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
   }
 
   addMapping(event, cell) {
@@ -404,13 +404,13 @@ class ApplicationDashboard extends Component {
     // });
     console.log("problem====>", problem);
     // 3_v2_uId_1
-    var programId=problem.program.id+"_v"+problem.versionId+"_uId_1";
-    console.log("programId=====>",programId);
-    
+    var programId = problem.program.id + "_v" + problem.versionId + "_uId_1";
+    console.log("programId=====>", programId);
+
     this.props.history.push({
-        pathname: `/report/editProblem/${problem.problemReportId}/ ${programId}/${problem.problemActionIndex}/${problem.problemStatus.id}/${problem.problemType.id}`,
-        // state: { language }
-      });
+      pathname: `/report/editProblem/${problem.problemReportId}/ ${programId}/${problem.problemActionIndex}/${problem.problemStatus.id}/${problem.problemType.id}`,
+      // state: { language }
+    });
 
   }
 
@@ -505,7 +505,7 @@ class ApplicationDashboard extends Component {
         headerAlign: 'center',
         formatter: (cell, row) => {
           if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+            var modifiedDate = moment(cell).format('MMM-YY');
             return modifiedDate;
           }
         }
@@ -764,7 +764,7 @@ class ApplicationDashboard extends Component {
         <Row className="mt-2">
           <Col md="12">
             <Card>
-              <CardHeader className="text-center">QAT Program Problems And Actions</CardHeader>
+              <CardHeader className="text-center">QAT Problems</CardHeader>
               <CardBody>
                 <ToolkitProvider
                   keyField="programId"
