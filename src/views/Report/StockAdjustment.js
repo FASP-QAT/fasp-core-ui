@@ -27,6 +27,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
+import MultiSelect from 'react-multi-select-component';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -257,7 +258,9 @@ class StockAdjustmentComponent extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: []
+            planningUnits: [],
+            planningUnitValues:[],
+            planningUnitLabels:[]
         }, () => {
             if (versionId.includes('Local')) {
                 const lan = 'en';
@@ -337,8 +340,11 @@ class StockAdjustmentComponent extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -478,9 +484,10 @@ class StockAdjustmentComponent extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+       let startY=150+(this.state.planningUnitValues.length*3)
         let content = {
-            margin: { top: 40 ,bottom:50},
-            startY: 200,
+            margin: { top: 80 ,bottom:50},
+            startY: startY,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -503,7 +510,7 @@ class StockAdjustmentComponent extends Component {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
 
-        let planningUnitIds = this.state.planningUnitValues;
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -512,9 +519,11 @@ class StockAdjustmentComponent extends Component {
         console.log("planningUnitIds---", planningUnitIds);
 
 
-        if (programId > 0 && versionId > 0 && planningUnitIds.length > 0) {
+        if (programId > 0 && versionId != -1 && this.state.planningUnitValues.length > 0) {
             console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
+
+            planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value).toString())
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -554,7 +563,7 @@ class StockAdjustmentComponent extends Component {
                         planningUnitIds.map(planningUnitId => {
                             dates.map(dt => {
 
-                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId)
+                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId &&c.actualQty==0)
                                 console.log("3--->", list)
                                 if (list.length > 0) {
                                     var adjustment = 0;
@@ -881,16 +890,15 @@ class StockAdjustmentComponent extends Component {
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls SelectGo">
-                                        <InputGroup className="box">
-                                            <ReactMultiSelectCheckboxes
+                                           <MultiSelect
                                                 name="planningUnitId"
                                                 id="planningUnitId"
                                                 bsSize="md"
+                                                value={this.state.planningUnitValues}
                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                 options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             />
 
-                                        </InputGroup>
                                     </div>
                                 </FormGroup>
                             </div>

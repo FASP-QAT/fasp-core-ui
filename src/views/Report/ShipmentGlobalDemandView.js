@@ -1440,6 +1440,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
+import MultiSelect from 'react-multi-select-component';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 const ref = React.createRef();
 
@@ -1725,39 +1726,6 @@ class ShipmentGlobalDemandView extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    if (navigator.onLine) {
-                        doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                            align: 'left'
-                        })
-
-                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 140, planningText)
-
-                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText)
-
-                        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 200, statusText)
-
-
-                    } else {
-                        doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                            align: 'left'
-                        })
-
-                        doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                            align: 'left'
-                        })
-
-                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-
-                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 180, fundingSourceText)
-
-                        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 210, statusText)
-                    }
 
                 }
 
@@ -1770,8 +1738,116 @@ class ShipmentGlobalDemandView extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
 
-        doc.setFontSize(10);
+        doc.setFontSize(8);
+        doc.setTextColor("#002f6c");
+        if (navigator.onLine) {
+            doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                align: 'left'
+            })
 
+            // var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 140, planningText)
+
+            // var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText)
+
+            // var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 200, statusText)
+            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+            let y = 130
+            console.log(doc.internal.pageSize.height)
+            var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
+            for (var i = 0; i < fundingSourceText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                } ;
+                doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+                y = y + 10
+                console.log(y)
+            }
+            var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
+            // 
+            y = y + 10;
+            for (var i = 0; i < statusText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+
+        } else {
+            doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                align: 'left'
+            })
+
+            doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                align: 'left'
+            })
+
+            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+            let y = 150
+            console.log(doc.internal.pageSize.height)
+            var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
+            for (var i = 0; i < fundingSourceText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+            var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
+            // 
+            y = y + 10;
+            for (var i = 0; i < statusText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+
+        }
+        doc.setTextColor("#fff");
         const title = "Shipment Global Demand";
         var canvas = document.getElementById("cool-canvas1");
 
@@ -1780,21 +1856,31 @@ class ShipmentGlobalDemandView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        doc.addImage(canvasImg, 'png', 50, 240, 300, 200, 'a', 'CANVAS');
+        let startY = 150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
+        console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        console.log(startYtable)
+        doc.addImage(canvasImg, 'png', 50, startYtable, 300, 200, 'a', 'CANVAS');
 
         //creates image2
         canvas = document.getElementById("cool-canvas2");
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg, 'png', width / 2, 240, 300, 200, 'b', 'CANVAS');
+
+        doc.addImage(canvasImg, 'png', width / 2, startYtable, 300, 200, 'b', 'CANVAS');
 
         // let tableHeadLength = this.state.table1Headers.length;
         let length = this.state.table1Headers.length + 1;
-
+        doc.addPage()
+        startYtable = 80
         //Tables
         let content1 = {
-            margin: { top: 80 ,bottom:50},
-            startY: height,
+            margin: { top: 80, bottom: 70 },
+            startY: startYtable,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
             columnStyles: {
                 0: { cellWidth: 70 },
@@ -1847,13 +1933,13 @@ class ShipmentGlobalDemandView extends Component {
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
             let productCategoryId = document.getElementById("productCategoryId").value;
-            let planningUnitIds = this.state.planningUnitValues;
-            let fundingSourceIds = this.state.fundingSourceValues;
-            let shipmentStatusIds = this.state.shipmentStatusValues;
+            let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = document.getElementById('realmId').value;
 
 
-            if (realmId > 0 && productCategoryId != -1 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
+            if (realmId > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: ''
                 })
@@ -1898,7 +1984,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (planningUnitIds.length == 0) {
+            } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
                     data: [],
@@ -1907,7 +1993,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (fundingSourceIds.length == 0) {
+            } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
                     data: [],
@@ -1916,7 +2002,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (shipmentStatusIds.length == 0) {
+            } else if (this.state.shipmentStatusValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
                     data: [],
@@ -1929,14 +2015,14 @@ class ShipmentGlobalDemandView extends Component {
         } else {
             let versionId = document.getElementById("versionId").value;
             let programId = document.getElementById("programId").value;
-            let planningUnitIds = this.state.planningUnitValues;
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-            let fundingSourceIds = this.state.fundingSourceValues;
-            let shipmentStatusIds = this.state.shipmentStatusValues;
+            let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             console.log("shipmentStatusIds---->", shipmentStatusIds);
 
-            if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceIds.length > 0 && shipmentStatusIds.length > 0) {
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -2182,7 +2268,7 @@ class ShipmentGlobalDemandView extends Component {
                     table1Headers: []
                 });
 
-            } else if (planningUnitIds.length == 0) {
+            } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
                     data: [],
@@ -2191,7 +2277,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (fundingSourceIds.length == 0) {
+            } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
                     data: [],
@@ -2200,7 +2286,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (shipmentStatusIds.length == 0) {
+            } else if (this.state.shipmentStatusValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
                     data: [],
@@ -2672,8 +2758,11 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -2718,9 +2807,11 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handleFundingSourceChange(fundingSourceIds) {
-
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            fundingSourceValues: fundingSourceIds.map(ele => ele.value),
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
 
@@ -2728,9 +2819,11 @@ class ShipmentGlobalDemandView extends Component {
         })
     }
     handleShipmentStatusChange(shipmentStatusIds) {
-
+        shipmentStatusIds = shipmentStatusIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            shipmentStatusValues: shipmentStatusIds.map(ele => ele.value),
+            shipmentStatusValues: shipmentStatusIds.map(ele => ele),
             shipmentStatusLabels: shipmentStatusIds.map(ele => ele.label)
         }, () => {
 
@@ -3023,17 +3116,16 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
-                                                        name="planningUnitId"
-                                                        id="planningUnitId"
-                                                        bsSize="md"
-                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                    // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                    />
+                                                <MultiSelect
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="md"
+                                                    value={this.state.planningUnitValues}
+                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                />
 
-                                                </InputGroup>
                                             </div>
                                         </FormGroup>
 
@@ -3041,16 +3133,15 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
+                                                <MultiSelect
 
-                                                        name="fundingSourceId"
-                                                        id="fundingSourceId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                                        options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                    />
-                                                </InputGroup>
+                                                    name="fundingSourceId"
+                                                    id="fundingSourceId"
+                                                    bsSize="sm"
+                                                    value={this.state.fundingSourceValues}
+                                                    onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                    options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                />
                                             </div>
                                         </FormGroup>
 
@@ -3058,16 +3149,15 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
+                                                <MultiSelect
 
-                                                        name="shipmentStatusId"
-                                                        id="shipmentStatusId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.handleShipmentStatusChange(e) }}
-                                                        options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
-                                                    />
-                                                </InputGroup>
+                                                    name="shipmentStatusId"
+                                                    id="shipmentStatusId"
+                                                    bsSize="sm"
+                                                    value={this.state.shipmentStatusValues}
+                                                    onChange={(e) => { this.handleShipmentStatusChange(e) }}
+                                                    options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
+                                                />
                                             </div>
                                         </FormGroup>
 

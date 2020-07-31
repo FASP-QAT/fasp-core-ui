@@ -55,6 +55,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import TracerCategoryService from '../../api/TracerCategoryService';
+import MultiSelect from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -228,10 +229,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   roundN = num => {
     return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-}
-round = num => {
+  }
+  round = num => {
     return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
-}
+  }
 
   exportCSV() {
 
@@ -252,9 +253,10 @@ round = num => {
     re = this.state.data
 
     for (var item = 0; item < re.length; item++) {
-      re[item].programData.map(p=>
-      A.push([[(getLabelText(re[item].planningUnit.label,this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label,this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos]])
-       ) }
+      re[item].programData.map(p =>
+        A.push([[(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos]])
+      )
+    }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
     }
@@ -337,10 +339,10 @@ round = num => {
           doc.setFontSize(8)
           doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
-        })
-        doc.text(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-          align: 'left'
-        })
+          })
+          doc.text(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+            align: 'left'
+          })
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
 
@@ -363,17 +365,17 @@ round = num => {
 
 
     const headers = [[i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance'), i18n.t('static.supplyPlan.monthsOfStock'), i18n.t('static.supplyPlan.minStock'), i18n.t('static.supplyPlan.maxStock')]]
-    var data =[];
-     this.state.data.map(elt => elt.programData.map(p=>data.push([getLabelText(elt.planningUnit.label,this.state.lang), getLabelText(p.program.label,this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
+    var data = [];
+    this.state.data.map(elt => elt.programData.map(p => data.push([getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
     let content = {
-      margin: { top: 80 ,bottom:50},
+      margin: { top: 80, bottom: 50 },
       startY: 180,
       head: headers,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 80 },
       columnStyles: {
-        0: { cellWidth: 181.89},
+        0: { cellWidth: 181.89 },
         1: { cellWidth: 180 },
       }
 
@@ -397,9 +399,11 @@ round = num => {
 
 
   handleChange(countrysId) {
-
+    countrysId = countrysId.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
     this.setState({
-      countryValues: countrysId.map(ele => ele.value),
+      countryValues: countrysId.map(ele => ele),
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
 
@@ -419,11 +423,11 @@ round = num => {
 
 
   filterData = () => {
-    let countrysId = this.state.countryValues
+    let countrysId = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let tracercategory = document.getElementById('tracerCategoryId').value
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
-    if (realmId > 0 && countrysId.length > 0 && tracercategory != 0) {
+    if (realmId > 0 && this.state.countryValues.length > 0 && tracercategory != 0) {
       var inputjson = {
         "realmCountryIds": countrysId,
         "tracerCategoryId": tracercategory,
@@ -489,7 +493,7 @@ round = num => {
     else if (realmId <= 0) {
       this.setState({ message: i18n.t('static.common.realmtext'), data: [] });
 
-    } else if (countrysId.length == 0) {
+    } else if (this.state.countryValues.length == 0) {
       this.setState({ message: i18n.t('static.program.validcountrytext'), data: [] });
 
     } else {
@@ -684,23 +688,21 @@ round = num => {
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <InputGroup className="box">
-                        <div className="controls edit">
-                          <ReactMultiSelectCheckboxes
+                      <div className="controls edit">
+                        <MultiSelect
 
-                            bsSize="sm"
-                            name="countrysId"
-                            id="countrysId"
-      
-                            onChange={(e) => { this.handleChange(e) }}
-                            options={countryList && countryList.length > 0 ? countryList : []}
-                          />
-                          {!!this.props.error &&
-                            this.props.touched && (
-                              <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                            )}
-                        </div>
-                      </InputGroup>
+                          bsSize="sm"
+                          name="countrysId"
+                          id="countrysId"
+                          value={this.state.countryValues}
+                          onChange={(e) => { this.handleChange(e) }}
+                          options={countryList && countryList.length > 0 ? countryList : []}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </div>
                     </FormGroup>
 
                     <FormGroup className="col-md-3">
@@ -755,15 +757,16 @@ round = num => {
                             {
                               this.state.planningUnits.map(
                                 ele => {
-                                return <tr><td>{getLabelText(ele.label,this.state.lang)}</td>{
+                                  return <tr><td>{getLabelText(ele.label, this.state.lang)}</td>{
                                     this.state.programs.map(ele1 => {
-                                      return(this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
-                                        item => { 
-                                           return(item.programData.filter(c=>c.program.code===ele1).length==0?<td></td>:<td className="text-center" style={this.cellstyleWithData(item.programData.filter(c=>c.program.code==ele1)[0])}>{item.programData.filter(c=>c.program.code==ele1)[0].outputString}</td>)
-                                      }
+                                      return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
+                                        item => {
+                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{item.programData.filter(c => c.program.code == ele1)[0].outputString}</td>)
+                                        }
 
-                                    )})
-                                    }</tr>
+                                      )
+                                    })
+                                  }</tr>
 
                                 }
                               )}
