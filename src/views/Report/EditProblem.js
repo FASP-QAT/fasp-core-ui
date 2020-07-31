@@ -835,7 +835,7 @@ export default class EditLanguageComponent extends Component {
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>Update Status</b></a></li></ul>
 
                                                         <div className="row">
-                                                            <FormGroup className="col-md-6 ">
+                                                            <FormGroup className="col-md-3 ">
                                                                 <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
 
                                                                 <Input type="select"
@@ -858,7 +858,9 @@ export default class EditLanguageComponent extends Component {
 
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="notes">{i18n.t('static.program.notes')}</Label>
-                                                                <Input type="text"
+                                                                {/* <Input type="text" */}
+                                                                <textarea
+                                                                    class="form-control" id="exampleFormControlTextarea1" rows="3"
                                                                     name="notes"
                                                                     id="notes"
                                                                     bsSize="sm"

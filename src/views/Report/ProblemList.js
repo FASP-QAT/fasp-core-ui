@@ -54,10 +54,16 @@ export default class ConsumptionDetails extends React.Component {
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.addNewProblem = this.addNewProblem.bind(this);
+        this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
 
     }
 
     componentDidMount = function () {
+
+        let problemStatusId = document.getElementById('problemStatusId').value;
+
+
+        console.log("problemStatusId ---------> ", problemStatusId);
 
         const lan = 'en';
         var db1;
@@ -105,7 +111,7 @@ export default class ConsumptionDetails extends React.Component {
                     var myResult = [];
                     myResult = problemStatusRequest.result;
                     var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
+                    for (var i = 0; i < 3; i++) {
                         var Json = {
                             name: getLabelText(myResult[i].label, lan),
                             id: myResult[i].id
@@ -123,13 +129,27 @@ export default class ConsumptionDetails extends React.Component {
 
     };
 
+    rowClassNameFormat(row, rowIdx) {
+        // row is whole row object
+        // rowIdx is index of row
+        // console.log('in rowClassNameFormat')
+        // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
+        if (row.realmProblem.criticality.id == 3) {
+            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
+        } else if (row.realmProblem.criticality.id == 2) {
+            return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
+        } else {
+            return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
+        }
+    }
 
     fetchData() {
         let programId = document.getElementById('programId').value;
         let problemStatusId = document.getElementById('problemStatusId').value;
         let problemTypeId = document.getElementById('problemTypeId').value;
 
-        console.log("programId ---------> ", programId)
+        console.log("programId ---------> ", programId);
+        console.log("problemStatusId ---------> ", problemStatusId);
         this.setState({ programId: programId });
         if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0) {
 
@@ -236,6 +256,28 @@ export default class ConsumptionDetails extends React.Component {
                 }
             },
             {
+                dataField: 'versionId',
+                text: i18n.t('static.program.versionId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+            },
+            {
+                dataField: 'region.label',
+                text: i18n.t('static.region.region'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+
+            },
+            {
                 dataField: 'planningUnit.label',
                 text: i18n.t('static.planningunit.planningunit'),
                 sort: true,
@@ -252,7 +294,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '100px' },
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
@@ -261,20 +303,12 @@ export default class ConsumptionDetails extends React.Component {
                 }
             },
             {
-                dataField: 'versionId',
-                text: i18n.t('static.program.versionId'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '170px' },
-            },
-            {
                 dataField: 'createdDate',
                 text: i18n.t('static.report.createdDate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
+                style: { width: '100px' },
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
@@ -288,14 +322,36 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
+                style: { width: '170px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
             {
-                dataField: 'realmProblem.criticality.label',
-                text: i18n.t('static.report.Criticality'),
+                dataField: 'realmProblem.problem.actionLabel',
+                text: i18n.t('static.common.action'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            // {
+            //     dataField: 'realmProblem.criticality.label',
+            //     text: i18n.t('static.report.Criticality'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     style: { width: '100px' },
+            //     formatter: (cell, row) => {
+            //         return getLabelText(cell, this.state.lang);
+            //     }
+            // },
+            {
+                dataField: 'problemType.label',
+                text: i18n.t('static.report.problemType'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -309,34 +365,14 @@ export default class ConsumptionDetails extends React.Component {
                 text: i18n.t('static.report.problemStatus'),
                 sort: true,
                 align: 'center',
-                style: { width: '80px' },
-                headerAlign: 'center',
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'problemType.label',
-                text: i18n.t('static.report.problemType'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.actionLabel',
-                text: i18n.t('static.common.action'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
                 style: { width: '100px' },
+                headerAlign: 'center',
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
+
+
 
 
         ];
@@ -416,6 +452,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     bsSize="sm"
                                                                     name="problemStatusId" id="problemStatusId"
                                                                     onChange={this.fetchData}
+                                                                    value={1}
                                                                 >
                                                                     <option value="0">Please select</option>
                                                                     {problemStatus}
@@ -461,7 +498,7 @@ export default class ConsumptionDetails extends React.Component {
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
