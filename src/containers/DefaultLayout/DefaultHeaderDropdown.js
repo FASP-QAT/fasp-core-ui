@@ -149,7 +149,10 @@ class DefaultHeaderDropdown extends Component {
   togglehelp() {
     this.setState({
       help: !this.state.help,
-      initialPage: 1
+      initialPage: 1,
+      showBugReport:0,
+      showOnlyMaster:0,
+      showAdditionalData:0
     });
   }
 
@@ -290,7 +293,7 @@ class DefaultHeaderDropdown extends Component {
         <img src={imageHelp} className="HelpIcon" title="Help" onClick={this.togglehelp} />
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className}>
           {/* className={'modal-info ' + this.props.className}> */}
-          <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><i class="fa fa-arrow-left" aria-hidden="true"></i> &nbsp;<strong> Help</strong></ModalHeader>
+          <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader>
           <ModalBody className="pb-0">
             {this.state.initialPage == 1 && <div className="col-md-12">
               <div><h4>What do yo want to do?</h4>Please click here you want to sign  </div>
@@ -342,8 +345,9 @@ class DefaultHeaderDropdown extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangeadditional} action>  <i className="icon-note icons helpclickicon mr-2"></i>Forecasting Units <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
                 </div>}
-                {this.state.showOnlyMaster == 0 && <div className="col-md-12">
+                {this.state.showAdditionalData == 1 && <div className="col-md-12">
                   <h4>Add/Update Planning Unit</h4>
+                  <br></br>
                   <FormGroup>
                     <Label >Forecasting Unit</Label>
                     <Input type="text" />
@@ -360,9 +364,13 @@ class DefaultHeaderDropdown extends Component {
                     <Label >Multiplier</Label>
                     <Input type="text" />
                   </FormGroup>
-                  <FormGroup>
+                  {/* <FormGroup>
                     <Button color="success" onClick={this.togglechangeadditional}>Submit</Button>
-                  </FormGroup>
+                  </FormGroup> */}
+                   <ModalFooter>
+                       <Button color="success" >Back</Button>
+                        <Button color="success" onClick={this.togglebugreport}>Submit</Button>
+                  </ModalFooter>
                 </div>}
               </ModalBody>
 
@@ -374,11 +382,6 @@ class DefaultHeaderDropdown extends Component {
 
 
         </Modal>
-
-
-
-
-
         {/*Change Additaion master */}
         {/* <Modal isOpen={this.state.changeadditional} toggle={this.togglechangeadditional}>
                   <ModalHeader toggle={this.togglechangeadditional} className="ModalHead modal-info-Headher"><strong>Add/Update Planning Unit</strong></ModalHeader>
@@ -498,4 +501,4 @@ class DefaultHeaderDropdown extends Component {
 DefaultHeaderDropdown.propTypes = propTypes;
 DefaultHeaderDropdown.defaultProps = defaultProps;
 
-export default DefaultHeaderDropdown
+export default DefaultHeaderDropdown;

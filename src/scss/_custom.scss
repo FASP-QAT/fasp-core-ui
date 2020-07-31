@@ -2921,7 +2921,7 @@ border-radius: 2em;
   font-size: 27px;
   color: #20a8d8;
   cursor: pointer;
-  // width: 24px;
+  
 }
 .ModalHead{
   padding: 7px 14px!important;
@@ -2973,15 +2973,21 @@ border-radius: 2em;
   position: relative;
   outline: 0;
   height: 29px!important;
-  background-color: none!important;
+  // background-color: none!important;
   border: 1px solid #e4e7ea!important;
   border-radius: 0.2rem!important;
 }
 .go606532123 {
    border: none!important;
-
+   background-color:transparent!important;
 }
 .go335935385 span {
   display: inline!important;
   padding-left: 5px;
+}
+.go1084040746 svg{
+  visibility: hidden !important;
+}
+.go355775859 .gray svg{
+  visibility: hidden !important;
 }

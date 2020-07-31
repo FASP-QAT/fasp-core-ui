@@ -80,9 +80,8 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-           <DefaultHeaderDropdown mssgs/>
-           {/* <DefaultHeaderDropdown accnt/> */}
-          <DefaultHeaderDropdown onLogout={this.props.onLogout}  accnt onChangePassword={this.props.onChangePassword} />
+           {/* <DefaultHeaderDropdown mssgs/> */}
+                     <DefaultHeaderDropdown onLogout={this.props.onLogout}  accnt onChangePassword={this.props.onChangePassword} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
