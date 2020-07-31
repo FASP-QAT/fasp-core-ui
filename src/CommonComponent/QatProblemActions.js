@@ -197,8 +197,12 @@ export function qatProblemActions() {
                                                             }
                                                         ]
                                                     }
+
                                                     json.realmProblem.problem.label.label_en = 'Missing recent actual consumption inputs (within the last' + " " + numberOfMonths + " " + 'months)';
                                                     json.realmProblem.problem.actionLabel.label_en = 'Please provide Actual consumption for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDate).format("MMM-YY");
+                                                    // var currentJson = json;
+                                                    // console.log("hiiiiiiiiiiiiiiiii=================");
+                                                    // console.log("current json====>", currentJson);
                                                     // {
                                                     //     label_en: 'Missing recent actual consumption inputs (within the last' + " " + numberOfMonths + " " + 'months)',
                                                     //     label_fr: '',
