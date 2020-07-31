@@ -9,6 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { UNIT_LABEL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     unit: ""
