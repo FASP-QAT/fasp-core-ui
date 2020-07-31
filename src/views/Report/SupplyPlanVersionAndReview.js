@@ -598,7 +598,7 @@ if(programId!=0&& countryId!=0){
                 headerAlign: 'center',
                  formatter: (cellContent, row) => {
                     return (
-                        (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null)
+                        (row.versionStatus.id == 2)? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null):null
                         // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
@@ -779,7 +779,7 @@ if(programId!=0&& countryId!=0){
                                                                 rowEvents={{
                                                                     onClick: (e, row, rowIndex) => {
                                                                         if (row.versionStatus.id == 1
-                                                                            //  && row.versionType.versionTypeId==1
+                                                                             && row.versionType.id==2
                                                                         )
                                                                             this.editprogramStatus(row);
                                                                     }

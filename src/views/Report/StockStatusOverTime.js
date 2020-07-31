@@ -1,4 +1,4 @@
-import React, { Component, lazy } from 'react';
+import React, { Component, lazy ,useState} from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
@@ -15,6 +15,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import MultiSelect from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
@@ -42,7 +43,6 @@ const options = {
                 },
                 ticks: {
                     beginAtZero: true,
-                    Max: 900,
                     fontColor: 'black'
                 }
             }
@@ -146,12 +146,14 @@ class StockStatusOverTime extends Component {
         return x1 + x2;
     }
 
-    handlePlanningUnitChange = (planningUnitIds) => {
+    handlePlanningUnitChange = (event) => {
+      console.log('***',event)
+        var planningUnitIds=event
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -373,8 +375,8 @@ class StockStatusOverTime extends Component {
                     this.setState({
                         versions: [],
                         planningUnits:[],
-                        programValues: [],
-                        programLabels: []
+                        planningUnitValues: [],
+                        planningUnitLabels: []
                     }, () => {this.unCheck();
                         this.setState({
                             versions: program[0].versionList.filter(function (x, i, a) {
@@ -388,8 +390,8 @@ class StockStatusOverTime extends Component {
                     this.setState({
                         versions: [],
                         planningUnits:[],
-                        programValues: [],
-                        programLabels: []
+                        planningUnitValues: [],
+                        planningUnitLabels: []
                        
                     }, () => { this.unCheck();
                         this.consolidatedVersionList(programId) })
@@ -398,8 +400,8 @@ class StockStatusOverTime extends Component {
 
                 this.setState({
                     versions: [],planningUnits:[],
-                    programValues: [],
-                    programLabels: []
+                    planningUnitValues: [],
+                        planningUnitLabels: []
                    
                 },()=>{this.unCheck();})
 
@@ -407,8 +409,8 @@ class StockStatusOverTime extends Component {
         } else {
             this.setState({
                 versions: [],planningUnits:[],
-                programValues: [],
-                programLabels: []
+                planningUnitValues: [],
+                        planningUnitLabels: []
             
             },()=>{this.unCheck();})
         }
@@ -471,7 +473,9 @@ class StockStatusOverTime extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: []
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
             if (versionId.includes('Local')) {
                 const lan = 'en';
@@ -557,19 +561,21 @@ class StockStatusOverTime extends Component {
     }
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
     fetchData() {
-        let planningUnitIds = this.state.planningUnitValues
+        let planningUnitIds = this.state.planningUnitValues.map(ele=>(ele.value).toString())
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log(planningUnitIds.length > 0)
-        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0) {
+      
+        let monthsInFutureForAmc = this.state.monthsInFutureForAmc
+        let monthsInPastForAmc = this.state.monthsInPastForAmc
+        console.log(monthsInFutureForAmc,monthsInPastForAmc)
+        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc!=undefined && monthsInPastForAmc!=undefined) {
             if (versionId.includes('Local')) {
 
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                 let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                let monthsInFutureForAmc = this.state.monthsInFutureForAmc
-                let monthsInPastForAmc = this.state.monthsInPastForAmc
+              
 
                 var db1;
                 getDatabase();
@@ -1216,9 +1222,13 @@ class StockStatusOverTime extends Component {
                                     }
 
 
-                                    var amcCalcualted =(sumOfConsumptions) / countAMC;
+                                    var amcCalcualted =0
+                                    var mos = 0
+                                    if(countAMC>0 && sumOfConsumptions>0){
+                                    amcCalcualted= (sumOfConsumptions) / countAMC;
                                     console.log('amcCalcualted', amcCalcualted,' endingBalance',endingBalance)
-                                    var mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                     mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                    }
                                     console.log(pu)
                                     /*   var maxForMonths = 0;
                                        if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
@@ -1380,8 +1390,14 @@ class StockStatusOverTime extends Component {
         } else if (versionId == 0) {
             this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
 
-        } else {
+        } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
+
+        } else if (monthsInPastForAmc == undefined) {
+            this.setState({ message: i18n.t('static.realm.monthInPastForAmcText'), matricsList: [] });
+
+        } else {
+            this.setState({ message: i18n.t('static.realm.monthInFutureForAmcText'), matricsList: [] });
 
         }
 
@@ -1395,8 +1411,8 @@ class StockStatusOverTime extends Component {
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.report.version') + ' , ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        this.state.planningUnitLabels.map(ele =>
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        this.state.planningUnitValues.map(ele =>
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (((ele.label).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("monthsInPastForAmc").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("monthsInFutureForAmc").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
@@ -1427,6 +1443,7 @@ class StockStatusOverTime extends Component {
 
 
     exportPDF = () => {
+        let ypos=0
         const addFooters = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
@@ -1471,6 +1488,7 @@ class StockStatusOverTime extends Component {
                 doc.text(i18n.t('static.report.stockstatusovertimeReport'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
+                
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
@@ -1489,7 +1507,7 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("monthsInFutureForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
-                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnitValues.map(ele=>ele.label)).join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 190, planningText)
           
                    
@@ -1518,7 +1536,7 @@ class StockStatusOverTime extends Component {
         var aspectwidth1 = (width - h1);
 
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
-        doc.addImage(canvasImg, 'png', 50, 220, 750, 230, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 190+(this.state.planningUnitValues.length*3) , 750, 230, 'CANVAS');
 
         const headers = [[i18n.t('static.report.month'), i18n.t('static.program.program'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
@@ -1606,12 +1624,12 @@ class StockStatusOverTime extends Component {
             '#f86c6b'
         ]
         console.log(this.state.matricsList)
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu).map(ele => (ele.mos)))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (ele.mos)))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
         console.log(dts)
         const bar = {
             labels: dts,
-            datasets: this.state.planningUnitLabels.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele, data: v[index], borderColor: backgroundColor[index] }))
+            datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor[index] }))
             /*  [
              {
                    type: "line",
@@ -1663,8 +1681,7 @@ class StockStatusOverTime extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
-
+        
         return (
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
@@ -1759,8 +1776,16 @@ class StockStatusOverTime extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
+                                                {/* <InputGroup className="box"> */}
+                                                <MultiSelect
+                                                name="planningUnitId"
+                                                id="planningUnitId"
+        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+        value={this.state.planningUnitValues}
+        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+        labelledBy={"Select"}
+      />
+                                                    {/* <ReactMultiSelectCheckboxes
                                                     className="planningUnitId"
                                                         name="planningUnitId"
                                                         id="planningUnitId"
@@ -1768,11 +1793,11 @@ class StockStatusOverTime extends Component {
                                                         onInputChange={(e) => { this.unCheck1(e) }}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                    />
+                                                    /> */}
                                                     {/* <InputGroupAddon addonType="append">
                                   <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                 </InputGroupAddon> */}
-                                                </InputGroup>
+                                                {/* </InputGroup> */}
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">
