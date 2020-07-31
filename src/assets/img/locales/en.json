@@ -1025,5 +1025,6 @@
     "static.supplyPlan.date":"Date",
     "static.whatIf.removePlannedShipmentsNotInLeadTimes":"Remove all planned shipments that are not within lead time",
     "static.whatIf.removeApprovedShipmentsNotInLeadTimes":"Remove all approved shipments that are not within lead time",
-    "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time"
+    "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time",
+    "static.report.suggession": "Suggession"
 }

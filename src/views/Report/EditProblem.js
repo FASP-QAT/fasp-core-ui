@@ -80,7 +80,8 @@ export default class EditLanguageComponent extends Component {
                         "label_sp": "",
                         "label_fr": "",
                         "label_pr": ""
-                    }
+                    },
+                    "code": ""
                 },
                 "versionId": "",
                 "realmProblem": {
@@ -630,7 +631,7 @@ export default class EditLanguageComponent extends Component {
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
                                                         <div className="row">
                                                             <FormGroup className="col-md-6 ">
-                                                                <Label for="program">{i18n.t('static.program.program')}</Label>
+                                                                <Label for="program">{i18n.t('static.program.programCode')}</Label>
                                                                 <Input type="text"
                                                                     name="program"
                                                                     id="program"
@@ -640,8 +641,8 @@ export default class EditLanguageComponent extends Component {
                                                                     invalid={(touched.program && !!errors.program)}
                                                                     onChange={(e) => { handleChange(e); }}
                                                                     onBlur={handleBlur}
-                                                                    // value={this.state.problemReport.program.code}
-                                                                    value={getLabelText(this.state.problemReport.program.label, this.state.lang)}
+                                                                    value={this.state.problemReport.program.code}
+                                                                    // value={getLabelText(this.state.problemReport.program.label, this.state.lang)}
                                                                     required />
                                                                 <FormFeedback className="red">{errors.program}</FormFeedback>
                                                             </FormGroup>

@@ -265,15 +265,15 @@ export default class ConsumptionDetails extends React.Component {
 
         const columns = [
             {
-                dataField: 'program.label',
-                text: i18n.t('static.program.program'),
+                dataField: 'program.code',
+                text: i18n.t('static.program.programCode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // }
             },
             {
                 dataField: 'versionId',
@@ -349,7 +349,7 @@ export default class ConsumptionDetails extends React.Component {
             },
             {
                 dataField: 'realmProblem.problem.actionLabel',
-                text: i18n.t('static.common.action'),
+                text: i18n.t('static.report.suggession'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -393,7 +393,7 @@ export default class ConsumptionDetails extends React.Component {
             },
             {
                 dataField: 'realmProblem.problem.actionUrl',
-                text: i18n.t('static.program.mapPlanningUnit'),
+                text: i18n.t('static.common.action'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
