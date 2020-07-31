@@ -81,7 +81,7 @@ export default class EditLanguageComponent extends Component {
                         "label_fr": "",
                         "label_pr": ""
                     },
-                    "code": ""
+                    "programCode": ""
                 },
                 "versionId": "",
                 "realmProblem": {
@@ -641,7 +641,7 @@ export default class EditLanguageComponent extends Component {
                                                                     invalid={(touched.program && !!errors.program)}
                                                                     onChange={(e) => { handleChange(e); }}
                                                                     onBlur={handleBlur}
-                                                                    value={this.state.problemReport.program.code}
+                                                                    value={this.state.problemReport.program.programCode}
                                                                     // value={getLabelText(this.state.problemReport.program.label, this.state.lang)}
                                                                     required />
                                                                 <FormFeedback className="red">{errors.program}</FormFeedback>

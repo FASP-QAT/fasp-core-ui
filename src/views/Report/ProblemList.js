@@ -265,7 +265,7 @@ export default class ConsumptionDetails extends React.Component {
 
         const columns = [
             {
-                dataField: 'program.code',
+                dataField: 'program.programCode',
                 text: i18n.t('static.program.programCode'),
                 sort: true,
                 align: 'center',
