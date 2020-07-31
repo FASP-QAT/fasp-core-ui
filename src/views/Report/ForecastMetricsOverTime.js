@@ -368,7 +368,7 @@ PercentageFormatter=num=>{
     const data = this.state.matricsList.map(elt => [this.dateFormatter(elt.month), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), this.PercentageFormatter(elt.forecastError ) ]);
 
     let content = {
-      margin: { top: 80 },
+      margin: { top: 80,bottom:50 },
       startY: height,
       head: headers,
       body: data,

@@ -1544,7 +1544,7 @@ class StockStatusOverTime extends Component {
         this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), getLabelText(elt.program.label, this.state.lang), getLabelText(elt.planningUnit.label, this.state.lang), elt.stock, elt.consumptionQty, this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
 
         let content = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: height,
             head: headers,
             body: data,
@@ -1783,7 +1783,7 @@ class StockStatusOverTime extends Component {
         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
         value={this.state.planningUnitValues}
         onChange={(e) => { this.handlePlanningUnitChange(e) }}
-        labelledBy={"Select"}
+        labelledBy={i18n.t('static.common.select')}
       />
         {/* </InputGroup> */}
                                                     {/* <ReactMultiSelectCheckboxes

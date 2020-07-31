@@ -1438,7 +1438,7 @@ console.log('shiplist',shiplist)
     
    
     let content = {
-      margin: { top: 40 },
+      margin: { top: 40 ,bottom:50},
       startY: 200,
       head: header,
       body: data,

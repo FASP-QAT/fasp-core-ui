@@ -728,8 +728,7 @@ class warehouseCapacity extends Component {
         doc.setFontSize(8);
 
         let content = {
-            margin: { top: 40 },
-            margin: { left: 100 },
+            margin: { top: 40,left:100  ,bottom:50},
             startY: 150,
             // head: [headers],
             // body: data,
