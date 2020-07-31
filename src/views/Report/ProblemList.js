@@ -409,9 +409,6 @@ export default class ConsumptionDetails extends React.Component {
                 formatter: this.buttonFormatter
             }
 
-
-
-
         ];
         const options = {
             hidePageListOnlyOnePage: true,
