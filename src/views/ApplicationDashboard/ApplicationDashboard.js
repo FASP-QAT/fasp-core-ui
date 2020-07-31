@@ -380,7 +380,8 @@ class ApplicationDashboard extends Component {
   }
   buttonFormatter(cell, row) {
     // console.log("-----------", cell);
-    return <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+    // <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>
+     return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
   }
 
   addMapping(event, cell) {
@@ -533,7 +534,7 @@ class ApplicationDashboard extends Component {
       // },
       {
         dataField: 'realmProblem.problem.actionLabel',
-        text: i18n.t('static.common.action'),
+        text: 'Suggestion',
         sort: true,
         align: 'center',
         headerAlign: 'center',

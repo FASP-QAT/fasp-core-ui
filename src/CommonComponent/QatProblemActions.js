@@ -119,7 +119,7 @@ export function qatProblemActions() {
                                         for (var m = 1; m <= numberOfMonths; m++) {
                                             var myDate = moment(Date.now()).subtract(m, 'months').startOf('month').format("YYYY-MM-DD");
                                             // // console.log("QAP 10====>", myDate);
-
+                                            // console.log("today===>problemActionList===>", problemActionList);
                                             var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') == myDate && c.actualFlag.toString() == "true");
                                             var index = problemActionList.findIndex(
                                                 c => moment(c.dt).format("YYYY-MM") == moment(myDate).format("YYYY-MM")
@@ -127,9 +127,14 @@ export function qatProblemActions() {
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
                                                     && c.realmProblem.problem.problemId == 1);
-
+                                            // console.log("pafafjsafsa1====>", problemList[prob])
                                             if (filteredConsumptionList.length == 0) {
+                                                // console.log("pafafjsafsa====>", problemList[prob]);
+                                                // console.log("index====>", index);
                                                 if (index == -1) {
+                                                    // console.log("pafafjsafsa=====>index====>", problemList[prob])
+
+
                                                     var json = {
                                                         problemReportId: 0,
                                                         program: {
@@ -198,18 +203,12 @@ export function qatProblemActions() {
                                                         ]
                                                     }
 
+
                                                     json.realmProblem.problem.label.label_en = 'Missing recent actual consumption inputs (within the last' + " " + numberOfMonths + " " + 'months)';
-                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Actual consumption for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDate).format("MMM-YY");
-                                                    // var currentJson = json;
-                                                    // console.log("hiiiiiiiiiiiiiiiii=================");
-                                                    // console.log("current json====>", currentJson);
-                                                    // {
-                                                    //     label_en: 'Missing recent actual consumption inputs (within the last' + " " + numberOfMonths + " " + 'months)',
-                                                    //     label_fr: '',
-                                                    //     label_pr: '',
-                                                    //     label_sp: ''
-                                                    // };
-                                                    // json.realmProblem.problem.actio
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Actual consumption for the planning Unit';
+                                                    // + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDate).format("MMM-YY");
+
+
                                                     problemActionList.push(json);
                                                     problemActionIndex++;
                                                 } else {
@@ -318,7 +317,8 @@ export function qatProblemActions() {
 
                                                     }
                                                     json.realmProblem.problem.label.label_en = 'Missing recent inventory inputs (within the last' + " " + numberOfMonthsInventory + " " + 'months)';
-                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Stock count for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateInventory).format("MMM-YY");
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Stock count for planning unit.';
+                                                    // + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateInventory).format("MMM-YY");
                                                     // {
                                                     //     label_en: 'Missing recent inventory inputs (within the last' + " " + numberOfMonthsInventory + " " + 'months)',
                                                     //     label_fr: '',
@@ -436,7 +436,7 @@ export function qatProblemActions() {
 
                                                     }
                                                     json.realmProblem.problem.label.label_en = 'Shipments have receive dates more than ' + " " + parseInt(problemList[prob].data1) + " " + 'days in the past';
-                                                    json.realmProblem.problem.actionLabel.label_en = 'Please update the Shipment status for Shipment Id ' + " " + filteredShipmentList[s].shipmentId + " " + 'it should have been Received by now';
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please update the Shipment status for Shipments that should have been Received by now';
 
                                                     // {
                                                     //     label_en: 'Shipments have receive dates more than ' + " " + parseInt(problemList[prob].data1) + " " + 'days in the past',
@@ -604,7 +604,8 @@ export function qatProblemActions() {
                                                     }
                                                     // Please provide Forecasted consumption for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
                                                     json.realmProblem.problem.label.label_en = 'No Forecasted consumption for' + " " + numberOfMonthsInFunture + " " + 'months in to the future';
-                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Forecasted consumption for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateFuture).format("MMM-YY");
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Forecasted consumption for planning unit.' ;
+                                                    // + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateFuture).format("MMM-YY");
                                                     // {
                                                     //     label_en: 'No Forecasted consumption for' + " " + numberOfMonthsInFunture + " " + 'months in to the future',
                                                     //     label_fr: '',
