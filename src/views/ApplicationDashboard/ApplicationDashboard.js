@@ -282,7 +282,7 @@ class ApplicationDashboard extends Component {
   }
 
   problemAction(problemAction) {
-    console.log("actionUrl============>", problemAction.realmProblem.problem.actionUrl);
+    // console.log("actionUrl============>", problemAction.realmProblem.problem.actionUrl);
     this.props.history.push({
       pathname: `${problemAction.realmProblem.problem.actionUrl}`,
       // state: { budget }
@@ -356,9 +356,12 @@ class ApplicationDashboard extends Component {
         }
         programList = latestVersionProgramList;
         for (var pp = 0; pp < programList.length; pp++) {
-          problemActionList = programList[pp].problemReportList;
+          problemActionList=problemActionList.concat(programList[pp].problemReportList);
+          // array1.concat(array2)
         }
-        this.setState({ problemActionList: problemActionList });
+        // console.log("problemActionList====>", problemActionList);
+        var filteredProblemActionList = problemActionList.filter(c => c.problemStatus.id == 1);
+        this.setState({ problemActionList: filteredProblemActionList });
       }.bind(this);
     }.bind(this);
     // console.log("problemActionlist ==========", problemActionList);
@@ -408,16 +411,16 @@ class ApplicationDashboard extends Component {
 
     const columns = [
       {
-        dataField: 'program.label',
-        text: 'Program',
+        dataField: 'program.programCode',
+        text: i18n.t('static.program.program'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
+        // formatter: (cell, row) => {
+        //   if (cell != null && cell != "") {
+        //     return getLabelText(cell, this.state.lang);
+        //   }
+        // }
         // formatter: (cellContent, row) => {
         //   return (
         //     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
@@ -425,8 +428,16 @@ class ApplicationDashboard extends Component {
         // }
       },
       {
+        dataField: 'versionId',
+        text: i18n.t('static.program.versionId'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        // style: { width: '170px' },
+      },
+      {
         dataField: 'region.label',
-        text: 'Region',
+        text: i18n.t('static.region.region'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -438,19 +449,7 @@ class ApplicationDashboard extends Component {
       },
       {
         dataField: 'planningUnit.label',
-        text: 'Planning Unit ',
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.label',
-        text: 'Problem',
+        text: i18n.t('static.planningunit.planningunit'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -462,7 +461,7 @@ class ApplicationDashboard extends Component {
       },
       {
         dataField: 'dt',
-        text: 'Month',
+        text: i18n.t('static.report.month'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -473,6 +472,20 @@ class ApplicationDashboard extends Component {
           }
         }
       },
+      {
+        dataField: 'realmProblem.problem.label',
+        text: i18n.t('static.report.problemDescription'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+
+      },
+
       // {
       //   dataField: 'isFound',
       //   text: 'Is Found',
@@ -483,7 +496,7 @@ class ApplicationDashboard extends Component {
       // },
       {
         dataField: 'realmProblem.problem.actionLabel',
-        text: 'Action',
+        text: i18n.t('static.common.action'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -493,21 +506,21 @@ class ApplicationDashboard extends Component {
           }
         }
       },
-      {
-        dataField: 'realmProblem.criticality.label',
-        text: 'Criticality',
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
+      // {
+      //   dataField: 'realmProblem.criticality.label',
+      //   text: 'Criticality',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: (cell, row) => {
+      //     if (cell != null && cell != "") {
+      //       return getLabelText(cell, this.state.lang);
+      //     }
+      //   }
+      // },
       {
         dataField: 'problemStatus.label',
-        text: 'Status',
+        text: i18n.t('static.report.problemStatus'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -517,6 +530,19 @@ class ApplicationDashboard extends Component {
           }
         }
       },
+      // {
+      //   dataField: 'problem',
+      //   text: 'Action',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: this.buttonFormatter
+      //   // formatter: (cell, row) => {
+      //   //   if (cell != null && cell != "") {
+      //   //     return getLabelText(cell, this.state.lang);
+      //   //   }
+      //   // }
+      // },
       // {
       //   dataField: 'note',
       //   text: 'Note',

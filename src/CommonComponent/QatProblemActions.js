@@ -87,8 +87,8 @@ export function qatProblemActions() {
                     } else {
                         problemList = problemList.filter(c => c.realm.id == realmId);
                     }
-                    console.log("realmId----", realmId);
-                    console.log("+++++++++++++problemList", problemList);
+                    // console.log("realmId----", realmId);
+                    // console.log("+++++++++++++problemList", problemList);
                     // console.log("QPA 4====>", "hi-----")
                     var planningUnitResult = [];
                     planningUnitResult = planningunitRequest.result;
@@ -98,7 +98,7 @@ export function qatProblemActions() {
                         problemActionList = programList[pp].problemReportList;
                         problemActionIndex = programList[pp].problemReportList.length;
 
-                        console.log("problemActionreport=======>", problemActionList, "====problemActionIndex", problemActionIndex);
+                        // console.log("problemActionreport=======>", problemActionList, "====problemActionIndex", problemActionIndex);
 
                         var regionList = programList[pp].regionList;
                         // console.log("QPA 6====>", regionList)
@@ -134,7 +134,8 @@ export function qatProblemActions() {
                                                         problemReportId: 0,
                                                         program: {
                                                             id: programList[pp].programId,
-                                                            label: programList[pp].label
+                                                            label: programList[pp].label,
+                                                            programCode: programList[pp].programCode
                                                         },
                                                         versionId: programList[pp].currentVersion.versionId,
                                                         realmProblem: problemList[prob],
@@ -196,6 +197,15 @@ export function qatProblemActions() {
                                                             }
                                                         ]
                                                     }
+                                                    json.realmProblem.problem.label.label_en = 'Missing recent actual consumption inputs (within the last' + " " + numberOfMonths + " " + 'months)';
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Actual consumption for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDate).format("MMM-YY");
+                                                    // {
+                                                    //     label_en: 'Missing recent actual consumption inputs (within the last' + " " + numberOfMonths + " " + 'months)',
+                                                    //     label_fr: '',
+                                                    //     label_pr: '',
+                                                    //     label_sp: ''
+                                                    // };
+                                                    // json.realmProblem.problem.actio
                                                     problemActionList.push(json);
                                                     problemActionIndex++;
                                                 } else {
@@ -239,7 +249,8 @@ export function qatProblemActions() {
                                                         problemReportId: 0,
                                                         program: {
                                                             id: programList[pp].programId,
-                                                            label: programList[pp].label
+                                                            label: programList[pp].label,
+                                                            programCode: programList[pp].programCode
                                                         },
                                                         versionId: programList[pp].currentVersion.versionId,
                                                         realmProblem: problemList[prob],
@@ -302,6 +313,14 @@ export function qatProblemActions() {
                                                         ]
 
                                                     }
+                                                    json.realmProblem.problem.label.label_en = 'Missing recent inventory inputs (within the last' + " " + numberOfMonthsInventory + " " + 'months)';
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Stock count for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateInventory).format("MMM-YY");
+                                                    // {
+                                                    //     label_en: 'Missing recent inventory inputs (within the last' + " " + numberOfMonthsInventory + " " + 'months)',
+                                                    //     label_fr: '',
+                                                    //     label_pr: '',
+                                                    //     label_sp: ''
+                                                    // };
                                                     problemActionList.push(json);
                                                     problemActionIndex++;
                                                 } else {
@@ -350,7 +369,8 @@ export function qatProblemActions() {
                                                         problemReportId: 0,
                                                         program: {
                                                             id: programList[pp].programId,
-                                                            label: programList[pp].label
+                                                            label: programList[pp].label,
+                                                            programCode: programList[pp].programCode
                                                         },
                                                         versionId: programList[pp].currentVersion.versionId,
                                                         realmProblem: problemList[prob],
@@ -411,6 +431,15 @@ export function qatProblemActions() {
                                                         ]
 
                                                     }
+                                                    json.realmProblem.problem.label.label_en = 'Shipments have receive dates more than ' + " " + parseInt(problemList[prob].data1) + " " + 'days in the past';
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please update the Shipment status for Shipment Id ' + " " + filteredShipmentList[s].shipmentId + " " + 'it should have been Received by now';
+
+                                                    // {
+                                                    //     label_en: 'Shipments have receive dates more than ' + " " + parseInt(problemList[prob].data1) + " " + 'days in the past',
+                                                    //     label_fr: '',
+                                                    //     label_pr: '',
+                                                    //     label_sp: ''
+                                                    // };
                                                     problemActionList.push(json);
                                                     problemActionIndex++;
                                                 } else {
@@ -508,7 +537,8 @@ export function qatProblemActions() {
                                                         problemReportId: 0,
                                                         program: {
                                                             id: programList[pp].programId,
-                                                            label: programList[pp].label
+                                                            label: programList[pp].label,
+                                                            programCode: programList[pp].programCode
                                                         },
                                                         versionId: programList[pp].currentVersion.versionId,
                                                         realmProblem: problemList[prob],
@@ -568,6 +598,15 @@ export function qatProblemActions() {
                                                             }
                                                         ]
                                                     }
+                                                    // Please provide Forecasted consumption for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
+                                                    json.realmProblem.problem.label.label_en = 'No Forecasted consumption for' + " " + numberOfMonthsInFunture + " " + 'months in to the future';
+                                                    json.realmProblem.problem.actionLabel.label_en = 'Please provide Forecasted consumption for' + " " + planningUnitList[p].planningUnit.label.label_en + " " + 'in' + " " + regionList[r].label.label_en + " " + 'region for the month of ' + " " + moment(myDateFuture).format("MMM-YY");
+                                                    // {
+                                                    //     label_en: 'No Forecasted consumption for' + " " + numberOfMonthsInFunture + " " + 'months in to the future',
+                                                    //     label_fr: '',
+                                                    //     label_pr: '',
+                                                    //     label_sp: ''
+                                                    // };
                                                     problemActionList.push(json);
                                                     problemActionIndex++;
                                                 } else {
