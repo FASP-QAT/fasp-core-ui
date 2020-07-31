@@ -480,9 +480,9 @@ export default class ConsumptionDetails extends React.Component {
                                                                     bsSize="sm"
                                                                     name="problemStatusId" id="problemStatusId"
                                                                     onChange={this.fetchData}
-                                                                    value={1}
+                                                                // value={1}
                                                                 >
-                                                                    <option value="0">Please select</option>
+                                                                    {/* <option value="0">Please select</option> */}
                                                                     {problemStatus}
                                                                 </Input>
                                                             </InputGroup>
