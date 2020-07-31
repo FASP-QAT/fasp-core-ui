@@ -53,7 +53,8 @@ export function jExcelLoadedFunction(instance) {
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-
+    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[0];
+    pageSelect.options[pageSelect.options.length] = new Option('All',5000000);
 
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[0];
