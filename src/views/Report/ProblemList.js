@@ -15,6 +15,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import jsPDF from "jspdf";
+import AuthenticationService from '../Common/AuthenticationService.js';
 import "jspdf-autotable";
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -25,6 +26,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 const entityname = i18n.t('static.report.problem');
+
 
 
 
@@ -55,6 +57,8 @@ export default class ConsumptionDetails extends React.Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.addNewProblem = this.addNewProblem.bind(this);
         this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
+        this.buttonFormatter = this.buttonFormatter.bind(this);
+        this.addMapping = this.addMapping.bind(this);
 
     }
 
@@ -217,6 +221,22 @@ export default class ConsumptionDetails extends React.Component {
         // this.props.history.push("/role/addRole");
     }
 
+    buttonFormatter(cell, row) {
+        // console.log("-----------", cell);
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+    }
+
+    addMapping(event, cell) {
+        console.log("-----cell------>>", cell);
+        event.stopPropagation();
+        this.props.history.push({
+            // pathname: `/programProduct/addProgramProduct/${cell}`,
+            // pathname: `/report/addProblem`,
+            pathname: `${cell}`,
+        });
+
+    }
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -371,6 +391,14 @@ export default class ConsumptionDetails extends React.Component {
                     return getLabelText(cell, this.state.lang);
                 }
             },
+            {
+                dataField: 'realmProblem.problem.actionUrl',
+                text: i18n.t('static.program.mapPlanningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.buttonFormatter
+            }
 
 
 
