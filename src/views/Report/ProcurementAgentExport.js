@@ -1941,7 +1941,7 @@ class ProcurementAgentExport extends Component {
         }
 
         let content = {
-            margin: { top: 40 },
+            margin: { top: 40 ,bottom:50},
             startY: 220,
             head: [headers],
             body: data,

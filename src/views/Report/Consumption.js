@@ -1726,7 +1726,7 @@ class Consumption extends Component {
 
 
     let content = {
-      margin: { top: 80 },
+      margin: { top: 80 ,bottom:50},
       startY: height,
       head: head1,
       body: row3,
