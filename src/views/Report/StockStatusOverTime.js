@@ -1709,7 +1709,7 @@ class StockStatusOverTime extends Component {
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
 
-                        <div>
+                        <div >
                             <Form >
                                 <Col md="12 pl-0">
                                     <div className="row">
@@ -1785,6 +1785,7 @@ class StockStatusOverTime extends Component {
         onChange={(e) => { this.handlePlanningUnitChange(e) }}
         labelledBy={i18n.t('static.common.select')}
       />
+        {/* </InputGroup> */}
                                                     {/* <ReactMultiSelectCheckboxes
                                                     className="planningUnitId"
                                                         name="planningUnitId"
@@ -1797,7 +1798,7 @@ class StockStatusOverTime extends Component {
                                                     {/* <InputGroupAddon addonType="append">
                                   <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                 </InputGroupAddon> */}
-                                                {/* </InputGroup> */}
+                                              
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-sm-3">
