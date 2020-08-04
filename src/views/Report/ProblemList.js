@@ -115,7 +115,7 @@ export default class ConsumptionDetails extends React.Component {
                     var myResult = [];
                     myResult = problemStatusRequest.result;
                     var proList = []
-                    for (var i = 0; i < 3; i++) {
+                    for (var i = 0; i < myResult.length; i++) {
                         var Json = {
                             name: getLabelText(myResult[i].label, lan),
                             id: myResult[i].id

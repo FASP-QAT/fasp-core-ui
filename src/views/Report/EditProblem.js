@@ -69,6 +69,7 @@ export default class EditLanguageComponent extends Component {
             notes: '',
             message: '',
             data: [],
+            problemStatusList: [],
             problemReport: {
                 "problemReportId": "",
                 "program": {
@@ -239,6 +240,7 @@ export default class EditLanguageComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProblemStatusById = this.getProblemStatusById.bind(this);
+        this.getProblemStatus = this.getProblemStatus.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
@@ -319,6 +321,53 @@ export default class EditLanguageComponent extends Component {
         }.bind(this);
 
     }
+
+    getProblemStatus() {
+
+        var db1;
+        const lan = 'en';
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(this.state.programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                var problemStatusRequest = problemStatusOs.getAll();
+
+
+                problemStatusRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = problemStatusRequest.result;
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
+                        var Json = {
+                            name: getLabelText(myResult[i].label, lan),
+                            id: myResult[i].id
+                        }
+                        proList[i] = Json
+                    }
+                    this.setState({
+                        problemStatusList: proList
+                    })
+
+
+                }.bind(this);
+
+            }.bind(this);
+        }.bind(this);
+    }
+
+
     touchAll(setTouched, errors) {
         setTouched({
             problemStatusInputId: true,
@@ -343,6 +392,7 @@ export default class EditLanguageComponent extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.getProblemStatus();
         let problemReportId = this.props.match.params.problemReportId;
         let programId = this.props.match.params.programId;
         let problemActionIndex = this.props.match.params.index;
@@ -414,6 +464,7 @@ export default class EditLanguageComponent extends Component {
 
 
     render() {
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -421,6 +472,14 @@ export default class EditLanguageComponent extends Component {
             </span>
         );
         const lan = 'en';
+
+        const { problemStatusList } = this.state;
+        let problemStatus = problemStatusList.length > 0
+            && problemStatusList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
 
         const columns = [
             {
@@ -850,9 +909,10 @@ export default class EditLanguageComponent extends Component {
                                                                     value={this.state.problemStatusInputId}
                                                                 >
                                                                     <option value="">Please select</option>
-                                                                    <option value="1">Open</option>
+                                                                    {/*<option value="1">Open</option>
                                                                     <option value="2">Closed</option>
-                                                                    <option value="3">Received</option>
+                                                                    <option value="3">Received</option> */}
+                                                                    {problemStatus}
                                                                 </Input>
                                                                 <FormFeedback className="red">{errors.problemStatusInputId}</FormFeedback>
                                                             </FormGroup>
