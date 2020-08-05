@@ -638,7 +638,7 @@ label.arrow_label:after {
 
 .jexcel_content {
   overflow-y: auto !important;
-  max-height: 440px;
+  max-height: 540px !important;
 }
 .jexcel > tbody > tr > td.readonly {
   color: #212721 !important;
@@ -844,9 +844,7 @@ label.arrow_label:after {
 
 
 
-.jexcel_content{
-      max-height: 540px;
-}
+
 
 // .boxSupplyplanLedgerRed{    width: 19px;background-color: red;
 //   height: 14px;display: inline-block;}
