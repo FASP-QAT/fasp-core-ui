@@ -1706,8 +1706,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption);
+        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
+        row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1716,8 +1716,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption);
+        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
+        row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     }
     head1[0] = head;
@@ -1726,7 +1726,7 @@ class Consumption extends Component {
 
 
     let content = {
-      margin: { top: 80 ,bottom:50},
+      margin: { top: 80, bottom: 50 },
       startY: height,
       head: head1,
       body: row3,

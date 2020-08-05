@@ -1735,7 +1735,7 @@ class ShipmentGlobalView extends Component {
         let length = displaylabel.length + 1;
 
         let content1 = {
-            margin: { top: 80 ,bottom:50},
+            margin: { top: 80, bottom: 50 },
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
@@ -1760,7 +1760,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 80, left: 100 ,bottom:50},
+            margin: { top: 80, left: 100, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -1797,19 +1797,6 @@ class ShipmentGlobalView extends Component {
           doc.save('canvas.pdf');*/
     }
 
-
-    handleChange(countrysId) {
-        countrysId = countrysId.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-          })
-        this.setState({
-            countryValues: countrysId.map(ele => ele),
-            countryLabels: countrysId.map(ele => ele.label)
-        }, () => {
-
-            this.fetchData(this.state.rangeValue)
-        })
-    }
     handleChangeProgram(programIds) {
 
         this.setState({
@@ -2196,7 +2183,7 @@ class ShipmentGlobalView extends Component {
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let productCategoryId = document.getElementById("productCategoryId").value;
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-    
+
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -2373,21 +2360,21 @@ class ShipmentGlobalView extends Component {
 
     }
 
-    handleChange(countrysId) {
+    // handleChange(countrysId) {
 
-        this.setState({
-            countryValues: countrysId.map(ele => ele.value),
-            countryLabels: countrysId.map(ele => ele.label)
-        }, () => {
+    //     this.setState({
+    //         countryValues: countrysId.map(ele => ele.value),
+    //         countryLabels: countrysId.map(ele => ele.label)
+    //     }, () => {
 
-            this.fetchData();
-        })
-    }
+    //         this.fetchData();
+    //     })
+    // }
 
     handleProcurementAgentChange(procurementAgentIds) {
         procurementAgentIds = procurementAgentIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
-          })
+        })
         this.setState({
             procurementAgentValues: procurementAgentIds.map(ele => ele),
             procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
@@ -2400,13 +2387,26 @@ class ShipmentGlobalView extends Component {
     handleFundingSourceChange(fundingSourceIds) {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
-          })
+        })
         this.setState({
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
 
             this.fetchData();
+        })
+    }
+
+    handleChange(countrysId) {
+        countrysId = countrysId.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            countryValues: countrysId.map(ele => ele),
+            countryLabels: countrysId.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData(this.state.rangeValue)
         })
     }
 
@@ -2648,21 +2648,21 @@ class ShipmentGlobalView extends Component {
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
                                             <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                          
-                                                <MultiSelect
 
-                                                    bsSize="sm"
-                                                    name="programIds"
-                                                    id="programIds"
-                                                    value={this.state.countryValues}
-                                                    onChange={(e) => { this.handleChange(e) }}
-                                                    options={countryList && countryList.length > 0 ? countryList : []}
-                                                />
-                                                {!!this.props.error &&
-                                                    this.props.touched && (
-                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                    )}
-                                           
+                                            <MultiSelect
+
+                                                bsSize="sm"
+                                                name="programIds"
+                                                id="programIds"
+                                                value={this.state.countryValues}
+                                                onChange={(e) => { this.handleChange(e) }}
+                                                options={countryList && countryList.length > 0 ? countryList : []}
+                                            />
+                                            {!!this.props.error &&
+                                                this.props.touched && (
+                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                )}
+
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
@@ -2740,18 +2740,18 @@ class ShipmentGlobalView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                
-                                                    <MultiSelect
 
-                                                        name="procurementAgentId"
-                                                        id="procurementAgentId"
-                                                        bsSize="sm"
-                                                        value={this.state.procurementAgentValues}
-                                                        onChange={(e) => { this.handleProcurementAgentChange(e) }}
-                                                        options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
-                                                    />
+                                                <MultiSelect
 
-                                               
+                                                    name="procurementAgentId"
+                                                    id="procurementAgentId"
+                                                    bsSize="sm"
+                                                    value={this.state.procurementAgentValues}
+                                                    onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                                    options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                                />
+
+
                                             </div>
                                         </FormGroup>
 
@@ -2759,16 +2759,16 @@ class ShipmentGlobalView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                    <MultiSelect
+                                                <MultiSelect
 
-                                                        name="fundingSourceId"
-                                                        id="fundingSourceId"
-                                                        bsSize="sm"
-                                                        value={this.state.fundingSourceValues}
-                                                        onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                                        options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                    />
-                                               
+                                                    name="fundingSourceId"
+                                                    id="fundingSourceId"
+                                                    bsSize="sm"
+                                                    value={this.state.fundingSourceValues}
+                                                    onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                    options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                />
+
                                             </div>
                                         </FormGroup>
 
