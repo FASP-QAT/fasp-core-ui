@@ -841,6 +841,11 @@ label.arrow_label:after {
   right: 0%;
 
 }
+// Multiselect select dropdown size
+.go2642161244{
+  height: calc(1.5em + 0.5rem + -2px)!important;
+    padding: 0.25rem 0.5rem!important;
+}
 
 
 
@@ -966,7 +971,7 @@ label.arrow_label:after {
 
  .ProblemlistSearchposition{
   position: absolute;
-  top: 60px;
+  top: 35px;
   right: 2%;
 }
   
