@@ -554,7 +554,7 @@ class PlanningUnitCountry extends Component {
         console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
-        tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
+        tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
         console.log('hasDuplicate', hasDuplicate);
