@@ -8431,10 +8431,10 @@ export default class WhatIfReportComponent extends React.Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pt-lg-0 pb-lg-0">
+                    <CardBody className="pt-lg-0">
                         <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                <FormGroup className="">
+                            <div className="row">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls Supplyfeild">
                                         <InputGroup>
@@ -8450,7 +8450,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                     <div className="controls Supplyfeild">
                                         <InputGroup>
@@ -8468,11 +8468,13 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <ul className="legendcommitversion mt-3">
+                                <FormGroup className="col-md-4">
+                                <ul className="legendcommitversion mt-3 list-group">
                                     <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                     <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
                                     <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
                                 </ul>
+                                </FormGroup>
                             </div>
                         </Col>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
