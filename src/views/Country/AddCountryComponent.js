@@ -230,7 +230,11 @@ export default class AddCountryComponent extends Component {
         let { country } = this.state
         country.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
+    
+    submitHandler = event => {
+        event.preventDefault();
+        event.target.className += " was-validated";
+    }
     render() {
         // const { languageList } = this.state;
         // let languageItems = languageList.length > 0
@@ -316,7 +320,7 @@ export default class AddCountryComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='countryForm'>
+                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='countryForm'>
                                                 <CardBody className="pt-2 pb-0">
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
