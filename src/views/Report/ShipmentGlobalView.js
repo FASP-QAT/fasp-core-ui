@@ -1296,6 +1296,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import MultiSelect from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1541,8 +1542,10 @@ class ShipmentGlobalView extends Component {
 
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+        // this.state.countryLabels.map(ele =>
+        //     csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         this.state.countryLabels.map(ele =>
-            csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+            csvRow.push((i18n.t('static.dashboard.country')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         var viewby = document.getElementById("viewById").value;
@@ -1734,7 +1737,7 @@ class ShipmentGlobalView extends Component {
         let length = displaylabel.length + 1;
 
         let content1 = {
-            margin: { top: 80 ,bottom:50},
+            margin: { top: 80, bottom: 50 },
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
             columnStyles: {
@@ -1759,7 +1762,7 @@ class ShipmentGlobalView extends Component {
         doc.autoTable(content1);
 
         let content2 = {
-            margin: { top: 80, left: 100 ,bottom:50},
+            margin: { top: 80, left: 100, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -1796,17 +1799,6 @@ class ShipmentGlobalView extends Component {
           doc.save('canvas.pdf');*/
     }
 
-
-    handleChange(countrysId) {
-
-        this.setState({
-            countryValues: countrysId.map(ele => ele.value),
-            countryLabels: countrysId.map(ele => ele.label)
-        }, () => {
-
-            this.fetchData(this.state.rangeValue)
-        })
-    }
     handleChangeProgram(programIds) {
 
         this.setState({
@@ -2189,10 +2181,11 @@ class ShipmentGlobalView extends Component {
 
         let viewby = document.getElementById("viewById").value;
         let realmId = document.getElementById('realmId').value;
-        let procurementAgentIds = this.state.procurementAgentValues;
-        let fundingSourceIds = this.state.fundingSourceValues;
+        let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let productCategoryId = document.getElementById("productCategoryId").value;
-        let CountryIds = this.state.countryValues;
+        let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -2210,7 +2203,7 @@ class ShipmentGlobalView extends Component {
         // console.log("startDate-----", startDate);
         // console.log("endDate-----", endDate);
 
-        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && CountryIds.length > 0 && ((viewby == 2 && procurementAgentIds.length > 0) || (viewby == 1 && fundingSourceIds.length > 0))) {
+        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
 
             this.setState({
                 message: ''
@@ -2296,7 +2289,7 @@ class ShipmentGlobalView extends Component {
                 val: []
             });
 
-        } else if (CountryIds.length == 0) {
+        } else if (this.state.countryValues.length == 0) {
             this.setState({
                 message: i18n.t('static.program.validcountrytext'),
                 data: [],
@@ -2338,7 +2331,7 @@ class ShipmentGlobalView extends Component {
                 val: []
             });
 
-        } else if (viewby == 1 && fundingSourceIds.length == 0) {
+        } else if (viewby == 1 && this.state.fundingSourceValues.length == 0) {
             this.setState({
                 message: i18n.t('static.fundingSource.selectFundingSource'),
                 data: [],
@@ -2351,7 +2344,7 @@ class ShipmentGlobalView extends Component {
                 lab: [],
                 val: []
             });
-        } else if (viewby == 2 && procurementAgentIds.length == 0) {
+        } else if (viewby == 2 && this.state.procurementAgentValues.length == 0) {
             this.setState({
                 message: i18n.t('static.procurementAgent.selectProcurementAgent'),
                 data: [],
@@ -2369,21 +2362,23 @@ class ShipmentGlobalView extends Component {
 
     }
 
-    handleChange(countrysId) {
+    // handleChange(countrysId) {
 
-        this.setState({
-            countryValues: countrysId.map(ele => ele.value),
-            countryLabels: countrysId.map(ele => ele.label)
-        }, () => {
+    //     this.setState({
+    //         countryValues: countrysId.map(ele => ele.value),
+    //         countryLabels: countrysId.map(ele => ele.label)
+    //     }, () => {
 
-            this.fetchData();
-        })
-    }
+    //         this.fetchData();
+    //     })
+    // }
 
     handleProcurementAgentChange(procurementAgentIds) {
-
+        procurementAgentIds = procurementAgentIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            procurementAgentValues: procurementAgentIds.map(ele => ele.value),
+            procurementAgentValues: procurementAgentIds.map(ele => ele),
             procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
         }, () => {
 
@@ -2392,13 +2387,28 @@ class ShipmentGlobalView extends Component {
     }
 
     handleFundingSourceChange(fundingSourceIds) {
-
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            fundingSourceValues: fundingSourceIds.map(ele => ele.value),
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
 
             this.fetchData();
+        })
+    }
+
+    handleChange(countrysId) {
+        countrysId = countrysId.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            countryValues: countrysId.map(ele => ele),
+            countryLabels: countrysId.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData(this.state.rangeValue)
         })
     }
 
@@ -2640,20 +2650,21 @@ class ShipmentGlobalView extends Component {
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
                                             <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
-                                            <InputGroup className="box">
-                                                <ReactMultiSelectCheckboxes
 
-                                                    bsSize="sm"
-                                                    name="programIds"
-                                                    id="programIds"
-                                                    onChange={(e) => { this.handleChange(e) }}
-                                                    options={countryList && countryList.length > 0 ? countryList : []}
-                                                />
-                                                {!!this.props.error &&
-                                                    this.props.touched && (
-                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                    )}
-                                            </InputGroup>
+                                            <MultiSelect
+
+                                                bsSize="sm"
+                                                name="programIds"
+                                                id="programIds"
+                                                value={this.state.countryValues}
+                                                onChange={(e) => { this.handleChange(e) }}
+                                                options={countryList && countryList.length > 0 ? countryList : []}
+                                            />
+                                            {!!this.props.error &&
+                                                this.props.touched && (
+                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                )}
+
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
@@ -2731,17 +2742,18 @@ class ShipmentGlobalView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
 
-                                                        name="procurementAgentId"
-                                                        id="procurementAgentId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.handleProcurementAgentChange(e) }}
-                                                        options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
-                                                    />
+                                                <MultiSelect
 
-                                                </InputGroup>
+                                                    name="procurementAgentId"
+                                                    id="procurementAgentId"
+                                                    bsSize="sm"
+                                                    value={this.state.procurementAgentValues}
+                                                    onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                                    options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                                />
+
+
                                             </div>
                                         </FormGroup>
 
@@ -2749,16 +2761,16 @@ class ShipmentGlobalView extends Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                                <InputGroup className="box">
-                                                    <ReactMultiSelectCheckboxes
+                                                <MultiSelect
 
-                                                        name="fundingSourceId"
-                                                        id="fundingSourceId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                                        options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                    />
-                                                </InputGroup>
+                                                    name="fundingSourceId"
+                                                    id="fundingSourceId"
+                                                    bsSize="sm"
+                                                    value={this.state.fundingSourceValues}
+                                                    onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                    options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                />
+
                                             </div>
                                         </FormGroup>
 

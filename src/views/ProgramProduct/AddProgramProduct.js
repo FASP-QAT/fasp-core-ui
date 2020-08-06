@@ -57,6 +57,7 @@ class AddprogramPlanningUnit extends Component {
         // this.disableRow = this.disableRow.bind(this);
         // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
     }
@@ -85,6 +86,205 @@ class AddprogramPlanningUnit extends Component {
         this.el.insertRow(
             data
         );
+    }
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson();
+        for (var y = 0; y < json.length; y++) {
+
+
+            var value = this.el.getValueFromCoords(11, y);
+            if (parseInt(value) == 1) {
+                // console.log("PROBLEM");
+
+
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(0, y);
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Reorder frequency
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Min months of stock
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in future for AMC
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in past for AMC
+                var col = ("F").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(5, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Local procurement lead time
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                //Shelf life
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(7, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                //Catalog price
+                var col = ("I").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(8, y);
+                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+            }
+
+        }
+        return valid;
     }
 
     changed = function (instance, cell, x, y, value) {
@@ -329,78 +529,90 @@ class AddprogramPlanningUnit extends Component {
         this.setState({ isValidData: valid });
     }
 
+
+
+
     submitForm() {
 
-        var json = this.el.getJson();
-        console.log("Rows on submit", json)
-        var planningUnitArray = []
-        console.log("json.length---" + json.length);
-        for (var i = 0; i < json.length; i++) {
-            var map = new Map(Object.entries(json[i]));
-            console.log("(map.get(11)---" + map.get("11"));
-            if (map.get("11") == 1) {
-                if (map.get("9") == "") {
-                    var pId = 0;
-                } else {
-                    var pId = map.get("9");
-                }
-                var planningUnitJson = {
-                    programPlanningUnitId: pId,
-                    program: {
-                        id: map.get("12")
-                    },
-                    planningUnit: {
-                        id: map.get("1"),
-                    },
-                    reorderFrequencyInMonths: map.get("2"),
-                    minMonthsOfStock: map.get("3"),
-                    monthsInFutureForAmc: map.get("4"),
-                    monthsInPastForAmc: map.get("5"),
-                    localProcurementLeadTime: map.get("6"),
-                    shelfLife: map.get("7"),
-                    catalogPrice: map.get("8"),
-                    active: map.get("10")
-                }
-                planningUnitArray.push(planningUnitJson);
-            }
+        var validation = this.checkValidation();
+        // var validation = this.state.isValidData;
+        if (validation == true) {
+            // console.log("validation---true-->");
 
-        }
-        AuthenticationService.setupAxiosInterceptors();
-        console.log("SUBMIT----", planningUnitArray);
-        ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
-            .then(response => {
-                if (response.status == "200") {
-                    this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+            var json = this.el.getJson();
+            console.log("Rows on submit", json)
+            var planningUnitArray = []
+            console.log("json.length---" + json.length);
+            for (var i = 0; i < json.length; i++) {
+                var map = new Map(Object.entries(json[i]));
+                console.log("(map.get(11)---" + map.get("11"));
+                if (map.get("11") == 1) {
+                    if (map.get("9") == "") {
+                        var pId = 0;
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        var pId = map.get("9");
+                    }
+                    var planningUnitJson = {
+                        programPlanningUnitId: pId,
+                        program: {
+                            id: map.get("12")
+                        },
+                        planningUnit: {
+                            id: map.get("1"),
+                        },
+                        reorderFrequencyInMonths: map.get("2"),
+                        minMonthsOfStock: map.get("3"),
+                        monthsInFutureForAmc: map.get("4"),
+                        monthsInPastForAmc: map.get("5"),
+                        localProcurementLeadTime: map.get("6"),
+                        shelfLife: map.get("7"),
+                        catalogPrice: map.get("8"),
+                        active: map.get("10")
+                    }
+                    planningUnitArray.push(planningUnitJson);
+                }
+
+            }
+            AuthenticationService.setupAxiosInterceptors();
+            console.log("SUBMIT----", planningUnitArray);
+            ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
+                .then(response => {
+                    if (response.status == "200") {
+                        this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+
+        } else {
+            console.log("Something went wrong");
+        }
     }
     componentDidMount() {
         var list = [];

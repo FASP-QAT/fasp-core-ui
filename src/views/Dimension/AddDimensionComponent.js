@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -56,7 +56,8 @@ export default class AddDimensionComponent extends Component {
                 label: {
                     label_en: ''
                 }
-            }
+            },
+            message: ''
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -113,6 +114,11 @@ export default class AddDimensionComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
 
+    }
+
+    submitHandler = event => {
+        event.preventDefault();
+        event.target.className += " was-validated";
     }
 
     render() {
@@ -210,10 +216,16 @@ export default class AddDimensionComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
 
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
+
+                                                        {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
+                                                        &nbsp; */}
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
@@ -224,10 +236,6 @@ export default class AddDimensionComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
             </div>
         );
     }
@@ -237,11 +245,11 @@ export default class AddDimensionComponent extends Component {
 
     resetClicked() {
         let { dimension } = this.state
-        dimension.label.label_en = ''
-        this.setState(
-            {
-                dimension
-            }
-        )
+        dimension.label.label_en = '';
+
+        this.setState({
+            dimension
+        },
+            () => { });
     }
 } 

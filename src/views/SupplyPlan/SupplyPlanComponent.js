@@ -7843,6 +7843,16 @@ export default class SupplyPlanComponent extends React.Component {
                                 <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
                             </a>
                         </div>
+                        {/* <div className="card-header-actions mr-1">
+                            <a className="card-header-action">
+                                <Link ><small className="supplyplanformulas">TEST 1</small></Link>
+                            </a>
+                        </div> */}
+                        {/* <div className="card-header-actions mr-1">
+                            <a className="card-header-action">
+                                <Link ><small className="supplyplanformulas">TEST 1</small></Link>
+                            </a>
+                        </div> */}
                     </div>
                     {/* <CardHeader>
                         <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
@@ -7862,8 +7872,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 }) => (
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
-                                                <div className="d-md-flex">
-                                                    <FormGroup className="">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-4 mb-1">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls Supplyfeild">
                                                             <InputGroup>
@@ -7879,7 +7889,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="tab-ml-1">
+                                                    <FormGroup className="col-md-4 mb-1">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                                         <div className="controls Supplyfeild">
                                                             <InputGroup>
@@ -7897,12 +7907,17 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <ul className="legendcommitversion mt-3">
-                                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                                        <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
-                                                        {/* <li><span className=" lightGreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleProcurementAgent')} </span></li> */}
-                                                    </ul>
+                                                    <FormGroup className="col-md-4 mb-1">
+                                                        <ul className="legendcommitversion list-group">
+                                                            <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                                            <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                                            {/* <li><span className="Updated1legend legendcolor"></span> <span className="legendcommitversionText"> update1</span></li> */}
+                                                            
+                                                            {/* <li><span className=" lightGreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleProcurementAgent')} </span></li> */}
+                                                        </ul>
+                                                    </FormGroup>
+                                                    
                                                     {/* <ul className="legend legendsync mt-0" >
                                                         <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  {i18n.t('static.supplyPlan.skippedShipments')}</span></li>
                                                         <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.emergencyShipments')}</span></li>
