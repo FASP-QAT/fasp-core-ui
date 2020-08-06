@@ -1,3 +1,4 @@
+import { DATE_FORMAT_CAP } from '../../Constants';
 import React from "react";
 import ReactDOM from 'react-dom';
 import jexcel from 'jexcel';
@@ -14,6 +15,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import jsPDF from "jspdf";
+import AuthenticationService from '../Common/AuthenticationService.js';
 import "jspdf-autotable";
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -23,39 +25,16 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+const entityname = i18n.t('static.report.problem');
 
 
-const problemList = [
-    { problemId: 1, type: 'No recent inputs of actual consumption (in the last 3 months)' },
-    { problemId: 2, type: 'No recent inputs of inventory (in the last 3 months)' },
-    { problemId: 3, type: 'Negative ending stock balances' },
-    { problemId: 4, type: 'Actual consumption record replaces forecasted consumption record' },
-    { problemId: 5, type: 'Stock adjustments lack explanatory notes' },
-    { problemId: 6, type: 'Shipments with receive dates in the past have a status that is not received' },
-    { problemId: 7, type: 'PSM shipments lack an RO#' },
-    { problemId: 8, type: 'ARTMIS & supply plan alignment (checking for quantities, product SKU, receive date)' },
-    { problemId: 9, type: 'Supply Plan is not planned for 18 months into the future (forecasted consumption and shipments)' },
-    { problemId: 10, type: 'Shipments are showing a status of planned within the lead time (usually 6 months)' },
-];
 
-const actionList = [
-    { actionId: 1, problemId: 1, action: 'Add consumption data for planning unit' },
-    { actionId: 2, problemId: 2, action: 'Add inventory data for planning unit' },
-    { actionId: 3, problemId: 3, action: 'check why inventory is negative' },
-    { actionId: 4, problemId: 4, action: 'check actual and forecasted consumption record' },
-    { actionId: 5, problemId: 5, action: 'Add notes' },
-    { actionId: 6, problemId: 6, action: 'Add recived date for shipments' },
-    { actionId: 7, problemId: 7, action: 'Add RO' },
-    { actionId: 8, problemId: 8, action: 'Check quantities,SKU,received date' },
-    { actionId: 9, problemId: 9, action: 'Add consumption for planning unit for future 18 months' },
-    { actionId: 10, problemId: 10, action: 'check shipment status' },
-];
 
 export default class ConsumptionDetails extends React.Component {
 
     constructor(props) {
         super(props);
-        this.options = props.options;
+        // this.options = props.options;
         this.state = {
             programList: [],
             categoryList: [],
@@ -76,10 +55,19 @@ export default class ConsumptionDetails extends React.Component {
 
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.addNewProblem = this.addNewProblem.bind(this);
+        this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
+        this.buttonFormatter = this.buttonFormatter.bind(this);
+        this.addMapping = this.addMapping.bind(this);
 
     }
 
     componentDidMount = function () {
+
+        let problemStatusId = document.getElementById('problemStatusId').value;
+
+
+        console.log("problemStatusId ---------> ", problemStatusId);
 
         const lan = 'en';
         var db1;
@@ -145,13 +133,31 @@ export default class ConsumptionDetails extends React.Component {
 
     };
 
+    rowClassNameFormat(row, rowIdx) {
+        // row is whole row object
+        // rowIdx is index of row
+        // console.log('in rowClassNameFormat')
+        // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
+        if (row.realmProblem.criticality.id == 3) {
+            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
+        } else if (row.realmProblem.criticality.id == 2) {
+            return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
+        } else {
+            return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
+        }
+    }
 
     fetchData() {
+        this.setState({
+            data: [],
+            message: ''
+        });
         let programId = document.getElementById('programId').value;
         let problemStatusId = document.getElementById('problemStatusId').value;
         let problemTypeId = document.getElementById('problemTypeId').value;
 
-        console.log("programId ---------> ", programId)
+        console.log("programId ---------> ", programId);
+        console.log("problemStatusId ---------> ", problemStatusId);
         this.setState({ programId: programId });
         if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0) {
 
@@ -182,11 +188,15 @@ export default class ConsumptionDetails extends React.Component {
                     var problemReportList = (programJson.problemReportList);
 
                     console.log("problemReportList---->", problemReportList);
+                    console.log("problemStatusId ---********------> ", problemStatusId);
 
                     const problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
 
+                    console.log("problemReportFilterList---->", problemReportFilterList);
+
                     this.setState({
                         data: problemReportFilterList,
+                        message: ''
                     },
                         () => {
 
@@ -195,18 +205,50 @@ export default class ConsumptionDetails extends React.Component {
 
                 }.bind(this)
             }.bind(this)
-        } else if (problemStatusId == 0) {
+        }
+        else if (problemStatusId == 0) {
             this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [] });
-        } else if (problemTypeId == 0) {
+        }
+        else if (problemTypeId == 0) {
             this.setState({ message: i18n.t('static.report.selectProblemType'), data: [] });
         }
     }
 
-    editProblem(problem) {
-
+    editProblem(problem, index) {
+        let problemStatusId = document.getElementById('problemStatusId').value;
+        let problemTypeId = document.getElementById('problemTypeId').value;
         this.props.history.push({
-            pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}`,
+            pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
             // state: { language }
+        });
+
+    }
+
+    addNewProblem() {
+        console.log("-------------------addNewProblem--------------------");
+        this.props.history.push("/report/addProblem");
+        // this.props.history.push("/role/addRole");
+    }
+
+    buttonFormatter(cell, row) {
+        // console.log("------cell-----", cell);
+        // console.log("------cell-----", row);
+        // return <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+        if (row.problemStatus.id == 2) {
+            return <span></span>
+        } else {
+            return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
+        }
+
+    }
+
+    addMapping(event, cell) {
+        // console.log("-----cell------>>", cell);
+        event.stopPropagation();
+        this.props.history.push({
+            // pathname: `/programProduct/addProgramProduct/${cell}`,
+            // pathname: `/report/addProblem`,
+            pathname: `${cell}`,
         });
 
     }
@@ -239,12 +281,15 @@ export default class ConsumptionDetails extends React.Component {
 
         const columns = [
             {
-                dataField: 'program.code',
+                dataField: 'program.programCode',
                 text: i18n.t('static.program.programCode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '80px' },
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // }
             },
             {
                 dataField: 'versionId',
@@ -252,7 +297,46 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '80px' },
+            },
+            {
+                dataField: 'region.label',
+                text: i18n.t('static.region.region'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        return getLabelText(cell, this.state.lang);
+                    }
+                }
+
+            },
+            {
+                dataField: 'planningUnit.label',
+                text: i18n.t('static.planningunit.planningunit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
                 style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            {
+                dataField: 'dt',
+                text: i18n.t('static.report.month'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '100px' },
+                formatter: (cell, row) => {
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        return modifiedDate;
+                    }
+                }
             },
             {
                 dataField: 'createdDate',
@@ -260,9 +344,12 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
+                style: { width: '100px' },
                 formatter: (cell, row) => {
-                    return new moment(cell).format('MMM YYYY');
+                    if (cell != null && cell != "") {
+                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        return modifiedDate;
+                    }
                 }
             },
             {
@@ -271,14 +358,36 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
+                style: { width: '170px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
             {
-                dataField: 'realmProblem.criticality.label',
-                text: i18n.t('static.report.Criticality'),
+                dataField: 'realmProblem.problem.actionLabel',
+                text: i18n.t('static.report.suggession'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            // {
+            //     dataField: 'realmProblem.criticality.label',
+            //     text: i18n.t('static.report.Criticality'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     style: { width: '100px' },
+            //     formatter: (cell, row) => {
+            //         return getLabelText(cell, this.state.lang);
+            //     }
+            // },
+            {
+                dataField: 'problemType.label',
+                text: i18n.t('static.report.problemType'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -292,19 +401,8 @@ export default class ConsumptionDetails extends React.Component {
                 text: i18n.t('static.report.problemStatus'),
                 sort: true,
                 align: 'center',
-                style: { width: '80px' },
+                style: { width: '100px' },
                 headerAlign: 'center',
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'problemType.label',
-                text: i18n.t('static.report.problemType'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -315,9 +413,8 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '100px' },
-            },
-
+                formatter: this.buttonFormatter
+            }
 
         ];
         const options = {
@@ -355,14 +452,13 @@ export default class ConsumptionDetails extends React.Component {
                 }} />
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-
-                    <div className="Card-header-reporticon">
-                        {/* <strong>QAT PROBLEM PLUS ACTION REPORT</strong> */}
-                        {
-                            // this.state.matricsList.length > 0 &&
-                            
-                        }
-                    </div>
+                    {/* <div className="Card-header-addicon">
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProblem}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
+                    </div> */}
                     <CardBody className=" pt-lg-0">
                         <Formik
                             render={
@@ -397,8 +493,9 @@ export default class ConsumptionDetails extends React.Component {
                                                                     bsSize="sm"
                                                                     name="problemStatusId" id="problemStatusId"
                                                                     onChange={this.fetchData}
+                                                                // value={1}
                                                                 >
-                                                                    <option value="0">Please select</option>
+                                                                    {/* <option value="0">Please select</option> */}
                                                                     {problemStatus}
                                                                 </Input>
                                                             </InputGroup>
@@ -414,7 +511,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     name="problemTypeId" id="problemTypeId"
                                                                     onChange={this.fetchData}
                                                                 >
-                                                                    <option value="0">Please select</option>
+                                                                    {/* <option value="0">Please select</option> */}
                                                                     <option value="1">Automatic</option>
                                                                     <option value="2">Manual</option>
                                                                 </Input>
@@ -442,11 +539,11 @@ export default class ConsumptionDetails extends React.Component {
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editProblem(row);
+                                                    this.editProblem(row, rowIndex);
                                                 }
                                             }}
                                             {...props.baseProps}

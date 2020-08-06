@@ -380,10 +380,11 @@ export default class AddProcurementUnit extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementUnitForm'>
                                                 {/* <CardHeader>
                                                     <strong>{i18n.t('static.procurementUnit.procurementUnit')}</strong>
                                                 </CardHeader> */}
