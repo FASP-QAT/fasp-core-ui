@@ -468,7 +468,7 @@ export default class ConsumptionDetails extends React.Component {
 
                                             <Col md="12 pl-0">
                                                 <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3 pl-md-0">
+                                                    <FormGroup className="col-md-3 pl-md-0 mb-2">
                                                         <Label htmlFor="appendedInputButton">Program</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
@@ -485,7 +485,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         </div>
                                                     </FormGroup>
 
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 mb-2">
                                                         <Label htmlFor="appendedInputButton">Problem Status</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
@@ -501,7 +501,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3 mb-2">
                                                         <Label htmlFor="appendedInputButton">Problem Type</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
