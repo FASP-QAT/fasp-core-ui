@@ -82,7 +82,7 @@ export default class DatabaseTranslations extends React.Component {
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [10, 30, 50, 100],
+                    paginationOptions: [10, 30, 50],
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,
@@ -150,7 +150,7 @@ export default class DatabaseTranslations extends React.Component {
             var json = this.state.labelList;
             LabelsService.saveStaticLabels(json).then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/ApplicationDashboard/`+ 'green/' + i18n.t(response.data.messageCode))
+                    this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t(response.data.messageCode))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -187,7 +187,7 @@ export default class DatabaseTranslations extends React.Component {
     render() {
         return (
             <div className="animated fadeIn">
-             <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <Col xs="12" sm="12">
@@ -226,7 +226,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     changed = function (instance, cell, x, y, value) {

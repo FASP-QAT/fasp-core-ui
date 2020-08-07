@@ -775,7 +775,7 @@ label.arrow_label:after {
 
 // PlanningUnitlist
 .PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
-.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 
 .listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
@@ -783,7 +783,7 @@ label.arrow_label:after {
 .listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
 
 .listRealmcountryplanningAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
-.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
 
 .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
@@ -946,7 +946,7 @@ label.arrow_label:after {
 
  .ProblemlistSearchposition{
   position: absolute;
-  top: 35px;
+  top: 25px;
   right: 2%;
 }
   
@@ -2721,6 +2721,10 @@ input::placeholder {
     margin-bottom: 15px;
 }
 
+.readonly{
+  background-color: #efefef;
+}
+
 
 .cardRealmDashboard {
     margin-bottom: 1.5rem;
@@ -2997,4 +3001,14 @@ border-radius: 2em;
 }
 .go355775859 .gray svg{
   visibility: hidden !important;
+}
+
+.react-bs-table-no-data{
+  text-align: center!important;
+}
+.planningunitstockAdjustment-box-icon {
+  position: absolute;
+  top: 33px;
+  right: 12px;
+  color: #697069 !important;
 }
