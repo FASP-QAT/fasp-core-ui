@@ -25,6 +25,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
@@ -44,14 +45,26 @@ class Program extends Component {
             healthAreaList: [],
             prgList: [],
             realmList: [],
+            message: '',
+            color: '',
             lang: localStorage.getItem('lang'),
             realmId: AuthenticationService.getRealmId()
         };
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        clearTimeout(this.state.timeout);
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+
     }
 
     componentDidMount() {
@@ -249,7 +262,12 @@ class Program extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -517,8 +535,13 @@ class Program extends Component {
 
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             console.log("in transaction complete");
-
-                                            this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                            this.setState({
+                                                message: 'static.program.downloadsuccess',
+                                                color: 'green'
+                                            })
+                                            this.hideFirstComponent();
+                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
@@ -575,7 +598,15 @@ class Program extends Component {
 
                                                         // }
                                                         transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
-                                                            this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
+                                                            // this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
+
+                                                            this.setState({
+                                                                message: 'static.program.downloadsuccess',
+                                                                color: 'green'
+                                                            })
+                                                            this.hideFirstComponent();
+                                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
+
                                                         }.bind(this);
                                                         transactionForOverwriteDownloadedProgramData.onerror = function (event) {
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")

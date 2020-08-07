@@ -56,6 +56,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
+        this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
 
     }
 
@@ -99,157 +101,216 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         }
     }
 
-    submitForm() {
-        // var validRows = this.checkValidation();
-        // if (validRows == true) {
-        var json = this.el.getJson();
-        console.log("Rows on submit", json)
-        var procurementUnitArray = []
-        for (var i = 0; i < json.length; i++) {
-            var map = new Map(Object.entries(json[i]));
-            if (map.get("7") == 1) {
-                if (map.get("6") == "") {
-                    var pId = 0;
-                } else {
-                    var pId = map.get("6");
-                }
-                var procurementUnitJson = {
-                    procurementAgentProcurementUnitId: pId,
-                    procurementAgent: {
-                        id: map.get("0")
-                    },
-                    procurementUnit: {
-                        id: map.get("1"),
-                    },
-                    skuCode: map.get("2"),
-                    vendorPrice: map.get("3"),
-                    approvedToShippedLeadTime: map.get("4"),
-                    gtin: map.get("5")
-                }
-                procurementUnitArray.push(procurementUnitJson);
-            }
+    checkDuplicatePlanningUnit = function () {
+        var tableJson = this.el.getJson();
+        let count = 0;
 
+        let tempArray = tableJson;
+        console.log('hasDuplicate------', tempArray);
+
+        var hasDuplicate = false;
+        tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
+            if (a === b) hasDuplicate = true
+        })
+        console.log('hasDuplicate', hasDuplicate);
+        if (hasDuplicate) {
+            this.setState({
+                message: 'Duplicate Procurement Unit Details Found',
+                changedFlag: 0,
+
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+            return false;
+        } else {
+            return true;
         }
-        console.log("procurementUnitArray----->", procurementUnitArray);
-        AuthenticationService.setupAxiosInterceptors();
-        ProcurementAgentService.addprocurementAgentProcurementUnitMapping(procurementUnitArray)
-            .then(response => {
-                if (response.status == "200") {
-                    this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
 
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-        // } else {
-        //     alert("please validate all rows and continue");
-        // }
     }
 
-    // checkValidation() {
-    //     var reg = /^[0-9\b]+$/;
-    //     var valid = true;
-    //     var json = this.el.getJson();
-    //     // console.log("check json--->",json);
-    //     var checkJson=[];
-    //     for (var y = 0; y < json.length; y++) {
-    //         var map = new Map(Object.entries(json[y]));
-    //         if(map.get("7")==true){
-    //             checkJson.push(json[y]);
-    //         }
-    //     }
-    //     console.log("check changed json entries-->",checkJson);
+    submitForm() {
 
-    //     for (var y = 0; y < checkJson.length; y++) {
-    //         var col = ("B").concat(parseInt(y) + 1);
-    //         var value = this.el.getValueFromCoords(1, y);
-    //         if (value == "") {
-    //             this.el.setStyle(col, "background-color", "transparent");
-    //             this.el.setStyle(col, "background-color", "yellow");
-    //             this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-    //             valid = false;
-    //         } else {
-    //             for (var i = 0; i < checkJson.length; i++) {
-    //                 var map = new Map(Object.entries(checkJson[i]));
-    //                 var planningUnitValue = map.get("1");
-    //                 if (planningUnitValue == value && y != i) {
-    //                     this.el.setStyle(col, "background-color", "transparent");
-    //                     this.el.setStyle(col, "background-color", "yellow");
-    //                     this.el.setComments(col, "Procurement Unit Allready Exists");
-    //                     i = checkJson.length;
-    //                     valid = false;
-    //                 } else {
-    //                     this.el.setStyle(col, "background-color", "transparent");
-    //                     this.el.setComments(col, "");
-    //                     // this.el.setValueFromCoords(7, y, 1, true);
-    //                 }
-    //             }
-    //         }
+        var duplicateValidation = this.checkDuplicatePlanningUnit();
+        var validation = this.checkValidation();
 
-    //         var col = ("C").concat(parseInt(y) + 1);
-    //         var value = this.el.getValueFromCoords(2, y);
-    //         if (value == "") {
-    //             this.el.setStyle(col, "background-color", "transparent");
-    //             this.el.setStyle(col, "background-color", "yellow");
-    //             this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-    //             valid = false;
-    //         } else {
-    //             this.el.setStyle(col, "background-color", "transparent");
-    //             this.el.setComments(col, "");
-    //         }
+        if (validation == true && duplicateValidation == true) {
+            var json = this.el.getJson();
+            console.log("Rows on submit", json)
+            var procurementUnitArray = []
+            for (var i = 0; i < json.length; i++) {
+                var map = new Map(Object.entries(json[i]));
+                if (map.get("7") == 1) {
+                    if (map.get("6") == "") {
+                        var pId = 0;
+                    } else {
+                        var pId = map.get("6");
+                    }
+                    var procurementUnitJson = {
+                        procurementAgentProcurementUnitId: pId,
+                        procurementAgent: {
+                            id: map.get("0")
+                        },
+                        procurementUnit: {
+                            id: map.get("1"),
+                        },
+                        skuCode: map.get("2"),
+                        vendorPrice: map.get("3"),
+                        approvedToShippedLeadTime: map.get("4"),
+                        gtin: map.get("5")
+                    }
+                    procurementUnitArray.push(procurementUnitJson);
+                }
 
+            }
+            console.log("procurementUnitArray----->", procurementUnitArray);
+            AuthenticationService.setupAxiosInterceptors();
+            ProcurementAgentService.addprocurementAgentProcurementUnitMapping(procurementUnitArray)
+                .then(response => {
+                    if (response.status == "200") {
+                        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
 
-    //         var col = ("E").concat(parseInt(y) + 1);
-    //         var value = this.el.getValueFromCoords(4, y);
-    //         if (value == "") {
-    //             this.el.setStyle(col, "background-color", "transparent");
-    //             this.el.setStyle(col, "background-color", "yellow");
-    //             this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-    //             valid = false;
-    //         } else {
-    //             if (isNaN(parseInt(value)) || !(reg.test(value))) {
-    //                 this.el.setStyle(col, "background-color", "transparent");
-    //                 this.el.setStyle(col, "background-color", "yellow");
-    //                 this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-    //                 valid = false;
-    //             } else {
-    //                 this.el.setStyle(col, "background-color", "transparent");
-    //                 this.el.setComments(col, "");
-    //                 // this.el.setValueFromCoords(7, y, 1, true);
-    //             }
-    //         }
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
 
-    //     }
-    //     return valid;
-    // }
-    changed = function (instance, cell, x, y, value) {
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            console.log("Something went wrong");
+        }
+    }
+
+    checkValidation() {
         var valid = true;
+        var json = this.el.getJson();
+        console.log("json.length-------", json.length);
+        for (var y = 0; y < json.length; y++) {
+            // var col = ("L").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            if (parseInt(value) == 1) {
+
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var reg = DECIMAL_NO_REGEX;
+                // console.log("---------VAL----------", value);
+                if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                // var col = ("F").concat(parseInt(y) + 1);
+                // var value = this.el.getValueFromCoords(5, y);
+                // if (value == "") {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                // } else {
+                //     if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         valid = false;
+                //     } else {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setComments(col, "");
+                //     }
+                // }
+
+            }
+        }
+        return valid;
+    }
+
+
+
+    changed = function (instance, cell, x, y, value) {
+        this.setState({
+            changedFlag: 1
+        })
+
         if (x == 1) {
             var json = this.el.getJson();
             var col = ("B").concat(parseInt(y) + 1);
@@ -257,27 +318,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(7, y, 1, true);
-                valid = false;
             } else {
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    var planningUnitValue = map.get("1");
-                    if (planningUnitValue == value && y != i) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Procurement Unit Allready Exists");
-                        i = json.length;
-                        this.el.setValueFromCoords(7, y, 1, true);
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                        this.el.setValueFromCoords(7, y, 1, true);
-                        valid = true;
-                    }
-                }
-
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
         if (x == 2) {
@@ -287,66 +330,58 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(7, y, 1, true);
-                valid = false;
+
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                this.el.setValueFromCoords(7, y, 1, true);
-                valid = true;
+
             }
         }
 
         if (x == 3) {
-            var reg = DECIMAL_NO_REGEX;
+            var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 this.el.setValueFromCoords(7, y, 1, true);
-                valid = true;
+
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
                 // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(7, y, 1, true);
                 // valid = false;
             } else {
-                if (isNaN(Number.parseFloat(value)) || !(reg.test(value))) {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(7, y, 1, true);
-                    valid = false;
+
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(7, y, 1, true);
-                    valid = true;
+
                 }
             }
         }
 
         if (x == 4) {
-            var reg = DECIMAL_NO_REGEX;
+            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(7, y, 1, true);
-                valid = false;
+
             } else {
-                if (isNaN(Number.parseFloat(value)) || !(reg.test(value))) {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(7, y, 1, true);
-                    valid = false;
+
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(7, y, 1, true);
-                    valid = true;
+
                 }
             }
         }
@@ -358,18 +393,22 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
                 // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(7, y, 1, true);
+                // this.el.setValueFromCoords(7, y, 1, true);
                 // valid = false;
             } else {
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setComments(col, "");
-                this.el.setValueFromCoords(7, y, 1, true);
+                // this.el.setValueFromCoords(7, y, 1, true);
                 // valid = true;
             }
         }
 
-        this.setState({ isValidData: valid });
+        // this.setState({ isValidData: valid });
     }
+
+    onedit = function (instance, cell, x, y, value) {
+        this.el.setValueFromCoords(7, y, 1, true);
+    }.bind(this);
 
     componentDidMount() {
         var procurmentAgentListJexcel = [];
@@ -465,12 +504,12 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             },
                                             {
                                                 title: i18n.t('static.procurementAgentProcurementUnit.vendorPrice'),
-                                                type: 'number'
+                                                type: 'numeric',
 
                                             },
                                             {
                                                 title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
-                                                type: 'number'
+                                                type: 'numeric',
                                             },
                                             {
                                                 title: i18n.t('static.procurementAgentProcurementUnit.gtin'),
@@ -783,12 +822,16 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isValidData && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
-                                &nbsp;
-                                </FormGroup>
+                                &nbsp; */}
+
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i> Add Row</Button>
+                            </FormGroup>
 
                         </CardFooter>
                     </Card>
