@@ -124,7 +124,7 @@ class ProductCatalog extends Component {
                 (getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.fUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.genericName, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ele.genericName.labelId!=0?(getLabelText(ele.genericName, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'):'',
                 ele.forecastingtoPlanningUnitMultiplier,
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.pUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -261,7 +261,7 @@ class ProductCatalog extends Component {
         ]);
 
         let content = {
-            margin: { top: 90 },
+            margin: { top: 90 ,bottom:70},
             startY: 200,
             head: [headers],
             body: data,

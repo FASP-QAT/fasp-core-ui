@@ -57,6 +57,7 @@ class AddprogramPlanningUnit extends Component {
         // this.disableRow = this.disableRow.bind(this);
         // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
     }
@@ -85,6 +86,205 @@ class AddprogramPlanningUnit extends Component {
         this.el.insertRow(
             data
         );
+    }
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson();
+        for (var y = 0; y < json.length; y++) {
+
+
+            var value = this.el.getValueFromCoords(11, y);
+            if (parseInt(value) == 1) {
+                // console.log("PROBLEM");
+
+
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(0, y);
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //Reorder frequency
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Min months of stock
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in future for AMC
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in past for AMC
+                var col = ("F").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(5, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Local procurement lead time
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                //Shelf life
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(7, y);
+                var reg = /^[0-9\b]+$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                //Catalog price
+                var col = ("I").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(8, y);
+                var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+                // console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+            }
+
+        }
+        return valid;
     }
 
     changed = function (instance, cell, x, y, value) {
@@ -329,78 +529,90 @@ class AddprogramPlanningUnit extends Component {
         this.setState({ isValidData: valid });
     }
 
+
+
+
     submitForm() {
 
-        var json = this.el.getJson();
-        console.log("Rows on submit", json)
-        var planningUnitArray = []
-        console.log("json.length---"+json.length);
-        for (var i = 0; i < json.length; i++) {
-            var map = new Map(Object.entries(json[i]));
-            console.log("(map.get(11)---"+map.get("11"));
-            if (map.get("11") == 1) {
-                if (map.get("9") == "") {
-                    var pId = 0;
-                } else {
-                    var pId = map.get("9");
-                }
-                var planningUnitJson = {
-                    programPlanningUnitId: pId,
-                    program: {
-                        id: map.get("12")
-                    },
-                    planningUnit: {
-                        id: map.get("1"),
-                    },
-                    reorderFrequencyInMonths: map.get("2"),
-                    minMonthsOfStock: map.get("3"),
-                    monthsInFutureForAmc: map.get("4"),
-                    monthsInPastForAmc: map.get("5"),
-                    localProcurementLeadTime: map.get("6"),
-                    shelfLife: map.get("7"),
-                    catalogPrice: map.get("8"),
-                    active: map.get("10")
-                }
-                planningUnitArray.push(planningUnitJson);
-            }
+        var validation = this.checkValidation();
+        // var validation = this.state.isValidData;
+        if (validation == true) {
+            // console.log("validation---true-->");
 
-        }
-        AuthenticationService.setupAxiosInterceptors();
-        console.log("SUBMIT----", planningUnitArray);
-        ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
-            .then(response => {
-                if (response.status == "200") {
-                    this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+            var json = this.el.getJson();
+            console.log("Rows on submit", json)
+            var planningUnitArray = []
+            console.log("json.length---" + json.length);
+            for (var i = 0; i < json.length; i++) {
+                var map = new Map(Object.entries(json[i]));
+                console.log("(map.get(11)---" + map.get("11"));
+                if (map.get("11") == 1) {
+                    if (map.get("9") == "") {
+                        var pId = 0;
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        var pId = map.get("9");
+                    }
+                    var planningUnitJson = {
+                        programPlanningUnitId: pId,
+                        program: {
+                            id: map.get("12")
+                        },
+                        planningUnit: {
+                            id: map.get("1"),
+                        },
+                        reorderFrequencyInMonths: map.get("2"),
+                        minMonthsOfStock: map.get("3"),
+                        monthsInFutureForAmc: map.get("4"),
+                        monthsInPastForAmc: map.get("5"),
+                        localProcurementLeadTime: map.get("6"),
+                        shelfLife: map.get("7"),
+                        catalogPrice: map.get("8"),
+                        active: map.get("10")
+                    }
+                    planningUnitArray.push(planningUnitJson);
+                }
+
+            }
+            AuthenticationService.setupAxiosInterceptors();
+            console.log("SUBMIT----", planningUnitArray);
+            ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
+                .then(response => {
+                    if (response.status == "200") {
+                        this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+
+        } else {
+            console.log("Something went wrong");
+        }
     }
     componentDidMount() {
         var list = [];
@@ -558,7 +770,7 @@ class AddprogramPlanningUnit extends Component {
                                                 position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
-                                                allowDeleteRow: false,
+                                                allowDeleteRow: true,
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
@@ -568,7 +780,170 @@ class AddprogramPlanningUnit extends Component {
                                                     entries: '',
                                                 },
                                                 onload: this.loaded,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    var items = [];
+                                                    //Add consumption batch info
 
+
+                                                    if (y == null) {
+                                                        // Insert a new column
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        // Delete a column
+                                                        // if (obj.options.allowDeleteColumn == true) {
+                                                        //     items.push({
+                                                        //         title: obj.options.text.deleteSelectedColumns,
+                                                        //         onclick: function () {
+                                                        //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                        //         }
+                                                        //     });
+                                                        // }
+
+                                                        // Rename column
+                                                        // if (obj.options.allowRenameColumn == true) {
+                                                        //     items.push({
+                                                        //         title: obj.options.text.renameThisColumn,
+                                                        //         onclick: function () {
+                                                        //             obj.setHeader(x);
+                                                        //         }
+                                                        //     });
+                                                        // }
+
+                                                        // Sorting
+                                                        if (obj.options.columnSorting == true) {
+                                                            // Line
+                                                            items.push({ type: 'line' });
+
+                                                            items.push({
+                                                                title: obj.options.text.orderAscending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 0);
+                                                                }
+                                                            });
+                                                            items.push({
+                                                                title: obj.options.text.orderDescending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 1);
+                                                                }
+                                                            });
+                                                        }
+                                                    } else {
+                                                        // Insert new row before
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowBefore'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = 0;
+                                                                    data[1] = "";
+                                                                    data[2] = "";
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = 0;
+                                                                    data[9] = 0;
+                                                                    data[10] = 1;
+                                                                    data[11] = 1;
+                                                                    data[12] = this.props.match.params.programId;
+                                                                    obj.insertRow(data, parseInt(y), 1);
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        // after
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowAfter'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = 0;
+                                                                    data[1] = "";
+                                                                    data[2] = "";
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = 0;
+                                                                    data[9] = 0;
+                                                                    data[10] = 1;
+                                                                    data[11] = 1;
+                                                                    data[12] = this.props.match.params.programId;
+                                                                    obj.insertRow(data, parseInt(y));
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        // Delete a row
+                                                        if (obj.options.allowDeleteRow == true) {
+                                                            // region id
+                                                            if (obj.getRowData(y)[9] == 0) {
+                                                                items.push({
+                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                    onclick: function () {
+                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+
+                                                        if (x) {
+                                                            if (obj.options.allowComments == true) {
+                                                                items.push({ type: 'line' });
+
+                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                items.push({
+                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                    onclick: function () {
+                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                    }
+                                                                });
+
+                                                                if (title) {
+                                                                    items.push({
+                                                                        title: obj.options.text.clearComments,
+                                                                        onclick: function () {
+                                                                            obj.setComments([x, y], '');
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // Line
+                                                    items.push({ type: 'line' });
+
+                                                    // Save
+                                                    if (obj.options.allowExport) {
+                                                        items.push({
+                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                            shortcut: 'Ctrl + S',
+                                                            onclick: function () {
+                                                                obj.download(true);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    return items;
+                                                }.bind(this)
                                             };
                                             var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                             this.el = elVar;

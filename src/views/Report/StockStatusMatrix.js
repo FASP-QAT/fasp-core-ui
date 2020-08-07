@@ -28,6 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
+import MultiSelect from "react-multi-select-component";
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -107,8 +108,11 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   handlePlanningUnitChange = (planningUnitIds) => {
+    planningUnitIds = planningUnitIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
     this.setState({
-      planningUnitValues: planningUnitIds.map(ele => ele.value),
+      planningUnitValues: planningUnitIds.map(ele => ele),
       planningUnitLabels: planningUnitIds.map(ele => ele.label)
     }, () => {
 
@@ -132,10 +136,10 @@ export default class StockStatusMatrix extends React.Component {
     let startDate = this.state.startYear + '-01-01';
     let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
     let programId = document.getElementById("programId").value;
-    let planningUnitIds = this.state.planningUnitValues;
+    let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
     let versionId = document.getElementById("versionId").value;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
-    if (planningUnitIds.length > 0 && programId > 0) {
+    if (this.state.planningUnitValues.length > 0 && programId > 0) {
 
       if (versionId.includes('Local')) {
         var data = [];
@@ -1202,7 +1206,9 @@ console.log('shiplist',shiplist)
     let versionId = document.getElementById("versionId").value;
 
     this.setState({
-      planningUnits: []
+      planningUnits: [],
+      planningUnitValues: [],
+      planningUnitLabels: []
     }, () => {
       if (versionId.includes('Local')) {
         const lan = 'en';
@@ -1436,10 +1442,10 @@ console.log('shiplist',shiplist)
     let data;
     data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
     
-   
+   var startY=150+(this.state.planningUnitValues.length*3)
     let content = {
-      margin: { top: 40 },
-      startY: 200,
+      margin: { top: 80 ,bottom:50},
+      startY: startY,
       head: header,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
@@ -1796,14 +1802,15 @@ console.log('shiplist',shiplist)
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                   <div className="controls">
-                    <InputGroup className="box">
-                      <ReactMultiSelectCheckboxes
+                   
+                      <MultiSelect
                         name="planningUnitId"
                         id="planningUnitId"
                         bsSize="md"
+                        value={this.state.planningUnitValues}
                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                      /> </InputGroup>    </div></FormGroup>
+                      />     </div></FormGroup>
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                   <div className="controls ">

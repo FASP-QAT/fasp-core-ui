@@ -9,6 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { UNIT_LABEL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     unit: ""
@@ -18,8 +19,11 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         unitName: Yup.string()
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
             .required(i18n.t('static.unit.unittext')),
-        unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
+        unitCode: Yup.string()
+            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            .required(i18n.t('static.unit.unitcodetext'))
 
     })
 }
@@ -181,7 +185,7 @@ export default class EditUnitComponent extends Component {
                                     UnitService.updateUnit(this.state.unit).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
-                                            this.props.history.push(`/unit/listUnit/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/unit/listUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -238,7 +242,7 @@ export default class EditUnitComponent extends Component {
                                                             id="unitName"
                                                             bsSize="sm"
                                                             valid={!errors.unitName}
-                                                            invalid={touched.unitName && !!errors.unitName  || this.state.unit.label.label_en == ''}
+                                                            invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.unit.label.label_en}
@@ -252,7 +256,7 @@ export default class EditUnitComponent extends Component {
                                                             id="unitCode"
                                                             bsSize="sm"
                                                             valid={!errors.unitCode}
-                                                            invalid={touched.unitCode && !!errors.unitCode  || this.state.unit.unitCode == ''}
+                                                            invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             required

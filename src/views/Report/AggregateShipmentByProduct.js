@@ -367,7 +367,7 @@ class AggregateShipmentByProduct extends Component {
             // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
         ]);
         let content = {
-            margin: { top: 40 },
+            margin: { top: 40,bottom:50 },
             startY: 200,
             head: [headers],
             body: data,

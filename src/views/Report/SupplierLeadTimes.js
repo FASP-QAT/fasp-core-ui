@@ -28,6 +28,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import MultiSelect from 'react-multi-select-component';
 
 
 // const { getToggledOptions } = utils;
@@ -188,7 +189,7 @@ class SupplierLeadTimes extends Component {
                     var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 110, planningText)
                     planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+                    doc.text(doc.internal.pageSize.width / 8, (110+(this.state.planningUnitLabels.length*3)), planningText)
                 }
 
             }
@@ -229,10 +230,11 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-
+        let startY=110+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
+      
         let content = {
-            margin: { top: 95 },
-            startY: 165,
+            margin: { top: 95 ,bottom:75},
+            startY: startY,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
@@ -259,8 +261,11 @@ class SupplierLeadTimes extends Component {
 
     }
     handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
             this.fetchData()
@@ -268,8 +273,11 @@ class SupplierLeadTimes extends Component {
     }
 
     handleProcurementAgentChange = (procurementAgentIds) => {
+        procurementAgentIds = procurementAgentIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
         this.setState({
-            procurementAgenttValues: procurementAgentIds.map(ele => ele.value),
+            procurementAgenttValues: procurementAgentIds.map(ele => ele),
             procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
         }, () => {
             this.fetchData()
@@ -673,13 +681,13 @@ class SupplierLeadTimes extends Component {
         // let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         // let plannedShipments = document.getElementById("shipmentStatusId").value;
-        let planningUnitIds = this.state.planningUnitValues;
-        let procurementAgentIds = this.state.procurementAgenttValues;
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let procurementAgentIds = this.state.procurementAgenttValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgenttValues.map(ele => (ele.value).toString());
         // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
 
-        if (programId > 0) {
+        if (programId > 0 && this.state.planningUnitValues.length>0 &&this.state.procurementAgenttValues.length>0) {
             if (navigator.onLine) {
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),
@@ -695,7 +703,8 @@ class SupplierLeadTimes extends Component {
                         var outPutList = response.data;
                         // var responseData = response.data;
                         this.setState({
-                            outPutList: outPutList
+                            outPutList: outPutList,
+                            message:''
                         })
                     }).catch(
                         error => {
@@ -722,6 +731,9 @@ class SupplierLeadTimes extends Component {
                     );
 
             } else {
+                planningUnitIds =  this.state.planningUnitValues.map(ele => (ele.value).toString());
+               procurementAgentIds =  this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+               
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -862,7 +874,7 @@ class SupplierLeadTimes extends Component {
                                         }
                                     }
                                     console.log("outPutList------>", outPutList);
-                                    this.setState({ outPutList: outPutList });
+                                    this.setState({ outPutList: outPutList ,message:''});
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -872,9 +884,11 @@ class SupplierLeadTimes extends Component {
 
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] });
+        }else if (this.state.planningUnitValues.length == 0) {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), outPutList: [] });
         }
         else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), outPutList: [] });
+            this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] });
 
         }
     }
@@ -1171,15 +1185,15 @@ class SupplierLeadTimes extends Component {
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
 
                                         <div className="controls SelectGo">
-                                            <InputGroup className="box">
-                                                <ReactMultiSelectCheckboxes
+                                                <MultiSelect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
+                                                    value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                 />
-                                            </InputGroup>
+                                            
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="tab-ml-1">
@@ -1187,15 +1201,14 @@ class SupplierLeadTimes extends Component {
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
 
                                         <div className="controls SelectGo">
-                                            <InputGroup className="box">
-                                                <ReactMultiSelectCheckboxes
+                                                <MultiSelect
                                                     name="procurementAgentId"
                                                     id="procurementAgentId"
                                                     bsSize="md"
+                                                    value={this.state.procurementAgenttValues}
                                                     onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                                 />
-                                            </InputGroup>
                                         </div>
                                     </FormGroup>
                                 </div>
