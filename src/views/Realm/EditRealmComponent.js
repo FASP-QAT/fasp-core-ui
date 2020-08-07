@@ -25,19 +25,25 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
-        minMosMinGaurdrail: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        minMosMinGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.minMosMinGaurdrail')),
         // .min(0, i18n.t('static.program.validvaluetext')),
-        minMosMaxGaurdrail: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        minMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.minMosMaxGaurdrail')),
         // .min(0, i18n.t('static.program.validvaluetext')),
-        maxMosMaxGaurdrail: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        maxMosMaxGaurdrail: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail')),
         // .min(0, i18n.t('static.program.validvaluetext')),
         /*   monthInPastForAmc: Yup.number()
@@ -292,7 +298,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}</Label>
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             // min="0"
                                                             name="minMosMinGaurdrail"
                                                             id="minMosMinGaurdrail"
@@ -307,7 +313,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}</Label>
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             // min="0"
                                                             name="minMosMaxGaurdrail"
                                                             id="minMosMaxGaurdrail"
@@ -322,7 +328,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}</Label>
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             // min="0"
                                                             name="maxMosMaxGaurdrail"
                                                             id="maxMosMaxGaurdrail"

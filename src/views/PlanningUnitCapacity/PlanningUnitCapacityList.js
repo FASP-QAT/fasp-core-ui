@@ -30,20 +30,40 @@ export default class PlanningUnitCapacityList extends Component {
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
         AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getPlanningUnitCapacityForId(planningUnitId).then(response => {
-            console.log(response.data)
-            this.setState({
-                planningUnitCapacityList: response.data,
-                selSource: response.data
+        if (planningUnitId == 0) {
+            PlanningUnitService.getAllPlanningUnitList().then(response => {
+                console.log("FORTUNER-------------", response.data)
+                this.setState({
+                    planningUnits: response.data,
+                    selSource: response.data
+                })
             })
-        })
+        } else {
+            PlanningUnitService.getPlanningUnitCapacityForId(planningUnitId).then(response => {
+                console.log("resp---->", response.data);
+                let tempPlanningUnitList = response.data;
+                let planningUnitList = [];
+                for (var j = 0; j < tempPlanningUnitList.length; j++) {
+                    let json = {
+                        label: tempPlanningUnitList[j].planningUnit.label,
+                        active: tempPlanningUnitList[j].active
+                    }
+                    planningUnitList.push(json);
+                }
+                this.setState({
+                    planningUnitCapacityList: planningUnitList,
+                    selSource: planningUnitList
+                })
+            })
+        }
+
     }
 
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getAllPlanningUnitList().then(response => {
-            console.log("FORTUNER-------------",response.data)
+            console.log("FORTUNER-------------", response.data)
             this.setState({
                 planningUnits: response.data,
                 selSource: response.data
@@ -174,9 +194,9 @@ export default class PlanningUnitCapacityList extends Component {
                                             name="planningUnitId"
                                             id="planningUnitId"
                                             bsSize="sm"
-                                        onChange={this.filterData}
+                                            onChange={this.filterData}
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="0">{i18n.t('static.common.all')}</option>
                                             {planningUnitList}
                                         </Input>
                                         {/* <InputGroupAddon addonType="append">
