@@ -1034,5 +1034,7 @@
     "static.whatIf.removeApprovedShipmentsNotInLeadTimes":"Remove all approved shipments that are not within lead time",
     "static.whatIf.removeShippedShipmentsNotInLeadTimes":"Remove all shipped shipments that are not within lead time",
     "static.report.plannedbudgetStatus":"Planned,Submitted",
-    "static.report.OrderedbudgetStatus": "Approved,Shipped,Arrived,Received"  
+    "static.report.OrderedbudgetStatus": "Approved,Shipped,Arrived,Received",
+    "static.realm.decimalNotAllow": "Decimal Number Not Allowed",  
+    "static.realm.negativeNumberNotAllowed": "Negative Number Not Allowed"
 }

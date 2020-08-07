@@ -36,12 +36,12 @@ export default class CountryListComponent extends Component {
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+            document.getElementById('div1').style.display = 'none';
         }, 8000);
-        }
-        componentWillUnmount() {
+    }
+    componentWillUnmount() {
         clearTimeout(this.timeout);
-        }
+    }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -184,14 +184,19 @@ export default class CountryListComponent extends Component {
             }];
         const options = {
             hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
+            // firstPageText: i18n.t('static.common.first'),
+            // prePageText: i18n.t('static.common.back'),
+            // nextPageText: i18n.t('static.common.next'),
+            // lastPageText: i18n.t('static.common.last'),
+
+            // nextPageTitle: i18n.t('static.common.firstPage'),
+            // prePageTitle: i18n.t('static.common.prevPage'),
+            // firstPageTitle: i18n.t('static.common.nextPage'),
+            // lastPageTitle: i18n.t('static.common.lastPage'),
+            withFirstAndLast: false,
+            
+            paginationSize: 10,
+            pageStartIndex: 1,
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -205,8 +210,12 @@ export default class CountryListComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selCountry.length
-            }]
+                text: '100', value: 100
+            },
+                // {
+                //     text: 'All', value: this.state.selCountry.length
+                // }
+            ]
         }
         return (
             <div className="animated">

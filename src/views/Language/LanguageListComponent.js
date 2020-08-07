@@ -175,8 +175,12 @@ export default class LanguageListComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selSource.length
-            }]
+                text: '100', value: 100
+            },
+            // {
+            //     text: 'All', value: this.state.selSource.length
+            // }
+        ]
         }
         return (
             <div className="animated">
