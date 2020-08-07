@@ -305,7 +305,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: false,
-                                        allowInsertRow: false,
+                                        allowInsertRow: true,
                                         allowManualInsertRow: false,
                                         copyCompatibility: true,
                                         editable: shipmentEditable,
@@ -362,7 +362,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     data[20] = true;
                                                     data[21] = "";
                                                     data[22] = 0;
-                                                    console.log("data", data);
                                                     obj.insertRow(data);
                                                 }.bind(this)
                                             });
@@ -1131,8 +1130,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         // var elInstance=this.state.plannedPsmShipmentsEl;
                                                         var rowData = obj.getRowData(y)
                                                         var batchInfo = rowData[17];
-                                                        var cell = obj.getCell(`B${parseInt(y) + 1}`)
-                                                        cell.classList.add('readonly');
                                                         var tableEditable = true;
                                                         if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                                                             tableEditable = false;
@@ -1678,8 +1675,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.setState({
                 shipmentBatchInfoTableEl: ""
             })
-            var cell = shipmentInstance.getCell(`A${parseInt(rowNumber) + 1}`)
-            cell.classList.remove('readonly');
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge();

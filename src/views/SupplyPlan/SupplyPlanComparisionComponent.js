@@ -3936,6 +3936,7 @@ export default class SupplyPlanComponent extends React.Component {
                         </div>
 
                         <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
+                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </div>
 
                         <h6 className="red">{this.state.shipmentDatesError}</h6>
@@ -3943,6 +3944,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <div id="shipmentDatesTable"></div>
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
+                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </div>
                         <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                         <div className="table-responsive">
@@ -3950,6 +3952,7 @@ export default class SupplyPlanComponent extends React.Component {
                         </div>
 
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </div>
 
                     </ModalBody>
@@ -4070,6 +4073,36 @@ export default class SupplyPlanComponent extends React.Component {
             [parameterName]: value
         })
 
+    }
+
+    actionCanceledShipments(type) {
+        if (type == "qtyCalculator") {
+            document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
+            this.setState({
+                qtyCalculatorValidationError: "",
+                shipmentQtyChangedFlag: 0
+            })
+        } else if (type == "shipmentDates") {
+            document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
+            this.setState({
+                shipmentDatesChangedFlag: 0,
+                shipmentDatesError: ""
+            })
+        } else if (type == "shipmentBatch") {
+            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
+            this.setState({
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentValidationBatchError: "",
+                shipmentBatchInfoDuplicateError: ""
+            })
+        }
     }
 
 }
