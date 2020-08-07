@@ -1221,40 +1221,39 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         this.setState({ shipmentBatchInfoTableEl: elVar });
                                                     }.bind(this)
                                                 });
+                                            }
+                                            if (rowData[19].toString() == "true") {
+                                                items.push({
+                                                    title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
+                                                    onclick: function () {
+                                                        obj.setValueFromCoords(19, y, false, true);
+                                                    }.bind(this)
+                                                });
+                                            }
+                                            if (rowData[19].toString() == "false" && rowData[14].toString() == "false") {
+                                                items.push({
+                                                    title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
+                                                    onclick: function () {
+                                                        obj.setValueFromCoords(19, y, true, true);
+                                                    }.bind(this)
+                                                });
+                                            }
 
-                                                if (rowData[19].toString() == "true") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(19, y, false, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-                                                if (rowData[19].toString() == "false" && rowData[14].toString() == "false") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(19, y, true, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-
-                                                if (rowData[20].toString() == "true" && rowData[14].toString() == "false") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(20, y, false, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-                                                if (rowData[20].toString() == "false" && rowData[14].toString() == "false") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.includeInProjectedShipment'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(20, y, true, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
+                                            if (rowData[20].toString() == "true" && rowData[14].toString() == "false") {
+                                                items.push({
+                                                    title: i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment'),
+                                                    onclick: function () {
+                                                        obj.setValueFromCoords(20, y, false, true);
+                                                    }.bind(this)
+                                                });
+                                            }
+                                            if (rowData[20].toString() == "false" && rowData[14].toString() == "false") {
+                                                items.push({
+                                                    title: i18n.t('static.supplyPlan.includeInProjectedShipment'),
+                                                    onclick: function () {
+                                                        obj.setValueFromCoords(20, y, true, true);
+                                                    }.bind(this)
+                                                });
                                             }
                                             return items;
                                         }.bind(this)
@@ -1466,6 +1465,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.props.updateState("shipmentQtyChangedFlag", 1);
         var elInstance = this.state.qtyCalculatorTableEl;
         var elInstance1 = this.state.qtyCalculatorTableEl1;
+        var rowData = elInstance.getRowData(y);
         if (x == 0) {
             elInstance1.setValueFromCoords(7, 0, value, true);
         }
@@ -1478,13 +1478,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             elInstance1.setValueFromCoords(9, 0, value, true);
         }
 
+        if (x == 4) {
+            if (value == "" && (rowData[3] == 1 || rowData[3] == 3 || rowData[3] == 4)) {
+                console.log("in if")
+                elInstance.setValueFromCoords(4, 0, 1, true);
+            }
+        }
+
         if (x == 5) {
             checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1);
         }
 
         if (x == 3) {
             if (value == 1 || value == 3 || value == 4) {
-                elInstance.setValueFromCoords(4, y, 2, true);
+                elInstance.setValueFromCoords(4, y, 1, true);
             } else {
                 elInstance.setValueFromCoords(4, y, "", true);
             }
