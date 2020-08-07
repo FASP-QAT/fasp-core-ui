@@ -5659,7 +5659,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 } else {
                                                     var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                     if (compare) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, ``, '', '', `${item1.isEmergencyOrder}`)}>{item1.suggestedOrderQty}</td>)
+                                                        return (<td>{item1.suggestedOrderQty}</td>)
                                                     } else {
                                                         return (<td>{item1.suggestedOrderQty}</td>)
                                                     }
@@ -5672,7 +5672,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
                                             {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                         </td>
-                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
+                                        <td align="left" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}>&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
                                         {
                                             this.state.manualShipmentsTotalData.map(item1 => (
                                                 <td align="right" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
