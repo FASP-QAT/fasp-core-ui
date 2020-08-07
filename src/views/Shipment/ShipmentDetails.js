@@ -38,7 +38,9 @@ export default class ShipmentDetails extends React.Component {
             productCategoryId: '',
             shipmentsEl: '',
             timeout: 0,
-            showShipments: 0
+            showShipments: 0,
+            shipmentChangedFlag: 0,
+            shipmentModalTitle: ""
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -53,6 +55,7 @@ export default class ShipmentDetails extends React.Component {
         this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
         this.checkValidationShipmentBatchInfo = this.checkValidationShipmentBatchInfo.bind(this);
         this.saveShipmentBatchInfo = this.saveShipmentBatchInfo.bind(this);
+        this.updateState = this.updateState.bind(this);
     }
 
     hideFirstComponent() {
@@ -1517,8 +1520,21 @@ export default class ShipmentDetails extends React.Component {
     }
 
     actionCanceled() {
+        this.setState({
+            message: i18n.t('static.message.cancelled'),
+            color: 'red',
+        })
         this.toggleLarge();
     }
+
+    updateState(parameterName, value) {
+        console.log("in update state")
+        this.setState({
+            [parameterName]: value
+        })
+
+    }
+
 
     render() {
         const { programList } = this.state;
@@ -1592,8 +1608,8 @@ export default class ShipmentDetails extends React.Component {
                                     )} />
 
                         <Col xs="12" sm="12" className="p-0">
-                            {/* {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} />} */}
-                            {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state}  />}
+                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} shipmentPage="shipmentDataEntry" />}
+                            {/* {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} />} */}
                             <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
@@ -1603,7 +1619,7 @@ export default class ShipmentDetails extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveShipments()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
+                            {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -1612,16 +1628,37 @@ export default class ShipmentDetails extends React.Component {
                 <Modal isOpen={this.state.batchInfo}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                        <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
+                        <strong>{this.state.shipmentModalTitle}</strong>
                     </ModalHeader>
                     <ModalBody>
+                        <h6 className="red">{this.state.qtyCalculatorValidationError}</h6>
+                        <div className="table-responsive">
+                            <div id="qtyCalculatorTable"></div>
+                        </div>
+
+                        <div className="table-responsive">
+                            <div id="qtyCalculatorTable1"></div>
+                        </div>
+                        <h6 className="red">{this.state.shipmentDatesError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentDatesTable"></div>
+                        </div>
                         <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                         <div className="table-responsive">
                             <div id="shipmentBatchInfoTable"></div>
                         </div>
+
                     </ModalBody>
                     <ModalFooter>
-                        {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveShipmentBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                        <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                            {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                        </div>
+                        <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
+                            {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
+                        </div>
+                        <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
+                            {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
+                        </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>

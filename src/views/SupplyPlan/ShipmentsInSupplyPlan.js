@@ -4,7 +4,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from "../../Constants";
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
@@ -199,6 +199,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     if (this.props.shipmentPage == "supplyPlanCompare") {
                                         shipmentEditable = false;
                                     }
+                                    var paginationOption = false;
+                                    var searchOption = false;
+                                    var paginationArray = []
+                                    if (this.props.shipmentPage == "shipmentDataEntry") {
+                                        paginationOption = 10;
+                                        searchOption = true;
+                                        paginationArray = [10, 25, 50];
+                                    }
                                     for (var i = 0; i < shipmentList.length; i++) {
                                         var shipmentMode = 1;
                                         if (shipmentList[i].shipmentMode == "Air") {
@@ -288,8 +296,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0 },
                                             { type: 'hidden' }
                                         ],
-                                        pagination: false,
-                                        search: false,
+                                        pagination: paginationOption,
+                                        paginationOptions: paginationArray,
+                                        search: searchOption,
                                         columnSorting: true,
                                         tableOverflow: true,
                                         wordWrap: true,
@@ -361,6 +370,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             items.push({
                                                 title: i18n.t('static.supplyPlan.qtyCalculator'),
                                                 onclick: function () {
+                                                    if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                        this.props.updateState("shipmentModalTitle", i18n.t("static.supplyPlan.qtyCalculator"));
+                                                        this.props.toggleLarge();
+                                                    }
                                                     document.getElementById("showSaveQtyButtonDiv").style.display = 'block';
                                                     this.el = jexcel(document.getElementById("qtyCalculatorTable"), '');
                                                     this.el.destroy();
@@ -552,6 +565,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 items.push({
                                                     title: i18n.t('static.supplyPlan.showShipmentDates'),
                                                     onclick: function () {
+                                                        if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                            this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentDates"));
+                                                            this.props.toggleLarge();
+                                                        }
                                                         document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'block';
                                                         this.el = jexcel(document.getElementById("shipmentDatesTable"), '');
                                                         this.el.destroy();
@@ -1099,6 +1116,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 items.push({
                                                     title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                     onclick: function () {
+                                                        if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                            this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
+                                                            this.props.toggleLarge();
+                                                        }
                                                         var batchInfoListAll = this.props.items.programJson.batchInfoList.filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
                                                         this.setState({
                                                             batchInfoListAll: batchInfoListAll
@@ -1274,7 +1295,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     loadedShipments = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
+        if (this.props.shipmentPage != "shipmentDataEntry") {
+            jExcelLoadedFunctionOnlyHideRow(instance);
+        } else {
+            jExcelLoadedFunction(instance);
+        }
     }
 
     loadedQtyCalculator = function (instance, cell, x, y, value) {
@@ -1520,6 +1545,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             })
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
             this.props.updateState("qtyCalculatorValidationError", "");
+            if (this.props.shipmentPage == "shipmentDataEntry") {
+                this.props.toggleLarge();
+            }
             elInstance.destroy();
             elInstance1.destroy();
         } else {
@@ -1653,6 +1681,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var cell = shipmentInstance.getCell(`A${parseInt(rowNumber) + 1}`)
             cell.classList.remove('readonly');
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+            if (this.props.shipmentPage == "shipmentDataEntry") {
+                this.props.toggleLarge();
+            }
             elInstance.destroy();
         } else {
             this.props.updateState("shipmentValidationBatchError", i18n.t('static.supplyPlan.validationFailed'));
@@ -2346,6 +2377,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             })
             document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
             this.props.updateState("shipmentDatesError", "");
+            if (this.props.shipmentPage == "shipmentDataEntry") {
+                this.props.toggleLarge();
+            }
             elInstance.destroy();
         } else {
             this.props.updateState("shipmentDatesError", i18n.t('static.supplyPlan.validationFailed'));
@@ -2746,7 +2780,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        this.props.toggleLarge('shipments');
+                        if (this.props.shipmentPage != "shipmentDataEntry") {
+                            this.props.toggleLarge('shipments');
+                        }
                         this.props.updateState("message", i18n.t('static.message.shipmentsSaved'));
                         this.props.updateState("color", 'green');
                         this.props.updateState("shipmentChangedFlag", 0);
@@ -2755,7 +2791,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         this.setState({
                             shipmentsEl: ""
                         })
-                        this.props.formSubmit(this.props.items.monthCount);
+                        if (this.props.shipmentPage != "shipmentDataEntry") {
+                            this.props.formSubmit(this.props.items.monthCount);
+                        }
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

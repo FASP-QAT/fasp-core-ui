@@ -438,7 +438,7 @@ export default class SupplyPlanComponent extends React.Component {
         const data = [openningArr, consumptionArr, shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr, closingBalanceArr, monthsOfStockArr, amcgArr, minStocArr, maxStockArr, unmetDemandArr];
 
         let content = {
-            margin: { top: 80  ,bottom:50},
+            margin: { top: 80, bottom: 50 },
             startY: height,
             head: headers,
             body: data,
@@ -532,6 +532,7 @@ export default class SupplyPlanComponent extends React.Component {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+            console.log("In compare program Id", document.getElementById("programId").value)
             var programRequest = programDataOs.get(document.getElementById("programId").value);
             programRequest.onerror = function (event) {
                 this.setState({
@@ -3663,7 +3664,11 @@ export default class SupplyPlanComponent extends React.Component {
                                 {
                                     this.state.expiredStockArr.map(item1 => {
                                         if (item1.toString() != "") {
-                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                            if (item1.qty != 0) {
+                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                            } else {
+                                                return (<td align="right"></td>)
+                                            }
                                         } else {
                                             return (<td align="right">{item1}</td>)
                                         }
@@ -3916,19 +3921,11 @@ export default class SupplyPlanComponent extends React.Component {
                         <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                     </ModalHeader>
                     <ModalBody>
-                        {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} shipmentPage="supplyPlanCompare"/>}
+                        {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} shipmentPage="supplyPlanCompare" />}
                         <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                         <div className="table-responsive">
                             <div id="shipmentsDetailsTable" />
                         </div>
-                        <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                        <div className="table-responsive">
-                            <div id="shipmentBatchInfoTable"></div>
-                        </div>
-
-                        <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                        </div>
-
                         <h6 className="red">{this.state.qtyCalculatorValidationError}</h6>
                         <div className="table-responsive">
                             <div id="qtyCalculatorTable"></div>
@@ -3947,6 +3944,14 @@ export default class SupplyPlanComponent extends React.Component {
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                         </div>
+                        <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentBatchInfoTable"></div>
+                        </div>
+
+                        <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                        </div>
+
                     </ModalBody>
                     <ModalFooter>
                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('shipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -3982,8 +3987,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                    <th style={{ textAlign: 'left' }}></th>
+                                    <th style={{ textAlign: 'center' }} colspan="2">{i18n.t('static.supplyPlan.total')}</th>
                                     <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                 </tr>
                             </tfoot>
