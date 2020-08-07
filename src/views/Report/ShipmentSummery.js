@@ -2153,7 +2153,7 @@ class ShipmentSummery extends Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
-                                                    <InputGroup className="box">
+                                                    
                                                         <MultiSelect
                                                             name="planningUnitId"
                                                             id="planningUnitId"
@@ -2163,7 +2163,7 @@ class ShipmentSummery extends Component {
                                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         />
 
-                                                    </InputGroup>
+                                                   
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
