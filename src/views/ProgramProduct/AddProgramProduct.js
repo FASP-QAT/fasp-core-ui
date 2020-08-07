@@ -527,7 +527,7 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Catalog Price',
+                                                        title: 'Catalog Price (USD)',
                                                         type: 'number'
                                                     },
                                                     {
