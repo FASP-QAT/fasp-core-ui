@@ -800,7 +800,7 @@ class PlanningUnitCapacity extends Component {
                     changedpapuList.push(json);
                 }
             }
-
+            console.log("changedpapuList----->", changedpapuList);
             AuthenticationService.setupAxiosInterceptors();
             PlanningUnitService.editPlanningUnitCapacity(changedpapuList)
                 .then(response => {
@@ -911,8 +911,18 @@ class PlanningUnitCapacity extends Component {
                                             // console.log("inventory Data Array-->", papuDataArr);
                                             if (papuDataArr.length == 0) {
                                                 data = [];
+                                                // data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+                                                // data[5] = true;
+
                                                 data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
+                                                data[1] = "";
+                                                data[2] = "";
+                                                data[3] = "";
+                                                data[4] = "";
                                                 data[5] = true;
+                                                data[6] = 0;
+                                                data[7] = 1;
+
                                                 papuDataArr[0] = data;
                                             }
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');

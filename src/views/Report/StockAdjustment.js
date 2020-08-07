@@ -888,7 +888,7 @@ class StockAdjustmentComponent extends Component {
 
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
                                     <div className="controls SelectGo">
                                            <MultiSelect
                                                 name="planningUnitId"

@@ -7875,7 +7875,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <div className="row">
                                                     <FormGroup className="col-md-4 mb-1">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                        <div className="controls Supplyfeild">
+                                                        <div className="controls ">
                                                             <InputGroup>
                                                                 <Input type="select"
                                                                     bsSize="sm"
@@ -7891,7 +7891,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     </FormGroup>
                                                     <FormGroup className="col-md-4 mb-1">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                        <div className="controls Supplyfeild">
+                                                        <div className="controls ">
                                                             <InputGroup>
                                                                 <Input
                                                                     type="select"

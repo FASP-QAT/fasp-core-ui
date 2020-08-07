@@ -327,7 +327,7 @@ class DefaultHeaderDropdown extends Component {
                 </div>
               </ModalBody>
               <ModalFooter>
-
+              <Button color="success" >Back</Button>
                 <Button color="success" onClick={this.togglebugreport}>Submit</Button>
               </ModalFooter>
             </div>}
@@ -344,6 +344,10 @@ class DefaultHeaderDropdown extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangeadditional} action><i className="icon-note  icons helpclickicon mr-2"></i> Planning Unit <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangeadditional} action>  <i className="icon-note icons helpclickicon mr-2"></i>Forecasting Units <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                   </ListGroup>
+                  <ModalFooter>
+                       <Button color="success" >Back</Button>
+                        {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
+                  </ModalFooter>
                 </div>}
                 {this.state.showAdditionalData == 1 && <div className="col-md-12">
                   <h4>Add/Update Planning Unit</h4>
