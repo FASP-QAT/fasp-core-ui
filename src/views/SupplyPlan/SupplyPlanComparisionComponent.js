@@ -107,7 +107,7 @@ export default class SupplyPlanComponent extends React.Component {
             monthsArray: [],
             programList: [],
             planningUnitList: [],
-            planningUnitName: [],
+            planningUnitName: "",
             regionList: [],
             consumptionTotalData: [],
             shipmentsTotalData: [],
@@ -3990,7 +3990,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th style={{ textAlign: 'center' }} colspan="2">{i18n.t('static.supplyPlan.total')}</th>
+                                    <th style={{ textAlign: 'center' }} colSpan="2">{i18n.t('static.supplyPlan.total')}</th>
                                     <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                 </tr>
                             </tfoot>

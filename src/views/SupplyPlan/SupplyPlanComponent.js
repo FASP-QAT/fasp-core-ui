@@ -28,6 +28,8 @@ import "jspdf-autotable";
 import csvicon from '../../assets/img/csv.png'
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ShipmentsInSupplyPlanComponent from "./ShipmentsInSupplyPlan";
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -113,7 +115,7 @@ export default class SupplyPlanComponent extends React.Component {
             monthsArray: [],
             programList: [],
             planningUnitList: [],
-            planningUnitName: [],
+            planningUnitName: "",
             regionList: [],
             consumptionTotalData: [],
             shipmentsTotalData: [],
@@ -1190,7 +1192,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th style={{ textAlign: 'center' }} colspan="2">{i18n.t('static.supplyPlan.total')}</th>
+                                        <th style={{ textAlign: 'center' }} colSpan="2">{i18n.t('static.supplyPlan.total')}</th>
                                         <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                     </tr>
                                 </tfoot>
@@ -1265,9 +1267,10 @@ export default class SupplyPlanComponent extends React.Component {
     };
 
     getPlanningUnitList(event) {
-
+        document.getElementById("planningUnitId").value = 0;
         this.setState({
-            display: 'none'
+            display: 'none',
+            planningUnitChange:false
         })
         var db1;
         var storeOS;
@@ -5686,7 +5689,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     id="planningUnitId"
                                                                     bsSize="sm"
                                                                     value={this.state.planningUnitId}
-                                                                    onChange={() => { this.formSubmit(this.state.monthCount); this.refs.compareChild.formSubmit(0) }}
+                                                                    onChange={() => { this.formSubmit(this.state.monthCount) }}
                                                                 >
                                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                                     {planningUnits}

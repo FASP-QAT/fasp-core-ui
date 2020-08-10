@@ -996,7 +996,7 @@
     "static.whatIf.scenarioList": "Scenario List",
     "static.whatIf.increaseConsumption": "Increase consumption",
     "static.whatIf.decreaseConsumption": "Decrease consumption",
-    "static.whatIf.removeUnFundedShipments": "Remove all un funded shipments",
+    "static.whatIf.removeUnFundedShipments": "Remove all unfunded shipments",
     "static.supplyPlan.currentSupplyPlan": "Current Supply Plan",
     "static.supplyPlan.supplyPlanForV": "Supply Plan for v",
     "static.whatIf.supplyPlanReset": "Supply plan reseted successfully",
@@ -1048,5 +1048,6 @@
     "static.report.OrderedbudgetStatus": "Approved,Shipped,Arrived,Received",
     "static.shipment.shipmentDates": "Shipment Dates",
     "static.realm.decimalNotAllow": "Decimal Number Not Allowed",
-    "static.realm.negativeNumberNotAllowed": "Negative Number Not Allowed"
+    "static.realm.negativeNumberNotAllowed": "Negative Number Not Allowed",
+    "static.supplyPlan.qatProduct":"QAT Product"
 }

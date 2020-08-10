@@ -152,7 +152,7 @@ export default class WhatIfReportComponent extends React.Component {
             monthsArray: [],
             programList: [],
             planningUnitList: [],
-            planningUnitName: [],
+            planningUnitName: "",
             regionList: [],
             consumptionTotalData: [],
             shipmentsTotalData: [],
@@ -950,9 +950,10 @@ export default class WhatIfReportComponent extends React.Component {
     };
 
     getPlanningUnitList(event) {
-
+        document.getElementById("planningUnitId").value = 0;
         this.setState({
-            display: 'none'
+            display: 'none',
+            planningUnitChange:false
         })
         var db1;
         var storeOS;
@@ -6148,7 +6149,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th style={{ textAlign: 'center' }} colspan="2">{i18n.t('static.supplyPlan.total')}</th>
+                                            <th style={{ textAlign: 'center' }} colSpan="2">{i18n.t('static.supplyPlan.total')}</th>
                                             <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                         </tr>
                                     </tfoot>
@@ -6255,7 +6256,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                     <div className="controls Supplyfeild">
                                         <InputGroup>
                                             <Input
