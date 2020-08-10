@@ -5704,7 +5704,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.skippedEmergencyShipments')}</span></li>
                                                     </ul> */}
                                                 </div>
-                                                <FormGroup className="col-md-12 mt-2">
+                                                <FormGroup className="col-md-12 mt-2 pl-0">
                                                         <ul className="legendcommitversion list-group">
                                                             <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                                             <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
@@ -5713,7 +5713,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         
                                                         </ul>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-12 " style={{marginLeft:'-8px'}}>
+                                                    <FormGroup className="col-md-12 pl-0" style={{marginLeft:'-8px'}}>
                                                         <ul className="legendcommitversion list-group">
                                                             <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> Min Months - 3</span></li>
                                                             <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">Reorder - 4</span></li>

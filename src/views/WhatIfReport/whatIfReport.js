@@ -6274,14 +6274,15 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-4">
+                              
+                            </div>
+                            <FormGroup className="col-md-12 mt-2 pl-0">
                                 <ul className="legendcommitversion mt-3 list-group">
                                     <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                     <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
                                     <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
                                 </ul>
                                 </FormGroup>
-                            </div>
                         </Col>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
                             <Row>
