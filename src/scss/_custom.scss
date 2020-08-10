@@ -848,8 +848,10 @@ label.arrow_label:after {
   height: calc(1.5em + 0.5rem + -2px)!important;
     padding: 0.25rem 0.5rem!important;
 }
-
-
+// Readonly background transperant made after conversion
+.LanguageremoveReadonlybackground .jexcel_content .draggable tr .readonly{
+  background: transparent!important;
+}
 
 
 // .realmcountrypUnitTd{text-align: right !important;}
