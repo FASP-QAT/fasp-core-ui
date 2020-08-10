@@ -857,7 +857,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.expiredStockArr.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                if (item1.qty != 0) {
+                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                } else {
+                                                    return (<td align="right"></td>)
+                                                }
                                             } else {
                                                 return (<td align="right">{item1}</td>)
                                             }
@@ -1119,14 +1123,6 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
                             </div>
-                            <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                            <div className="table-responsive">
-                                <div id="shipmentBatchInfoTable"></div>
-                            </div>
-
-                            <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                            </div>
 
                             <h6 className="red">{this.state.qtyCalculatorValidationError}</h6>
                             <div className="table-responsive">
@@ -1139,6 +1135,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                             <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
                                 {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
+                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </div>
 
                             <h6 className="red">{this.state.shipmentDatesError}</h6>
@@ -1147,6 +1144,15 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
                             <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                                 {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
+                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </div>
+                            <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
+                            <div className="table-responsive">
+                                <div id="shipmentBatchInfoTable"></div>
+                            </div>
+                            <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </div>
                         </ModalBody>
                         <ModalFooter>
@@ -1184,8 +1190,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                        <th style={{ textAlign: 'left' }}></th>
+                                        <th style={{ textAlign: 'center' }} colspan="2">{i18n.t('static.supplyPlan.total')}</th>
                                         <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                     </tr>
                                 </tfoot>
@@ -2562,6 +2567,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             jsonArrForGraph.push(json);
                         }
+                        console.log("Total exipred stock array", totalExpiredStockArr);
                         this.setState({
                             suggestedShipmentsTotalData: suggestedShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
@@ -5810,7 +5816,36 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             [parameterName]: value
         })
+    }
 
+    actionCanceledShipments(type) {
+        if (type == "qtyCalculator") {
+            document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
+            this.setState({
+                qtyCalculatorValidationError: "",
+                shipmentQtyChangedFlag: 0
+            })
+        } else if (type == "shipmentDates") {
+            document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
+            this.setState({
+                shipmentDatesChangedFlag: 0,
+                shipmentDatesError: ""
+            })
+        } else if (type == "shipmentBatch") {
+            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
+            this.setState({
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentValidationBatchError: "",
+                shipmentBatchInfoDuplicateError: ""
+            })
+        }
     }
 
 }
