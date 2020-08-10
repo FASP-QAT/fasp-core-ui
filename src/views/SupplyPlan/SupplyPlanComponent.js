@@ -491,7 +491,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#cfd5ea',
+                        backgroundColor: '#a5c5ec',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -503,7 +503,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.ordered'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#8aa9e6',
+                        backgroundColor: '#20a8d8',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -539,7 +539,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 2,
                         type: 'line',
                         yAxisID: 'A',
-                        borderColor: 'rgba(179,181,158,1)',
+                        borderColor: '#4dbd74',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -555,7 +555,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 3,
                         yAxisID: 'A',
                         backgroundColor: 'transparent',
-                        borderColor: 'rgba(255.102.102.1)',
+                        borderColor: '#F48521',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -572,7 +572,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 4,
                         yAxisID: 'B',
                         backgroundColor: 'transparent',
-                        borderColor: '#f4862a',
+                        borderColor: '#ED5626',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -589,7 +589,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 5,
                         yAxisID: 'B',
                         backgroundColor: 'rgba(255,193,8,0.2)',
-                        borderColor: '#f86c6b',
+                        borderColor: '#118b70',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
                         fill: '+1',
@@ -609,7 +609,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 6,
                         yAxisID: 'B',
                         backgroundColor: 'rgba(0,0,0,0)',
-                        borderColor: '#ffc107',
+                        borderColor: '#EDB944',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
                         fill: true,
@@ -644,8 +644,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                             </div>
                         {/* </Row> */}
-                        <div className="table-responsive" style={{overflowX:'hidden'}}>
-                        <Table className="table-bordered text-center mt-2 overflowhide" bordered  size="sm"  options={this.options}>
+                       
+                        <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm"  options={this.options}>
                             <thead>
                                 <tr>
                                     <th className="BorderNoneSupplyPlan"></th>
@@ -925,7 +925,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                             </tbody>
                         </Table>
-                        </div>
+                        
                         <div className="row" >
                             {
                                 this.state.jsonArrForGraph.length > 0
