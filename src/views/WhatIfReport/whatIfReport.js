@@ -5601,7 +5601,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                                 </div>
                             </Row>
-                            <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
+                            <div className="table-responsive" style={{overflowX:'hidden'}}>
+                            <Table className="table-bordered text-center mt-2 overflowhide" bordered  size="sm" options={this.options}>
                                 <thead>
                                     <tr>
                                         <th className="BorderNoneSupplyPlan"></th>
@@ -5882,6 +5883,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tr>
                                 </tbody>
                             </Table>
+                            </div>
                             <div className="row" >
                                 {
                                     this.state.jsonArrForGraph.length > 0
@@ -6272,14 +6274,15 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-4">
+                              
+                            </div>
+                            <FormGroup className="col-md-12 mt-2 pl-0">
                                 <ul className="legendcommitversion mt-3 list-group">
                                     <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                     <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
                                     <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
                                 </ul>
                                 </FormGroup>
-                            </div>
                         </Col>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
                             <Row>

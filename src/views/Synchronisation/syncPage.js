@@ -1367,7 +1367,7 @@ export default class syncPage extends Component {
                         </div>
 
                       </FormGroup>
-                      <div className="col-md-10">
+                      <div className="col-md-11 ml-2 mt-2">
                         <ul class="legendcommitversion">
                           <li><span class="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
                           <li><span class=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.newDataCurrentVersion')} </span></li>
