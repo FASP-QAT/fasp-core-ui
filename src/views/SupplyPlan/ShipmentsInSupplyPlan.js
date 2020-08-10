@@ -213,7 +213,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             shipmentMode = 2;
                                         }
                                         var erpType = "hidden";
-                                        if (shipmentList[i].erpFlag.toString() == "true") {
+                                        if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
                                             erpType = "text";
                                         }
                                         var orderNoAndPrimeLineNo = "";
@@ -366,51 +366,52 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 }.bind(this)
                                             });
                                             var rowData = obj.getRowData(y);
-                                            items.push({
-                                                title: i18n.t('static.supplyPlan.qtyCalculator'),
-                                                onclick: function () {
-                                                    if (this.props.shipmentPage == "shipmentDataEntry") {
-                                                        this.props.updateState("shipmentModalTitle", i18n.t("static.supplyPlan.qtyCalculator"));
-                                                        this.props.toggleLarge();
-                                                    }
-                                                    document.getElementById("showSaveQtyButtonDiv").style.display = 'block';
-                                                    this.el = jexcel(document.getElementById("qtyCalculatorTable"), '');
-                                                    this.el.destroy();
-                                                    var json = [];
-                                                    var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[2] && p.planningUnit.id == planningUnitId)[0];
-                                                    var moq = procurementAgentPlanningUnit.moq;
-                                                    var unitsPerPalletEuro1 = procurementAgentPlanningUnit.unitsPerPalletEuro1;
-                                                    var unitsPerPalletEuro2 = procurementAgentPlanningUnit.unitsPerPalletEuro2;
-                                                    var unitsPerContainer = procurementAgentPlanningUnit.unitsPerContainer;
-                                                    var roundingOptionType = "hidden";
-                                                    if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) {
-                                                        roundingOptionType = "dropdown";
-                                                    }
-                                                    var orderBasedOn = [];
-                                                    orderBasedOn.push({ id: 5, name: i18n.t('static.supplyPlan.none') });
-                                                    if (moq != 0 && moq != null) {
-                                                        orderBasedOn.push({ id: 2, name: i18n.t('static.procurementAgentPlanningUnit.moq') });
-                                                    }
-                                                    if (unitsPerContainer != 0 && unitsPerContainer != null) {
-                                                        orderBasedOn.push({ id: 1, name: i18n.t('static.supplyPlan.container') })
-                                                    }
-                                                    if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) {
-                                                        orderBasedOn.push({ id: 3, name: i18n.t('static.supplyPlan.palletEuro1') })
-                                                    }
-                                                    if (unitsPerPalletEuro2 != 0 && unitsPerPalletEuro2 != null) {
-                                                        orderBasedOn.push({ id: 4, name: i18n.t('static.supplyPlan.palletEuro2') })
-                                                    }
-                                                    var tableEditable = true;
-                                                    if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
-                                                        tableEditable = false;
-                                                    }
-                                                    var data = [];
-                                                    data[0] = 2;//A
-                                                    data[1] = rowData[22];//B
-                                                    data[2] = rowData[8];//C
-                                                    data[3] = 5;//D
-                                                    data[4] = "";//E
-                                                    data[5] = `=IF(
+                                            if (rowData[2] != "") {
+                                                items.push({
+                                                    title: i18n.t('static.supplyPlan.qtyCalculator'),
+                                                    onclick: function () {
+                                                        if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                            this.props.updateState("shipmentModalTitle", i18n.t("static.supplyPlan.qtyCalculator"));
+                                                            this.props.toggleLarge();
+                                                        }
+                                                        document.getElementById("showSaveQtyButtonDiv").style.display = 'block';
+                                                        this.el = jexcel(document.getElementById("qtyCalculatorTable"), '');
+                                                        this.el.destroy();
+                                                        var json = [];
+                                                        var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[2] && p.planningUnit.id == planningUnitId)[0];
+                                                        var moq = procurementAgentPlanningUnit.moq;
+                                                        var unitsPerPalletEuro1 = procurementAgentPlanningUnit.unitsPerPalletEuro1;
+                                                        var unitsPerPalletEuro2 = procurementAgentPlanningUnit.unitsPerPalletEuro2;
+                                                        var unitsPerContainer = procurementAgentPlanningUnit.unitsPerContainer;
+                                                        var roundingOptionType = "hidden";
+                                                        if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) {
+                                                            roundingOptionType = "dropdown";
+                                                        }
+                                                        var orderBasedOn = [];
+                                                        orderBasedOn.push({ id: 5, name: i18n.t('static.supplyPlan.none') });
+                                                        if (moq != 0 && moq != null) {
+                                                            orderBasedOn.push({ id: 2, name: i18n.t('static.procurementAgentPlanningUnit.moq') });
+                                                        }
+                                                        if (unitsPerContainer != 0 && unitsPerContainer != null) {
+                                                            orderBasedOn.push({ id: 1, name: i18n.t('static.supplyPlan.container') })
+                                                        }
+                                                        if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) {
+                                                            orderBasedOn.push({ id: 3, name: i18n.t('static.supplyPlan.palletEuro1') })
+                                                        }
+                                                        if (unitsPerPalletEuro2 != 0 && unitsPerPalletEuro2 != null) {
+                                                            orderBasedOn.push({ id: 4, name: i18n.t('static.supplyPlan.palletEuro2') })
+                                                        }
+                                                        var tableEditable = true;
+                                                        if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
+                                                            tableEditable = false;
+                                                        }
+                                                        var data = [];
+                                                        data[0] = 2;//A
+                                                        data[1] = rowData[22];//B
+                                                        data[2] = rowData[8];//C
+                                                        data[3] = 5;//D
+                                                        data[4] = "";//E
+                                                        data[5] = `=IF(
                                                         D${parseInt(0) + 1}==5,
                                                         IF(A${parseInt(0) + 1}==1,B${parseInt(0) + 1},C${parseInt(0) + 1}),
                                                         IF(
@@ -439,98 +440,33 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 )
                                                         )
                                                 )`;//F
-                                                    data[6] = y;//G
-                                                    data[7] = moq;//H
-                                                    data[8] = unitsPerPalletEuro1;//I
-                                                    data[9] = unitsPerPalletEuro2;//J
-                                                    data[10] = unitsPerContainer;//K
-                                                    data[11] = `=ROUND(IF(A1==1,B1,C1)/I1,2)`;//L
-                                                    data[12] = `=ROUND(IF(A1==1,B1,C1)/J1,2)`;//M
-                                                    data[13] = `=ROUND(IF(A1==1,B1,C1)/K1,2)`;//N
-                                                    json.push(data)
-                                                    var options = {
-                                                        data: json,
-                                                        columnDrag: true,
-                                                        columns: [
-                                                            { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.supplyPlan.suggestedOrderQty') }, { id: 2, name: i18n.t('static.supplyPlan.manualOrderQty') }], width: 120 },
-                                                            { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
-                                                            { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', mask: '#,##', width: 120 },
-                                                            { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
-                                                            { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
-                                                            { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', readOnly: true, mask: '#,##', width: 120 },
-                                                            { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
-                                                            { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.procurementUnit.unitsPerContainer'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro1'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro2'), width: 0 },
-                                                            { type: 'hidden', title: i18n.t('static.procurementUnit.noOfContainers'), width: 0 },
-                                                        ],
-                                                        pagination: false,
-                                                        search: false,
-                                                        columnSorting: true,
-                                                        tableOverflow: true,
-                                                        wordWrap: true,
-                                                        allowInsertColumn: false,
-                                                        allowManualInsertColumn: false,
-                                                        allowDeleteRow: false,
-                                                        copyCompatibility: true,
-                                                        allowInsertRow: false,
-                                                        allowManualInsertRow: false,
-                                                        allowExport: false,
-                                                        editable: tableEditable,
-                                                        onchange: this.shipmentQtyChanged,
-                                                        text: {
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
-                                                        onload: this.loadedQtyCalculator,
-                                                        updateTable: function (el, cell, x, y, source, value, id) {
-                                                            var elInstance = el.jexcel;
-                                                            var orderBasedOn = elInstance.getRowData(y)[3];
-                                                            if (orderBasedOn == 1 || orderBasedOn == 3 || orderBasedOn == 4) {
-                                                                var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
-                                                                cell.classList.remove('readonly');
-                                                            } else {
-                                                                var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
-                                                                cell.classList.add('readonly');
-                                                            }
-                                                        }
-
-                                                    }
-                                                    var elVar = jexcel(document.getElementById("qtyCalculatorTable"), options);
-                                                    this.el = elVar;
-                                                    this.setState({ qtyCalculatorTableEl: elVar });
-                                                    if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) {
-                                                        var data1 = [];
-                                                        var json1 = []
-                                                        data1[0] = moq;//A
-                                                        data1[1] = unitsPerPalletEuro1;//B
-                                                        data1[2] = unitsPerPalletEuro2;//C
-                                                        data1[3] = unitsPerContainer;//D
-                                                        data1[4] = `=ROUND(IF(H1==1,I1,J1)/B1,2)`;//E
-                                                        data1[5] = `=ROUND(IF(H1==1,I1,J1)/C1,2)`;//F
-                                                        data1[6] = `=ROUND(IF(H1==1,I1,J1)/D1,2)`;//G
-                                                        data1[7] = 2;//H
-                                                        data1[8] = rowData[22];//I
-                                                        data1[9] = rowData[8];//J
-                                                        json1.push(data1)
-                                                        var options1 = {
-                                                            data: json1,
+                                                        data[6] = y;//G
+                                                        data[7] = moq;//H
+                                                        data[8] = unitsPerPalletEuro1;//I
+                                                        data[9] = unitsPerPalletEuro2;//J
+                                                        data[10] = unitsPerContainer;//K
+                                                        data[11] = `=ROUND(IF(A1==1,B1,C1)/I1,2)`;//L
+                                                        data[12] = `=ROUND(IF(A1==1,B1,C1)/J1,2)`;//M
+                                                        data[13] = `=ROUND(IF(A1==1,B1,C1)/K1,2)`;//N
+                                                        json.push(data)
+                                                        var options = {
+                                                            data: json,
                                                             columnDrag: true,
                                                             columns: [
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##', width: 120 },
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##', width: 120 },
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##', width: 120 },
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##', width: 120 },
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
-                                                                { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
-                                                                { type: 'hidden' },
-                                                                { type: 'hidden' },
-                                                                { type: 'hidden' }
+                                                                { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.supplyPlan.suggestedOrderQty') }, { id: 2, name: i18n.t('static.supplyPlan.manualOrderQty') }], width: 120 },
+                                                                { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
+                                                                { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', mask: '#,##', width: 120 },
+                                                                { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
+                                                                { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
+                                                                { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', readOnly: true, mask: '#,##', width: 120 },
+                                                                { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
+                                                                { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
+                                                                { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },
+                                                                { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), width: 0 },
+                                                                { type: 'hidden', title: i18n.t('static.procurementUnit.unitsPerContainer'), width: 0 },
+                                                                { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro1'), width: 0 },
+                                                                { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro2'), width: 0 },
+                                                                { type: 'hidden', title: i18n.t('static.procurementUnit.noOfContainers'), width: 0 },
                                                             ],
                                                             pagination: false,
                                                             search: false,
@@ -544,22 +480,87 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             allowInsertRow: false,
                                                             allowManualInsertRow: false,
                                                             allowExport: false,
-                                                            editable: false,
+                                                            editable: tableEditable,
+                                                            onchange: this.shipmentQtyChanged,
                                                             text: {
                                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                                 show: '',
                                                                 entries: '',
                                                             },
-                                                            onload: this.loadedQtyCalculator1,
+                                                            onload: this.loadedQtyCalculator,
+                                                            updateTable: function (el, cell, x, y, source, value, id) {
+                                                                var elInstance = el.jexcel;
+                                                                var orderBasedOn = elInstance.getRowData(y)[3];
+                                                                if (orderBasedOn == 1 || orderBasedOn == 3 || orderBasedOn == 4) {
+                                                                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                                    cell.classList.remove('readonly');
+                                                                } else {
+                                                                    var cell = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                                    cell.classList.add('readonly');
+                                                                }
+                                                            }
 
                                                         }
-                                                        var elVar1 = jexcel(document.getElementById("qtyCalculatorTable1"), options1);
-                                                        this.el = elVar1;
-                                                        this.setState({ qtyCalculatorTableEl1: elVar1 });
-                                                    }
-                                                }.bind(this)
-                                            });
+                                                        var elVar = jexcel(document.getElementById("qtyCalculatorTable"), options);
+                                                        this.el = elVar;
+                                                        this.setState({ qtyCalculatorTableEl: elVar });
+                                                        if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) {
+                                                            var data1 = [];
+                                                            var json1 = []
+                                                            data1[0] = moq;//A
+                                                            data1[1] = unitsPerPalletEuro1;//B
+                                                            data1[2] = unitsPerPalletEuro2;//C
+                                                            data1[3] = unitsPerContainer;//D
+                                                            data1[4] = `=ROUND(IF(H1==1,I1,J1)/B1,2)`;//E
+                                                            data1[5] = `=ROUND(IF(H1==1,I1,J1)/C1,2)`;//F
+                                                            data1[6] = `=ROUND(IF(H1==1,I1,J1)/D1,2)`;//G
+                                                            data1[7] = 2;//H
+                                                            data1[8] = rowData[22];//I
+                                                            data1[9] = rowData[8];//J
+                                                            json1.push(data1)
+                                                            var options1 = {
+                                                                data: json1,
+                                                                columnDrag: true,
+                                                                columns: [
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
+                                                                    { type: 'hidden' },
+                                                                    { type: 'hidden' },
+                                                                    { type: 'hidden' }
+                                                                ],
+                                                                pagination: false,
+                                                                search: false,
+                                                                columnSorting: true,
+                                                                tableOverflow: true,
+                                                                wordWrap: true,
+                                                                allowInsertColumn: false,
+                                                                allowManualInsertColumn: false,
+                                                                allowDeleteRow: false,
+                                                                copyCompatibility: true,
+                                                                allowInsertRow: false,
+                                                                allowManualInsertRow: false,
+                                                                allowExport: false,
+                                                                editable: false,
+                                                                text: {
+                                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                    show: '',
+                                                                    entries: '',
+                                                                },
+                                                                onload: this.loadedQtyCalculator1,
 
+                                                            }
+                                                            var elVar1 = jexcel(document.getElementById("qtyCalculatorTable1"), options1);
+                                                            this.el = elVar1;
+                                                            this.setState({ qtyCalculatorTableEl1: elVar1 });
+                                                        }
+                                                    }.bind(this)
+                                                });
+                                            }
                                             if (rowData[2] != "" && rowData[7] != "") {
                                                 items.push({
                                                     title: i18n.t('static.supplyPlan.showShipmentDates'),
@@ -1489,15 +1490,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance1 = this.state.qtyCalculatorTableEl1;
         var rowData = elInstance.getRowData(y);
         if (x == 0) {
-            elInstance1.setValueFromCoords(7, 0, value, true);
+            if (elInstance1 != undefined) {
+                elInstance1.setValueFromCoords(7, 0, value, true);
+            }
         }
 
         if (x == 1) {
-            elInstance1.setValueFromCoords(8, 0, value, true);
+            if (elInstance1 != undefined) {
+                elInstance1.setValueFromCoords(8, 0, value, true);
+            }
         }
 
         if (x == 2) {
-            elInstance1.setValueFromCoords(9, 0, value, true);
+            if (elInstance1 != undefined) {
+                elInstance1.setValueFromCoords(9, 0, value, true);
+            }
         }
 
         if (x == 4) {
