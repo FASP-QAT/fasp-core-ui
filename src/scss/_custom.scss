@@ -2328,7 +2328,7 @@ input::placeholder {
     margin-top: -3%;
   }
   /* commit version legend */
-  .legendcommitversion { list-style: none;display: inline-flex; }
+  .legendcommitversion { list-style: none;display: table-row; }
   .legendcommitversion li { float: left; margin-right: 10px; }
   .legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
   
@@ -3012,3 +3012,4 @@ border-radius: 2em;
   right: 12px;
   color: #697069 !important;
 }
+

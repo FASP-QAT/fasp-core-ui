@@ -5688,16 +5688,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 mb-1">
-                                                        <ul className="legendcommitversion list-group">
-                                                            <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                            <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
-                                                            {/* <li><span className="Updated1legend legendcolor"></span> <span className="legendcommitversionText"> update1</span></li> */}
-
-                                                            {/* <li><span className=" lightGreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleProcurementAgent')} </span></li> */}
-                                                        </ul>
-                                                    </FormGroup>
+                                                    
 
                                                     {/* <ul className="legend legendsync mt-0" >
                                                         <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  {i18n.t('static.supplyPlan.skippedShipments')}</span></li>
@@ -5705,6 +5696,24 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.skippedEmergencyShipments')}</span></li>
                                                     </ul> */}
                                                 </div>
+                                                <FormGroup className="col-md-12 mt-2">
+                                                        <ul className="legendcommitversion list-group">
+                                                            <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                                            <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                                        
+                                                        </ul>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-12 ">
+                                                        <ul className="legendcommitversion list-group">
+                                                            <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> Min Months - 3</span></li>
+                                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">Reorder - 4</span></li>
+                                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">Months In Past - 3</span></li>
+                                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">Months In Future -3</span></li>
+                                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">Shelf Life - 24</span></li>
+                                                        
+                                                        </ul>
+                                                    </FormGroup>
                                             </Col>
                                         </Form>
                                     )} />
