@@ -318,56 +318,56 @@ class ApplicationDashboard extends Component {
 
     this.hideFirstComponent();
     console.log("====== in application dasboard =======");
-    var problemActionList = [];
-    var db1;
-    var storeOS;
-    getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
-    openRequest.onsuccess = function (e) {
-      var realmId = AuthenticationService.getRealmId();
-      var programList = [];
-      db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-        this.setState({
-          supplyPlanError: i18n.t('static.program.errortext')
-        })
-      };
-      getRequest.onsuccess = function (event) {
-        qatProblemActions();
-        var latestVersionProgramList = [];
-        for (var i = 0; i < getRequest.result.length; i++) {
-          var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          programList.push(programJson);
+   
+    // var problemActionList = [];
+    // var db1;
+    // var storeOS;
+    // getDatabase();
+    // var openRequest = indexedDB.open('fasp', 1);
+    // openRequest.onsuccess = function (e) {
+    //   var realmId = AuthenticationService.getRealmId();
+    //   var programList = [];
+    //   db1 = e.target.result;
+    //   var transaction = db1.transaction(['programData'], 'readwrite');
+    //   var program = transaction.objectStore('programData');
+    //   var getRequest = program.getAll();
+    //   getRequest.onerror = function (event) {
+    //     this.setState({
+    //       supplyPlanError: i18n.t('static.program.errortext')
+    //     })
+    //   };
+    //   getRequest.onsuccess = function (event) {
+    //     qatProblemActions();
+    //     var latestVersionProgramList = [];
+    //     for (var i = 0; i < getRequest.result.length; i++) {
+    //       var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+    //       var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+    //       var programJson = JSON.parse(programData);
+    //       programList.push(programJson);
 
-        }
-        for (var d = 0; d < programList.length; d++) {
-          var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
-          if (index == -1) {
-            latestVersionProgramList.push(programList[d]);
-          } else {
-            var versionId = latestVersionProgramList[index].currentVersion.versionId;
-            if (versionId < programList[d].currentVersion.versionId) {
-              latestVersionProgramList[index] = programList[d];
-            }
-          }
+    //     }
+    //     for (var d = 0; d < programList.length; d++) {
+    //       var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
+    //       if (index == -1) {
+    //         latestVersionProgramList.push(programList[d]);
+    //       } else {
+    //         var versionId = latestVersionProgramList[index].currentVersion.versionId;
+    //         if (versionId < programList[d].currentVersion.versionId) {
+    //           latestVersionProgramList[index] = programList[d];
+    //         }
+    //       }
 
-        }
-        programList = latestVersionProgramList;
-        for (var pp = 0; pp < programList.length; pp++) {
-          problemActionList = problemActionList.concat(programList[pp].problemReportList);
-          // array1.concat(array2)
-        }
-        // console.log("problemActionList====>", problemActionList);
-        var filteredProblemActionList = problemActionList.filter(c => c.problemStatus.id == 1);
-        this.setState({ problemActionList: filteredProblemActionList });
-      }.bind(this);
-    }.bind(this);
-    // console.log("problemActionlist ==========", problemActionList);
+    //     }
+    //     programList = latestVersionProgramList;
+    //     for (var pp = 0; pp < programList.length; pp++) {
+    //       problemActionList = problemActionList.concat(programList[pp].problemReportList);
+    //       // array1.concat(array2)
+    //     }
+    //     var filteredProblemActionList = problemActionList.filter(c => c.problemStatus.id == 1);
+    //     this.setState({ problemActionList: filteredProblemActionList });
+    //   }.bind(this);
+    // }.bind(this);
+    
   }
 
 
@@ -761,7 +761,7 @@ class ApplicationDashboard extends Component {
             </Card>
           </Col>
         </Row>
-        <Row className="mt-2">
+        {/* <Row className="mt-2">
           <Col md="12">
             <Card>
               <CardHeader className="text-center">QAT Problems</CardHeader>
@@ -797,7 +797,7 @@ class ApplicationDashboard extends Component {
               </CardBody>
             </Card>
           </Col>
-        </Row>
+        </Row> */}
         {/* <Row className="mt-2">
           <Col md="12">
             <Card> */}

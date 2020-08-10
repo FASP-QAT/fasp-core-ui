@@ -232,6 +232,13 @@ const Budgets = React.lazy(() => import('./views/Report/Budgets'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+
+  { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
+  { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'Shipment Details', component: ShipmentList },
+  { path: '/report/addProblem/:color/:message', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
+  { path: '/report/problemList/:color/:message', name:'Qat Problem List', component: ProblemList },
+  // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
+
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
   { path: '/report/inventoryTurns', name: ' Inventory Turns', component: InventoryTurnsReport },
   { path: '/report/costOfInventory', name: ' Cost Of Inventory', component: CostOfInventoryReport },

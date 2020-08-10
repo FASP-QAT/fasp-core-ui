@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, CardBody, CardFooter, FormGroup, Label, Input, Table, Button } from 'reactstrap';
 import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 export default class AddProblem extends Component {
 

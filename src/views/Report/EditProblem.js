@@ -69,6 +69,7 @@ export default class EditLanguageComponent extends Component {
             notes: '',
             message: '',
             data: [],
+            problemStatusList: [],
             problemReport: {
                 "problemReportId": "",
                 "program": {
@@ -342,6 +343,9 @@ export default class EditLanguageComponent extends Component {
         }
     }
     componentDidMount() {
+        // var bfList = AuthenticationService.getLoggedInUserRoleBusinessFunctionArray();
+        // console.log("bfList#####====>", bfList);
+        
         AuthenticationService.setupAxiosInterceptors();
         let problemReportId = this.props.match.params.problemReportId;
         let programId = this.props.match.params.programId;
@@ -406,6 +410,32 @@ export default class EditLanguageComponent extends Component {
                     }
 
 
+                    var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                    var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
+                    var problemStatusRequest = problemStatusOs.getAll();
+
+                    problemStatusRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    problemStatusRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = problemStatusRequest.result;
+                        var proList = []
+                        for (var i = 0; i < myResult.length; i++) {
+                            var Json = {
+                                name: getLabelText(myResult[i].label, lan),
+                                id: myResult[i].id
+                            }
+                            proList[i] = Json
+                        }
+                        this.setState({
+                            problemStatusList: proList
+                        })
+
+
+                    }.bind(this);
+
+
                 }.bind(this)
             }.bind(this)
         }
@@ -414,6 +444,16 @@ export default class EditLanguageComponent extends Component {
 
 
     render() {
+
+        const { problemStatusList } = this.state;
+        let problemStatus = problemStatusList.length > 0
+            && problemStatusList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -837,7 +877,7 @@ export default class EditLanguageComponent extends Component {
 
                                                         <div className="row">
                                                             <FormGroup className="col-md-3 ">
-                                                                <Label htmlFor="action">Problem Status<span class="red Reqasterisk">*</span></Label>
+                                                                <Label htmlFor="action">{i18n.t('static.report.problemStatus')}<span class="red Reqasterisk">*</span></Label>
 
                                                                 <Input type="select"
                                                                     bsSize="sm"
@@ -849,10 +889,8 @@ export default class EditLanguageComponent extends Component {
                                                                     required
                                                                     value={this.state.problemStatusInputId}
                                                                 >
-                                                                    <option value="">Please select</option>
-                                                                    <option value="1">Open</option>
-                                                                    <option value="2">Closed</option>
-                                                                    <option value="3">Received</option>
+                                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                                    {problemStatus}
                                                                 </Input>
                                                                 <FormFeedback className="red">{errors.problemStatusInputId}</FormFeedback>
                                                             </FormGroup>

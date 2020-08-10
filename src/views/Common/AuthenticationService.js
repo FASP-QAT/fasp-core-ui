@@ -1073,6 +1073,14 @@ class AuthenticationService {
                     break;
                 case "/problem/editProblem": return true
                     break;
+                case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
+                    break;
+                case "/report/problemList/:color/:message": return true
+                    break;
+                case "/report/addProblem/:color/:message": return true
+                    break;
+                case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId": return true
+                    break;
                 default:
                     console.log("Inside default-");
                     return false;
