@@ -215,11 +215,6 @@
 //---------------------------JEXCEL CONVERSION FROM BOOTSTRAP-------------------------------//
 
 
-
-
-
-
-
 import React, { Component } from 'react';
 import {
     Card, CardHeader, CardBody
@@ -234,6 +229,8 @@ import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+
 const entityname = i18n.t('static.role.role');
 class ListRoleComponent extends Component {
     constructor(props) {
@@ -253,12 +250,12 @@ class ListRoleComponent extends Component {
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+            document.getElementById('div1').style.display = 'none';
         }, 8000);
-        }
-        componentWillUnmount() {
+    }
+    componentWillUnmount() {
         clearTimeout(this.timeout);
-        }
+    }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -278,25 +275,30 @@ class ListRoleComponent extends Component {
         }
     }
 
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
-                    this.setState({ roleList: response.data, selSource: response.data, loading: false },
+                    // this.setState({ roleList: response.data, selSource: response.data, loading: false })
+
+                    this.setState({
+                        roleList: response.data, selSource: response.data, loading: false
+                    },
                         () => {
 
                             let roleList = this.state.roleList;
+                            // console.log("langaugeList---->", langaugeList);
                             let roleArray = [];
                             let count = 0;
 
                             for (var j = 0; j < roleList.length; j++) {
                                 data = [];
-                                data[0] = roleList[j].languageName;
-                                data[1] = roleList[j].languageCode;
-                                
-
+                                data[0] = roleList[j].roleId
+                                data[1] = roleList[j].roleId;
+                                data[2] = getLabelText(roleList[j].label, this.state.lang)
                                 roleArray[count] = data;
                                 count++;
                             }
@@ -304,7 +306,7 @@ class ListRoleComponent extends Component {
                                 data = [];
                                 roleArray[0] = data;
                             }
-                            console.log("roleArray---->", roleArray);
+                            // console.log("roleArray---->", roleArray);
                             this.el = jexcel(document.getElementById("tableDiv"), '');
                             this.el.destroy();
                             var json = [];
@@ -313,17 +315,20 @@ class ListRoleComponent extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [150, 150],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
-
                                     {
-                                        title: i18n.t('static.language.roleid'),
+                                        title: 'roleId',
+                                        type: 'hidden',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.role.roleid'),
                                         type: 'text',
                                         readOnly: true
                                     },
                                     {
-                                        title: i18n.t('static.language.role'),
+                                        title: i18n.t('static.role.role'),
                                         type: 'text',
                                         readOnly: true
                                     }
@@ -342,12 +347,13 @@ class ListRoleComponent extends Component {
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
-                                onchange: this.changed,
+                                onselection: this.selected,
                                 oneditionend: this.onedit,
                                 copyCompatibility: true,
                                 allowExport: false,
                                 paginationOptions: [10, 25, 50],
                                 position: 'top',
+                                contextMenu: false
                             };
                             var roleEl = jexcel(document.getElementById("tableDiv"), options);
                             this.el = roleEl;
@@ -369,10 +375,43 @@ class ListRoleComponent extends Component {
                 }
 
             })
+
+        // .catch(
+        //     error => {
+        //         switch (error.response ? error.response.status : "") {
+
+        //             case 500:
+        //             case 401:
+        //             case 404:
+        //             case 406:
+        //             case 412:
+        //                 this.setState({ message: error.response.data.messageCode });
+        //                 break;
+        //             default:
+        //                 this.setState({ message: 'static.unkownError' });
+        //                 break;
+        //         }
+        //     }
+        // );
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    selected = function (instance, cell, x, y, value) {
+
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                this.props.history.push({
+                    pathname: `/role/editRole/${this.el.getValueFromCoords(0, x)}`,
+                    // state: { role }
+                });
+            }
+        }
+    }.bind(this);
+
+
 
     showRoleLabel(cell, row) {
         return cell.label_en;
@@ -389,6 +428,8 @@ class ListRoleComponent extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
+
+
         return (
             <div className="animated">
 
@@ -404,8 +445,7 @@ class ListRoleComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pt-md-1 pb-md-1">
-                        {/* <div id="loader" className="center"></div> */}
+                    <CardBody className="pb-lg-0  ">
                         <div className="table-responsive">
                             <div id="tableDiv" className="LanguageremoveReadonlybackground">
                             </div>
@@ -428,3 +468,9 @@ class ListRoleComponent extends Component {
     }
 }
 export default ListRoleComponent;
+
+
+
+
+
+
