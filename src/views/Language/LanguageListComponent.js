@@ -350,14 +350,16 @@ export default class LanguageListComponent extends Component {
                         () => {
 
                             let langaugeList = this.state.langaugeList;
+                            // console.log("langaugeList---->", langaugeList);
                             let languageArray = [];
                             let count = 0;
 
                             for (var j = 0; j < langaugeList.length; j++) {
                                 data = [];
-                                data[0] = langaugeList[j].languageName;
-                                data[1] = langaugeList[j].languageCode;
-                                data[2] = langaugeList[j].active;
+                                data[0] = langaugeList[j].languageId
+                                data[1] = langaugeList[j].languageName;
+                                data[2] = langaugeList[j].languageCode;
+                                data[3] = langaugeList[j].active;
 
                                 languageArray[count] = data;
                                 count++;
@@ -366,7 +368,7 @@ export default class LanguageListComponent extends Component {
                                 data = [];
                                 languageArray[0] = data;
                             }
-                            console.log("languageArray---->", languageArray);
+                            // console.log("languageArray---->", languageArray);
                             this.el = jexcel(document.getElementById("tableDiv"), '');
                             this.el.destroy();
                             var json = [];
@@ -378,7 +380,11 @@ export default class LanguageListComponent extends Component {
                                 colWidths: [150, 150, 100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
-
+                                    {
+                                        title: 'LanguageId',
+                                        type: 'hidden',
+                                        readOnly: true
+                                    },
                                     {
                                         title: i18n.t('static.language.language'),
                                         type: 'text',
@@ -413,7 +419,9 @@ export default class LanguageListComponent extends Component {
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
-                                onchange: this.changed,
+                                onselection: this.selected,
+
+
                                 oneditionend: this.onedit,
                                 copyCompatibility: true,
                                 allowExport: false,
@@ -442,6 +450,21 @@ export default class LanguageListComponent extends Component {
 
 
     }
+
+    selected = function (instance, cell, x, y, value) {
+        
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+                this.props.history.push({
+                    pathname: `/language/editLanguage/${this.el.getValueFromCoords(0, x)}`,
+                });
+            }
+        }
+    }.bind(this);
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
