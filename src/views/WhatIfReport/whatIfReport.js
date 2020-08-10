@@ -6091,8 +6091,8 @@ export default class WhatIfReportComponent extends React.Component {
                                 </div>
 
                                 <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
-                                    {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
                                 </div>
 
                                 <h6 className="red">{this.state.shipmentDatesError}</h6>
@@ -6100,8 +6100,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     <div id="shipmentDatesTable"></div>
                                 </div>
                                 <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                                 </div>
                                 <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                                 <div className="table-responsive">
@@ -6109,8 +6109,8 @@ export default class WhatIfReportComponent extends React.Component {
                                 </div>
 
                                 <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 </div>
                             </ModalBody>
                             <ModalFooter>
@@ -6237,10 +6237,10 @@ export default class WhatIfReportComponent extends React.Component {
                     </div>
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                <FormGroup className="">
+                            <div className="row">
+                                <FormGroup  className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls Supplyfeild">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -6254,9 +6254,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup  className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                    <div className="controls Supplyfeild">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -6272,11 +6272,13 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <ul className="legendcommitversion mt-3">
+                                <FormGroup className="col-md-4">
+                                <ul className="legendcommitversion mt-3 list-group">
                                     <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                     <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
                                     <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
                                 </ul>
+                                </FormGroup>
                             </div>
                         </Col>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
