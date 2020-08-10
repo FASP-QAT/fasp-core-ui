@@ -212,7 +212,8 @@ export default class WhatIfReportComponent extends React.Component {
             rows: rows,
             expiredStockDetails: [],
             expiredStockDetailsTotal: 0,
-            showShipments: 0
+            showShipments: 0,
+            paColors: []
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -414,6 +415,7 @@ export default class WhatIfReportComponent extends React.Component {
                         && c.planningUnit.id == planningUnitId
                         && moment(c.consumptionDate).format("YYYY-MM") >= moment(this.state.startDate).format("YYYY-MM")
                         && moment(c.consumptionDate).format("YYYY-MM") <= moment(this.state.stopDate).format("YYYY-MM")
+                        && (c.actualFlag).toString() == "false"
                     );
                     console.log("Consumption List", consumptionFiltered);
                     for (var i = 0; i < consumptionFiltered.length; i++) {
@@ -953,7 +955,7 @@ export default class WhatIfReportComponent extends React.Component {
         document.getElementById("planningUnitId").value = 0;
         this.setState({
             display: 'none',
-            planningUnitChange:false
+            planningUnitChange: false
         })
         var db1;
         var storeOS;
@@ -1174,6 +1176,7 @@ export default class WhatIfReportComponent extends React.Component {
         var unmetDemand = [];
         var unallocatedConsumption = [];
         var unallocatedAdjustments = [];
+        var paColors = [];
         var db1;
         var storeOS;
         getDatabase();
@@ -1204,7 +1207,11 @@ export default class WhatIfReportComponent extends React.Component {
                 var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
                 this.setState({
                     shelfLife: shelfLife,
-                    versionId: programJson.currentVersion.versionId
+                    versionId: programJson.currentVersion.versionId,
+                    monthsInPastForAMC: monthsInPastForAMC,
+                    monthsInFutureForAMC: monthsInFutureForAMC,
+                    reorderFrequency: reorderFrequencyInMonths,
+                    minMonthsOfStock: minMonthsOfStock
                 })
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                 var lastActualConsumptionDateArr = [];
@@ -1563,6 +1570,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1583,6 +1594,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1603,6 +1618,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1623,6 +1642,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1690,6 +1713,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1710,6 +1737,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1730,6 +1761,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1750,6 +1785,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -2117,7 +2156,7 @@ export default class WhatIfReportComponent extends React.Component {
                             var expiredStockQty = 0;
                             var expiredStockJsonArr = []
                             for (var j = 0; j < expiredStock.length; j++) {
-                                expiredStockJsonArr.push({ remainingQty: parseInt((expiredStock[j].remainingQty)), batchNo: (expiredStock[j].batchNo), expiryDate: (expiredStock[j].expiryDate) })
+                                expiredStockJsonArr.push({ remainingQty: parseInt((expiredStock[j].remainingQty)), batchNo: (expiredStock[j].batchNo), expiryDate: (expiredStock[j].expiryDate), autoGenerated: (expiredStock[j].autoGenerated) })
                                 expiredStockQty += parseInt((expiredStock[j].remainingQty));
                             }
                             totalExpiredStockArr.push({ qty: expiredStockQty, details: expiredStockJsonArr, month: m[i - 1] });
@@ -2306,7 +2345,8 @@ export default class WhatIfReportComponent extends React.Component {
                             lastActualConsumptionDate: lastActualConsumptionDate,
                             lastActualConsumptionDateArr: lastActualConsumptionDateArr,
                             unmetDemand: unmetDemand,
-                            expiredStockArr: totalExpiredStockArr
+                            expiredStockArr: totalExpiredStockArr,
+                            paColors: paColors
                         })
                     }.bind(this)
                 }.bind(this)
@@ -2565,7 +2605,7 @@ export default class WhatIfReportComponent extends React.Component {
                         id: -1
                     })
                     for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= startDate && batchInfoList[k].createdDate <= startDate && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value) {
+                        if (batchInfoList[k].expiryDate >= startDate && batchInfoList[k].createdDate <= startDate && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value && (batchInfoList[k].autoGenerated).toString() == "false") {
                             var batchJson = {
                                 name: batchInfoList[k].batchNo,
                                 id: batchInfoList[k].batchId
@@ -3657,7 +3697,7 @@ export default class WhatIfReportComponent extends React.Component {
                         id: -1
                     })
                     for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].createdDate <= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value) {
+                        if (batchInfoList[k].expiryDate >= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].createdDate <= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value && (batchInfoList[k].autoGenerated).toString() == "false") {
                             var batchJson = {
                                 name: batchInfoList[k].batchNo,
                                 id: batchInfoList[k].batchId
@@ -5602,287 +5642,289 @@ export default class WhatIfReportComponent extends React.Component {
                                     <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                                 </div>
                             </Row>
-                            <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th className="BorderNoneSupplyPlan"></th>
-                                        <th className="supplyplanTdWidth"></th>
-                                        {
-                                            this.state.monthsArray.map(item => (
-                                                <th className="supplyplanTdWidthForMonths" style={{ padding: '10px 0 !important' }}>{item.month}</th>
-                                            ))
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div className="table-responsive" style={{ overflowX: 'hidden' }}>
+                                <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th className="BorderNoneSupplyPlan"></th>
+                                            <th className="supplyplanTdWidth"></th>
+                                            {
+                                                this.state.monthsArray.map(item => (
+                                                    <th className="supplyplanTdWidthForMonths" style={{ padding: '10px 0 !important' }}>{item.month}</th>
+                                                ))
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
-                                        {
-                                            this.state.openingBalanceArray.map(item1 => (
-                                                <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
-                                        {
-                                            this.state.consumptionTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
-                                            {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                        </td>
-                                        <td align="left"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
-                                        {
-                                            this.state.shipmentsTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
+                                        <tr bgcolor='#d9d9d9'>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
+                                            {
+                                                this.state.openingBalanceArray.map(item1 => (
+                                                    <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
+                                            {
+                                                this.state.consumptionTotalData.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                                {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
+                                            {
+                                                this.state.shipmentsTotalData.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
 
-                                    <tr className="totalShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
-                                        {
-                                            this.state.suggestedShipmentsTotalData.map(item1 => {
-                                                if (item1.suggestedOrderQty.toString() != "") {
-                                                    if (item1.isEmergencyOrder == 1) {
-                                                        return (<td align="right" bgcolor='red' className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                        <tr className="totalShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
+                                            {
+                                                this.state.suggestedShipmentsTotalData.map(item1 => {
+                                                    if (item1.suggestedOrderQty.toString() != "") {
+                                                        if (item1.isEmergencyOrder == 1) {
+                                                            return (<td align="right" bgcolor='red' className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                        } else {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                        }
                                                     } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                        var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                                        if (compare) {
+                                                            return (<td>{item1.suggestedOrderQty}</td>)
+                                                        } else {
+                                                            return (<td>{item1.suggestedOrderQty}</td>)
+                                                        }
                                                     }
-                                                } else {
-                                                    var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                                                    if (compare) {
-                                                        return (<td>{item1.suggestedOrderQty}</td>)
+                                                })
+                                            }
+                                        </tr>
+
+                                        <tr className="totalShipments hoverTd">
+                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                                {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}>&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
+                                            {
+                                                this.state.manualShipmentsTotalData.map(item1 => (
+                                                    <td align="right" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+
+                                        <tr className="manualShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+
+                                            {
+                                                this.state.deliveredShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
-                                                        return (<td>{item1.suggestedOrderQty}</td>)
+                                                        return (<td align="right" >{item1}</td>)
                                                     }
-                                                }
-                                            })
-                                        }
-                                    </tr>
+                                                })
+                                            }
 
-                                    <tr className="totalShipments hoverTd">
-                                        <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
-                                            {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                        </td>
-                                        <td align="left" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}>&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
-                                        {
-                                            this.state.manualShipmentsTotalData.map(item1 => (
-                                                <td align="right" onClick={() => this.toggleLarge('SuggestedShipments', "", 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
+                                        </tr>
 
-                                    <tr className="manualShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
-
-                                        {
-                                            this.state.deliveredShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-
-                                    </tr>
-
-                                    <tr className="manualShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
-                                        {
-                                            this.state.shippedShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td align="right" bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-
-                                    <tr className="manualShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
-                                        {
-                                            this.state.orderedShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr className="manualShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
-                                        {
-                                            this.state.plannedShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr className="totalShipments">
-                                        <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
-                                            {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                        </td>
-                                        <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
-                                        {
-                                            this.state.erpShipmentsTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr className="erpShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
-                                        {
-                                            this.state.deliveredErpShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-
-                                    <tr className="erpShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
-                                        {
-                                            this.state.shippedErpShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr className="erpShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
-                                        {
-                                            this.state.orderedErpShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr className="erpShipments">
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
-                                        {
-                                            this.state.plannedErpShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
-                                        {
-                                            this.state.inventoryTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
-                                        {
-                                            this.state.expiredStockArr.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.qty != 0) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                        <tr className="manualShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
+                                            {
+                                                this.state.shippedShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td align="right" bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                     } else {
-                                                        return (<td align="right"></td>)
+                                                        return (<td align="right" >{item1}</td>)
                                                     }
-                                                } else {
-                                                    return (<td align="right">{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr bgcolor='#d9d9d9'>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
-                                        {
-                                            this.state.closingBalanceArray.map(item1 => (
-                                                <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
-                                        {
-                                            this.state.monthsOfStockArray.map(item1 => (
-                                                <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
-                                        {
-                                            this.state.amcTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.minStockMos')}</td>
-                                        {
-                                            this.state.minStockMoS.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.maxStockMos')}</td>
-                                        {
-                                            this.state.maxStockMoS.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td className="BorderNoneSupplyPlan"></td>
-                                        <td align="left">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
-                                        {
-                                            this.state.unmetDemand.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                </tbody>
-                            </Table>
+                                                })
+                                            }
+                                        </tr>
+
+                                        <tr className="manualShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                            {
+                                                this.state.orderedShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="manualShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                            {
+                                                this.state.plannedShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalShipments">
+                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                                {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
+                                            {
+                                                this.state.erpShipmentsTotalData.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr className="erpShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+                                            {
+                                                this.state.deliveredErpShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+
+                                        <tr className="erpShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
+                                            {
+                                                this.state.shippedErpShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="erpShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                            {
+                                                this.state.orderedErpShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="erpShipments">
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                            {
+                                                this.state.plannedErpShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
+                                            {
+                                                this.state.inventoryTotalData.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
+                                            {
+                                                this.state.expiredStockArr.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        if (item1.qty != 0) {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td align="right"></td>)
+                                                        }
+                                                    } else {
+                                                        return (<td align="right">{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr bgcolor='#d9d9d9'>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
+                                            {
+                                                this.state.closingBalanceArray.map(item1 => (
+                                                    <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
+                                            {
+                                                this.state.monthsOfStockArray.map(item1 => (
+                                                    <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
+                                            {
+                                                this.state.amcTotalData.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">{i18n.t('static.supplyPlan.minStockMos')}</td>
+                                            {
+                                                this.state.minStockMoS.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">{i18n.t('static.supplyPlan.maxStockMos')}</td>
+                                            {
+                                                this.state.maxStockMoS.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td align="left">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
+                                            {
+                                                this.state.unmetDemand.map(item1 => (
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                ))
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </Table>
+                            </div>
                             <div className="row" >
                                 {
                                     this.state.jsonArrForGraph.length > 0
@@ -5903,10 +5945,6 @@ export default class WhatIfReportComponent extends React.Component {
                             className={'modal-lg ' + this.props.className, "modalWidth"}>
                             <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                                {/* <ul className="legend legend-supplypln">
-                                <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
-                                <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
-                            </ul> */}
                                 <ul className="legendcommitversion">
                                     <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
@@ -6132,6 +6170,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         <tr>
                                             <th>{i18n.t('static.inventory.batchNumber')}</th>
                                             <th>{i18n.t('static.inventory.expireDate')}</th>
+                                            <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
                                             <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
                                         </tr>
                                     </thead>
@@ -6141,6 +6180,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <tr>
                                                     <td align="left">{item.batchNo}</td>
                                                     <td align="left">{item.expiryDate}</td>
+                                                    <td align="left">{item.autoGenerated}</td>
                                                     <td align="left">{item.remainingQty}</td>
                                                 </tr>
                                             )
@@ -6149,7 +6189,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th style={{ textAlign: 'center' }} colSpan="2">{i18n.t('static.supplyPlan.total')}</th>
+                                            <th style={{ textAlign: 'center' }} colSpan="3">{i18n.t('static.supplyPlan.total')}</th>
                                             <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                         </tr>
                                     </tfoot>
@@ -6238,10 +6278,10 @@ export default class WhatIfReportComponent extends React.Component {
                     </div>
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                <FormGroup className="">
+                            <div className="row">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls Supplyfeild">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -6255,9 +6295,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                    <div className="controls Supplyfeild">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -6273,12 +6313,29 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <ul className="legendcommitversion mt-3">
+
+                            </div>
+                            <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
+                                <ul className="legendcommitversion list-group">
+                                    {
+                                        this.state.paColors.map(item1 => (
+                                            <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                        ))
+                                    }
                                     <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                     <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                    <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                    <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
                                 </ul>
-                            </div>
+                            </FormGroup>
+                            <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                <ul className="legendcommitversion list-group">
+                                    <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} - {this.state.minMonthsOfStock}</span></li>
+                                    <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} - {this.state.reorderFrequency}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} - {this.state.monthsInPastForAMC}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} - {this.state.monthsInFutureForAMC}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} - {this.state.shelfLife}</span></li>
+                                </ul>
+                            </FormGroup>
                         </Col>
                         <div className="animated fadeIn" style={{ display: this.state.display }}>
                             <Row>
