@@ -3455,7 +3455,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                     </Row>
-                    <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
+                    <div className="table-responsive" style={{overflowX:'hidden'}}>
+                    <Table className="table-bordered text-center mt-2 overflowhide" bordered  size="sm" options={this.options}>
                         <thead>
                             <tr>
                                 <th className="BorderNoneSupplyPlan"></th>
@@ -3731,6 +3732,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </tr>
                         </tbody>
                     </Table>
+                    </div>
                     {/* </div> */}
 
 
