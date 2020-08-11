@@ -139,7 +139,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                 <h5 style={{ color: "red" }} id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
+                                        <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={{
