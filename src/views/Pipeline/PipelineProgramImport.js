@@ -34,7 +34,7 @@ export default class PipelineProgramImport extends Component {
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: 'Make sure that your program json file do not have  planning units with negative inventory ',
+            message: 'Please ensure you do not have negative inventory before you proceed.',
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),

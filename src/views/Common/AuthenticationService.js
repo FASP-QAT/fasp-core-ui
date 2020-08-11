@@ -907,7 +907,12 @@ class AuthenticationService {
                     }
                     break;
 
-                case "/report/editProblem/:problemReportId/:programId":
+                case "/report/addProblem":
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                        return true;
+                    }
+                    break;
+                case "/report/editProblem/:problemReportId/:programId/:index/:problemStatusId/:problemTypeId":
                     if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;
                     }
@@ -1066,6 +1071,16 @@ class AuthenticationService {
                 case "/logout/:message":
                 case "/logout":
                     return true;
+                    break;
+                case "/problem/editProblem": return true
+                    break;
+                case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
+                    break;
+                case "/report/problemList/:color/:message": return true
+                    break;
+                case "/report/addProblem/:color/:message": return true
+                    break;
+                case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId": return true
                     break;
                 default:
                     console.log("Inside default-");

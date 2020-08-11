@@ -177,20 +177,20 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
 
-            var col = ("K").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[10]).toString();
+            // var col = ("K").concat(parseInt(y) + 1);
+            // var value = (this.el.getRowData(y)[10]).toString();
 
-            if (value == "Invalid date" || value === "") {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            // if (value == "Invalid date" || value === "") {
+            //     valid = false;
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
 
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
 
-            }
+            // }
             var col = ("L").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[11]).toString();
 
@@ -415,23 +415,23 @@ export default class PipelineProgramShipment extends Component {
                 }
             }
         }
-        if (x == 10) {
-            var col = ("K").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // if (x == 10) {
+        //     var col = ("K").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         if (isNaN(Date.parse(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invaliddate'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
         if (x == 11) {
             var col = ("L").concat(parseInt(y) + 1);
             if (value == "") {
@@ -780,8 +780,26 @@ export default class PipelineProgramShipment extends Component {
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
         this.el.destroy();
 
-        var data = this.state.pipelineShipmentData.map((item, index) => [item.dataSource, item.planningUnit, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), item.procurementAgent, item.supplier, item.quantity, item.rate, item.shipmentMode, item.freightCost, item.productCost, moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.shipmentStatus, item.notes, item.fundingSource, item.active])
-            ;
+        var data = this.state.pipelineShipmentData.map((item, index) =>
+            [
+                item.dataSource,
+                item.planningUnit,
+                moment(item.expectedDeliveryDate).format("YYYY-MM-DD"),
+                item.procurementAgent,
+                item.supplier,
+                item.quantity,
+                item.rate,
+                item.shipmentMode,
+                item.freightCost,
+                item.productCost,
+                '',
+                // moment(item.orderedDate).format("YYYY-MM-DD"), 
+                moment(item.shippedDate).format("YYYY-MM-DD"),
+                moment(item.receivedDate).format("YYYY-MM-DD"),
+                item.shipmentStatus, item.notes,
+                item.fundingSource,
+                item.active
+            ]);
         // json[0] = data;
         var options = {
             data: data,
@@ -839,8 +857,8 @@ export default class PipelineProgramShipment extends Component {
                 },
                 {
                     title: i18n.t('static.shipment.ordereddate'),
-                    type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    type: 'hidden',
+                    // options: { format: 'MM-DD-YYYY' }
 
                 }, {
                     title: i18n.t('static.shipment.shipdate'),
@@ -903,7 +921,7 @@ export default class PipelineProgramShipment extends Component {
     }
 
     loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        // jExcelLoadedFunction(instance);
     }
 
 
@@ -938,11 +956,11 @@ export default class PipelineProgramShipment extends Component {
         console.log(JSON.stringify(data))
         PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
             .then(response => {
-                // console.log(response.data)
+                console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
-                    changedData: false
-                })
+                    changedData: false,
+                }, () => console.log("=====", this.state));
             }
             ).catch(
                 error => {
@@ -970,58 +988,58 @@ export default class PipelineProgramShipment extends Component {
     SubmitProgram() {
 
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
-        .then(response => {
-            var planningUnitListFinalInventory = response.data;
-            console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
-            var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
-            console.log("negtive inventory list=====", negtiveInventoryList);
-            if (negtiveInventoryList.length > 0) {
-                console.log("my page------");
-                this.props.history.push({
-                    pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
-                });
-            } else {
-                PipelineService.submitProgram(this.props.match.params.pipelineId)
-        .then(response => {
-             console.log(response.data.messageCode)
-            this.setState({
-                message: response.data.messageCode,
-                changedData: false
-            })
-            this.props.history.push({
-                pathname: `/pipeline/pieplineProgramList`
-            });
-        }
-        ).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+            .then(response => {
+                var planningUnitListFinalInventory = response.data;
+                console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
+                var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
+                console.log("negtive inventory list=====", negtiveInventoryList);
+                if (negtiveInventoryList.length > 0) {
+                    console.log("my page------");
+                    this.props.history.push({
+                        pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
+                    });
                 } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
+                    PipelineService.submitProgram(this.props.match.params.pipelineId)
+                        .then(response => {
+                            console.log(response.data.messageCode)
+                            this.setState({
+                                message: response.data.messageCode,
+                                changedData: false
+                            })
+                            this.props.history.push({
+                                pathname: `/pipeline/pieplineProgramList`
+                            });
+                        }
+                        ).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: error.response.data.messageCode });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
+                    console.log('You have submitted the program');
                 }
-            }
-        );
+
+            });
 
 
-                console.log('You have submitted the program');
-            }
 
-        });
 
-        
-
-       
     }
 
     render() {
@@ -1029,7 +1047,7 @@ export default class PipelineProgramShipment extends Component {
         return (
             <>
                 <div className="table-responsive" >
-                <h5>{i18n.t(this.state.message)}</h5>
+                    <h5>{i18n.t(this.state.message)}</h5>
                     <div id="shipmenttableDiv">
                     </div>
                     <div>

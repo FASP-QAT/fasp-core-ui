@@ -12,6 +12,8 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -89,8 +91,8 @@ export default class ShipmentDetails extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            label: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id
                         }
                         proList.push(programJson)
                     }
@@ -101,9 +103,69 @@ export default class ShipmentDetails extends React.Component {
 
             }.bind(this);
         }.bind(this)
+
+
+        var programIdd = this.props.match.params.programId;
+        var versionId = this.props.match.params.versionId;
+        var planningUnitId = this.props.match.params.planningUnitId;
+
+        if (programIdd != '') {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    console.log("myResult", myResult);
+                    var programId = programIdd.split("_")[0];
+                    console.log('programId----->>>', programId)
+                    console.log(myResult);
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].program.id == programId && myResult[i].active == true) {
+                            var productJson = {
+                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                id: myResult[i].planningUnit.id
+                            }
+                            proList[i] = productJson
+                        }
+                    }
+                    console.log("proList---" + proList);
+                    this.setState({
+                        planningUnitList: proList,
+                        planningUnitListAll: myResult
+                    })
+                    this.setState({ programId: programIdd, planningUnitId: planningUnitId });
+                    this.formSubmit(this.state.planningUnit);
+                }.bind(this)
+            }.bind(this)
+        }
     };
 
-    getPlanningUnitList(event) {
+    getPlanningUnitList(value) {
+        this.setState({
+            programSelect: value,
+            programId: value.value
+        })
         var db1;
         var storeOS;
         getDatabase();
@@ -130,15 +192,15 @@ export default class ShipmentDetails extends React.Component {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 console.log("myResult", myResult);
-                var programId = (document.getElementById("programId").value).split("_")[0];
+                var programId = (value.value).split("_")[0];
                 console.log('programId----->>>', programId)
                 console.log(myResult);
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].program.id == programId && myResult[i].active == true) {
                         var productJson = {
-                            name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                            id: myResult[i].planningUnit.id
+                            label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                            value: myResult[i].planningUnit.id
                         }
                         proList[i] = productJson
                     }
@@ -152,10 +214,10 @@ export default class ShipmentDetails extends React.Component {
         }.bind(this)
     }
 
-    formSubmit() {
+    formSubmit(value) {
         var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId });
-        var planningUnitId = document.getElementById("planningUnitId").value;
+        this.setState({ programId: programId, planningUnitId: value.value, planningUnit: value });
+        var planningUnitId = value.value;
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
@@ -188,7 +250,7 @@ export default class ShipmentDetails extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
                 })
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == value.value);
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
                     programJson: programJson,
@@ -263,41 +325,35 @@ export default class ShipmentDetails extends React.Component {
                                 }) => (
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
-                                                <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3 pl-0">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
+                                                <div className="row">
+                                                    <FormGroup className="col-md-4">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    name="programId" id="programId"
-                                                                    onChange={this.getPlanningUnitList}
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {programs}
-                                                                </Input>
-                                                            </InputGroup>
+                                                            <Select
+                                                                name="programSelect"
+                                                                id="programSelect"
+                                                                bsSize="sm"
+                                                                options={this.state.programList}
+                                                                value={this.state.programSelect}
+                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-4 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
-                                                                    bsSize="sm"
-                                                                    value={this.state.planningUnitId}
-                                                                    onChange={this.formSubmit}
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnits}
-                                                                </Input>
-                                                            </InputGroup>
+                                                            <Select
+                                                                name="planningUnit"
+                                                                id="planningUnit"
+                                                                bsSize="sm"
+                                                                options={this.state.planningUnitList}
+                                                                value={this.state.planningUnit}
+                                                                onChange={(e) => { this.formSubmit(e); }}
+                                                            />
                                                         </div>
                                                     </FormGroup>
+                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
                                             </Col>
                                         </Form>

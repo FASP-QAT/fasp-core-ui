@@ -146,9 +146,9 @@ class ChangePasswordComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            <CardHeader>
+                            {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.dashboard.changepassword')}</strong>{' '}
-                            </CardHeader>
+                            </CardHeader> */}
                             <Formik
                                 initialValues={{
                                     oldPassword: "",
@@ -265,7 +265,7 @@ class ChangePasswordComponent extends Component {
                                                                 required
                                                             />
                                                             <InputGroupAddon addonType="append">
-                                                                <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
                                                             </InputGroupAddon>
                                                             <FormFeedback>{errors.newPassword}</FormFeedback>
                                                         </InputGroup>
