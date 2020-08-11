@@ -20,6 +20,7 @@ import "jspdf-autotable";
 import csvicon from '../../assets/img/csv.png'
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ShipmentsInSupplyPlanComponent from "./ShipmentsInSupplyPlan";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
@@ -653,9 +654,7 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         var regionId = -1;
         var planningUnitId = document.getElementById("planningUnitId").value;
-
-        var planningUnit = document.getElementById("planningUnitId");
-        var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
+        var planningUnitName = this.props.items.planningUnitName;
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
@@ -1177,7 +1176,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (deliveredShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                deliveredShipmentsTotalData.push({ qty: deliveredShipmentsQty, month: m[i], shipmentDetail: deliveredShipmentsDetailsArr, noOfShipments: deliveredShipmentsDetailsArr.length, colour: colour })
+                                deliveredShipmentsTotalData.push({ qty: deliveredShipmentsQty, month: m[i], shipmentDetail: deliveredShipmentsDetailsArr, noOfShipments: deliveredShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 deliveredShipmentsTotalData.push("");
                             }
@@ -1187,7 +1186,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (shippedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                shippedShipmentsTotalData.push({ qty: shippedShipmentsQty, month: m[i], shipmentDetail: shippedShipmentsDetailsArr, noOfShipments: shippedShipmentsDetailsArr.length, colour: colour })
+                                shippedShipmentsTotalData.push({ qty: shippedShipmentsQty, month: m[i], shipmentDetail: shippedShipmentsDetailsArr, noOfShipments: shippedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 shippedShipmentsTotalData.push("");
                             }
@@ -1197,7 +1196,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (orderedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                orderedShipmentsTotalData.push({ qty: orderedShipmentsQty, month: m[i], shipmentDetail: orderedShipmentsDetailsArr, noOfShipments: orderedShipmentsDetailsArr.length, colour: colour })
+                                orderedShipmentsTotalData.push({ qty: orderedShipmentsQty, month: m[i], shipmentDetail: orderedShipmentsDetailsArr, noOfShipments: orderedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 orderedShipmentsTotalData.push("");
                             }
@@ -1207,7 +1206,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (plannedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                plannedShipmentsTotalData.push({ qty: plannedShipmentsQty, month: m[i], shipmentDetail: plannedShipmentsDetailsArr, noOfShipments: plannedShipmentsDetailsArr.length, colour: colour })
+                                plannedShipmentsTotalData.push({ qty: plannedShipmentsQty, month: m[i], shipmentDetail: plannedShipmentsDetailsArr, noOfShipments: plannedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 plannedShipmentsTotalData.push("");
                             }
@@ -1304,7 +1303,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (deliveredErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                deliveredErpShipmentsTotalData.push({ qty: deliveredErpShipmentsQty, month: m[i], shipmentDetail: deliveredErpShipmentsDetailsArr, noOfShipments: deliveredErpShipmentsDetailsArr.length, colour: colour })
+                                deliveredErpShipmentsTotalData.push({ qty: deliveredErpShipmentsQty, month: m[i], shipmentDetail: deliveredErpShipmentsDetailsArr, noOfShipments: deliveredErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 deliveredErpShipmentsTotalData.push("");
                             }
@@ -1314,7 +1313,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (shippedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                shippedErpShipmentsTotalData.push({ qty: shippedErpShipmentsQty, month: m[i], shipmentDetail: shippedErpShipmentsDetailsArr, noOfShipments: shippedErpShipmentsDetailsArr.length, colour: colour })
+                                shippedErpShipmentsTotalData.push({ qty: shippedErpShipmentsQty, month: m[i], shipmentDetail: shippedErpShipmentsDetailsArr, noOfShipments: shippedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 shippedErpShipmentsTotalData.push("");
                             }
@@ -1324,7 +1323,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (orderedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                orderedErpShipmentsTotalData.push({ qty: orderedErpShipmentsQty, month: m[i], shipmentDetail: orderedErpShipmentsDetailsArr, noOfShipments: orderedErpShipmentsDetailsArr.length, colour: colour })
+                                orderedErpShipmentsTotalData.push({ qty: orderedErpShipmentsQty, month: m[i], shipmentDetail: orderedErpShipmentsDetailsArr, noOfShipments: orderedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 orderedErpShipmentsTotalData.push("");
                             }
@@ -1334,7 +1333,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (plannedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                plannedErpShipmentsTotalData.push({ qty: plannedErpShipmentsQty, month: m[i], shipmentDetail: plannedErpShipmentsDetailsArr, noOfShipments: plannedErpShipmentsDetailsArr.length, colour: colour })
+                                plannedErpShipmentsTotalData.push({ qty: plannedErpShipmentsQty, month: m[i], shipmentDetail: plannedErpShipmentsDetailsArr, noOfShipments: plannedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 plannedErpShipmentsTotalData.push("");
                             }
@@ -3540,7 +3539,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.deliveredShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3555,7 +3554,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.shippedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td align="right" bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3569,7 +3568,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.orderedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3582,7 +3581,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.plannedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3606,7 +3605,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3620,7 +3619,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.shippedErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3633,7 +3632,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.orderedErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -3646,7 +3645,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.plannedErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
