@@ -1,7 +1,4 @@
 import React from "react";
-import ReactDOM from 'react-dom';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody,
     Label, Input, FormGroup,
@@ -9,14 +6,11 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, APPROVED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
-import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
@@ -343,7 +337,7 @@ export default class ShipmentDetails extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.planningunit')}</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
                                                                 <Input

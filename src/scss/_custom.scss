@@ -481,7 +481,7 @@ label.arrow_label:after {
 
 .table thead tr th {
   position: sticky;
-  top: 0px;
+  top: -1px;
   padding: 6px 4px 5px 4px!important;
   // padding: 5px !important;
   background: #fff;
@@ -492,7 +492,8 @@ label.arrow_label:after {
 .react-bootstrap-table {
   overflow-y: auto !important;
   table-layout: auto !important; 
-  max-height: 540px;
+  max-height: 545px;
+  border: 1px solid #e5e7e8;
 }
 
 .react-bootstrap-table-pagination {
@@ -2016,7 +2017,7 @@ input::placeholder {
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 337px !important;
+  margin-left: 286px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2351,7 +2352,7 @@ input::placeholder {
     margin-top: -3%;
   }
   /* commit version legend */
-  .legendcommitversion { list-style: none;display: inline-flex; }
+  .legendcommitversion { list-style: none;display: table-row; }
   .legendcommitversion li { float: left; margin-right: 10px; }
   .legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
   
@@ -2490,7 +2491,7 @@ input::placeholder {
 
   .supplyplanTdWidth{
     overflow: hidden!important;
-    min-width: 315px!important;
+    min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
   }
@@ -3035,3 +3036,4 @@ border-radius: 2em;
   right: 12px;
   color: #697069 !important;
 }
+
