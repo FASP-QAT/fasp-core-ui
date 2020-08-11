@@ -120,7 +120,7 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('problem', { keyPath: 'problemId', autoIncrement: true });
         }
         if (!db1.objectStoreNames.contains('problemStatus')) {
-            storeOS = db1.createObjectStore('problemStatus', { keyPath: 'problemStatusId', autoIncrement: true });
+            storeOS = db1.createObjectStore('problemStatus', { keyPath: 'id', autoIncrement: true });
         }
     };
 }

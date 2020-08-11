@@ -481,7 +481,7 @@ label.arrow_label:after {
 
 .table thead tr th {
   position: sticky;
-  top: 0px;
+  top: -1px;
   padding: 6px 4px 5px 4px!important;
   // padding: 5px !important;
   background: #fff;
@@ -492,7 +492,8 @@ label.arrow_label:after {
 .react-bootstrap-table {
   overflow-y: auto !important;
   table-layout: auto !important; 
-  max-height: 540px;
+  max-height: 545px;
+  border: 1px solid #e5e7e8;
 }
 
 .react-bootstrap-table-pagination {
@@ -775,7 +776,7 @@ label.arrow_label:after {
 
 // PlanningUnitlist
 .PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
-.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 
 .listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
@@ -783,7 +784,7 @@ label.arrow_label:after {
 .listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
 
 .listRealmcountryplanningAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
-.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .listRealmcountryplanningAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
 
 .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
@@ -847,8 +848,10 @@ label.arrow_label:after {
   height: calc(1.5em + 0.5rem + -2px)!important;
     padding: 0.25rem 0.5rem!important;
 }
-
-
+// Readonly background transperant made after conversion
+.LanguageremoveReadonlybackground .jexcel_content .draggable tr .readonly{
+  background: transparent!important;
+}
 
 
 // .realmcountrypUnitTd{text-align: right !important;}
@@ -946,7 +949,7 @@ label.arrow_label:after {
 
  .ProblemlistSearchposition{
   position: absolute;
-  top: 35px;
+  top: 25px;
   right: 2%;
 }
   
@@ -1993,7 +1996,7 @@ input::placeholder {
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 337px !important;
+  margin-left: 324px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2328,7 +2331,7 @@ input::placeholder {
     margin-top: -3%;
   }
   /* commit version legend */
-  .legendcommitversion { list-style: none;display: inline-flex; }
+  .legendcommitversion { list-style: none;display: table-row; }
   .legendcommitversion li { float: left; margin-right: 10px; }
   .legendcommitversion .legendcolor { float: left; width: 19px; height: 14px; margin: 2px; }
   
@@ -2721,6 +2724,10 @@ input::placeholder {
     margin-bottom: 15px;
 }
 
+.readonly{
+  background-color: #efefef;
+}
+
 
 .cardRealmDashboard {
     margin-bottom: 1.5rem;
@@ -2998,3 +3005,14 @@ border-radius: 2em;
 .go355775859 .gray svg{
   visibility: hidden !important;
 }
+
+.react-bs-table-no-data{
+  text-align: center!important;
+}
+.planningunitstockAdjustment-box-icon {
+  position: absolute;
+  top: 33px;
+  right: 12px;
+  color: #697069 !important;
+}
+
