@@ -1,4 +1,4 @@
-
+import i18n from '../../src/i18n';
 
 export function jExcelLoadedFunction(instance) {
     var obj = {};
@@ -53,7 +53,8 @@ export function jExcelLoadedFunction(instance) {
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-
+    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[0];
+    pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
 
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[0];
@@ -103,3 +104,76 @@ export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
 }
+
+export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0) {
+    if (type == "text") {
+        var col = (colName).concat(parseInt(rowNo) + 1);
+        if (value == "") {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            return false;
+        } else {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
+            return true;
+        }
+    } else if (type == "number") {
+        var col = (colName).concat(parseInt(rowNo) + 1);
+        value = value.toString().replaceAll("\,", "");
+        console.log("Value", value);
+        if (value == "") {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            return false;
+        } else {
+            console.log("isNaN(Number.parseInt(value))", Number.parseInt(value));
+            console.log("(greaterThan0 == 1 && value < 0)", (greaterThan0 == 1 && value <= 0));
+            if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && value <= 0)) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                return false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                return true;
+            }
+        }
+    } else if (type == "date") {
+        var col = (colName).concat(parseInt(rowNo) + 1);
+        if (value == "") {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            return false;
+        } else {
+            // if (isNaN(Date.parse(value))) {
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+            // } else {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
+            return true;
+            // }
+        }
+    }
+}
+
+export function positiveValidation(colName, rowNo, elInstance) {
+    var col = (colName).concat(parseInt(rowNo) + 1);
+    elInstance.setStyle(col, "background-color", "transparent");
+    elInstance.setComments(col, "");
+}
+
+export function inValid(colName, rowNo, message, elInstance) {
+    var col = (colName).concat(parseInt(rowNo) + 1);
+    elInstance.setStyle(col, "background-color", "transparent");
+    elInstance.setStyle(col, "background-color", "yellow");
+    elInstance.setComments(col, message);
+}
+
+
+

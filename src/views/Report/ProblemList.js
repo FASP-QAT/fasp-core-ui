@@ -30,10 +30,6 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
 const entityname = i18n.t('static.report.problem');
 
-
-
-
-
 export default class ConsumptionDetails extends React.Component {
 
     constructor(props) {
@@ -191,20 +187,29 @@ export default class ConsumptionDetails extends React.Component {
 
                     // console.log("problemReportList---->", problemReportList);
                     // console.log("problemStatusId ---********------> ", problemStatusId);
-                    var problemReportFilterList = []
+
                     if (problemStatusId != -1) {
-                        problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+
+                        var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+
+                            });
                     } else {
-                        problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
+                        var problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+
+                            });
                     }
                     // console.log("problemReportFilterList---->", problemReportFilterList);
-                    this.setState({
-                        data: problemReportFilterList,
-                        message: ''
-                    },
-                        () => {
 
-                        });
 
 
                 }.bind(this)
@@ -364,7 +369,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
+                style: { width: '100px' },
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
@@ -396,32 +401,45 @@ export default class ConsumptionDetails extends React.Component {
                 }
             },
             {
-                dataField: 'problemType.label',
-                text: i18n.t('static.report.problemType'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
                 dataField: 'problemStatus.label',
                 text: i18n.t('static.report.problemStatus'),
                 sort: true,
                 align: 'center',
+                headerAlign: 'center',
+                style: { width: '140px' },
+                formatter: (cell, row) => {
+                    return getLabelText(cell, this.state.lang);
+                }
+            },
+            // {
+            //     dataField: 'realmProblem.criticality.label',
+            //     text: i18n.t('static.report.Criticality'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     style: { width: '100px' },
+            //     formatter: (cell, row) => {
+            //         return getLabelText(cell, this.state.lang);
+            //     }
+            // },
+            {
+                dataField: 'problemType.label',
+                text: i18n.t('static.report.problemType'),
+                sort: true,
+                align: 'center',
                 style: { width: '100px' },
                 headerAlign: 'center',
+                style: { width: '100px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
             {
-                dataField: 'realmProblem.problem.label',
+                dataField: 'problemTransList',
                 text: 'Note',
                 sort: true,
                 align: 'center',
+                style: { width: '100px' },
                 headerAlign: 'center',
                 style: { width: '170px' },
                 formatter: (cell, row) => {
@@ -539,7 +557,7 @@ export default class ConsumptionDetails extends React.Component {
                         </Col>
 
                         <ToolkitProvider
-                            keyField="problemReportId"
+                            keyField="problemActionIndex"
                             data={this.state.data}
                             columns={columns}
                             search={{ searchFormatted: true }}

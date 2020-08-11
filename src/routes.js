@@ -163,6 +163,7 @@ const RealmList = React.lazy(() => import('./views/Realm/ListRealmComponent'));
 const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanComponent'));
 const WhatIfReport = React.lazy(() => import('./views/WhatIfReport/whatIfReport'));
+const ManualTagging = React.lazy(() => import('./views/ManualTagging/ManualTagging'));
 
 
 const AddForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/AddForecastingUnitComponent'));
@@ -428,6 +429,7 @@ const routes = [
 
   { path: '/supplyPlan', name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/report/whatIf', name: i18n.t('static.dashboard.whatIf'), component: WhatIfReport },
+  { path: '/shipment/manualTagging', name: i18n.t('static.dashboard.manualTagging'), component: ManualTagging },
   { path: '/supplyPlanFormulas', name: i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 

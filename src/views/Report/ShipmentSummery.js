@@ -930,6 +930,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
+import MultiSelect from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1245,13 +1246,13 @@ class ShipmentSummery extends Component {
                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-
-                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-
-                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
+                   
                 }
 
             }
@@ -1274,12 +1275,12 @@ class ShipmentSummery extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 100;
         var aspectwidth1 = (width - h1);
-
-        doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
+        let startY=170+(this.state.planningUnitLabels.length*3)
+        doc.addImage(canvasImg, 'png', 50, startY, 750, 260, 'CANVAS');
 
         //Table1
         let content1 = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:70},
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 190.5, halign: 'center' },
             columnStyles: {
@@ -1301,7 +1302,7 @@ class ShipmentSummery extends Component {
 
         //Table2
         let content2 = {
-            margin: { top: 80 },
+            margin: { top: 80 ,bottom:50},
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },
@@ -1607,6 +1608,9 @@ class ShipmentSummery extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele.value),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -1626,7 +1630,7 @@ class ShipmentSummery extends Component {
         let programId = document.getElementById("programId").value;
         let viewById = document.getElementById("viewById").value;
 
-        let planningUnitIds = this.state.planningUnitValues;
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -1635,9 +1639,10 @@ class ShipmentSummery extends Component {
         console.log("planningUnitIds---", planningUnitIds);
 
 
-        if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
+        if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
+                planningUnitIds= this.state.planningUnitValues.map(ele => (ele.value).toString())
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -1801,7 +1806,7 @@ class ShipmentSummery extends Component {
         } else if (versionId == -1) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
 
-        } else if (planningUnitIds.length == 0) {
+        } else if (this.state.planningUnitValues.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
         }
     }
@@ -2148,16 +2153,17 @@ class ShipmentSummery extends Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
-                                                    <InputGroup className="box">
-                                                        <ReactMultiSelectCheckboxes
+                                                    
+                                                        <MultiSelect
                                                             name="planningUnitId"
                                                             id="planningUnitId"
                                                             bsSize="md"
+                                                            value={this.state.planningUnitValues}
                                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         />
 
-                                                    </InputGroup>
+                                                   
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">

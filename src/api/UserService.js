@@ -33,6 +33,7 @@ class UserService {
         });
     }
     getUserByUserId(userId) {
+        console.log("decryptedCurUser sync data api---",userId)
         return axios.get(`${API_URL}/api/user/${userId}`, {
         });
     }

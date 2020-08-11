@@ -1706,8 +1706,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption);
+        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
+        row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -1716,8 +1716,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(consumptionArray[i].forecastedConsumption);
-        row2.push(consumptionArray[i].actualConsumption);
+        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
+        row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     }
     head1[0] = head;
@@ -1726,7 +1726,7 @@ class Consumption extends Component {
 
 
     let content = {
-      margin: { top: 80 },
+      margin: { top: 80, bottom: 50 },
       startY: height,
       head: head1,
       body: row3,
@@ -1915,7 +1915,7 @@ class Consumption extends Component {
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-    if (planningUnitId > 0 && programId > 0) {
+    if (planningUnitId > 0 && programId > 0 && versionId != -1) {
       if (versionId.includes('Local')) {
         console.log("------------OFFLINE PART------------");
         var db1;
@@ -2133,25 +2133,17 @@ class Consumption extends Component {
           })
       }
 
-    } else if (programId == 0) {
+    } else if (programId == -1) {
       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+
+    } else if (versionId == -1) {
+      this.setState({ message: i18n.t('static.program.validversion'), consumptions: [] });
 
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
 
   getPrograms() {
@@ -2322,7 +2314,7 @@ class Consumption extends Component {
       }.bind(this)
 
     }
-
+    this.filterData();
   }
   // getProductCategories() {
   //   let programId = document.getElementById("programId").value;
@@ -2448,6 +2440,7 @@ class Consumption extends Component {
         versions: []
       })
     }
+    this.filterData();
   }
   consolidatedVersionList = (programId) => {
     const lan = 'en';

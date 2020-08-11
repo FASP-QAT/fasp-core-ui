@@ -549,6 +549,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReportService from '../../api/ReportService';
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import MultiSelect from 'react-multi-select-component';
 
 class warehouseCapacity extends Component {
     constructor(props) {
@@ -728,8 +729,7 @@ class warehouseCapacity extends Component {
         doc.setFontSize(8);
 
         let content = {
-            margin: { top: 40 },
-            margin: { left: 100 },
+            margin: { top: 40,left:100  ,bottom:50},
             startY: 150,
             // head: [headers],
             // body: data,
@@ -809,7 +809,11 @@ class warehouseCapacity extends Component {
     }
     filterProgram = () => {
         let countryId = document.getElementById("countryId").value;
-        if (countryId != 0) {
+        this.setState({
+            programLst: [],
+            programValues:[],
+            programLabels:[]
+        }, () => { if (countryId != 0) {
             const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
             if (programLst.length > 0) {
 
@@ -824,13 +828,15 @@ class warehouseCapacity extends Component {
                 });
             }
         }
-        this.fetchData();
+        this.fetchData();})
     }
 
     handleChangeProgram(programIds) {
-
+        programIds = programIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
         this.setState({
-            programValues: programIds.map(ele => ele.value),
+            programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
 
@@ -918,12 +924,12 @@ class warehouseCapacity extends Component {
 
     fetchData(e) {
         if (navigator.onLine) {
-            let programId = this.state.programValues;
+            let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let countryId = document.getElementById("countryId").value;
 
             console.log("programId---", programId);
             console.log("countryId---", countryId);
-            if (programId.length > 0 && countryId > 0) {
+            if (this.state.programValues.length > 0 && countryId > 0) {
                 AuthenticationService.setupAxiosInterceptors();
                 let inputjson = {
                     realmCountryId: countryId,
@@ -960,7 +966,7 @@ class warehouseCapacity extends Component {
                         }
                     );
 
-            } else if (programId.length == 0) {
+            } else if (this.state.programValues.length == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
             } else if (countryId == 0) {
                 this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] });
@@ -1152,12 +1158,12 @@ class warehouseCapacity extends Component {
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                    <InputGroup className="box">
-                                                        <ReactMultiSelectCheckboxes
+                                                        <MultiSelect
 
                                                             bsSize="sm"
                                                             name="programId"
                                                             id="programId"
+                                                            value={this.state.programValues}
                                                             onChange={(e) => { this.handleChangeProgram(e) }}
                                                             options={programList && programList.length > 0 ? programList : []}
 
@@ -1166,7 +1172,7 @@ class warehouseCapacity extends Component {
                                                             this.props.touched && (
                                                                 <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                                                             )}
-                                                    </InputGroup>
+                                                   
                                                 </FormGroup>
                                             </Online>
 

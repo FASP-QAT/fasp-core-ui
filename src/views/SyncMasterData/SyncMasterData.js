@@ -44,6 +44,7 @@ export default class SyncMasterData extends Component {
         AuthenticationService.setupAxiosInterceptors();
         document.getElementById("retryButtonDiv").style.display = "none";
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("decryptedCurUser sync data---",decryptedCurUser)
         UserService.getUserByUserId(decryptedCurUser).then(response => {
             console.log("user----------------------", response.data);
             localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data).toString(), `${SECRET_KEY}`));

@@ -424,6 +424,7 @@ export default class ConsumptionDetails extends React.Component {
                         data: data,
                         columnDrag: true,
                         colWidths: [80, 120, 150, 80, 80, 180, 100, 80],
+                        colHeaderClasses: ["Reqasterisk"],
                         columns: [
                             {
                                 title: i18n.t('static.report.consumptionDate'),
@@ -486,7 +487,7 @@ export default class ConsumptionDetails extends React.Component {
                         oneditionend: this.onedit,
                         copyCompatibility: true,
                         allowExport: false,
-                        paginationOptions: [10, 25, 50, 100],
+                        paginationOptions: [10, 25, 50],
                         position: 'top',
                         updateTable: function (el, cell, x, y, source, value, id) {
                             var elInstance = el.jexcel;

@@ -340,7 +340,7 @@ class StockStatus extends Component {
         , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.roundN(ele.mos)), this.formatter(ele.minMos), this.formatter(ele.maxMos)]);
 
     let content = {
-      margin: { top: 80 },
+      margin: { top: 80 ,bottom:50},
       startY: height,
       head: header,
       body: data,
