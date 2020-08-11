@@ -1835,6 +1835,8 @@ export default class SupplyPlanComponent extends React.Component {
                             var shipmentTotalQty = 0;
 
                             var manualShipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= m[i].startDate && c.expectedDeliveryDate <= m[i].endDate) && c.erpFlag == false);
+                            console.log("==================hiiiiiiiiii");
+                            console.log("==================manualShipmentArr",manualShipmentArr);
                             var manualTotalQty = 0;
 
                             var deliveredShipmentsQty = 0;
@@ -1866,6 +1868,8 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             shipmentsTotalData.push(shipmentTotalQty);
                             for (var j = 0; j < manualShipmentArr.length; j++) {
+                                console.log("in for===============+++++");
+                                console.log("manualShipmentArr[j].shipmentQty=====", manualShipmentArr)
                                 manualTotalQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 if (manualShipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {

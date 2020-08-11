@@ -1,6 +1,16 @@
 import React, { Component, lazy, Suspense } from 'react';
+
+import { SECRET_KEY } from '../../Constants';
+import CryptoJS from 'crypto-js';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import AuthenticationService from '../../views/Common/AuthenticationService';
+
+import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { DATE_FORMAT_CAP } from '../../Constants.js';
+import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import {
   Badge,
@@ -37,6 +47,10 @@ import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities
 import i18n from '../../i18n'
 import DashboardService from "../../api/DashboardService";
 import Widget01 from '../../views/Widgets/Widget01';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import BootstrapTable from 'react-bootstrap-table-next';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -178,7 +192,7 @@ const mainChart = {
 
 
 
-
+// let problemActionlist = [];
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
@@ -193,22 +207,55 @@ class ApplicationDashboard extends Component {
       dropdownOpen: false,
       radioSelected: 2,
       activeIndex: 0,
+      problemActionList: [],
+
       message: '',
       dashboard: '',
       users: []
     };
+    // this.state = {
+
+    // };
 
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
+    this.problemAction = this.problemAction.bind(this);
+    this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
+    this.buttonFormatter = this.buttonFormatter.bind(this);
+    this.addMapping = this.addMapping.bind(this);
+    this.editProblem = this.editProblem.bind(this);
+  }
+
+  rowClassNameFormat(row, rowIdx) {
+    // row is whole row object
+    // rowIdx is index of row
+    // console.log('in rowClassNameFormat')
+    // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
+    if (row.realmProblem.criticality.id == 3) {
+      return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
+    } else if (row.realmProblem.criticality.id == 2) {
+      return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
+    } else {
+      return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
+    }
+  }
+
+  problemAction(problemAction) {
+    // console.log("actionUrl============>", problemAction.realmProblem.problem.actionUrl);
+    this.props.history.push({
+      pathname: `${problemAction.realmProblem.problem.actionUrl}`,
+      // state: { budget }
+    });
     // this.redirectToCrud = this.redirectToCrud.bind(this);
   }
 
   redirectToCrud = (url) => {
     this.props.history.push(url);
   }
+
   hideFirstComponent() {
     setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
@@ -242,7 +289,59 @@ class ApplicationDashboard extends Component {
         })
       })
     this.hideFirstComponent();
+    console.log("====== in application dasboard =======");
+   
+    // var problemActionList = [];
+    // var db1;
+    // var storeOS;
+    // getDatabase();
+    // var openRequest = indexedDB.open('fasp', 1);
+    // openRequest.onsuccess = function (e) {
+    //   var realmId = AuthenticationService.getRealmId();
+    //   var programList = [];
+    //   db1 = e.target.result;
+    //   var transaction = db1.transaction(['programData'], 'readwrite');
+    //   var program = transaction.objectStore('programData');
+    //   var getRequest = program.getAll();
+    //   getRequest.onerror = function (event) {
+    //     this.setState({
+    //       supplyPlanError: i18n.t('static.program.errortext')
+    //     })
+    //   };
+    //   getRequest.onsuccess = function (event) {
+    //     qatProblemActions();
+    //     var latestVersionProgramList = [];
+    //     for (var i = 0; i < getRequest.result.length; i++) {
+    //       var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+    //       var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+    //       var programJson = JSON.parse(programData);
+    //       programList.push(programJson);
+
+    //     }
+    //     for (var d = 0; d < programList.length; d++) {
+    //       var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
+    //       if (index == -1) {
+    //         latestVersionProgramList.push(programList[d]);
+    //       } else {
+    //         var versionId = latestVersionProgramList[index].currentVersion.versionId;
+    //         if (versionId < programList[d].currentVersion.versionId) {
+    //           latestVersionProgramList[index] = programList[d];
+    //         }
+    //       }
+
+    //     }
+    //     programList = latestVersionProgramList;
+    //     for (var pp = 0; pp < programList.length; pp++) {
+    //       problemActionList = problemActionList.concat(programList[pp].problemReportList);
+    //       // array1.concat(array2)
+    //     }
+    //     var filteredProblemActionList = problemActionList.filter(c => c.problemStatus.id == 1);
+    //     this.setState({ problemActionList: filteredProblemActionList });
+    //   }.bind(this);
+    // }.bind(this);
+    
   }
+
 
   onExiting() {
     this.animating = true;
@@ -250,6 +349,41 @@ class ApplicationDashboard extends Component {
 
   onExited() {
     this.animating = false;
+  }
+  buttonFormatter(cell, row) {
+    // console.log("-----------", cell);
+    // <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>
+    return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
+  }
+
+  addMapping(event, cell) {
+    console.log("-----cell------>>", cell);
+    event.stopPropagation();
+    this.props.history.push({
+      // pathname: `/programProduct/addProgramProduct/${cell}`,
+      // pathname: `/report/addProblem`,
+      pathname: `${cell}`,
+    });
+
+  }
+
+  editProblem(problem, index) {
+    // let problemStatusId = document.getElementById('problemStatusId').value;
+    // let problemTypeId = document.getElementById('problemTypeId').value;
+    // this.props.history.push({
+    //   pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
+    //   // state: { language }
+    // });
+    console.log("problem====>", problem);
+    // 3_v2_uId_1
+    var programId = problem.program.id + "_v" + problem.versionId + "_uId_1";
+    console.log("programId=====>", programId);
+
+    this.props.history.push({
+      pathname: `/report/editProblem/${problem.problemReportId}/ ${programId}/${problem.problemActionIndex}/${problem.problemStatus.id}/${problem.problemType.id}`,
+      // state: { language }
+    });
+
   }
 
   next() {
@@ -275,6 +409,194 @@ class ApplicationDashboard extends Component {
 
   render() {
     const { activeIndex } = this.state;
+    // const { problemActionlist } = this.state;
+
+    const { SearchBar, ClearSearchButton } = Search;
+    const customTotal = (from, to, size) => (
+      <span className="react-bootstrap-table-pagination-total">
+        {i18n.t('static.common.result', { from, to, size })}
+      </span>
+    );
+
+
+    const columns = [
+      {
+        dataField: 'program.programCode',
+        text: i18n.t('static.program.program'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        // formatter: (cell, row) => {
+        //   if (cell != null && cell != "") {
+        //     return getLabelText(cell, this.state.lang);
+        //   }
+        // }
+        // formatter: (cellContent, row) => {
+        //   return (
+        //     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+        //   );
+        // }
+      },
+      {
+        dataField: 'versionId',
+        text: i18n.t('static.program.versionId'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        // style: { width: '170px' },
+      },
+      {
+        dataField: 'region.label',
+        text: i18n.t('static.region.region'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+      },
+      {
+        dataField: 'planningUnit.label',
+        text: i18n.t('static.planningunit.planningunit'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+      },
+      {
+        dataField: 'dt',
+        text: i18n.t('static.report.month'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            var modifiedDate = moment(cell).format('MMM-YY');
+            return modifiedDate;
+          }
+        }
+      },
+      {
+        dataField: 'realmProblem.problem.label',
+        text: i18n.t('static.report.problemDescription'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+
+      },
+
+      // {
+      //   dataField: 'isFound',
+      //   text: 'Is Found',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   // formatter: this.formatLabel
+      // },
+      {
+        dataField: 'realmProblem.problem.actionLabel',
+        text: 'Suggestion',
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+      },
+      // {
+      //   dataField: 'realmProblem.criticality.label',
+      //   text: 'Criticality',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: (cell, row) => {
+      //     if (cell != null && cell != "") {
+      //       return getLabelText(cell, this.state.lang);
+      //     }
+      //   }
+      // },
+      {
+        dataField: 'problemStatus.label',
+        text: i18n.t('static.report.problemStatus'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+          }
+        }
+      },
+      // {
+      //   dataField: 'problem',
+      //   text: 'Action',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: this.buttonFormatter
+      //   // formatter: (cell, row) => {
+      //   //   if (cell != null && cell != "") {
+      //   //     return getLabelText(cell, this.state.lang);
+      //   //   }
+      //   // }
+      // },
+      // {
+      //   dataField: 'note',
+      //   text: 'Note',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center'
+      // }
+      {
+        dataField: 'realmProblem.problem.actionUrl',
+        text: i18n.t('static.common.action'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.buttonFormatter
+      }
+    ];
+    const options = {
+      hidePageListOnlyOnePage: true,
+      firstPageText: i18n.t('static.common.first'),
+      prePageText: i18n.t('static.common.back'),
+      nextPageText: i18n.t('static.common.next'),
+      lastPageText: i18n.t('static.common.last'),
+      nextPageTitle: i18n.t('static.common.firstPage'),
+      prePageTitle: i18n.t('static.common.prevPage'),
+      firstPageTitle: i18n.t('static.common.nextPage'),
+      lastPageTitle: i18n.t('static.common.lastPage'),
+      showTotal: true,
+      paginationTotalRenderer: customTotal,
+      disablePageTitle: true,
+      sizePerPageList: [{
+        text: '10', value: 10
+      }, {
+        text: '30', value: 30
+      }
+        ,
+      {
+        text: '50', value: 50
+      },
+      {
+        text: 'All', value: this.state.problemActionList.length
+      }]
+    }
+
+    // const slides = items.map((item) => {
 
     // const items = [
     //   // {
@@ -314,6 +636,7 @@ class ApplicationDashboard extends Component {
         </CarouselItem>
       );
     });
+
 
     return (
       <div className="animated fadeIn">
@@ -433,6 +756,43 @@ class ApplicationDashboard extends Component {
             </Card>
           </Col>
         </Row>
+        {/* <Row className="mt-2">
+          <Col md="12">
+            <Card>
+              <CardHeader className="text-center">QAT Problems</CardHeader>
+              <CardBody>
+                <ToolkitProvider
+                  keyField="programId"
+                  data={this.state.problemActionList}
+                  columns={columns}
+                  search={{ searchFormatted: true }}
+                  hover
+                  filter={filterFactory()}
+                >
+                  {
+                    props => (
+                      <div className="TableCust">
+                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                          <SearchBar {...props.searchProps} />
+                          <ClearSearchButton {...props.searchProps} />
+                        </div>
+                        <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                          pagination={paginationFactory(options)}
+                          rowEvents={{
+                            onClick: (e, row, rowIndex) => {
+                              this.editProblem(row);
+                            }
+                          }}
+                          {...props.baseProps}
+                        />
+                      </div>
+                    )
+                  }
+                </ToolkitProvider>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row> */}
         {/* <Row className="mt-2">
           <Col md="12">
             <Card> */}

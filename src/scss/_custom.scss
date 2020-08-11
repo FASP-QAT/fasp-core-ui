@@ -1989,9 +1989,30 @@ input::placeholder {
 // .otherfeild-text{margin-left: -37%;}
 // .planning-text{    margin-left: 0px;}
 
-.background-red {
+// .background-red {
+//   // background-color: red;
+//   background-color: #ce2f2f!important;
+// }
+// .background-orange {
+//   // background-color: red;
+//   background-color: #e07847!important;
+// }
+// .background-yellow {
+//   // background-color: red;
+//   background-color: #e0d24d!important;
+// }
+
+.background-red td:not(:last-child){
   // background-color: red;
-  background-color: #fac8c8!important;
+  background-color: #cc4e4e!important;
+}
+.background-orange td:not(:last-child){
+  // background-color: red;
+  background-color: #e07847!important;
+}
+.background-yellow td:not(:last-child){
+  // background-color: red;
+  background-color: #e0d24d!important;
 }
 
 .supplyplan-larrow {
