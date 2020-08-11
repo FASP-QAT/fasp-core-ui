@@ -216,7 +216,8 @@ export default class WhatIfReportComponent extends React.Component {
             expiredStockDetails: [],
             expiredStockDetailsTotal: 0,
             showShipments: 0,
-            paColors: []
+            paColors: [],
+            programSelect: ""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -313,7 +314,7 @@ export default class WhatIfReportComponent extends React.Component {
                     })
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
-                    this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                    this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     this.setState({
                         message: i18n.t('static.whatIf.supplyPlanReset'),
                         color: 'green',
@@ -417,7 +418,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 1) {
@@ -461,7 +462,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 } else if (this.state.scenarioId == 2) {
                     var consumptionList = programJson.consumptionList;
@@ -503,7 +504,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
@@ -537,7 +538,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 5) {
@@ -572,7 +573,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 6) {
@@ -608,7 +609,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 }
@@ -949,8 +950,8 @@ export default class WhatIfReportComponent extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: programJson1.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id
                         }
                         proList[i] = programJson
                     }
@@ -962,11 +963,13 @@ export default class WhatIfReportComponent extends React.Component {
         }.bind(this);
     };
 
-    getPlanningUnitList(event) {
+    getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         this.setState({
             display: 'none',
-            planningUnitChange: false
+            planningUnitChange: false,
+            programSelect: value,
+            programId: value.value
         })
         var db1;
         var storeOS;
@@ -984,7 +987,7 @@ export default class WhatIfReportComponent extends React.Component {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(document.getElementById("programId").value);
+            var programRequest = programDataOs.get(value.value);
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -1033,7 +1036,7 @@ export default class WhatIfReportComponent extends React.Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var programId = (value.value).split("_")[0];
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -2410,7 +2413,7 @@ export default class WhatIfReportComponent extends React.Component {
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
             });
-            this.formSubmit(this.state.planningUnit,monthCountConsumption);
+            this.formSubmit(this.state.planningUnit, monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
             this.setState({
                 shipments: !this.state.shipments
@@ -2427,7 +2430,7 @@ export default class WhatIfReportComponent extends React.Component {
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
             });
-            this.formSubmit(this.state.planningUnit,monthCountAdjustments);
+            this.formSubmit(this.state.planningUnit, monthCountAdjustments);
         } else if (supplyPlanType == 'expiredStock') {
             var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
             console.log("startDate", startDate)
@@ -2505,7 +2508,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit,monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     rightClicked() {
@@ -2513,7 +2516,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit,monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     leftClickedConsumption() {
@@ -2521,7 +2524,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(this.state.planningUnit,monthCountConsumption)
+        this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
 
     rightClickedConsumption() {
@@ -2529,7 +2532,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(this.state.planningUnit,monthCountConsumption);
+        this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
 
     leftClickedAdjustments() {
@@ -2537,7 +2540,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(this.state.planningUnit,monthCountAdjustments)
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
 
     rightClickedAdjustments() {
@@ -2545,7 +2548,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(this.state.planningUnit,monthCountAdjustments);
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
 
     // Consumption Functionality
@@ -3638,7 +3641,7 @@ export default class WhatIfReportComponent extends React.Component {
                             color: 'green',
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -5230,7 +5233,7 @@ export default class WhatIfReportComponent extends React.Component {
                             color: 'green',
                             inventoryChangedFlag: 0
                         })
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -6289,18 +6292,15 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="row">
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls">
-                                        <InputGroup>
-                                            <Input type="select"
-                                                bsSize="sm"
-                                                value={this.state.programId}
-                                                name="programId" id="programId"
-                                                onChange={this.getPlanningUnitList}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {programs}
-                                            </Input>
-                                        </InputGroup>
+                                    <div className="controls ">
+                                        <Select
+                                            name="programSelect"
+                                            id="programSelect"
+                                            bsSize="sm"
+                                            options={this.state.programList}
+                                            value={this.state.programSelect}
+                                            onChange={(e) => { this.getPlanningUnitList(e); }}
+                                        />
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-4 mb-1">
@@ -6317,7 +6317,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </div>
                                 </FormGroup>
                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-
+                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                             </div>
                             <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
                                 <ul className="legendcommitversion list-group">

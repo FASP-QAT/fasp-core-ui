@@ -1838,8 +1838,6 @@ export default class SupplyPlanComponent extends React.Component {
                             var shipmentTotalQty = 0;
 
                             var manualShipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= m[i].startDate && c.expectedDeliveryDate <= m[i].endDate) && c.erpFlag == false);
-                            console.log("==================hiiiiiiiiii");
-                            console.log("==================manualShipmentArr", manualShipmentArr);
                             var manualTotalQty = 0;
 
                             var deliveredShipmentsQty = 0;
@@ -2726,7 +2724,7 @@ export default class SupplyPlanComponent extends React.Component {
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
             });
-            this.formSubmit(this.state.planningUnit,monthCountAdjustments);
+            this.formSubmit(this.state.planningUnit, monthCountAdjustments);
         } else if (supplyPlanType == 'expiredStock') {
             var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
             console.log("startDate", startDate)
@@ -2804,7 +2802,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit,monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     rightClicked() {
@@ -2812,7 +2810,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit,monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     leftClickedConsumption() {
@@ -2820,7 +2818,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(this.state.planningUnit,monthCountConsumption)
+        this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
 
     rightClickedConsumption() {
@@ -2828,7 +2826,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(this.state.planningUnit,monthCountConsumption);
+        this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
 
     leftClickedAdjustments() {
@@ -2836,7 +2834,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(this.state.planningUnit,monthCountAdjustments)
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
 
     rightClickedAdjustments() {
@@ -2844,7 +2842,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(this.state.planningUnit,monthCountAdjustments);
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
 
     // Consumption Functionality
@@ -3937,7 +3935,7 @@ export default class SupplyPlanComponent extends React.Component {
                             color: 'green',
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -5529,7 +5527,7 @@ export default class SupplyPlanComponent extends React.Component {
                             color: 'green',
                             inventoryChangedFlag: 0
                         })
-                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
