@@ -5713,7 +5713,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-4 mb-1">
+                                                    <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
@@ -5729,7 +5729,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 mb-1">
+                                                    <FormGroup className="col-md-4 ">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
                                                             <Select
