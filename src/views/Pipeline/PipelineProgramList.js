@@ -133,13 +133,13 @@ export default class PipelineProgramList extends Component {
                 headerAlign: 'center',
                 formatter: this.formatDate
             },
-            {
-                dataField: 'STATUS',
-                text: 'Status',
-                align: 'center',
-                headerAlign: 'center',
+            // {
+            //     dataField: 'STATUS',
+            //     text: 'Status',
+            //     align: 'center',
+            //     headerAlign: 'center',
 
-            }
+            // }
         ];
         const options = {
             hidePageListOnlyOnePage: true,

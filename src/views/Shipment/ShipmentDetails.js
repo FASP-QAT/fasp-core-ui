@@ -1,7 +1,4 @@
 import React from "react";
-import ReactDOM from 'react-dom';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody,
     Label, Input, FormGroup,
@@ -9,14 +6,11 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, APPROVED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
-import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
@@ -107,6 +101,62 @@ export default class ShipmentDetails extends React.Component {
 
             }.bind(this);
         }.bind(this)
+
+
+        var programIdd = this.props.match.params.programId;
+        var versionId = this.props.match.params.versionId;
+        var planningUnitId = this.props.match.params.planningUnitId;
+
+        if (programIdd != '') {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                }.bind(this);
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    console.log("myResult", myResult);
+                    var programId = programIdd.split("_")[0];
+                    console.log('programId----->>>', programId)
+                    console.log(myResult);
+                    var proList = []
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].program.id == programId && myResult[i].active == true) {
+                            var productJson = {
+                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                id: myResult[i].planningUnit.id
+                            }
+                            proList[i] = productJson
+                        }
+                    }
+                    console.log("proList---" + proList);
+                    this.setState({
+                        planningUnitList: proList,
+                        planningUnitListAll: myResult
+                    })
+                    this.setState({ programId: programIdd, planningUnitId: planningUnitId });
+                    this.formSubmit();
+                }.bind(this)
+            }.bind(this)
+        }
     };
 
     getPlanningUnitList(event) {
@@ -287,7 +337,7 @@ export default class ShipmentDetails extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.planningunit')}</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
                                                             <InputGroup>
                                                                 <Input

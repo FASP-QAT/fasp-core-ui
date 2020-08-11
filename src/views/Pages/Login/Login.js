@@ -26,6 +26,8 @@ import moment from 'moment';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
+import { qatProblemActions } from '../../../CommonComponent/QatProblemActions'
+
 
 const initialValues = {
   emailId: "",
@@ -239,6 +241,7 @@ class Login extends Component {
                                   }
                                 }
                               );
+
                           }
                           else {
                             var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
@@ -263,7 +266,9 @@ class Login extends Component {
                                     this.props.history.push(`/logout/static.message.syncExpiresOn`)
                                   } else {
                                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                                    // qatProblemActions();
                                     this.props.history.push(`/ApplicationDashboard`)
+
                                   }
                                 } else {
                                   this.setState({ message: 'static.message.login.invalidCredentials' });

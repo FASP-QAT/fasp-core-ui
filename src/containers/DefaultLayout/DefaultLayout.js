@@ -521,17 +521,17 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
-                            name: 'QAT PROBLEM LIST',
+                            name: 'QAT Problem List',
                             url: '/report/problemList',
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
-                          {
-                            name: 'QAT PROBLEM+ACTION REPORT',
-                            url: '/report/qatProblemPlusActionReport',
-                            icon: 'fa fa-file-text-o',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
-                          },
+                          // {
+                          //   name: 'QAT PROBLEM+ACTION REPORT',
+                          //   url: '/report/qatProblemPlusActionReport',
+                          //   icon: 'fa fa-file-text-o',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          // },
                           // {
                           //   name: i18n.t('static.dashboard.funderExport'),
                           //   url: '/report/funderExport',
