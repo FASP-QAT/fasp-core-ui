@@ -294,7 +294,8 @@ export default class LanguageListComponent extends Component {
         this.state = {
             langaugeList: [],
             message: '',
-            selSource: []
+            selSource: [],
+            loading: true
         }
         this.editLanguage = this.editLanguage.bind(this);
         this.addLanguage = this.addLanguage.bind(this);
@@ -427,11 +428,12 @@ export default class LanguageListComponent extends Component {
                                 allowExport: false,
                                 paginationOptions: [10, 25, 50],
                                 position: 'top',
+                                contextMenu: false
                             };
                             var languageEl = jexcel(document.getElementById("tableDiv"), options);
                             this.el = languageEl;
                             this.setState({
-                                languageEl: languageEl
+                                languageEl: languageEl, loading: false
                             })
 
 
@@ -483,7 +485,7 @@ export default class LanguageListComponent extends Component {
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card  style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
