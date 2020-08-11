@@ -313,7 +313,7 @@ export default class WhatIfReportComponent extends React.Component {
                     })
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
-                    this.formSubmit(this.state.monthCount);
+                    this.formSubmit(this.state.planningUnit,this.state.monthCount);
                     this.setState({
                         message: i18n.t('static.whatIf.supplyPlanReset'),
                         color: 'green',
@@ -417,7 +417,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 1) {
@@ -461,7 +461,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
                     }.bind(this)
                 } else if (this.state.scenarioId == 2) {
                     var consumptionList = programJson.consumptionList;
@@ -503,7 +503,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
@@ -537,7 +537,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 5) {
@@ -572,7 +572,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 6) {
@@ -608,7 +608,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
 
                     }.bind(this)
                 }
@@ -2410,7 +2410,7 @@ export default class WhatIfReportComponent extends React.Component {
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
             });
-            this.formSubmit(monthCountConsumption);
+            this.formSubmit(this.state.planningUnit,monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
             this.setState({
                 shipments: !this.state.shipments
@@ -2427,7 +2427,7 @@ export default class WhatIfReportComponent extends React.Component {
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
             });
-            this.formSubmit(monthCountAdjustments);
+            this.formSubmit(this.state.planningUnit,monthCountAdjustments);
         } else if (supplyPlanType == 'expiredStock') {
             var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
             console.log("startDate", startDate)
@@ -2505,7 +2505,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(monthCount)
+        this.formSubmit(this.state.planningUnit,monthCount)
     }
 
     rightClicked() {
@@ -2513,7 +2513,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(monthCount)
+        this.formSubmit(this.state.planningUnit,monthCount)
     }
 
     leftClickedConsumption() {
@@ -2521,7 +2521,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(monthCountConsumption)
+        this.formSubmit(this.state.planningUnit,monthCountConsumption)
     }
 
     rightClickedConsumption() {
@@ -2529,7 +2529,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(monthCountConsumption);
+        this.formSubmit(this.state.planningUnit,monthCountConsumption);
     }
 
     leftClickedAdjustments() {
@@ -2537,7 +2537,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(monthCountAdjustments)
+        this.formSubmit(this.state.planningUnit,monthCountAdjustments)
     }
 
     rightClickedAdjustments() {
@@ -2545,7 +2545,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(monthCountAdjustments);
+        this.formSubmit(this.state.planningUnit,monthCountAdjustments);
     }
 
     // Consumption Functionality
@@ -3638,7 +3638,7 @@ export default class WhatIfReportComponent extends React.Component {
                             color: 'green',
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -5230,7 +5230,7 @@ export default class WhatIfReportComponent extends React.Component {
                             color: 'green',
                             inventoryChangedFlag: 0
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit,this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
