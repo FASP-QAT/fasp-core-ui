@@ -172,7 +172,8 @@ export default class SupplyPlanComponent extends React.Component {
             expiredStockDetails: [],
             expiredStockDetailsTotal: 0,
             showShipments: 0,
-            paColors: []
+            paColors: [],
+            programSelect: ""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -1263,8 +1264,8 @@ export default class SupplyPlanComponent extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: programJson1.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id
                         }
                         proList[i] = programJson
                     }
@@ -1276,11 +1277,13 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
     };
 
-    getPlanningUnitList(event) {
+    getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         this.setState({
             display: 'none',
-            planningUnitChange: false
+            planningUnitChange: false,
+            programSelect: value,
+            programId: value.value
         })
         var db1;
         var storeOS;
@@ -1298,7 +1301,7 @@ export default class SupplyPlanComponent extends React.Component {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(document.getElementById("programId").value);
+            var programRequest = programDataOs.get(value.value);
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -1329,7 +1332,7 @@ export default class SupplyPlanComponent extends React.Component {
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    var programId = (document.getElementById("programId").value).split("_")[0];
+                    var programId = (value.value).split("_")[0];
                     var proList = []
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -5716,17 +5719,14 @@ export default class SupplyPlanComponent extends React.Component {
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    name="programId" id="programId"
-                                                                    onChange={this.getPlanningUnitList}
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {programs}
-                                                                </Input>
-                                                            </InputGroup>
+                                                            <Select
+                                                                name="programSelect"
+                                                                id="programSelect"
+                                                                bsSize="sm"
+                                                                options={this.state.programList}
+                                                                value={this.state.programSelect}
+                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            />
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-4 ">
@@ -5743,6 +5743,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
                                                 <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
                                                     <ul className="legendcommitversion list-group">
