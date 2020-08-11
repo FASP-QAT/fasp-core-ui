@@ -264,7 +264,7 @@ class RealmDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="p-0">
                 <div class="h1 text-muted text-left mb-0 m-3">
-                  <i class="icon-people icon-color"></i>
+                  <i class="cui-user icon-color"></i>
                   <ButtonGroup className="float-right BtnZindex">
                     <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
                       <DropdownToggle caret className="p-0" color="transparent">
@@ -350,7 +350,7 @@ class RealmDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="box-p">
                 <div class="h1 text-muted text-left mb-2  ">
-                  <i class="icon-location-pin icon-color"></i>
+                  <i class="cui-location-pin icon-color"></i>
                   <ButtonGroup className="float-right BtnZindex">
                     <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
                       <DropdownToggle caret className="p-0" color="transparent">

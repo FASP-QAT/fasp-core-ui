@@ -649,7 +649,7 @@ class ApplicationDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="p-0">
                 <div class="h1 text-muted text-left mb-0 m-3">
-                  <i class="icon-people icon-color"></i>
+                  <i class="cui-user icon-color"></i>
                   <ButtonGroup className="float-right BtnZindex">
                     <Dropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
                       <DropdownToggle caret className="p-0" color="transparent">
@@ -680,7 +680,7 @@ class ApplicationDashboard extends Component {
             <Card className=" CardHeight">
               <CardBody className="box-p">
                 <div class="h1 text-muted text-left mb-2  ">
-                  <i class="icon-grid icon-color"></i>
+                  <i class="fa fa-table icon-color"></i>
 
                   <ButtonGroup className="float-right BtnZindex">
                     <Dropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
