@@ -210,6 +210,62 @@ export default class SupplyPlanComponent extends React.Component {
         this.updateFieldData = this.updateFieldData.bind(this);
     }
 
+    roundN = num => {
+        if (num != '') {
+            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        } else {
+            return ''
+        }
+    }
+
+    formatter = value => {
+        if (value != '' && !isNaN(Number.parseInt(value))) {
+            // var cell1 = this.roundN(value)
+            // cell1 += '';
+            // var x = cell1.split('.');
+            // var x1 = x[0];
+            // var x2 = x.length > 1 ? '.' + x[1] : '';
+            // var rgx = /(\d+)(\d{3})/;
+            // while (rgx.test(x1)) {
+            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            // }
+            // return x1 + x2;
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (isNaN(Number.parseInt(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
+    formatterDouble = value => {
+        if (value != '' && !isNaN(Number.parseInt(value))) {
+            var cell1 = this.roundN(value)
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (isNaN(Number.parseInt(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
     updateFieldData(value) {
         console.log("Value", value);
         // console.log(event.value)
@@ -296,8 +352,8 @@ export default class SupplyPlanComponent extends React.Component {
         const exportCSV = () => {
 
             var csvRow = [];
-            csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+            csvRow.push(i18n.t('static.program.program') + ' , ' + ((this.state.programSelect.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((this.state.planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
             csvRow.push('')
             csvRow.push('')
             csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -416,10 +472,10 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     if (i == 1) {
                         doc.setFontSize(8)
-                        doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                        doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 8, 80, {
                             align: 'left'
                         })
-                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 8, 90, {
                             align: 'left'
                         })
                     }
@@ -478,7 +534,7 @@ export default class SupplyPlanComponent extends React.Component {
             var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-            const data = [openningArr, consumptionArr, shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr, closingBalanceArr, monthsOfStockArr, amcgArr, minStocArr, maxStockArr, unmetDemandArr];
+            const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map(c => this.formatter(c)), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), minStocArr.map(c => this.formatter(c)), maxStockArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
             let content = {
                 margin: { top: 80, bottom: 50 },
