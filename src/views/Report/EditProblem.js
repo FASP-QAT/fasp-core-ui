@@ -494,13 +494,13 @@ export default class EditLanguageComponent extends Component {
 
     render() {
 
-        const { problemStatusList } = this.state;
-        let problemStatus = problemStatusList.length > 0
-            && problemStatusList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
+        // const { problemStatusList } = this.state;
+        // let problemStatus = problemStatusList.length > 0
+        //     && problemStatusList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
 
 
         const { SearchBar, ClearSearchButton } = Search;
