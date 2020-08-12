@@ -30,6 +30,9 @@ import "jspdf-autotable";
 import csvicon from '../../assets/img/csv.png'
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan.js";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -255,6 +258,14 @@ export default class WhatIfReportComponent extends React.Component {
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.updateState = this.updateState.bind(this)
+        this.updateFieldData = this.updateFieldData.bind(this);
+    }
+
+    updateFieldData(value) {
+        console.log("Value", value);
+        // console.log(event.value)
+        this.setState({ planningUnit: value, planningUnitId: value.value });
+
     }
 
     resetClicked() {
@@ -1027,8 +1038,8 @@ export default class WhatIfReportComponent extends React.Component {
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
                                 var productJson = {
-                                    name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                    id: myResult[i].planningUnit.id
+                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                    value: myResult[i].planningUnit.id
                                 }
                                 proList.push(productJson);
                                 planningList.push(myResult[i]);
@@ -1099,7 +1110,7 @@ export default class WhatIfReportComponent extends React.Component {
         return month;
     }
 
-    formSubmit(monthCount) {
+    formSubmit(value, monthCount) {
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -1108,7 +1119,7 @@ export default class WhatIfReportComponent extends React.Component {
         // this.toggleAccordionTotalShipments();
         // this.toggleAccordionManualShipments();
         // this.toggleAccordionErpShipments();
-        if (document.getElementById("planningUnitId").value != 0) {
+        if (value.value != 0) {
             this.setState({
                 planningUnitChange: true,
                 display: 'block'
@@ -1124,10 +1135,8 @@ export default class WhatIfReportComponent extends React.Component {
 
         var programId = document.getElementById("programId").value;
         var regionId = -1;
-        var planningUnitId = document.getElementById("planningUnitId").value;
-
-        var planningUnit = document.getElementById("planningUnitId");
-        var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
+        var planningUnitId = value.value;
+        var planningUnitName = value.label;
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
@@ -1670,7 +1679,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (deliveredShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                deliveredShipmentsTotalData.push({ qty: deliveredShipmentsQty, month: m[i], shipmentDetail: deliveredShipmentsDetailsArr, noOfShipments: deliveredShipmentsDetailsArr.length, colour: colour })
+                                deliveredShipmentsTotalData.push({ qty: deliveredShipmentsQty, month: m[i], shipmentDetail: deliveredShipmentsDetailsArr, noOfShipments: deliveredShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 deliveredShipmentsTotalData.push("");
                             }
@@ -1680,7 +1689,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (shippedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                shippedShipmentsTotalData.push({ qty: shippedShipmentsQty, month: m[i], shipmentDetail: shippedShipmentsDetailsArr, noOfShipments: shippedShipmentsDetailsArr.length, colour: colour })
+                                shippedShipmentsTotalData.push({ qty: shippedShipmentsQty, month: m[i], shipmentDetail: shippedShipmentsDetailsArr, noOfShipments: shippedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 shippedShipmentsTotalData.push("");
                             }
@@ -1690,7 +1699,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (orderedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                orderedShipmentsTotalData.push({ qty: orderedShipmentsQty, month: m[i], shipmentDetail: orderedShipmentsDetailsArr, noOfShipments: orderedShipmentsDetailsArr.length, colour: colour })
+                                orderedShipmentsTotalData.push({ qty: orderedShipmentsQty, month: m[i], shipmentDetail: orderedShipmentsDetailsArr, noOfShipments: orderedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 orderedShipmentsTotalData.push("");
                             }
@@ -1700,7 +1709,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (plannedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                plannedShipmentsTotalData.push({ qty: plannedShipmentsQty, month: m[i], shipmentDetail: plannedShipmentsDetailsArr, noOfShipments: plannedShipmentsDetailsArr.length, colour: colour })
+                                plannedShipmentsTotalData.push({ qty: plannedShipmentsQty, month: m[i], shipmentDetail: plannedShipmentsDetailsArr, noOfShipments: plannedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 plannedShipmentsTotalData.push("");
                             }
@@ -1813,7 +1822,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (deliveredErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                deliveredErpShipmentsTotalData.push({ qty: deliveredErpShipmentsQty, month: m[i], shipmentDetail: deliveredErpShipmentsDetailsArr, noOfShipments: deliveredErpShipmentsDetailsArr.length, colour: colour })
+                                deliveredErpShipmentsTotalData.push({ qty: deliveredErpShipmentsQty, month: m[i], shipmentDetail: deliveredErpShipmentsDetailsArr, noOfShipments: deliveredErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 deliveredErpShipmentsTotalData.push("");
                             }
@@ -1823,7 +1832,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (shippedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                shippedErpShipmentsTotalData.push({ qty: shippedErpShipmentsQty, month: m[i], shipmentDetail: shippedErpShipmentsDetailsArr, noOfShipments: shippedErpShipmentsDetailsArr.length, colour: colour })
+                                shippedErpShipmentsTotalData.push({ qty: shippedErpShipmentsQty, month: m[i], shipmentDetail: shippedErpShipmentsDetailsArr, noOfShipments: shippedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 shippedErpShipmentsTotalData.push("");
                             }
@@ -1833,7 +1842,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (orderedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                orderedErpShipmentsTotalData.push({ qty: orderedErpShipmentsQty, month: m[i], shipmentDetail: orderedErpShipmentsDetailsArr, noOfShipments: orderedErpShipmentsDetailsArr.length, colour: colour })
+                                orderedErpShipmentsTotalData.push({ qty: orderedErpShipmentsQty, month: m[i], shipmentDetail: orderedErpShipmentsDetailsArr, noOfShipments: orderedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 orderedErpShipmentsTotalData.push("");
                             }
@@ -1843,7 +1852,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (plannedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                plannedErpShipmentsTotalData.push({ qty: plannedErpShipmentsQty, month: m[i], shipmentDetail: plannedErpShipmentsDetailsArr, noOfShipments: plannedErpShipmentsDetailsArr.length, colour: colour })
+                                plannedErpShipmentsTotalData.push({ qty: plannedErpShipmentsQty, month: m[i], shipmentDetail: plannedErpShipmentsDetailsArr, noOfShipments: plannedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 plannedErpShipmentsTotalData.push("");
                             }
@@ -5729,7 +5738,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.deliveredShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5744,7 +5753,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.shippedShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td align="right" bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5758,7 +5767,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.orderedShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5771,7 +5780,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.plannedShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5795,7 +5804,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5809,7 +5818,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.shippedErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5822,7 +5831,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.orderedErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -5835,7 +5844,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.plannedErpShipmentsTotalData.map(item1 => {
                                                 if (item1.toString() != "") {
-                                                    return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                    return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
                                                     return (<td align="right" >{item1}</td>)
                                                 }
@@ -6294,24 +6303,20 @@ export default class WhatIfReportComponent extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-4">
+                                <FormGroup className="col-md-4 mb-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                    <div className="controls">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="sm"
-                                                value={this.state.planningUnitId}
-                                                onChange={() => { this.formSubmit(this.state.monthCount); }}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {planningUnits}
-                                            </Input>
-                                        </InputGroup>
+                                    <div className="controls ">
+                                        <Select
+                                            name="planningUnit"
+                                            id="planningUnit"
+                                            bsSize="sm"
+                                            options={this.state.planningUnitList}
+                                            value={this.state.planningUnit}
+                                            onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
+                                        />
                                     </div>
                                 </FormGroup>
+                                <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
 
                             </div>
                             <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>

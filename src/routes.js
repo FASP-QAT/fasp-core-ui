@@ -132,6 +132,7 @@ const AddLanguage = React.lazy(() => import('./views/Language/AddLanguageCompone
 const ListLanguage = React.lazy(() => import('./views/Language/LanguageListComponent'));
 const EditLanguage = React.lazy(() => import('./views/Language/EditLanguageComponent'));
 const EditProblem = React.lazy(() => import('./views/Report/EditProblem'));
+const AddProblem = React.lazy(() => import('./views/Report/AddProblem'));
 
 const AddUnit = React.lazy(() => import('./views/Unit/AddUnitComponent'));
 const ListUnit = React.lazy(() => import('./views/Unit/UnitListComponent'));
@@ -163,6 +164,7 @@ const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanComponent'));
 const WhatIfReport = React.lazy(() => import('./views/WhatIfReport/whatIfReport'));
 const ManualTagging = React.lazy(() => import('./views/ManualTagging/ManualTagging'));
+const ShipmentDelinking = React.lazy(() => import('./views/ManualTagging/ShipmentDelinking'));
 
 
 const AddForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/AddForecastingUnitComponent'));
@@ -228,9 +230,18 @@ const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
+// const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+
+  { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
+  { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'Shipment Details', component: ShipmentList },
+  { path: '/report/addProblem/:color/:message', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
+  { path: '/report/problemList/:color/:message', name:'Qat Problem List', component: ProblemList },
+  // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
+
+  { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
   { path: '/report/inventoryTurns', name: ' Inventory Turns', component: InventoryTurnsReport },
   { path: '/report/costOfInventory', name: ' Cost Of Inventory', component: CostOfInventoryReport },
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name: 'Planning Unit List', component: PlanningUnitListNegativeInventory },
@@ -381,7 +392,8 @@ const routes = [
   { path: '/language/listLanguage', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
   { path: '/language/listLanguage/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
   { path: '/language/editLanguage/:languageId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.languageheader') }), component: EditLanguage },
-  { path: '/report/editProblem/:problemReportId/:programId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.report.problem') }), component: EditProblem },
+  { path: '/report/editProblem/:problemReportId/:programId/:index/:problemStatusId/:problemTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.report.problem') }), component: EditProblem },
+  { path: '/report/addProblem', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
 
   { path: '/unit/addUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.unit') }), component: AddUnit },
   { path: '/unit/listUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.unit') }), component: ListUnit },
@@ -419,6 +431,7 @@ const routes = [
   { path: '/supplyPlan', name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/report/whatIf', name: i18n.t('static.dashboard.whatIf'), component: WhatIfReport },
   { path: '/shipment/manualTagging', name: i18n.t('static.dashboard.manualTagging'), component: ManualTagging },
+  { path: '/shipment/delinking', name: i18n.t('static.dashboard.delinking'), component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 

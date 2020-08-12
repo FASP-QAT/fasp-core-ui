@@ -86,8 +86,8 @@ const validationSchema = function (values) {
             .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
-        programNotes: Yup.string()
-            .required(i18n.t('static.program.validnotestext'))
+        // programNotes: Yup.string()
+        //     .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -363,8 +363,7 @@ export default class EditProgram extends Component {
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
-            healthAreaId: true,
-            programNotes: true
+            healthAreaId: true
         }
         )
         this.validateForm(errors)
@@ -592,13 +591,11 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
 
                                                         <Input
                                                             value={this.state.program.programNotes}
                                                             bsSize="sm"
-                                                            valid={!errors.programNotes}
-                                                            invalid={touched.programNotes && !!errors.programNotes || this.state.program.programNotes == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="textarea" name="programNotes" id="programNotes" />

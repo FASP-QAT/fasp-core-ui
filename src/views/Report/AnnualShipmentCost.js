@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY,DATE_FORMAT_CAP } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -84,7 +84,7 @@ class AnnualShipmentCost extends Component {
             "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
             "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
             "reportbaseValue": document.getElementById("view").value,
-            
+
         }
 
         let versionId = document.getElementById("versionId").value;
@@ -246,7 +246,7 @@ class AnnualShipmentCost extends Component {
                                     outPutList.push(json);
                                 });
                                 console.log("9----", outPutList);
-                                this.setState({ outPutList: outPutList,message:'' });
+                                this.setState({ outPutList: outPutList, message: '' });
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
@@ -258,7 +258,7 @@ class AnnualShipmentCost extends Component {
                 ReportService.getAnnualShipmentCost(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));
-                        var outPutList=[];
+                        var outPutList = [];
                         var responseData = response.data;
                         for (var i = 0; i < responseData.length; i++) {
                             var shipmentAmt = responseData[i].shipmentAmt;
@@ -271,10 +271,10 @@ class AnnualShipmentCost extends Component {
                                 'planningUnit': getLabelText(responseData[i].planningUnit.label, this.state.lang)
                             }
                             for (var key in shipmentAmt) {
-                                var keyName=key.split("-")[1];
-                                var keyValue=shipmentAmt[key];
-                                console.log("keyName--",keyName);
-                                console.log("keyValue--",keyValue);
+                                var keyName = key.split("-")[1];
+                                var keyValue = shipmentAmt[key];
+                                console.log("keyName--", keyName);
+                                console.log("keyValue--", keyValue);
                                 json[keyName] = keyValue;
                             }
                             outPutList.push(json);
@@ -538,11 +538,11 @@ class AnnualShipmentCost extends Component {
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
             year.push(from);
         }
-        var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
-        //var data = this.state.outPutList;
-        var data = [{ 2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
-        { 2019: 15234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "PEPFAR", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
-        { 2019: 0, 2020: 17234, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "GF", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" }]
+        // var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
+        var data = this.state.outPutList;
+        // var data = [{ 2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
+        // { 2019: 15234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "PEPFAR", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
+        // { 2019: 0, 2020: 17234, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "GF", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" }]
         //this.state.matricsList;//[['GHSC-PSM \n PEPFAR \nplanning unit 1', 200000, 300000], ['PPM \nGF \n planning unit 1', 15826, 2778993]]
         var index = doc.internal.pageSize.width / (year.length + 3);
         var initalvalue = index + 10
@@ -570,7 +570,7 @@ class AnnualShipmentCost extends Component {
             var values = Object.entries(record).map(([key, value]) => (value)
             )
             var total = 0
-            var splittext = doc.splitTextToSize(record.procurementAgent + '\n' + record.fundingsource + '\n' + record.planningUnit, index);
+            var splittext = doc.splitTextToSize(record.procurementAgent + '\n' + record.fundingsource + '\n' + record.planningUnit + '\n' + '\n', index);
 
             doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
             initalvalue = initalvalue + index
@@ -589,13 +589,15 @@ class AnnualShipmentCost extends Component {
                 }
             }
             doc.setFont('helvetica', 'bold')
-            doc.text(this.formatter(total).toString(), initalvalue + index, yindex, {
-                align: 'left'
+            doc.text(this.formatter(total).toString() , initalvalue + index, yindex, {
+                align: 'left',
+                
             });
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
             GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
             if (j < data.length - 1) {
                 if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
+                   console.log("in this if=======");
                     yindex = yindex + 40
                     initalvalue = 10
                     doc.setLineDash([2, 2], 0);
@@ -618,7 +620,8 @@ class AnnualShipmentCost extends Component {
 
                 }
             } if (j == data.length - 1) {
-                yindex = yindex + 40
+                console.log("in this second if=======");
+                yindex = yindex + 80
                 initalvalue = 10
                 doc.setLineDash([2, 2], 0);
                 doc.line(doc.internal.pageSize.width / 8, yindex, doc.internal.pageSize.width - 50, yindex);

@@ -29,6 +29,7 @@ export default class PlanningUnitCapacityList extends Component {
 
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
+        console.log("planningUnitId---"+planningUnitId);
         AuthenticationService.setupAxiosInterceptors();
         if (planningUnitId == 0) {
             PlanningUnitService.getAllPlanningUnitList().then(response => {

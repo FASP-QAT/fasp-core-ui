@@ -8,6 +8,7 @@ import FundingSourceService from "../../api/FundingSourceService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { LABEL_REGEX } from '../../Constants.js';
 
 import i18n from '../../i18n'
 const initialValues = {
@@ -21,7 +22,7 @@ const validationSchema = function (values) {
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
     fundingSource: Yup.string()
-      .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
+      .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
       .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSourceCode: Yup.string()
       // .max(6, i18n.t('static.common.max6digittext'))
@@ -239,9 +240,9 @@ class AddFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               value={this.Capitalize(this.state.fundingSource.fundingSourceCode)}
-                              required 
+                              required
                               maxLength={6}
-                              />
+                            />
                             <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                           </FormGroup>
                         </CardBody>

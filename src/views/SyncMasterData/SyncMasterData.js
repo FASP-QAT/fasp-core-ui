@@ -17,7 +17,8 @@ import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
 import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
-import UserService from '../../api/UserService'
+import UserService from '../../api/UserService';
+import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 
 export default class SyncMasterData extends Component {
 

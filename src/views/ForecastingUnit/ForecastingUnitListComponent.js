@@ -404,7 +404,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                     bsSize="sm"
                                                 // onChange={this.filterDataForRealm}
                                                 >
-                                                    {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+                                                    <option value="-1">{i18n.t('static.common.all')}</option>
 
                                                     {realmList}
                                                 </Input>

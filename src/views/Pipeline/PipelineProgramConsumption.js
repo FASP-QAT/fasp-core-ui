@@ -6,7 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions';
 
 export default class PipelineProgramConsumption extends Component {
 
@@ -84,7 +84,7 @@ export default class PipelineProgramConsumption extends Component {
                 dataSourceId = map.get("5");
             } else {
                 dataSourceId = list[map.get("8")].dataSourceId;
-                
+
             }
 
             var consumptionJson = {
@@ -158,8 +158,14 @@ export default class PipelineProgramConsumption extends Component {
                                 for (var j = 0; j < consumptionList.length; j++) {
                                     for (var cm = 0; cm < consumptionList[j].consNumMonth; cm++) {
                                         data = [];
-                                        data[1] = moment(consumptionList[j].consumptionDate).add(cm,'months').format("YYYY-MM-DD");
-                                        data[2] = consumptionList[j].regionId;
+                                        data[1] = moment(consumptionList[j].consumptionDate).add(cm, 'months').format("YYYY-MM-DD");
+
+                                        if (regionList.length == 1) {
+                                            data[2] = regionList[0].id;
+                                        } else {
+                                            data[2] = consumptionList[j].regionId;
+                                        };
+
                                         data[3] = consumptionList[j].consumptionQty;
                                         data[4] = consumptionList[j].dayOfStockOut;
                                         data[5] = consumptionList[j].dataSourceId;
@@ -228,7 +234,7 @@ export default class PipelineProgramConsumption extends Component {
                                             source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                         },
 
-                                        { title: 'Index', type: 'hidden'},
+                                        { title: 'Index', type: 'hidden' },
                                         // { title: 'Last Modified date', type: 'text', readOnly: true },
                                         // { title: 'Last Modified by', type: 'text', readOnly: true }
                                     ],
@@ -242,6 +248,7 @@ export default class PipelineProgramConsumption extends Component {
                                     allowDeleteRow: false,
                                     onchange: this.changed,
                                     oneditionend: this.onedit,
+                                    allowInsertRow: false,
                                     copyCompatibility: true,
                                     paginationOptions: [10, 25, 50],
                                     position: 'top',
@@ -250,7 +257,7 @@ export default class PipelineProgramConsumption extends Component {
                                         show: '',
                                         entries: '',
                                     },
-                                    onload: this.loadedJexcelCommonFunction,
+                                    onload: this.loadedJexcelCommonFunctionTwo,
                                 };
 
                                 this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
@@ -371,10 +378,10 @@ export default class PipelineProgramConsumption extends Component {
         });
     }
 
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+    loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
+        // jExcelLoadedFunctionWithoutPagination(instance);
     }
-    
+
     render() {
         return (
             <>

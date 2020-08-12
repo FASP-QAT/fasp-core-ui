@@ -438,6 +438,7 @@ label.arrow_label:after {
 .Select--multi .Select-value {
   color: #212721 !important;
   font-size: 12px !important;
+  margin-top: 3px!important;
 }
 
 .Select--multi .Select-value-icon:focus,
@@ -1989,14 +1990,35 @@ input::placeholder {
 // .otherfeild-text{margin-left: -37%;}
 // .planning-text{    margin-left: 0px;}
 
-.background-red {
+// .background-red {
+//   // background-color: red;
+//   background-color: #ce2f2f!important;
+// }
+// .background-orange {
+//   // background-color: red;
+//   background-color: #e07847!important;
+// }
+// .background-yellow {
+//   // background-color: red;
+//   background-color: #e0d24d!important;
+// }
+
+.background-red td:not(:last-child){
   // background-color: red;
-  background-color: #fac8c8!important;
+  background-color: #cc4e4e!important;
+}
+.background-orange td:not(:last-child){
+  // background-color: red;
+  background-color: #e07847!important;
+}
+.background-yellow td:not(:last-child){
+  // background-color: red;
+  background-color: #e0d24d!important;
 }
 
 .supplyplan-larrow {
   float: left;
-  margin-left: 324px !important;
+  margin-left: 286px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2470,7 +2492,7 @@ input::placeholder {
 
   .supplyplanTdWidth{
     overflow: hidden!important;
-    min-width: 315px!important;
+    min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
   }
@@ -3016,3 +3038,29 @@ border-radius: 2em;
   color: #697069 !important;
 }
 
+////multiselect css
+.Select--single>.Select-control .Select-value, .Select-placeholder {
+  bottom: 0;
+  color: #aaa;
+  left: 0;
+  line-height: 28px!important;
+  padding-left: 10px;
+  padding-right: 10px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.Select-input {
+  height: 27px!important;
+  
+}
+.Select-control {
+  border-radius: 0.2rem!important;
+  border: 1px solid #e4e7ea!important;
+  color: #697069!important;
+  height: 0px!important;
+}
