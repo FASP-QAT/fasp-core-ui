@@ -18,6 +18,7 @@ import 'react-sortable-tree/style.css';
 import { node } from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from "formik";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 let initialValues = {
     productCategory: ''
@@ -67,6 +68,7 @@ export default class ProductCategoryTree extends Component {
             nodename: '',
             maxId: 0,
             message: '',
+            duplicate: 0
 
 
         }
@@ -79,11 +81,19 @@ export default class ProductCategoryTree extends Component {
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
         this.reSetTree = this.reSetTree.bind(this);
         this.setTreeData = this.setTreeData.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
 
     setTreeData(treeData) {
         console.log("treeData----->", treeData);
     }
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -96,11 +106,13 @@ export default class ProductCategoryTree extends Component {
                     this.setState({
                         message: response.data.messageCode
                     })
+                    this.hideSecondComponent();
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
+                        this.hideSecondComponent();
                     } else {
                         switch (error.response.status) {
                             case 500:
@@ -109,9 +121,11 @@ export default class ProductCategoryTree extends Component {
                             case 406:
                             case 412:
                                 this.setState({ message: error.response.data.messageCode });
+                                this.hideSecondComponent();
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
+                                this.hideSecondComponent();
                                 console.log("Error code unkown");
                                 break;
                         }
@@ -151,6 +165,7 @@ export default class ProductCategoryTree extends Component {
                         }
 
                     });
+                    console.log("treeData------>", treeData);
 
                     this.setState({ treeData: treeData });
                     document.getElementById("treeDiv").style.display = "block";
@@ -158,11 +173,13 @@ export default class ProductCategoryTree extends Component {
                     this.setState({
                         message: response.data.messageCode
                     })
+                    this.hideSecondComponent();
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
+                        this.hideSecondComponent();
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -171,9 +188,11 @@ export default class ProductCategoryTree extends Component {
                             case 406:
                             case 412:
                                 this.setState({ message: error.response.data.messageCode });
+                                this.hideSecondComponent();
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
+                                this.hideSecondComponent();
                                 console.log("Error code unkown");
                                 break;
                         }
@@ -183,31 +202,53 @@ export default class ProductCategoryTree extends Component {
 
     }
     addNewNode() {
-        let currentMaxId = this.state.maxId + 1;
-        const addNode = {
-            id: currentMaxId,
-            parentId: 1,
-            payload: {
-                active: true,
-                productCategoryId: 0,
-                realm: {
-                    id: this.state.realmId
-                },
-                label: {
-                    label_en: this.state.nodename
-                },
-                expanded: true
-            },
-            isNew: true
-        };
+        let children = this.state.treeData[0].children;
+        let duplicate = 0;
+        console.log("children--------->", children);
+        for (let i = 0; i < children.length; i++) {
+            if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
+                // console.log("Children Duplicate");
+                duplicate = 1;
+            }
+        }
+        if (duplicate == 0) {//not duplicate found
 
-        var newNode = addNodeUnderParent({
-            treeData: this.state.treeData,
-            parentKey: 1,
-            newNode: { ...addNode, title: addNode.payload.label.label_en },
-            getNodeKey: ({ node }) => node.id
+            let currentMaxId = this.state.maxId + 1;
+            const addNode = {
+                id: currentMaxId,
+                parentId: 1,
+                payload: {
+                    active: true,
+                    productCategoryId: 0,
+                    realm: {
+                        id: this.state.realmId
+                    },
+                    label: {
+                        label_en: this.state.nodename
+                    },
+                    expanded: true
+                },
+                isNew: true
+            };
+
+            var newNode = addNodeUnderParent({
+                treeData: this.state.treeData,
+                parentKey: 1,
+                newNode: { ...addNode, title: addNode.payload.label.label_en },
+                getNodeKey: ({ node }) => node.id
+            })
+            this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
+        } else {//duplicate found
+            this.setState({
+                message: 'Duplicate product category name found',
+                color: 'red'
+            })
+            this.hideSecondComponent();
+        }
+        this.setState({
+            duplicate: duplicate
         })
-        this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
+
     }
     disableNode(rowInfo) {
         // console.log("disable node row info---->", rowInfo);
@@ -336,6 +377,7 @@ export default class ProductCategoryTree extends Component {
             this.setState({ treeData: enabledNode, message: '' });
         } else {
             this.setState({ message: 'Sorry The Parent Is Disabled !' });
+            this.hideSecondComponent();
         }
 
     }
@@ -371,17 +413,25 @@ export default class ProductCategoryTree extends Component {
                 if (response.status == 200) {
                     // console.log("success-------------------------.");
                     // this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
-                    this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.productCategory.success'))
+                    // this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.productCategory.success'))
+                    this.props.history.push(`/productCategory/productCategoryTree/` + 'green/' + i18n.t('static.productCategory.success'))
+                    this.setState({
+                        message: i18n.t('static.productCategory.success'),
+                        color: 'green'
+                    })
+                    this.hideSecondComponent();
                 } else {
                     this.setState({
                         message: response.data.messageCode
                     })
+                    this.hideSecondComponent();
                 }
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
+                        this.hideSecondComponent();
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -390,9 +440,11 @@ export default class ProductCategoryTree extends Component {
                             case 406:
                             case 412:
                                 this.setState({ message: error.response.data.messageCode });
+                                this.hideSecondComponent();
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
+                                this.hideSecondComponent();
                                 break;
                         }
                     }
@@ -402,6 +454,7 @@ export default class ProductCategoryTree extends Component {
 
     }
     reSetTree() {
+        this.setState({ nodename: '' });
         this.getProductCategoryListByRealmId();
     }
     touchAll(errors) {
@@ -434,7 +487,7 @@ export default class ProductCategoryTree extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5 className="red">{this.state.message}</h5>
+                <h5 id="div2" className={this.state.color}>{this.state.message}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="mb-lg-0">
@@ -478,7 +531,12 @@ export default class ProductCategoryTree extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addNewNode();
-                                        resetForm({ productCategory: '' });
+                                        if (this.state.duplicate == 1) {
+
+                                        } else {
+                                            resetForm({ productCategory: '' });
+                                        }
+
                                     }}
                                     render={
                                         ({
@@ -490,30 +548,38 @@ export default class ProductCategoryTree extends Component {
                                             handleSubmit,
                                             isSubmitting,
                                             isValid,
-                                            setTouched
+                                            setTouched,
+                                            handleReset
                                         }) => (
-                                                <Form onSubmit={handleSubmit} noValidate name='productCategoryForm'>
+                                                <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm'>
                                                     <FormGroup>
-                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
-                                                        <Row>
-                                                            <Col md={4} className="pr-lg-1">
-                                                                <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}</Label>
-                                                                <Input
-                                                                    type="text"
-                                                                    value={this.state.nodename}
-                                                                    bsSize="sm"
-                                                                    valid={!errors.productCategory && this.state.nodename != ''}
-                                                                    invalid={touched.productCategory && !!errors.productCategory}
-                                                                    onChange={event => { handleChange(event); this.nodeNameChange(event) }}
-                                                                    onBlur={handleBlur}
-                                                                    name="productCategory" />
-                                                                <FormFeedback className="red">{errors.productCategory}</FormFeedback>
-                                                            </Col>
-                                                            <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
-                                                            </Col>
-                                                        </Row>}
+                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                            <Row>
+                                                                <Col md={4} className="pr-lg-1">
+                                                                    <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        value={this.state.nodename}
+                                                                        bsSize="sm"
+                                                                        valid={!errors.productCategory && this.state.nodename != ''}
+                                                                        invalid={touched.productCategory && !!errors.productCategory}
+                                                                        onChange={event => { handleChange(event); this.nodeNameChange(event) }}
+                                                                        onBlur={handleBlur}
+                                                                        name="productCategory" />
+                                                                    <FormFeedback className="red">{errors.productCategory}</FormFeedback>
+                                                                </Col>
+                                                                <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
+                                                                    <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
+                                                                </Col>
+                                                            </Row>}
                                                     </FormGroup>
+                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                        <CardFooter>
+                                                            <FormGroup>
+                                                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            </ FormGroup>
+                                                        </CardFooter>}
                                                 </Form>
                                             )} />
                                 <FormGroup>
@@ -571,13 +637,13 @@ export default class ProductCategoryTree extends Component {
                                     </div>
                                 </FormGroup>
                             </CardBody>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
-                            <CardFooter>
-                                <FormGroup>
-                                    <Button type="reset" size="md" onClick={this.reSetTree} color="warning" className="float-right mr-1 text-white"><i className="fa fa-refresh"></i> Reset</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                </ FormGroup>
-                            </CardFooter>}
+                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                <CardFooter>
+                                    <FormGroup>
+                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ FormGroup>
+                                </CardFooter>} */}
                         </Card>
                     </Col>
                 </Row>

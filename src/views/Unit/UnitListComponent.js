@@ -50,12 +50,12 @@ export default class UnitListComponent extends Component {
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
-        document.getElementById('div1').style.display = 'none';
+            document.getElementById('div1').style.display = 'none';
         }, 8000);
-        }
-        componentWillUnmount() {
+    }
+    componentWillUnmount() {
         clearTimeout(this.timeout);
-        }
+    }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -136,7 +136,7 @@ export default class UnitListComponent extends Component {
 
         UnitService.getUnitListAll()
             .then(response => {
-                console.log(response)
+                console.log("Unit--->", response.data);
 
                 this.setState({
                     unitList: response.data,
@@ -168,7 +168,7 @@ export default class UnitListComponent extends Component {
     }
 
     formatLabel(cell, row) {
-        console.log("----------jjjjjjj", cell);
+        // console.log("----------jjjjjjj", cell);
         return getLabelText(cell, this.state.lang);
     }
     render() {
@@ -264,7 +264,7 @@ export default class UnitListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-0">
-                        
+
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>

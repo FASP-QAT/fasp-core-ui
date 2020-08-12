@@ -427,6 +427,7 @@ export default class LanguageListComponent extends Component {
                                 allowExport: false,
                                 paginationOptions: [10, 25, 50],
                                 position: 'top',
+                                contextMenu: false,
                             };
                             var languageEl = jexcel(document.getElementById("tableDiv"), options);
                             this.el = languageEl;
@@ -452,7 +453,7 @@ export default class LanguageListComponent extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
-        
+
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
