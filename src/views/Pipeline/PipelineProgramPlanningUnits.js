@@ -357,7 +357,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
 
             //Local procurement lead time
-            var col = ("I").concat(parseInt(y) + 1);
+            var col = ("J").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(9, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -377,7 +377,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             }
 
-            var col = ("J").concat(parseInt(y) + 1);
+            var col = ("K").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(10, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -397,7 +397,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             }
 
-            var col = ("K").concat(parseInt(y) + 1);
+            var col = ("L").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(11, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -446,8 +446,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                 planningUnitId: planningUnitId,
                 reorderFrequencyInMonths: map.get("4"),
                 minMonthsOfStock: map.get("5"),
-                monthsInFutureForAmc: map.get("6"),
-                monthsInPastForAmc: map.get("7"),
+
+                monthsInFutureForAmc: parseInt(map.get("6")),
+                monthsInPastForAmc: parseInt(map.get("7")),
+
                 programPlanningUnitId: map.get("8"),
                 localProcurmentLeadTime: map.get("9"),
                 shelfLife: map.get("10"),
@@ -456,6 +458,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
             planningUnitArray.push(planningUnitJson);
         }
+        console.log("planning unit array====>", planningUnitArray);
         return planningUnitArray;
 
     }
@@ -555,17 +558,17 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [290, 290, 290, 290, 170, 170, 170, 170],
+                                                colWidths: [190, 290, 200, 290, 170, 170, 100, 100, 100, 170, 100, 100],
                                                 columns: [
 
                                                     {
                                                         title: 'Pipeline Product Category',
                                                         type: 'text',
-                                                        readonly: true
+                                                        readOnly: true
                                                     }, {
                                                         title: 'Pipeline Product',
                                                         type: 'text',
-                                                        readonly: true
+                                                        readOnly: true
                                                     },
                                                     {
                                                         title: 'Product Category',
@@ -626,6 +629,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                allowInsertRow: false,
                                                 text: {
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
@@ -763,7 +767,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        // jExcelLoadedFunction(instance);
     }
 
     render() {

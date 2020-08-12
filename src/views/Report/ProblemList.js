@@ -25,10 +25,10 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
+import getProblemDesc from '../../CommonComponent/getProblemDesc';
+import getSuggestion from '../../CommonComponent/getSuggestion';
 const entityname = i18n.t('static.report.problem');
-
-
-
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -55,20 +55,18 @@ export default class ConsumptionDetails extends React.Component {
 
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.addNewProblem = this.addNewProblem.bind(this);
+        this.addMannualProblem = this.addMannualProblem.bind(this);
         this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
         this.buttonFormatter = this.buttonFormatter.bind(this);
         this.addMapping = this.addMapping.bind(this);
+        this.getNote = this.getNote.bind(this);
 
     }
 
     componentDidMount = function () {
-
+        qatProblemActions();
         let problemStatusId = document.getElementById('problemStatusId').value;
-
-
         console.log("problemStatusId ---------> ", problemStatusId);
-
         const lan = 'en';
         var db1;
         getDatabase();
@@ -156,8 +154,8 @@ export default class ConsumptionDetails extends React.Component {
         let problemStatusId = document.getElementById('problemStatusId').value;
         let problemTypeId = document.getElementById('problemTypeId').value;
 
-        console.log("programId ---------> ", programId);
-        console.log("problemStatusId ---------> ", problemStatusId);
+        // console.log("programId ---------> ", programId);
+        // console.log("problemStatusId ---------> ", problemStatusId);
         this.setState({ programId: programId });
         if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0) {
 
@@ -187,20 +185,31 @@ export default class ConsumptionDetails extends React.Component {
 
                     var problemReportList = (programJson.problemReportList);
 
-                    console.log("problemReportList---->", problemReportList);
-                    console.log("problemStatusId ---********------> ", problemStatusId);
+                    // console.log("problemReportList---->", problemReportList);
+                    // console.log("problemStatusId ---********------> ", problemStatusId);
 
-                    const problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                    if (problemStatusId != -1) {
 
-                    console.log("problemReportFilterList---->", problemReportFilterList);
+                        var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
 
-                    this.setState({
-                        data: problemReportFilterList,
-                        message: ''
-                    },
-                        () => {
+                            });
+                    } else {
+                        var problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
 
-                        });
+                            });
+                    }
+                    // console.log("problemReportFilterList---->", problemReportFilterList);
+
 
 
                 }.bind(this)
@@ -224,33 +233,46 @@ export default class ConsumptionDetails extends React.Component {
 
     }
 
-    addNewProblem() {
+    addMannualProblem() {
         console.log("-------------------addNewProblem--------------------");
         this.props.history.push("/report/addProblem");
         // this.props.history.push("/role/addRole");
     }
 
     buttonFormatter(cell, row) {
-        // console.log("------cell-----", cell);
-        // console.log("------cell-----", row);
-        // return <Button type="button" size="sm" color="success" onClick={(event) => this.addMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
         if (row.problemStatus.id == 2) {
             return <span></span>
         } else {
-            return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
+            return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell, row)} color="info"><i className="fa fa-pencil"></i></Button>;
         }
 
     }
 
-    addMapping(event, cell) {
-        // console.log("-----cell------>>", cell);
-        event.stopPropagation();
-        this.props.history.push({
-            // pathname: `/programProduct/addProgramProduct/${cell}`,
-            // pathname: `/report/addProblem`,
-            pathname: `${cell}`,
-        });
+    addMapping(event, cell, row) {
 
+        var planningunitId = row.planningUnit.id;
+        var programId = document.getElementById('programId').value;
+        var versionId = row.versionId
+        event.stopPropagation();
+        if (row.realmProblem.problem.problemId != 2) {
+            this.props.history.push({
+                // pathname: `/programProduct/addProgramProduct/${cell}`,
+                // pathname: `/report/addProblem`,
+                pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
+            });
+        } else {
+            this.props.history.push({
+                pathname: `${cell}`,
+            });
+        }
+
+
+    }
+
+    getNote(row, lang) {
+        var transList = row.problemTransList;
+        var listLength = row.problemTransList.length;
+        return transList[listLength - 1].notes;
     }
 
     render() {
@@ -297,11 +319,12 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
+                style: { width: '60px' },
             },
             {
                 dataField: 'region.label',
                 text: i18n.t('static.region.region'),
+                hidden: true,
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -317,6 +340,7 @@ export default class ConsumptionDetails extends React.Component {
                 dataField: 'planningUnit.label',
                 text: i18n.t('static.planningunit.planningunit'),
                 sort: true,
+                hidden: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
@@ -328,12 +352,13 @@ export default class ConsumptionDetails extends React.Component {
                 dataField: 'dt',
                 text: i18n.t('static.report.month'),
                 sort: true,
+                hidden: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '100px' },
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        var modifiedDate = moment(cell).format('MMM-YY');
                         return modifiedDate;
                     }
                 }
@@ -358,9 +383,9 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '230px' },
                 formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
+                    return getProblemDesc(row, this.state.lang);
                 }
             },
             {
@@ -369,7 +394,19 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '170px' },
+                style: { width: '230px' },
+                formatter: (cell, row) => {
+                    // return getLabelText(cell, this.state.lang);
+                    return getSuggestion(row, this.state.lang);
+                }
+            },
+            {
+                dataField: 'problemStatus.label',
+                text: i18n.t('static.report.problemStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '140px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -390,6 +427,7 @@ export default class ConsumptionDetails extends React.Component {
                 text: i18n.t('static.report.problemType'),
                 sort: true,
                 align: 'center',
+                style: { width: '100px' },
                 headerAlign: 'center',
                 style: { width: '100px' },
                 formatter: (cell, row) => {
@@ -397,14 +435,15 @@ export default class ConsumptionDetails extends React.Component {
                 }
             },
             {
-                dataField: 'problemStatus.label',
-                text: i18n.t('static.report.problemStatus'),
+                dataField: 'problemTransList',
+                text: 'Note',
                 sort: true,
                 align: 'center',
                 style: { width: '100px' },
                 headerAlign: 'center',
+                style: { width: '170px' },
                 formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
+                    return this.getNote(row, this.state.lang);
                 }
             },
             {
@@ -413,6 +452,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
+                style: { width: '50px' },
                 formatter: this.buttonFormatter
             }
 
@@ -446,85 +486,78 @@ export default class ConsumptionDetails extends React.Component {
 
         return (
 
-            <div className="animated fadeIn">
+            <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    {/* <div className="Card-header-addicon">
+                    <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProblem}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
-                    </div> */}
-                    <CardBody className=" pt-lg-1">
-                        <Formik
-                            render={
-                                ({
-                                }) => (
-                                        <Form name='simpleForm'>
+                    </div>
+                    <CardBody className=" pb-lg-0">
+                        <Col md="9 pl-0">
+                            <div className="d-md-flex Selectdiv2">
+                                <FormGroup>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                value={this.state.programId}
+                                                name="programId" id="programId"
+                                                onChange={this.fetchData}
+                                            >
+                                                <option value="0">Please select</option>
+                                                {programs}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
 
-                                            <Col md="12 pl-0">
-                                                <div className="d-md-flex">
-                                                    <FormGroup className="col-md-3 pl-md-0 mb-2">
-                                                        <Label htmlFor="appendedInputButton">Program</Label>
-                                                        <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    name="programId" id="programId"
-                                                                    onChange={this.fetchData}
-                                                                >
-                                                                    <option value="0">Please select</option>
-                                                                    {programs}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-
-                                                    <FormGroup className="col-md-3 mb-2">
-                                                        <Label htmlFor="appendedInputButton">Problem Status</Label>
-                                                        <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    name="problemStatusId" id="problemStatusId"
-                                                                    onChange={this.fetchData}
-                                                                // value={1}
-                                                                >
-                                                                    {/* <option value="0">Please select</option> */}
-                                                                    {problemStatus}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 mb-2">
-                                                        <Label htmlFor="appendedInputButton">Problem Type</Label>
-                                                        <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    // value={this.state.hqStatusId}
-                                                                    name="problemTypeId" id="problemTypeId"
-                                                                    onChange={this.fetchData}
-                                                                >
-                                                                    {/* <option value="0">Please select</option> */}
-                                                                    <option value="1">Automatic</option>
-                                                                    <option value="2">Manual</option>
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                </div>
-                                            </Col>
-                                        </Form>
-                                    )} />
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                name="problemStatusId" id="problemStatusId"
+                                                onChange={this.fetchData}
+                                            // value={1}
+                                            >
+                                                <option value="-1">All</option>
+                                                {problemStatus}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                // value={this.state.hqStatusId}
+                                                name="problemTypeId" id="problemTypeId"
+                                                onChange={this.fetchData}
+                                            >
+                                                {/* <option value="0">Please select</option> */}
+                                                <option value="1">Automatic</option>
+                                                <option value="2">Manual</option>
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </Col>
 
                         <ToolkitProvider
-                            keyField="problemReportId"
+                            keyField="problemActionIndex"
                             data={this.state.data}
                             columns={columns}
                             search={{ searchFormatted: true }}
@@ -534,8 +567,8 @@ export default class ConsumptionDetails extends React.Component {
                             {
                                 props => (
 
-                                    <div className="TableCust">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left ProblemlistSearchposition">
+                                    <div className="TableCust listBudgetAlignThtd">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>

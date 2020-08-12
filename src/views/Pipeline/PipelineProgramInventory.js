@@ -20,9 +20,12 @@ export default class PipelineProgramInventory extends Component {
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
+        var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[c - 7];
-        var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value);
+        console.log("==========>planningUnitValue", value);
+        console.log("========>", this.state.realmCountryPlanningUnitList);
+        var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value && c.realmCountry.id == realmCountryId);
 
         for (var k = 0; k < puList.length; k++) {
             var realmCountryPlanningUnitJson = {
@@ -31,6 +34,8 @@ export default class PipelineProgramInventory extends Component {
             }
             mylist.push(realmCountryPlanningUnitJson);
         }
+
+        console.log("myList=====>", mylist);
         return mylist;
     }
 
@@ -40,6 +45,18 @@ export default class PipelineProgramInventory extends Component {
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(1, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -84,15 +101,15 @@ export default class PipelineProgramInventory extends Component {
                 //         this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
                 //         i = json.length;
                 //     } else {
-                        // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                        // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
-                        // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
-                        // var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                        // this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                        // this.el.setValueFromCoords(4, y, quantity, true);
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    // }
+                // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
+                // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
+                // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
+                // var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
+                // this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
+                // this.el.setValueFromCoords(4, y, quantity, true);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // }
                 // }
 
                 var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
@@ -120,6 +137,18 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
+            }
+
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = map.get("7");
+            if (value != "" && !isNaN(parseInt(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
             }
         }
 
@@ -166,6 +195,7 @@ export default class PipelineProgramInventory extends Component {
             var realmCountryPlanningUnitList = [];
 
             this.setState({ realmCountryPlanningUnitList: response.data });
+            console.log("realmCountryPlanningUnitId====>", response.data);
 
             for (var i = 0; i < response.data.length; i++) {
                 var rcpJson = {
@@ -224,9 +254,16 @@ export default class PipelineProgramInventory extends Component {
                                     data = [];
                                     data[0] = inventoryList[j].planningUnitId;
                                     data[1] = inventoryList[j].dataSourceId;
-                                    data[2] = inventoryList[j].regionId;
+
+                                    if (regionList.length == 1) {
+                                        data[2] = regionList[0].id;
+                                    } else {
+                                        data[2] = inventoryList[j].regionId;
+                                    }
+
                                     data[3] = inventoryList[j].inventoryDate;
                                     data[4] = inventoryList[j].manualAdjustment;
+
                                     if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
                                         data[5] = '';
                                     } else {
@@ -245,7 +282,7 @@ export default class PipelineProgramInventory extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [190, 130, 100, 120, 100, 90, 100, 130, 130],
+                                    colWidths: [190, 130, 100, 120, 100, 150, 100, 130, 100],
                                     columns: [
 
                                         {
@@ -331,7 +368,7 @@ export default class PipelineProgramInventory extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        // jExcelLoadedFunction(instance);
     }
 
     render() {

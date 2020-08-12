@@ -28,6 +28,9 @@ import "jspdf-autotable";
 import csvicon from '../../assets/img/csv.png'
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ShipmentsInSupplyPlanComponent from "./ShipmentsInSupplyPlan";
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -113,7 +116,7 @@ export default class SupplyPlanComponent extends React.Component {
             monthsArray: [],
             programList: [],
             planningUnitList: [],
-            planningUnitName: [],
+            planningUnitName: "",
             regionList: [],
             consumptionTotalData: [],
             shipmentsTotalData: [],
@@ -168,7 +171,9 @@ export default class SupplyPlanComponent extends React.Component {
             expiredStockArr: [],
             expiredStockDetails: [],
             expiredStockDetailsTotal: 0,
-            showShipments: 0
+            showShipments: 0,
+            paColors: [],
+            programSelect: ""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -202,6 +207,70 @@ export default class SupplyPlanComponent extends React.Component {
         this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.updateState = this.updateState.bind(this)
+        this.updateFieldData = this.updateFieldData.bind(this);
+    }
+
+    roundN = num => {
+        if (num != '') {
+            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        } else {
+            return ''
+        }
+    }
+
+    formatter = value => {
+        if (value != '' && !isNaN(Number.parseInt(value))) {
+            // var cell1 = this.roundN(value)
+            // cell1 += '';
+            // var x = cell1.split('.');
+            // var x1 = x[0];
+            // var x2 = x.length > 1 ? '.' + x[1] : '';
+            // var rgx = /(\d+)(\d{3})/;
+            // while (rgx.test(x1)) {
+            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            // }
+            // return x1 + x2;
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (isNaN(Number.parseInt(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
+    formatterDouble = value => {
+        if (value != '' && !isNaN(Number.parseInt(value))) {
+            var cell1 = this.roundN(value)
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (isNaN(Number.parseInt(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
+    updateFieldData(value) {
+        console.log("Value", value);
+        // console.log(event.value)
+        this.setState({ planningUnit: value, planningUnitId: value.value });
+
     }
 
     hideSecondComponent() {
@@ -283,8 +352,8 @@ export default class SupplyPlanComponent extends React.Component {
         const exportCSV = () => {
 
             var csvRow = [];
-            csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+            csvRow.push(i18n.t('static.program.program') + ' , ' + ((this.state.programSelect.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((this.state.planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
             csvRow.push('')
             csvRow.push('')
             csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -403,10 +472,10 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     if (i == 1) {
                         doc.setFontSize(8)
-                        doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                        doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 8, 80, {
                             align: 'left'
                         })
-                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 8, 90, {
                             align: 'left'
                         })
                     }
@@ -465,7 +534,7 @@ export default class SupplyPlanComponent extends React.Component {
             var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-            const data = [openningArr, consumptionArr, shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr, closingBalanceArr, monthsOfStockArr, amcgArr, minStocArr, maxStockArr, unmetDemandArr];
+            const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map(c => this.formatter(c)), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), minStocArr.map(c => this.formatter(c)), maxStockArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
             let content = {
                 margin: { top: 80, bottom: 50 },
@@ -491,7 +560,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#cfd5ea',
+                        backgroundColor: '#a5c5ec',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -503,7 +572,7 @@ export default class SupplyPlanComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.ordered'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#8aa9e6',
+                        backgroundColor: '#20a8d8',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -539,7 +608,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 2,
                         type: 'line',
                         yAxisID: 'A',
-                        borderColor: 'rgba(179,181,158,1)',
+                        borderColor: '#4dbd74',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -555,7 +624,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 3,
                         yAxisID: 'A',
                         backgroundColor: 'transparent',
-                        borderColor: 'rgba(255.102.102.1)',
+                        borderColor: '#F48521',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -572,7 +641,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 4,
                         yAxisID: 'B',
                         backgroundColor: 'transparent',
-                        borderColor: '#f4862a',
+                        borderColor: '#ED5626',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -589,7 +658,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 5,
                         yAxisID: 'B',
                         backgroundColor: 'rgba(255,193,8,0.2)',
-                        borderColor: '#f86c6b',
+                        borderColor: '#118b70',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
                         fill: '+1',
@@ -609,7 +678,7 @@ export default class SupplyPlanComponent extends React.Component {
                         stack: 6,
                         yAxisID: 'B',
                         backgroundColor: 'rgba(0,0,0,0)',
-                        borderColor: '#ffc107',
+                        borderColor: '#EDB944',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
                         fill: true,
@@ -638,12 +707,13 @@ export default class SupplyPlanComponent extends React.Component {
 
                             </div>
                         </Row>
-                        <Row>
-                            <div className="col-md-12">
-                                <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
-                            </div>
-                        </Row>
+                        {/* <Row> */}
+                        <div className="col-md-12">
+                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                        </div>
+                        {/* </Row> */}
+
                         <Table className="table-bordered text-center mt-2 overflowhide" bordered responsive size="sm" options={this.options}>
                             <thead>
                                 <tr>
@@ -695,7 +765,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         this.state.suggestedShipmentsTotalData.map(item1 => {
                                             if (item1.suggestedOrderQty.toString() != "") {
                                                 if (item1.isEmergencyOrder == 1) {
-                                                    return (<td align="right" bgcolor='red' className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                    return (<td align="right" bgcolor='red' style={{ color: "#FFF" }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                 } else {
                                                     return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                 }
@@ -729,7 +799,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.deliveredShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -744,7 +814,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.shippedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td align="right" bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -758,7 +828,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.orderedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -771,7 +841,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.plannedShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -795,7 +865,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -809,7 +879,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.shippedErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -822,7 +892,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.orderedErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -835,7 +905,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.plannedErpShipmentsTotalData.map(item1 => {
                                             if (item1.toString() != "") {
-                                                return (<td bgcolor={item1.colour} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                             } else {
                                                 return (<td align="right" >{item1}</td>)
                                             }
@@ -924,31 +994,28 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tr>
                             </tbody>
                         </Table>
-                        <div className="row" >
-                            {
-                                this.state.jsonArrForGraph.length > 0
-                                &&
-                                <div className="col-md-12" >
-
-                                    <div className="col-md-11 float-right">
-                                        <div className="chart-wrapper chart-graph-report">
-                                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                        </div>
-                                    </div>   </div>}
-
-                        </div>
                     </div>
+                    <div className="row" >
+                        {
+                            this.state.jsonArrForGraph.length > 0
+                            &&
+                            <div className="col-md-12" >
+
+                                <div className="col-md-11 float-right">
+                                    <div className="chart-wrapper chart-graph-report">
+                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                    </div>
+                                </div>   </div>}
+
+                    </div>
+                    {/* </div> */}
 
                     {/* Consumption modal */}
                     <Modal isOpen={this.state.consumption}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                            {/* <ul className="legend legend-supplypln">
-                                <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
-                                <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
-                            </ul> */}
-                            <ul className="legendcommitversion">
+                            <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
                                 <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
                                 <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                             </ul>
@@ -1173,6 +1240,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr>
                                         <th>{i18n.t('static.inventory.batchNumber')}</th>
                                         <th>{i18n.t('static.inventory.expireDate')}</th>
+                                        <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
                                         <th>{i18n.t('static.supplyPlan.expiredQty')}</th>
                                     </tr>
                                 </thead>
@@ -1182,6 +1250,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <tr>
                                                 <td align="left">{item.batchNo}</td>
                                                 <td align="left">{item.expiryDate}</td>
+                                                <td align="left">{item.autoGenerated}</td>
                                                 <td align="left">{item.remainingQty}</td>
                                             </tr>
                                         )
@@ -1190,7 +1259,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th style={{ textAlign: 'center' }} colspan="2">{i18n.t('static.supplyPlan.total')}</th>
+                                        <th style={{ textAlign: 'center' }} colSpan="3">{i18n.t('static.supplyPlan.total')}</th>
                                         <th style={{ textAlign: 'left' }}>{this.state.expiredStockDetailsTotal}</th>
                                     </tr>
                                 </tfoot>
@@ -1200,11 +1269,12 @@ export default class SupplyPlanComponent extends React.Component {
                     {/* Expired stock modal */}
                 </TabPane>
                 <TabPane tabId="2">
-                    {this.state.planningUnitChange && <SupplyPlanComparisionComponent ref="compareChild" />}
+                    {this.state.planningUnitChange && <SupplyPlanComparisionComponent ref="compareChild" items={this.state} />}
                 </TabPane></>)
     }
 
     componentDidMount() {
+        console.log("contrast(colour)", contrast("#FF0000"));
         var fields = document.getElementsByClassName("totalShipments");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -1251,8 +1321,8 @@ export default class SupplyPlanComponent extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: programJson1.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id
                         }
                         proList[i] = programJson
                     }
@@ -1264,10 +1334,13 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
     };
 
-    getPlanningUnitList(event) {
-
+    getPlanningUnitList(value) {
+        document.getElementById("planningUnitId").value = 0;
         this.setState({
-            display: 'none'
+            display: 'none',
+            planningUnitChange: false,
+            programSelect: value,
+            programId: value.value
         })
         var db1;
         var storeOS;
@@ -1285,7 +1358,7 @@ export default class SupplyPlanComponent extends React.Component {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(document.getElementById("programId").value);
+            var programRequest = programDataOs.get(value.value);
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -1316,13 +1389,13 @@ export default class SupplyPlanComponent extends React.Component {
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    var programId = (document.getElementById("programId").value).split("_")[0];
+                    var programId = (value.value).split("_")[0];
                     var proList = []
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].program.id == programId && myResult[i].active == true) {
                             var productJson = {
-                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                id: myResult[i].planningUnit.id
+                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                value: myResult[i].planningUnit.id
                             }
                             proList.push(productJson);
                             planningList.push(myResult[i]);
@@ -1392,7 +1465,7 @@ export default class SupplyPlanComponent extends React.Component {
         return month;
     }
 
-    formSubmit(monthCount) {
+    formSubmit(value, monthCount) {
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -1401,7 +1474,7 @@ export default class SupplyPlanComponent extends React.Component {
         // this.toggleAccordionTotalShipments();
         // this.toggleAccordionManualShipments();
         // this.toggleAccordionErpShipments();
-        if (document.getElementById("planningUnitId").value != 0) {
+        if (value.value != 0) {
             this.setState({
                 planningUnitChange: true,
                 display: 'block'
@@ -1417,10 +1490,8 @@ export default class SupplyPlanComponent extends React.Component {
 
         var programId = document.getElementById("programId").value;
         var regionId = -1;
-        var planningUnitId = document.getElementById("planningUnitId").value;
-
-        var planningUnit = document.getElementById("planningUnitId");
-        var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
+        var planningUnitId = value.value;
+        var planningUnitName = value.label;
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
@@ -1469,6 +1540,7 @@ export default class SupplyPlanComponent extends React.Component {
         var unmetDemand = [];
         var unallocatedConsumption = [];
         var unallocatedAdjustments = [];
+        var paColors = [];
         var db1;
         var storeOS;
         getDatabase();
@@ -1499,7 +1571,11 @@ export default class SupplyPlanComponent extends React.Component {
                 var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
                 this.setState({
                     shelfLife: shelfLife,
-                    versionId: programJson.currentVersion.versionId
+                    versionId: programJson.currentVersion.versionId,
+                    monthsInPastForAMC: monthsInPastForAMC,
+                    monthsInFutureForAMC: monthsInFutureForAMC,
+                    reorderFrequency: reorderFrequencyInMonths,
+                    minMonthsOfStock: minMonthsOfStock
                 })
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                 var lastActualConsumptionDateArr = [];
@@ -1849,8 +1925,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
                             }
                             shipmentsTotalData.push(shipmentTotalQty);
-
                             for (var j = 0; j < manualShipmentArr.length; j++) {
+                                console.log("in for===============+++++");
+                                console.log("manualShipmentArr[j].shipmentQty=====", manualShipmentArr)
                                 manualTotalQty += parseInt((manualShipmentArr[j].shipmentQty));
                                 if (manualShipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
                                     if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
@@ -1858,6 +1935,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1878,6 +1959,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1898,6 +1983,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1918,6 +2007,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (manualShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -1942,7 +2035,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (deliveredShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                deliveredShipmentsTotalData.push({ qty: deliveredShipmentsQty, month: m[i], shipmentDetail: deliveredShipmentsDetailsArr, noOfShipments: deliveredShipmentsDetailsArr.length, colour: colour })
+                                deliveredShipmentsTotalData.push({ qty: deliveredShipmentsQty, month: m[i], shipmentDetail: deliveredShipmentsDetailsArr, noOfShipments: deliveredShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 deliveredShipmentsTotalData.push("");
                             }
@@ -1952,7 +2045,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (shippedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                shippedShipmentsTotalData.push({ qty: shippedShipmentsQty, month: m[i], shipmentDetail: shippedShipmentsDetailsArr, noOfShipments: shippedShipmentsDetailsArr.length, colour: colour })
+                                shippedShipmentsTotalData.push({ qty: shippedShipmentsQty, month: m[i], shipmentDetail: shippedShipmentsDetailsArr, noOfShipments: shippedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 shippedShipmentsTotalData.push("");
                             }
@@ -1962,7 +2055,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (orderedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                orderedShipmentsTotalData.push({ qty: orderedShipmentsQty, month: m[i], shipmentDetail: orderedShipmentsDetailsArr, noOfShipments: orderedShipmentsDetailsArr.length, colour: colour })
+                                orderedShipmentsTotalData.push({ qty: orderedShipmentsQty, month: m[i], shipmentDetail: orderedShipmentsDetailsArr, noOfShipments: orderedShipmentsDetailsArr.length, textColor: contrast(colour) })
                             } else {
                                 orderedShipmentsTotalData.push("");
                             }
@@ -1972,7 +2065,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (plannedShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                plannedShipmentsTotalData.push({ qty: plannedShipmentsQty, month: m[i], shipmentDetail: plannedShipmentsDetailsArr, noOfShipments: plannedShipmentsDetailsArr.length, colour: colour })
+                                plannedShipmentsTotalData.push({ qty: plannedShipmentsQty, month: m[i], shipmentDetail: plannedShipmentsDetailsArr, noOfShipments: plannedShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 plannedShipmentsTotalData.push("");
                             }
@@ -1985,6 +2078,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -2005,6 +2102,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -2025,6 +2126,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -2045,6 +2150,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
                                         var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                         paColor = procurementAgent.colorHtmlCode;
+                                        var index = paColors.findIndex(c => c.color == "#" + paColor);
+                                        if (index == -1) {
+                                            paColors.push({ color: "#" + paColor, text: procurementAgent.procurementAgentCode })
+                                        }
                                     } else {
                                         if (erpShipmentArr[j].procurementAgent.id != "") {
                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
@@ -2069,7 +2178,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (deliveredErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                deliveredErpShipmentsTotalData.push({ qty: deliveredErpShipmentsQty, month: m[i], shipmentDetail: deliveredErpShipmentsDetailsArr, noOfShipments: deliveredErpShipmentsDetailsArr.length, colour: colour })
+                                deliveredErpShipmentsTotalData.push({ qty: deliveredErpShipmentsQty, month: m[i], shipmentDetail: deliveredErpShipmentsDetailsArr, noOfShipments: deliveredErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 deliveredErpShipmentsTotalData.push("");
                             }
@@ -2079,7 +2188,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (shippedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                shippedErpShipmentsTotalData.push({ qty: shippedErpShipmentsQty, month: m[i], shipmentDetail: shippedErpShipmentsDetailsArr, noOfShipments: shippedErpShipmentsDetailsArr.length, colour: colour })
+                                shippedErpShipmentsTotalData.push({ qty: shippedErpShipmentsQty, month: m[i], shipmentDetail: shippedErpShipmentsDetailsArr, noOfShipments: shippedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 shippedErpShipmentsTotalData.push("");
                             }
@@ -2089,7 +2198,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (orderedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                orderedErpShipmentsTotalData.push({ qty: orderedErpShipmentsQty, month: m[i], shipmentDetail: orderedErpShipmentsDetailsArr, noOfShipments: orderedErpShipmentsDetailsArr.length, colour: colour })
+                                orderedErpShipmentsTotalData.push({ qty: orderedErpShipmentsQty, month: m[i], shipmentDetail: orderedErpShipmentsDetailsArr, noOfShipments: orderedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 orderedErpShipmentsTotalData.push("");
                             }
@@ -2099,14 +2208,15 @@ export default class SupplyPlanComponent extends React.Component {
                                 if (plannedErpShipmentsDetailsArr.length > 1) {
                                     colour = "#d9ead3";
                                 }
-                                plannedErpShipmentsTotalData.push({ qty: plannedErpShipmentsQty, month: m[i], shipmentDetail: plannedErpShipmentsDetailsArr, noOfShipments: plannedErpShipmentsDetailsArr.length, colour: colour })
+                                plannedErpShipmentsTotalData.push({ qty: plannedErpShipmentsQty, month: m[i], shipmentDetail: plannedErpShipmentsDetailsArr, noOfShipments: plannedErpShipmentsDetailsArr.length, colour: colour, textColor: contrast(colour) })
                             } else {
                                 plannedErpShipmentsTotalData.push("");
                             }
                         }
+                        console.log("Delivered shipment totral data", deliveredShipmentsTotalData);
 
                         // Calculations for exipred stock
-                        var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
+                        var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == value.value);
                         var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
                         for (var ma = 0; ma < myArray.length; ma++) {
                             var shipmentList = programJson.shipmentList;
@@ -2411,7 +2521,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var expiredStockQty = 0;
                             var expiredStockJsonArr = []
                             for (var j = 0; j < expiredStock.length; j++) {
-                                expiredStockJsonArr.push({ remainingQty: parseInt((expiredStock[j].remainingQty)), batchNo: (expiredStock[j].batchNo), expiryDate: (expiredStock[j].expiryDate) })
+                                expiredStockJsonArr.push({ remainingQty: parseInt((expiredStock[j].remainingQty)), batchNo: (expiredStock[j].batchNo), expiryDate: (expiredStock[j].expiryDate), autoGenerated: (expiredStock[j].autoGenerated) })
                                 expiredStockQty += parseInt((expiredStock[j].remainingQty));
                             }
                             totalExpiredStockArr.push({ qty: expiredStockQty, details: expiredStockJsonArr, month: m[i - 1] });
@@ -2601,7 +2711,8 @@ export default class SupplyPlanComponent extends React.Component {
                             lastActualConsumptionDate: lastActualConsumptionDate,
                             lastActualConsumptionDateArr: lastActualConsumptionDateArr,
                             unmetDemand: unmetDemand,
-                            expiredStockArr: totalExpiredStockArr
+                            expiredStockArr: totalExpiredStockArr,
+                            paColors: paColors
                         })
                     }.bind(this)
                 }.bind(this)
@@ -2653,7 +2764,7 @@ export default class SupplyPlanComponent extends React.Component {
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
             });
-            this.formSubmit(monthCountConsumption);
+            this.formSubmit(this.state.planningUnit, monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
             this.setState({
                 shipments: !this.state.shipments
@@ -2670,7 +2781,7 @@ export default class SupplyPlanComponent extends React.Component {
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
             });
-            this.formSubmit(monthCountAdjustments);
+            this.formSubmit(this.state.planningUnit, monthCountAdjustments);
         } else if (supplyPlanType == 'expiredStock') {
             var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
             console.log("startDate", startDate)
@@ -2748,7 +2859,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     rightClicked() {
@@ -2756,7 +2867,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     leftClickedConsumption() {
@@ -2764,7 +2875,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(monthCountConsumption)
+        this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
 
     rightClickedConsumption() {
@@ -2772,7 +2883,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(monthCountConsumption);
+        this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
 
     leftClickedAdjustments() {
@@ -2780,7 +2891,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(monthCountAdjustments)
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
 
     rightClickedAdjustments() {
@@ -2788,7 +2899,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(monthCountAdjustments);
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
 
     // Consumption Functionality
@@ -2857,7 +2968,7 @@ export default class SupplyPlanComponent extends React.Component {
                         id: -1
                     })
                     for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= startDate && batchInfoList[k].createdDate <= startDate && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value) {
+                        if (batchInfoList[k].expiryDate >= startDate && batchInfoList[k].createdDate <= startDate && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value && (batchInfoList[k].autoGenerated).toString() == "false") {
                             var batchJson = {
                                 name: batchInfoList[k].batchNo,
                                 id: batchInfoList[k].batchId
@@ -3881,7 +3992,7 @@ export default class SupplyPlanComponent extends React.Component {
                             color: 'green',
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -3949,7 +4060,7 @@ export default class SupplyPlanComponent extends React.Component {
                         id: -1
                     })
                     for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].createdDate <= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value) {
+                        if (batchInfoList[k].expiryDate >= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].createdDate <= moment(endDate).startOf("month").format("YYYY-MM-DD") && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value && (batchInfoList[k].autoGenerated).toString() == "false") {
                             var batchJson = {
                                 name: batchInfoList[k].batchNo,
                                 id: batchInfoList[k].batchId
@@ -5473,7 +5584,7 @@ export default class SupplyPlanComponent extends React.Component {
                             color: 'green',
                             inventoryChangedFlag: 0
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -5660,61 +5771,60 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <Col md="12 pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-4 mb-1">
+                                                    <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    name="programId" id="programId"
-                                                                    onChange={this.getPlanningUnitList}
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {programs}
-                                                                </Input>
-                                                            </InputGroup>
+                                                            <Select
+                                                                name="programSelect"
+                                                                id="programSelect"
+                                                                bsSize="sm"
+                                                                options={this.state.programList}
+                                                                value={this.state.programSelect}
+                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 mb-1">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                    <FormGroup className="col-md-4 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
-                                                                    bsSize="sm"
-                                                                    value={this.state.planningUnitId}
-                                                                    onChange={() => { this.formSubmit(this.state.monthCount); this.refs.compareChild.formSubmit(0) }}
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnits}
-                                                                </Input>
-                                                            </InputGroup>
+                                                            <Select
+                                                                name="planningUnit"
+                                                                id="planningUnit"
+                                                                bsSize="sm"
+                                                                options={this.state.planningUnitList}
+                                                                value={this.state.planningUnit}
+                                                                onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
+                                                            />
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4 mb-1">
-                                                        <ul className="legendcommitversion list-group">
-                                                            <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                            <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
-                                                            {/* <li><span className="Updated1legend legendcolor"></span> <span className="legendcommitversionText"> update1</span></li> */}
-
-                                                            {/* <li><span className=" lightGreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleProcurementAgent')} </span></li> */}
-                                                        </ul>
-                                                    </FormGroup>
-
-                                                    {/* <ul className="legend legendsync mt-0" >
-                                                        <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  {i18n.t('static.supplyPlan.skippedShipments')}</span></li>
-                                                        <li><span className="redlegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.emergencyShipments')}</span></li>
-                                                        <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> {i18n.t('static.supplyPlan.skippedEmergencyShipments')}</span></li>
-                                                    </ul> */}
+                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                                 </div>
+                                                <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
+                                                    <ul className="legendcommitversion list-group">
+                                                        {
+                                                            this.state.paColors.map(item1 => (
+                                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                                            ))
+                                                        }
+                                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                                        <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyShipments')} </span></li>
+                                                    </ul>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                                    <ul className="legendcommitversion list-group">
+                                                        <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} - {this.state.minMonthsOfStock}</span></li>
+                                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} - {this.state.reorderFrequency}</span></li>
+                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} - {this.state.monthsInPastForAMC}</span></li>
+                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} - {this.state.monthsInFutureForAMC}</span></li>
+                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} - {this.state.shelfLife}</span></li>
+                                                    </ul>
+                                                </FormGroup>
                                             </Col>
                                         </Form>
                                     )} />
-                        <div className="animated fadeIn">
+                        <div className="animated fadeIn" style={{ display: this.state.display }}>
                             <Row>
                                 <Col xs="12" md="12" className="mb-4">
                                     <Nav tabs>
