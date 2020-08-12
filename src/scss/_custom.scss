@@ -770,7 +770,7 @@ label.arrow_label:after {
 
 // listBudgetAlignThtd 
 .listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
-.listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(6){text-align: right !important;}
@@ -3017,10 +3017,17 @@ border-radius: 2em;
 .go606532123 {
    border: none!important;
    background-color:transparent!important;
+   
+}
+.go2014367929 {
+
+  padding:4px 0px 5px 7px !important;
+ 
 }
 .go335935385 span {
   display: inline!important;
   padding-left: 5px;
+  word-wrap: break-word!important;
 }
 .go1084040746 svg{
   visibility: hidden !important;

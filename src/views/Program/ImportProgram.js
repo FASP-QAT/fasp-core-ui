@@ -331,7 +331,7 @@ export default class ImportProgram extends Component {
                                                     <label className="custom-file-label" id="file-input">Choose file</label>
                                                 </Col>
                                             </FormGroup>
-                                            <FormGroup id="programIdDiv">
+                                            <FormGroup id="programIdDiv" className="col-md-4">
                                                 <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                 <Select
                                                     bsSize="sm"
