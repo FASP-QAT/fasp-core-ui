@@ -583,6 +583,7 @@ export default class EditProgram extends Component {
                                                             onBlur={handleBlur} type="select" name="userId" id="userId">
                                                             {/* <option value="0">Please select</option> */}
                                                             {/* <option value="1">Anchal</option> */}
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {programManagers}
 
                                                         </Input>

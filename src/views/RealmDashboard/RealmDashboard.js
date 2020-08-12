@@ -274,7 +274,7 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>View User</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>List Users</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
 
                         </DropdownMenu>
@@ -304,7 +304,7 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>View Country</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/country/listCountry")}>List Countries</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/country/addCountry")}>Add Country</DropdownItem>
 
                         </DropdownMenu>
@@ -332,7 +332,7 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>View Technical Area</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/healthArea/listHealthArea")}>List Technical Areas</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/healthArea/addHealthArea")}>Add Technical Area</DropdownItem>
 
                         </DropdownMenu>
@@ -360,7 +360,7 @@ class RealmDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>View Region</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>List Regions</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/realmCountry/listRealmCountry")}>Add Region</DropdownItem>
 
                         </DropdownMenu>
@@ -386,7 +386,7 @@ class RealmDashboard extends Component {
                         <DropdownToggle caret className="p-0" color="transparent">
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>View Organisation</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/organisation/listOrganisation")}>List Organisations</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/organisation/addOrganisation")}>Add Organisation</DropdownItem>
 
                         </DropdownMenu>
@@ -415,7 +415,7 @@ class RealmDashboard extends Component {
 
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>View Total Programs</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>List Programs</DropdownItem>
 
 
                         </DropdownMenu>

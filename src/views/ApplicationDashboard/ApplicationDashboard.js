@@ -662,7 +662,7 @@ class ApplicationDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>View User</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/user/listUser")}>List Users</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem>
 
                         </DropdownMenu>
@@ -696,7 +696,7 @@ class ApplicationDashboard extends Component {
                           {/* <i className="icon-settings"></i> */}
                         </DropdownToggle>
                         <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/realm/realmlist")}>Realm List</DropdownItem>
+                          <DropdownItem onClick={() => this.redirectToCrud("/realm/realmlist")}>List Realms</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
 
                         </DropdownMenu>
@@ -724,8 +724,8 @@ class ApplicationDashboard extends Component {
                         <DropdownToggle caret className="p-0" color="transparent">
                         </DropdownToggle>
                         <DropdownMenu right>
+                        <DropdownItem onClick={() => this.redirectToCrud("/language/listLanguage")}>List Languages</DropdownItem>
                           <DropdownItem onClick={() => this.redirectToCrud("/language/addLanguage")}>Add Language</DropdownItem>
-                          <DropdownItem onClick={() => this.redirectToCrud("/language/listLanguage")}>View Language</DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup>
