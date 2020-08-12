@@ -611,7 +611,7 @@ export default class UnitListComponent extends Component {
 
         UnitService.getUnitListAll()
             .then(response => {
-                console.log(response)
+                console.log("Unit--->", response.data);
 
                 this.setState({
                     unitList: response.data,
@@ -646,7 +646,7 @@ export default class UnitListComponent extends Component {
     }
 
     formatLabel(cell, row) {
-        console.log("----------jjjjjjj", cell);
+        // console.log("----------jjjjjjj", cell);
         return getLabelText(cell, this.state.lang);
     }
     render() {
