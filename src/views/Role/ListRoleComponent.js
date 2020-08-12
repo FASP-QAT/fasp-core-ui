@@ -445,10 +445,9 @@ class ListRoleComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0  ">
-                        <div className="table-responsive">
-                            <div id="tableDiv" className="LanguageremoveReadonlybackground">
-                            </div>
+                    <CardBody>
+                        <div  className="">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                         </div>
                     </CardBody>
                 </Card>
