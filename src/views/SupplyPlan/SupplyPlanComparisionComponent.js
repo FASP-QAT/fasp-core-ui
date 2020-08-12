@@ -3509,7 +3509,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         this.state.suggestedShipmentsTotalData.map(item1 => {
                                             if (item1.suggestedOrderQty.toString() != "") {
                                                 if (item1.isEmergencyOrder == 1) {
-                                                    return (<td align="right" bgcolor='red'><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                    return (<td align="right" bgcolor='red' style={{ color: "#FFF" }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                 } else {
                                                     return (<td align="right" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                 }
