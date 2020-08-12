@@ -498,14 +498,12 @@ export default class CountryListComponent extends Component {
                             pagination: 10,
                             search: true,
                             columnSorting: true,
-                            tableOverflow: true,
+                            // tableOverflow: true,
                             wordWrap: true,
                             allowInsertColumn: false,
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
                             onselection: this.selected,
-
-
                             oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowExport: false,
@@ -605,7 +603,7 @@ export default class CountryListComponent extends Component {
                     </div>
                     <CardBody className="">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -629,10 +627,10 @@ export default class CountryListComponent extends Component {
                             </FormGroup>
                         </Col>
 
-                        <div className="table-responsive">
-                            <div id="tableDiv" className="LanguageremoveReadonlybackground">
+                       
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
-                        </div>
+                        
 
                     </CardBody>
                 </Card>

@@ -252,6 +252,8 @@ const routes = [
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
+  { path: '/productCategory/productCategoryTree/:color/:message', name: 'Product Category', component: ProductCategoryTree },
+
   { path: '/', exact: true, name: i18n.t('static.home') },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimensionheader') }), component: AddDimension },

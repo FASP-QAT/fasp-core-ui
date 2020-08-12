@@ -433,7 +433,7 @@ function minMax() {
     var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
     var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
     var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
-    var curDate = moment(Date.now()).subtract(1, 'months').format("YYYY-MM-DD");
+    var curDate = moment(Date.now()).add(6, 'months').format("YYYY-MM-DD");
     var openingBalance = 0;
     var expiredStockQty = 0;
     for (var i = 0; createdDate < curDate; i++) {

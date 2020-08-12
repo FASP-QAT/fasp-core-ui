@@ -142,12 +142,18 @@ class MasterSyncService {
     }
 
     getProblemListForSync(lastSyncDate) {
-        return axios.get(`${API_URL}/api/sync/problem/${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/problem/realm/1/lastSyncDate/${lastSyncDate}`, {
         });
     }
 
     getProblemStatusListForSync(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/problemStatus/${lastSyncDate}`, {
+        });
+    }
+
+    syncProgram(programId, versionId, lastSyncDate) {
+        console.log("In service")
+        return axios.get(`${API_URL}/api/programData/shipmentSync/programId/${programId}/versionId/${versionId}/lastSyncDate/${lastSyncDate}`, {
         });
     }
 

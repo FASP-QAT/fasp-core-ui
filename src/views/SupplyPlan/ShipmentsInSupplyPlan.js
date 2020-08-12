@@ -320,7 +320,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         updateTable: function (el, cell, x, y, source, value, id) {
                                             var elInstance = el.jexcel;
                                             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                                'K', 'L', 'M', 'N', 'O']
+                                                'K', 'L', 'M', 'N', 'O','P','Q','R','S','T','U','V','W']
                                             var rowData = elInstance.getRowData(y);
                                             var erpFlag = rowData[14];
                                             if (erpFlag.toString() == true) {
@@ -405,6 +405,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                                                             tableEditable = false;
                                                         }
+                                                        var adjustedOrderQty=[];
+                                                        if(rowData[22]!="" || rowData[22]>0){
+                                                            adjustedOrderQty.push({ id: 1, name: i18n.t('static.supplyPlan.suggestedOrderQty') })
+                                                        }
+                                                        adjustedOrderQty.push({ id: 2, name: i18n.t('static.supplyPlan.manualOrderQty') })
                                                         var data = [];
                                                         data[0] = 2;//A
                                                         data[1] = rowData[22];//B
@@ -453,7 +458,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             data: json,
                                                             columnDrag: true,
                                                             columns: [
-                                                                { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.supplyPlan.suggestedOrderQty') }, { id: 2, name: i18n.t('static.supplyPlan.manualOrderQty') }], width: 120 },
+                                                                { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: adjustedOrderQty, width: 120 },
                                                                 { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
                                                                 { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', mask: '#,##', width: 120 },
                                                                 { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
@@ -594,12 +599,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         var expectedArrivedDate = "";
                                                         var receivedDate = "";
                                                         var expectedDeliveryDate = "";
-                                                        var plannedDateEditable = false;
-                                                        var submittedDateEditable = false;
-                                                        var approvedDateEditable = false;
-                                                        var shippedDateEditable = false;
-                                                        var arrivedDateEditable = false;
-                                                        var receivedDateEditable = false;
                                                         expectedPlannedDate = shipmentDates.plannedDate;
                                                         expectedSubmittedDate = shipmentDates.submittedDate;
                                                         expectedApprovedDate = shipmentDates.approvedDate;
@@ -609,39 +608,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                                         if (shipmentStatus == PLANNED_SHIPMENT_STATUS) {
                                                             plannedDate = shipmentDates.plannedDate;
-                                                            if (shipmentStatus != lastShipmentStatus) {
-                                                                plannedDateEditable = true;
-                                                            }
                                                         } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
                                                             plannedDate = shipmentDates.plannedDate;
                                                             submittedDate = shipmentDates.submittedDate;
-                                                            if (shipmentStatus != lastShipmentStatus) {
-                                                                submittedDateEditable = true;
-                                                            }
                                                         } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
                                                             plannedDate = shipmentDates.plannedDate;
                                                             submittedDate = shipmentDates.submittedDate;
                                                             approvedDate = shipmentDates.approvedDate;
-                                                            if (shipmentStatus != lastShipmentStatus) {
-                                                                approvedDateEditable = true;
-                                                            }
                                                         } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
                                                             plannedDate = shipmentDates.plannedDate;
                                                             submittedDate = shipmentDates.submittedDate;
                                                             approvedDate = shipmentDates.approvedDate;
                                                             shippedDate = shipmentDates.shippedDate;
-                                                            if (shipmentStatus != lastShipmentStatus) {
-                                                                shippedDateEditable = true;
-                                                            }
                                                         } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
                                                             plannedDate = shipmentDates.plannedDate;
                                                             submittedDate = shipmentDates.submittedDate;
                                                             approvedDate = shipmentDates.approvedDate;
                                                             shippedDate = shipmentDates.shippedDate;
                                                             arrivedDate = shipmentDates.arrivedDate;
-                                                            if (shipmentStatus != lastShipmentStatus) {
-                                                                arrivedDateEditable = true;
-                                                            }
                                                         } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
                                                             plannedDate = shipmentDates.plannedDate;
                                                             submittedDate = shipmentDates.submittedDate;
@@ -649,13 +633,32 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             shippedDate = shipmentDates.shippedDate;
                                                             arrivedDate = shipmentDates.arrivedDate;
                                                             receivedDate = shipmentDates.receivedDate;
-                                                            if (shipmentStatus != lastShipmentStatus) {
-                                                                receivedDateEditable = true;
+                                                        } else if (shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
+                                                            if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                plannedDate = shipmentDates.plannedDate;
+                                                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                plannedDate = shipmentDates.plannedDate;
+                                                                submittedDate = shipmentDates.submittedDate;
+                                                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                plannedDate = shipmentDates.plannedDate;
+                                                                submittedDate = shipmentDates.submittedDate;
+                                                                approvedDate = shipmentDates.approvedDate;
+                                                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                                                plannedDate = shipmentDates.plannedDate;
+                                                                submittedDate = shipmentDates.submittedDate;
+                                                                approvedDate = shipmentDates.approvedDate;
+                                                                shippedDate = shipmentDates.shippedDate;
+                                                            } else {
+                                                                plannedDate = shipmentDates.plannedDate;
+                                                                submittedDate = shipmentDates.submittedDate;
+                                                                approvedDate = shipmentDates.approvedDate;
+                                                                shippedDate = shipmentDates.shippedDate;
+                                                                arrivedDate = shipmentDates.arrivedDate;
                                                             }
                                                         }
 
                                                         var tableEditable = true;
-                                                        if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
+                                                        if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare" || shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
                                                             tableEditable = false;
                                                         }
 
@@ -1218,7 +1221,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             updateTable: function (el, cell, x, y, source, value, id) {
                                                                 var elInstance = el.jexcel;
                                                                 var autoGenerated = (elInstance.getRowData(y))[6];
-                                                                console.log("autoGenerated",autoGenerated)
+                                                                console.log("autoGenerated", autoGenerated)
                                                                 if (autoGenerated.toString() == "true") {
                                                                     var cell = elInstance.getCell(`A${parseInt(y) + 1}`)
                                                                     cell.classList.add('readonly');
@@ -1244,7 +1247,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 data[4] = y;
                                                                                 data[5] = -1;
                                                                                 data[6] = "false";
-                                                                                console.log("data",data)
+                                                                                console.log("data", data)
                                                                                 obj.insertRow(data);
                                                                             }
                                                                         });
@@ -1523,6 +1526,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (elInstance1 != undefined) {
                 elInstance1.setValueFromCoords(9, 0, value, true);
             }
+            console.log("x===2 value",elInstance.getRowData(0)[2]);
+            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1);
         }
 
         if (x == 4) {
@@ -1580,7 +1585,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     checkValidationForShipmentQty() {
         var elInstance = this.state.qtyCalculatorTableEl;
         var y = 0;
-        var valid = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1);
+        var valid = true;
+        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1);
+        if (validation == false) {
+            valid = false;
+        }
+        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1);
+        if (validation == false) {
+            valid = false;
+        }
         return valid;
     }
 
@@ -1686,7 +1699,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentTransBatchInfoId: map.get("3"),
                     batch: {
                         batchNo: batchNo,
-                        expiryDate: moment(map.get("1")).format("YYYY-MM-DD"),
+                        expiryDate: moment(map.get("1")).startOf('month').format("YYYY-MM-DD"),
                         batchId: 0,
                         autoGenerated: autoGenerated
                     },
@@ -1856,6 +1869,34 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedDeliveryDate = moment(Date.now()).format("YYYY-MM-DD");
                             }
                         }
+                        if (shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
+                            if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                submittedDate = moment(plannedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                approvedDate = moment(submittedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                shippedDate = moment(approvedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                approvedDate = moment(submittedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                shippedDate = moment(approvedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                shippedDate = moment(approvedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                arrivedDate = moment(shippedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            }
+                        }
                     } else {
                         console.log("in eklse");
                         var ppUnit = papuResult;
@@ -1900,6 +1941,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 if (plannedDate == "" || plannedDate == null) {
                                     plannedDate = moment(Date.now()).format("YYYY-MM-DD");
                                 }
+                                console.log("SubmittedDate===================>", submittedDate);
                                 if (submittedDate == "" || submittedDate == null) {
                                     submittedDate = moment(Date.now()).format("YYYY-MM-DD");
                                 }
@@ -1949,7 +1991,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                             if (rowData[19].toString() == "false" || expectedDeliveryDate == null || expectedDeliveryDate == "" || receivedDate == null || receivedDate == "") {
                                 expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                receivedDate = moment(arrivedDate).add(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                         }
                         if (shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
@@ -1971,6 +2013,34 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 receivedDate = moment(Date.now()).format("YYYY-MM-DD");
                                 expectedDeliveryDate = moment(Date.now()).format("YYYY-MM-DD");
+                            }
+                        }
+                        if (shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
+                            if (lastShipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                submittedDate = moment(plannedDate).add(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                approvedDate = moment(submittedDate).add(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                approvedDate = moment(submittedDate).add(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            } else if (lastShipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                                expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                receivedDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                         }
                     }
@@ -2821,7 +2891,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentsEl: ""
                         })
                         if (this.props.shipmentPage != "shipmentDataEntry") {
-                            this.props.formSubmit(this.props.items.monthCount);
+                            this.props.formSubmit(this.props.items.planningUnit, this.props.items.monthCount);
                         }
                     }.bind(this)
                 }.bind(this)

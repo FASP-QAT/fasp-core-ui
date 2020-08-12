@@ -454,7 +454,7 @@ export default class LanguageListComponent extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
-        
+
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
@@ -485,7 +485,7 @@ export default class LanguageListComponent extends Component {
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card  style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
@@ -494,14 +494,13 @@ export default class LanguageListComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pt-md-1 pb-md-1">
-                        {/* <div id="loader" className="center"></div> */}
-                        <div className="table-responsive">
-                            <div id="tableDiv" className="LanguageremoveReadonlybackground">
-                            </div>
+                    <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
+
                     </CardBody>
-                </Card><div style={{ display: this.state.loading ? "block" : "none" }}>
+                </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>Loading...</strong></h4></div>
