@@ -1045,10 +1045,10 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepTwo">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                         <Card>
                                             <CardHeader>
                                                <strong>Program Planning Units</strong>{' '}
-                                            </CardHeader>
+                                        </CardHeader>
                                             <CardBody  className="pt-0">
                                                 {/* <h3>Program Planning Units</h3> */}
                                                 <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId} items={this.state} realmId={this.state.program.realmCountry.realm.realmId}></PipelineProgramPlanningUnits>
@@ -1060,13 +1060,13 @@ export default class PipelineProgramSetup extends Component {
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        {/* <CardFooter>
+                                         <CardFooter>
                                                 <span className="red">
                                                     *Planning Unit cells in yellow color indicates that either the same planning unit is being selected twice or the planning unit which you are trying to map does not exist.
                                                     please created ticket for the planning units which do not exist.
                                                 </span>
                                             </CardFooter>
-                                        </Card> */}
+                                        </Card> 
                                         <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
@@ -1076,7 +1076,7 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepThree">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                       <Card>
                                             <CardHeader>
                                                <strong>Data Source</strong>{' '}
                                             </CardHeader>
@@ -1085,14 +1085,14 @@ export default class PipelineProgramSetup extends Component {
                                                 {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
                                                <PipelineProgramDataSource ref="datasourcechild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramDataSource>
                                             </CardBody>
-                                            {/* <CardFooter>
+                                         {/*  <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
-                                            </CardFooter> */}
-                                        {/* </Card> */}
+                                            </CardFooter>*/}
+                                       </Card> 
                                         <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
@@ -1103,7 +1103,7 @@ export default class PipelineProgramSetup extends Component {
                                 
                                 <div id="stepFour">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                       <Card>
                                             <CardHeader>
                                                <strong>Funding Source</strong>{' '}
                                             </CardHeader>
@@ -1118,7 +1118,7 @@ export default class PipelineProgramSetup extends Component {
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
-                                            </CardFooter> */}
+                                            </CardFooter>*/}
                                         </Card>
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
@@ -1184,10 +1184,10 @@ export default class PipelineProgramSetup extends Component {
                                             <CardHeader>
                                                 <strong>Inventory Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0"> */}
+                                            <CardBody className="pt-0">
                                         {/* <h3>Inventory</h3> */}
                                         {this.state.inventoryStatus && <PipelineProgramInventory pipelineId={this.props.match.params.pipelineId} ref="inventoryChild"></PipelineProgramInventory>}
-                                        {/* </CardBody> */}
+                                         </CardBody> 
                                         {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
@@ -1204,14 +1204,15 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepEight">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                        <Card>
                                             <CardHeader>
                                                 <strong>Shipment Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/*<h3>Shipments</h3>*/}
+                                                </CardBody>
                                                 {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepSeven} {...this.props}></PipelineProgramShipment>}
-                                            </CardBody>
+                                          
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
@@ -1219,7 +1220,7 @@ export default class PipelineProgramSetup extends Component {
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        {/* </Card> */}
+                                         </Card>
                                     </Col>
                                 </div>
                             </CardBody>
