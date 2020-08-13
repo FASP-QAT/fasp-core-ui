@@ -15,7 +15,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-import { DATE_FORMAT_SM,DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
+import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -36,6 +36,7 @@ const initialValues = {
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         budget: Yup.string()
+            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         programId: Yup.string()
             .required(i18n.t('static.budget.programtext')),
@@ -52,6 +53,7 @@ const validationSchema = function (values, t) {
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
@@ -695,7 +697,7 @@ class AddBudgetComponent extends Component {
 
         budget.label.label_en = ''
         // budget.program.programId = ''
-        budget.program.id= ''
+        budget.program.id = ''
         budget.fundingSource.fundingSourceId = ''
         budget.budgetAmt = ''
         budget.startDate = ''
@@ -705,10 +707,10 @@ class AddBudgetComponent extends Component {
         budget.currency.conversionRateToUsd = ''
 
 
-            this.setState({
-                budget
-            },
-                () => { });
+        this.setState({
+            budget
+        },
+            () => { });
     }
 }
 

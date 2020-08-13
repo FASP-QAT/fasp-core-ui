@@ -8,6 +8,7 @@ import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { LABEL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     fundingSource: "",
@@ -17,7 +18,7 @@ const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
-            .matches(/^[a-zA-Z\s]+$/, i18n.t('static.message.rolenamevalidtext'))
+            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
             .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))

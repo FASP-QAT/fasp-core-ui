@@ -21,6 +21,7 @@ import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import moment from "moment";
+import { DECIMAL_NO_REGEX, INTEGER_NO_REGEX } from '../../Constants.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 
@@ -1493,13 +1494,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //catelog price
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
+            var reg = DECIMAL_NO_REGEX;
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1577,13 +1578,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //volume
         if (x == 8) {
+            var reg = DECIMAL_NO_REGEX;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1597,13 +1599,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //weight
         if (x == 9) {
+            var reg = DECIMAL_NO_REGEX;
             var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
