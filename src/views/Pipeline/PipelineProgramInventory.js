@@ -55,7 +55,7 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, "");
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
+           /* var col = ("H").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(7, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -65,7 +65,7 @@ export default class PipelineProgramInventory extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-            }
+            }*/
 
         }
         return valid;
