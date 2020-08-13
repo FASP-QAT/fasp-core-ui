@@ -266,7 +266,7 @@ class ResetPasswordComponent extends Component {
                                                                         required
                                                                     />
                                                                     <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="icon-info icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                        <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
                                                                     </InputGroupAddon>
                                                                     <FormFeedback>{errors.newPassword}</FormFeedback>
                                                                 </InputGroup>

@@ -93,7 +93,7 @@
     "static.login.forgotpassword": "Forgot Password",
     "static.message.user.forgotPasswordTokenUsed": "Token already used",
     "static.message.user.invalidToken": "Invalid Token",
-    "static.program.downloadsuccess": "Program downloaded successfully",
+    "static.program.downloadsuccess": "Program Downloaded Successfully",
     "static.language.english": "English",
     "static.message.user.couldNotBeUnlocked": "User could not be unlocked",
     "static.login.login": "Login",
