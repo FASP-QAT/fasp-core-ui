@@ -22,8 +22,20 @@ export default class PipelineProgramConsumption extends Component {
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
+
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -39,8 +51,20 @@ export default class PipelineProgramConsumption extends Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
+        if (x == 1) {
+            var json = this.el.getJson();
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -57,9 +81,22 @@ export default class PipelineProgramConsumption extends Component {
         var list = this.state.consumptionList;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
+
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[1]).toString();
+
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                //valid = false;
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, (list[y].regionId).concat(" Does not exist."));
+            }
             var map = new Map(Object.entries(json[y]));
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = map.get("5");
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = map.get("2");
             if (value != "" && !isNaN(parseInt(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -70,6 +107,7 @@ export default class PipelineProgramConsumption extends Component {
             }
         }
 
+
     }
     saveConsumption() {
         var json = this.el.getJson();
@@ -79,21 +117,21 @@ export default class PipelineProgramConsumption extends Component {
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
 
-            var dataSourceId = map.get("5");
+            var dataSourceId = map.get("2");
             if (dataSourceId != "" && !isNaN(parseInt(dataSourceId))) {
-                dataSourceId = map.get("5");
+                dataSourceId = map.get("2");
             } else {
-                dataSourceId = list[map.get("8")].dataSourceId;
+                dataSourceId = list[map.get("2")].dataSourceId;
 
             }
 
             var consumptionJson = {
-                regionId: map.get("2"),
+                regionId: map.get("1"),
                 planningUnitId: map.get("0"),
-                consumptionDate: map.get("1"),
+                consumptionDate: map.get("3"),
                 actualFlag: map.get("7"),
-                consumptionQty: map.get("3"),
-                dayOfStockOut: map.get("4"),
+                consumptionQty: map.get("4"),
+                dayOfStockOut: map.get("5"),
                 dataSourceId: dataSourceId,
                 notes: map.get("6")
             }
@@ -158,17 +196,16 @@ export default class PipelineProgramConsumption extends Component {
                                 for (var j = 0; j < consumptionList.length; j++) {
                                     for (var cm = 0; cm < consumptionList[j].consNumMonth; cm++) {
                                         data = [];
-                                        data[1] = moment(consumptionList[j].consumptionDate).add(cm, 'months').format("YYYY-MM-DD");
-
+                                        data[3] = moment(consumptionList[j].consumptionDate).add(cm, 'months').format("YYYY-MM-DD");
                                         if (regionList.length == 1) {
-                                            data[2] = regionList[0].id;
+                                            data[1] = regionList[0].id;
                                         } else {
-                                            data[2] = consumptionList[j].regionId;
+                                            data[1] = consumptionList[j].regionId;
                                         };
-
-                                        data[3] = consumptionList[j].consumptionQty;
-                                        data[4] = consumptionList[j].dayOfStockOut;
-                                        data[5] = consumptionList[j].dataSourceId;
+                                        // data[2] = consumptionList[j].regionId;
+                                        data[4] = consumptionList[j].consumptionQty;
+                                        data[5] = consumptionList[j].dayOfStockOut;
+                                        data[2] = consumptionList[j].dataSourceId;
                                         if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
                                             data[6] = '';
                                         } else {
@@ -194,22 +231,27 @@ export default class PipelineProgramConsumption extends Component {
                                     columns: [
                                         // { title: 'Month', type: 'text', readOnly: true },
                                         {
-                                            title: 'Planning Unit',
+                                            title: i18n.t('static.planningunit.planningunit'),
                                             type: 'dropdown',
                                             source: planningUnitListQat,
                                             readOnly: true
                                         },
                                         {
-                                            title: 'Consumption Date',
+                                            title: i18n.t('static.inventory.region'),
+                                            type: 'dropdown',
+                                            source: regionList
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.dataSource'),
+                                            type: 'dropdown',
+                                            source: dataSourceList
+                                        },
+                                        {
+                                            title: i18n.t('static.pipeline.consumptionDate'),
                                             type: 'calendar',
                                             options: {
                                                 format: 'MM-YYYY'
                                             }
-                                        },
-                                        {
-                                            title: i18n.t('static.inventory.region'),
-                                            type: 'dropdown',
-                                            source: regionList
                                         },
                                         {
                                             title: i18n.t('static.consumption.consumptionqty'),
@@ -220,12 +262,7 @@ export default class PipelineProgramConsumption extends Component {
                                             type: 'numeric'
                                         },
                                         {
-                                            title: i18n.t('static.inventory.dataSource'),
-                                            type: 'dropdown',
-                                            source: dataSourceList
-                                        },
-                                        {
-                                            title: 'Notes',
+                                            title: i18n.t('static.program.notes'),
                                             type: 'text'
                                         },
                                         {
