@@ -74,6 +74,26 @@ class AuthenticationService {
         }
     }
 
+    displayDashboardBasedOnRole() {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let roleList = [];
+            for (let i = 0; i <= decryptedUser.roleList.length; i++) {
+                let role = decryptedUser.roleList[i];
+                if (role != null && role != "") {
+                    roleList.push(role.roleId);
+                }
+            }
+            console.log("roleList---" + roleList);
+            if (roleList.includes("ROLE_APPLICATION_ADMIN"))
+                return 1;
+            if (roleList.includes("ROLE_REALM_ADMIN"))
+                return 2;
+            return 3;
+        }
+    }
+
     getLoggedInUserId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         return decryptedCurUser;
