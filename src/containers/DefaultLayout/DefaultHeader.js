@@ -80,8 +80,17 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-           {/* <DefaultHeaderDropdown mssgs/> */}
-                     <DefaultHeaderDropdown onLogout={this.props.onLogout}  accnt onChangePassword={this.props.onChangePassword} />
+          {/* <DefaultHeaderDropdown mssgs/> */}
+          <NavItem className="">
+            <NavLink to="#" className="nav-link">
+              <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
+                <span className="icon-wrapper-bg "></span>
+                <i className="cui-home icons HomeIcon   icon-anim-pulse text-primary " onClick={this.props.onChangeDashboard} title="View Dashboard"></i>
+              </span>
+            </NavLink>
+          </NavItem>
+          {/* <DefaultHeaderDropdown /> */}
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">

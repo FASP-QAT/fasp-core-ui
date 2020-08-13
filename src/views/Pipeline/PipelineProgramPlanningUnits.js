@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
 import jexcel from 'jexcel';
+import React, { Component } from 'react';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import PipelineService from '../../api/PipelineService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import PlanningUnitService from '../../api/PlanningUnitService'
-import i18n from '../../i18n';
+import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
-import { textFilter } from 'react-bootstrap-table2-filter';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
@@ -101,9 +100,9 @@ export default class PipelineProgramPlanningUnits extends Component {
             // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
             // instance.jexcel.setValue(columnName, '');
         }
-        //Reorder frequency in months
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
+            //var reg = /^[0-9\b]+$/;
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -120,7 +119,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        //Min month of stock
+        //Reorder frequency in months
         if (x == 5) {
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
@@ -139,7 +138,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        //Months In Future For AMC
+        //Min month of stock
         if (x == 6) {
             var reg = /^[0-9\b]+$/;
             var col = ("G").concat(parseInt(y) + 1);
@@ -158,7 +157,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        //Months In Past For AMC
+        //Months In Future For AMC
         if (x == 7) {
             var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
@@ -177,10 +176,10 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        //Local Procurment Lead Time
-        if (x == 9) {
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var col = ("J").concat(parseInt(y) + 1);
+        //Months In Past For AMC
+        if (x == 8) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -196,9 +195,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        //Shelf Life
+        //Local Procurment Lead Time
         if (x == 10) {
-            var reg = /^[0-9\b]+$/;
+            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("K").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -215,11 +214,30 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
-        //Catalog Price
+        //Shelf Life
         if (x == 11) {
+            var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var col = ("L").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Catalog Price
+        if (x == 12) {
             // var reg = /^[0-9]+.[0-9]+$/;
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var col = ("L").concat(parseInt(y) + 1);
+            var col = ("M").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -235,6 +253,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
         }
+
     }
 
     checkValidation() {
@@ -275,16 +294,16 @@ export default class PipelineProgramPlanningUnits extends Component {
                     }
                 }
             }
-            var reg = /^[0-9\b]+$/;
+
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
-            if (value == "") {
+            if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -293,9 +312,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+
             }
-
-
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(5, y);
@@ -315,6 +333,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
+
 
             var reg = /^[0-9\b]+$/;
             var col = ("G").concat(parseInt(y) + 1);
@@ -356,16 +375,16 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             }
 
-            //Local procurement lead time
-            var col = ("J").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(9, y);
-            if (value === "") {
+            var reg = /^[0-9\b]+$/;
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(8, y);
+            if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -374,9 +393,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
             }
 
+            //Local procurement lead time
             var col = ("K").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(10, y);
             if (value === "") {
@@ -385,7 +404,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -417,6 +436,28 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             }
 
+            var col = ("M").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(12, y);
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+
+
+
 
         }
         return valid;
@@ -444,16 +485,16 @@ export default class PipelineProgramPlanningUnits extends Component {
                     id: 0
                 },
                 planningUnitId: planningUnitId,
-                reorderFrequencyInMonths: map.get("4"),
-                minMonthsOfStock: map.get("5"),
+                multiplier: map.get("4"),
+                reorderFrequencyInMonths: map.get("5"),
+                minMonthsOfStock: map.get("6"),
+                monthsInFutureForAmc: map.get("7"),
+                monthsInPastForAmc: map.get("8"),
+                programPlanningUnitId: map.get("9"),
+                localProcurmentLeadTime: map.get("10"),
+                shelfLife: map.get("11"),
+                catalogPrice: map.get("12")
 
-                monthsInFutureForAmc: parseInt(map.get("6")),
-                monthsInPastForAmc: parseInt(map.get("7")),
-
-                programPlanningUnitId: map.get("8"),
-                localProcurmentLeadTime: map.get("9"),
-                shelfLife: map.get("10"),
-                catalogPrice: map.get("11")
 
             }
             planningUnitArray.push(planningUnitJson);
@@ -533,16 +574,31 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     data[1] = planningUnitList[j].pipelineProductName;
 
                                                     data[2] = planningUnitList[j].productCategoryId;
-                                                    data[3] = planningUnitList[j].planningUnitId;
-                                                    data[4] = planningUnitList[j].reorderFrequencyInMonths;
-                                                    data[5] = planningUnitList[j].minMonthsOfStock;
-                                                    data[6] = planningUnitList[j].monthsInFutureForAmc;
-                                                    data[7] = planningUnitList[j].monthsInPastForAmc;
-                                                    data[8] = planningUnitList[j].programPlanningUnitId
-                                                    data[9] = planningUnitList[j].localProcurmentLeadTime
+                                                    data[3] = planningUnitList[j].planningUnitId;   
+                                                    data[4] = planningUnitList[j].multiplier
+                                                    data[5] = planningUnitList[j].reorderFrequencyInMonths;
+                                                    data[6] = planningUnitList[j].minMonthsOfStock;
+                                                    if (planningUnitList[j].monthsInFutureForAmc == 0) {
+                                                        data[7] = this.props.items.program.monthsInFutureForAmc;
+                                                    } else {
+                                                        data[7] = planningUnitList[j].monthsInFutureForAmc;
+                                                    }
+                                                    if (planningUnitList[j].monthsInPastForAmc == 0) {
+                                                        data[8] = this.props.items.program.monthsInPastForAmc;
+                                                    } else {
+                                                        data[8] = planningUnitList[j].monthsInPastForAmc;
+                                                    }
 
-                                                    data[10] = planningUnitList[j].shelfLife
-                                                    data[11] = planningUnitList[j].catalogPrice
+                                                    data[9] = planningUnitList[j].programPlanningUnitId
+
+                                                    data[10] = planningUnitList[j].localProcurmentLeadTime
+                                                    if (planningUnitList[j].shelfLife == 0) {
+                                                        data[11] = this.props.items.program.shelfLife;
+                                                    } else {
+                                                        data[11] = planningUnitList[j].shelfLife
+                                                    }
+                                                    data[12] = planningUnitList[j].catalogPrice
+
                                                     productDataArr.push(data);
 
                                                 }
@@ -558,61 +614,66 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [190, 290, 200, 290, 170, 170, 100, 100, 100, 170, 100, 100],
+                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 80, 80, 80],
                                                 columns: [
 
                                                     {
-                                                        title: 'Pipeline Product Category',
+                                                        title: i18n.t('static.pipeline.pplnproductcategory'),
                                                         type: 'text',
                                                         readOnly: true
                                                     }, {
-                                                        title: 'Pipeline Product',
+                                                        title: i18n.t('static.pipeline.pplnproduct'),
                                                         type: 'text',
                                                         readOnly: true
                                                     },
                                                     {
-                                                        title: 'Product Category',
+                                                        title: i18n.t('static.product.productcategory'),
                                                         type: 'dropdown',
                                                         source: productCategoryList,
                                                         // filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: 'Planning Unit',
+                                                        title: i18n.t('static.planningunit.planningunit'),
                                                         type: 'autocomplete',
                                                         source: planningUnitListQat,
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: 'Reorder frequency in months',
+                                                        title: i18n.t('static.unit.multiplier'),
                                                         type: 'number',
 
                                                     },
                                                     {
-                                                        title: 'Min month of stock',
+                                                        title: i18n.t('static.program.reorderFrequencyInMonths'),
+                                                        type: 'number',
+
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.supplyPlan.minStockMos'),
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Months In Future For AMC',
+                                                        title: i18n.t('static.report.mosfuture'),
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Months In Past For AMC',
+                                                        title: i18n.t('static.report.mospast'),
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Pipeline Product Id',
+                                                        title: i18n.t('static.report.id'),
                                                         type: 'hidden'
                                                     },
                                                     {
-                                                        title: 'Local Procurment Lead Time',
+                                                        title: i18n.t('static.pipeline.localprocurementleadtime'),
                                                         type: 'number',
                                                     },
                                                     {
-                                                        title: 'Shelf Life',
+                                                        title: i18n.t('static.report.shelfLife'),
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Catalog Price',
+                                                        title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                         type: 'number'
                                                     }
                                                 ],

@@ -164,6 +164,7 @@ const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanComponent'));
 const WhatIfReport = React.lazy(() => import('./views/WhatIfReport/whatIfReport'));
 const ManualTagging = React.lazy(() => import('./views/ManualTagging/ManualTagging'));
+const ShipmentDelinking = React.lazy(() => import('./views/ManualTagging/ShipmentDelinking'));
 
 
 const AddForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/AddForecastingUnitComponent'));
@@ -315,10 +316,12 @@ const routes = [
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource/:subFundingSourceId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
-
+  { path: '/ApplicationDashboard/:id', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  { path: '/ApplicationDashboard/:id/:color/:message', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
@@ -432,6 +435,7 @@ const routes = [
   { path: '/supplyPlan', name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/report/whatIf', name: i18n.t('static.dashboard.whatIf'), component: WhatIfReport },
   { path: '/shipment/manualTagging', name: i18n.t('static.dashboard.manualTagging'), component: ManualTagging },
+  { path: '/shipment/delinking', name: i18n.t('static.dashboard.delinking'), component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
 
 

@@ -731,15 +731,15 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Local Procurment Lead Time',
+                                                        title: 'Local Procurment Lead Time(Months)',
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Shelf Life',
+                                                        title: 'Shelf Life(Months)',
                                                         type: 'number'
                                                     },
                                                     {
-                                                        title: 'Catalog Price',
+                                                        title: 'Catalog Price (USD)',
                                                         type: 'number'
                                                     },
                                                     {

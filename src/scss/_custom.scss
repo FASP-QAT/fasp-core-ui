@@ -1791,24 +1791,40 @@ input::placeholder {
 }
 .progressetuptext2 {
   // left: 22%;
-  left: 25%;
+  left: 15%;
   transform: translateX(-35%) scale(1);
 }
 .progressetuptext3 {
-  // left: 46.46%;
-  left: 50%;
+  // left: 33.46%;
+  left: 30%;
   transform: translateX(-45%) scale(1);
 }
 .progressetuptext4 {
-  // left: 71.46%;
-  left: 75%;
+  // left: 44.46%;
+  left: 45%;
   transform: translateX(-70%) scale(1);
 }
 .progressetuptext5 {
   // left: 94.95%;
+  left: 60%;
+  transform: translateX(-97%) scale(1);
+}
+.progressetuptext6 {
+  // left: 94.95%;
+  left: 75%;
+  transform: translateX(-97%) scale(1);
+}
+.progressetuptext7 {
+  // left: 94.95%;
+  left: 90%;
+  transform: translateX(-97%) scale(1);
+}
+.progressetuptext8 {
+  // left: 94.95%;
   left: 100%;
   transform: translateX(-97%) scale(1);
 }
+
 ///data setup
 .progresdatatext1 {
   // left: 7px;
@@ -3024,6 +3040,9 @@ border-radius: 2em;
   padding:4px 0px 5px 7px !important;
  
 }
+.go355775859 .gray {
+  color: #697069!important;
+}
 .go335935385 span {
   display: inline!important;
   padding-left: 5px;
@@ -3071,4 +3090,10 @@ border-radius: 2em;
   border: 1px solid #e4e7ea!important;
   color: #697069!important;
   height: 0px!important;
+}
+//////top header
+
+.HomeIcon{
+  color: #20a8d8;
+  font-size: 20px;
 }

@@ -354,6 +354,7 @@ export default class CountryListComponent extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -377,17 +378,23 @@ export default class CountryListComponent extends Component {
                 const selCountry = this.state.countryList.filter(c => c.active == true);
                 this.setState({
                     selCountry: selCountry
+                }, () => {
+                    this.buildJExcel();
                 });
             } else if (selStatus == "false") {
                 const selCountry = this.state.countryList.filter(c => c.active == false);
                 this.setState({
                     selCountry: selCountry
+                }, () => {
+                    this.buildJExcel();
                 });
             }
 
         } else {
             this.setState({
                 selCountry: this.state.countryList
+            }, () => {
+                this.buildJExcel();
             });
         }
     }
@@ -411,6 +418,98 @@ export default class CountryListComponent extends Component {
         }
     }
 
+    buildJExcel() {
+        let countryList = this.state.selCountry;
+        // console.log("countryList---->", countryList);
+        let countryArray = [];
+        let count = 0;
+
+        for (var j = 0; j < countryList.length; j++) {
+            data = [];
+            data[0] = countryList[j].countryId
+            data[1] = getLabelText(countryList[j].label, this.state.lang)
+            data[2] = countryList[j].countryCode;
+            data[3] = countryList[j].countryCode2;
+            data[4] = countryList[j].active;
+
+            countryArray[count] = data;
+            count++;
+        }
+        if (countryList.length == 0) {
+            data = [];
+            countryArray[0] = data;
+        }
+        // console.log("countryArray---->", countryArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = countryArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [150, 150, 100, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'countryId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.country.countryMaster'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.country.countrycode'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Country Code2',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            // tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false
+        };
+        var countryEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = countryEl;
+        this.setState({
+            countryEl: countryEl, loading: false
+        })
+    }
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
@@ -426,99 +525,7 @@ export default class CountryListComponent extends Component {
                     selCountry: response.data, loading: false
                 },
                     () => {
-
-                        let countryList = this.state.countryList;
-                        // console.log("countryList---->", countryList);
-                        let countryArray = [];
-                        let count = 0;
-
-                        for (var j = 0; j < countryList.length; j++) {
-                            data = [];
-                            data[0] = countryList[j].countryId
-                            data[1] = getLabelText(countryList[j].label, this.state.lang)
-                            data[2] = countryList[j].countryCode;
-                            data[3] = countryList[j].countryCode2;
-                            data[4] = countryList[j].active;
-
-                            countryArray[count] = data;
-                            count++;
-                        }
-                        if (countryList.length == 0) {
-                            data = [];
-                            countryArray[0] = data;
-                        }
-                        // console.log("countryArray---->", countryArray);
-                        this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
-                        var json = [];
-                        var data = countryArray;
-
-                        var options = {
-                            data: data,
-                            columnDrag: true,
-                            colWidths: [150, 150, 100, 100],
-                            colHeaderClasses: ["Reqasterisk"],
-                            columns: [
-                                {
-                                    title: 'countryId',
-                                    type: 'hidden',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.country.countryMaster'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.country.countrycode'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    title: 'Country Code2',
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    type: 'dropdown',
-                                    title: i18n.t('static.common.status'),
-                                    readOnly: true,
-                                    source: [
-                                        { id: true, name: i18n.t('static.common.active') },
-                                        { id: false, name: i18n.t('static.common.disabled') }
-                                    ]
-                                },
-                            ],
-                            text: {
-                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                show: '',
-                                entries: '',
-                            },
-                            onload: this.loaded,
-                            pagination: 10,
-                            search: true,
-                            columnSorting: true,
-                            // tableOverflow: true,
-                            wordWrap: true,
-                            allowInsertColumn: false,
-                            allowManualInsertColumn: false,
-                            allowDeleteRow: false,
-                            onselection: this.selected,
-                            oneditionend: this.onedit,
-                            copyCompatibility: true,
-                            allowExport: false,
-                            paginationOptions: [10, 25, 50],
-                            position: 'top',
-                            contextMenu: false
-                        };
-                        var countryEl = jexcel(document.getElementById("tableDiv"), options);
-                        this.el = countryEl;
-                        this.setState({
-                            countryEl: countryEl, loading: false
-                        })
-
-
+                        this.buildJExcel();
 
                     })
 
@@ -628,10 +635,10 @@ export default class CountryListComponent extends Component {
                             </FormGroup>
                         </Col>
 
-                       
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
-                        
+
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
+
 
                     </CardBody>
                 </Card>
