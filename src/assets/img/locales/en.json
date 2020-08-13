@@ -1064,5 +1064,6 @@
     "static.supplyPlan.minMonthsOfStock":"Min Months Of Stock",
     "static.supplyPlan.shelfLife": "Shelf Life",
     "static.supplyPlan.qatGenerated":"QAT Generated",
-    "static.jexcel.pages":"pages"
+    "static.jexcel.pages":"pages",
+    "static.common.startdateCompare": "Start date should be smaller than end date "
 }
