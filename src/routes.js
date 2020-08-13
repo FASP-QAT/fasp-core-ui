@@ -316,6 +316,7 @@ const routes = [
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource/:subFundingSourceId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
+  { path: '/ApplicationDashboard/:id', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:id/:color/:message', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },

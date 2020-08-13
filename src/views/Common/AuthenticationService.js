@@ -995,7 +995,8 @@ class AuthenticationService {
                     }
                     break;
                 case "/ApplicationDashboard/:color/:message":
-                    case "/ApplicationDashboard/:id/:color/:message":
+                case "/ApplicationDashboard/:id":
+                case "/ApplicationDashboard/:id/:color/:message":
                 case "/ApplicationDashboard":
                     if (bfunction.includes("ROLE_BF_APPLICATION_DASHBOARD")) {
                         return true;

@@ -67,8 +67,11 @@ class DefaultHeaderDropdown extends Component {
     this.togglebugreport = this.togglebugreport.bind(this);
     this.togglechangeadditional = this.togglechangeadditional.bind(this);
     this.togglechangemaster = this.togglechangemaster.bind(this);
+    this.dashboard = this.dashboard.bind(this);
   }
-
+  dashboard(){
+    this.props.history.push(`/ApplicationDashboard/`)  
+  }
 
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
@@ -250,9 +253,9 @@ class DefaultHeaderDropdown extends Component {
     const itemsCount = 15;
     return (
       <Dropdown nav className="d-md-down-none" isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle nav>
+        {/* <DropdownToggle nav onClick={this.props.onChangeDashboard}>
           <i className="cui-home icons HomeIcon"></i>
-        </DropdownToggle>
+        </DropdownToggle> */}
         {/* <DropdownMenu right className="dropdown-menu-lg">
           <DropdownItem header tag="div" className="text-center"><strong>You have {itemsCount} pending tasks</strong></DropdownItem>
           <DropdownItem>
