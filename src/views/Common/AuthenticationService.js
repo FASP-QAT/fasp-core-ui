@@ -85,7 +85,6 @@ class AuthenticationService {
                     roleList.push(role.roleId);
                 }
             }
-            console.log("roleList---" + roleList);
             if (roleList.includes("ROLE_APPLICATION_ADMIN"))
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
@@ -996,6 +995,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/ApplicationDashboard/:color/:message":
+                    case "/ApplicationDashboard/:id/:color/:message":
                 case "/ApplicationDashboard":
                     if (bfunction.includes("ROLE_BF_APPLICATION_DASHBOARD")) {
                         return true;
