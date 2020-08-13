@@ -8,7 +8,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
+import PlanningUnitCapacityService from '../../api/PlanningUnitCapacityService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { DATE_FORMAT_CAP } from '../../Constants.js';
+import moment from 'moment';
 
 
 const entityname = i18n.t('static.dashboad.planningunitcapacity');
@@ -29,32 +32,17 @@ export default class PlanningUnitCapacityList extends Component {
 
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
+        console.log("planningUnitId---" + planningUnitId);
         AuthenticationService.setupAxiosInterceptors();
-        if (planningUnitId == 0) {
-            PlanningUnitService.getAllPlanningUnitList().then(response => {
-                console.log("FORTUNER-------------", response.data)
-                this.setState({
-                    planningUnits: response.data,
-                    selSource: response.data
-                })
-            })
+        if (planningUnitId != 0) {
+            const planningUnitCapacityList = this.state.selSource.filter(c => c.planningUnit.id == planningUnitId)
+            this.setState({
+                planningUnitCapacityList
+            });
         } else {
-            PlanningUnitService.getPlanningUnitCapacityForId(planningUnitId).then(response => {
-                console.log("resp---->", response.data);
-                let tempPlanningUnitList = response.data;
-                let planningUnitList = [];
-                for (var j = 0; j < tempPlanningUnitList.length; j++) {
-                    let json = {
-                        label: tempPlanningUnitList[j].planningUnit.label,
-                        active: tempPlanningUnitList[j].active
-                    }
-                    planningUnitList.push(json);
-                }
-                this.setState({
-                    planningUnitCapacityList: planningUnitList,
-                    selSource: planningUnitList
-                })
-            })
+            this.setState({
+                planningUnitCapacityList: this.state.selSource
+            });
         }
 
     }
@@ -63,9 +51,14 @@ export default class PlanningUnitCapacityList extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getAllPlanningUnitList().then(response => {
-            console.log("FORTUNER-------------", response.data)
             this.setState({
-                planningUnits: response.data,
+                planningUnits: response.data
+            })
+        })
+        PlanningUnitCapacityService.getPlanningUnitCapacityList().then(response => {
+            console.log("response.data---", response.data);
+            this.setState({
+                planningUnitCapacityList: response.data,
                 selSource: response.data
             })
         })
@@ -96,40 +89,50 @@ export default class PlanningUnitCapacityList extends Component {
         );
 
         const columns = [{
-            dataField: 'label',
+            dataField: 'planningUnit.label',
             text: i18n.t('static.dashboard.planningunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         },
-        //  {
-        //     dataField: 'supplier.label',
-        //     text: i18n.t('static.dashboard.supplier'),
-        //     sort: true,
-        //     align: 'center',
-        //     headerAlign: 'center',
-        //     // formatter: this.formatLabel
-        // }, {
-        //     dataField: 'startDate',
-        //     text: i18n.t('static.common.startdate'),
-        //     sort: true,
-        //     align: 'center',
-        //     headerAlign: 'center'
-        // }, {
-        //     dataField: 'stopDate',
-        //     text: i18n.t('static.common.stopdate'),
-        //     sort: true,
-        //     align: 'center',
-        //     headerAlign: 'center',
-        //     //formatter: this.formatLabel
-        // }, {
-        //     dataField: 'capacity',
-        //     text: i18n.t('static.planningunit.capacity'),
-        //     sort: true,
-        //     align: 'center',
-        //     headerAlign: 'center'
-        // }, 
+        {
+            dataField: 'supplier.label',
+            text: i18n.t('static.dashboard.supplier'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'startDate',
+            text: i18n.t('static.common.startdate'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (
+                    (row.startDate ? moment(row.startDate).format(`${DATE_FORMAT_CAP}`) : null)
+                );
+            }
+        }, {
+            dataField: 'stopDate',
+            text: i18n.t('static.common.stopdate'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (
+                    (row.stopDate ? moment(row.stopDate).format(`${DATE_FORMAT_CAP}`) : null)
+                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                );
+            }
+        }, {
+            dataField: 'capacity',
+            text: i18n.t('static.planningunit.capacity'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        },
         {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -208,7 +211,7 @@ export default class PlanningUnitCapacityList extends Component {
                         </Col>
                         <ToolkitProvider
                             keyField="planningUnitCapacityId"
-                            data={this.state.selSource}
+                            data={this.state.planningUnitCapacityList}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover

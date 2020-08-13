@@ -67,13 +67,15 @@ export default class PlanningUnitListComponent extends Component {
     }
     filterDataForRealm() {
         let realmId = document.getElementById("realmId").value;
-        PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-            console.log(response.data)
-            this.setState({
-                planningUnitList: response.data,
-                selSource: response.data
+        if (realmId != 0) {
+            PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
+                console.log(response.data)
+                this.setState({
+                    planningUnitList: response.data,
+                    selSource: response.data
+                })
             })
-        })
+        }
 
     }
 
@@ -298,7 +300,7 @@ export default class PlanningUnitListComponent extends Component {
                                                 bsSize="sm"
                                                 onChange={this.filterDataForRealm}
                                             >
-                                                {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+                                                <option value="0">{i18n.t('static.common.all')}</option>
                                                 {realmList}
                                             </Input>
                                             {/* <InputGroupAddon addonType="append">

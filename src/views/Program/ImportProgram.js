@@ -149,7 +149,7 @@ export default class ImportProgram extends Component {
                             this.setState({
                                 message: i18n.t('static.program.dataimportsuccess')
                             })
-                            this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.dataimportsuccess'))
+                            this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
                                 title: i18n.t('static.program.confirmsubmit'),
@@ -184,7 +184,7 @@ export default class ImportProgram extends Component {
                                             this.setState({
                                                 message: i18n.t('static.program.dataimportsuccess')
                                             })
-                                            this.props.history.push(`/dashboard/`+'green/'+ i18n.t('static.program.dataimportsuccess'))
+                                            this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },
                                     {
@@ -193,7 +193,7 @@ export default class ImportProgram extends Component {
                                             this.setState({
                                                 message: i18n.t('static.program.actioncancelled')
                                             })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
+                                            this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.program.actioncancelled'))
                                         }
                                     }
                                 ]
@@ -331,7 +331,7 @@ export default class ImportProgram extends Component {
                                                     <label className="custom-file-label" id="file-input">Choose file</label>
                                                 </Col>
                                             </FormGroup>
-                                            <FormGroup id="programIdDiv">
+                                            <FormGroup id="programIdDiv" className="col-md-4">
                                                 <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                 <Select
                                                     bsSize="sm"

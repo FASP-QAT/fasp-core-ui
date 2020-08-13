@@ -529,6 +529,9 @@ class RealmCountryRegion extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
         //Active

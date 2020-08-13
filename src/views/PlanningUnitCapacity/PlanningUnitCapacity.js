@@ -899,7 +899,7 @@ class PlanningUnitCapacity extends Component {
                                                     data[3] = papuList[j].stopDate;
                                                     data[4] = papuList[j].capacity;
                                                     data[5] = papuList[j].active;
-                                                    data[6] = papuList[j].planningUnitId;
+                                                    data[6] = papuList[j].planningUnitCapacityId;
                                                     data[7] = 0;
                                                     papuDataArr[count] = data;
                                                     count++;
@@ -1344,6 +1344,11 @@ class PlanningUnitCapacity extends Component {
                 }
 
             }
+        }
+
+        //Active
+        if (x == 5) {
+            this.el.setValueFromCoords(7, y, 1, true);
         }
 
     }.bind(this);
