@@ -1799,6 +1799,20 @@ class ShipmentGlobalView extends Component {
           doc.save('canvas.pdf');*/
     }
 
+
+    handleChange(countrysId) {
+        console.log('==>',countrysId)
+        countrysId = countrysId.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+          })
+        this.setState({
+            countryValues: countrysId.map(ele => ele),
+            countryLabels: countrysId.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData(this.state.rangeValue)
+        })
+    }
     handleChangeProgram(programIds) {
 
         this.setState({
@@ -2448,9 +2462,9 @@ class ShipmentGlobalView extends Component {
 
         const { countrys } = this.state;
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
-            // console.log(JSON.stringify(item))
+            console.log(JSON.stringify(item))
             return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
-        }, this);
+          }, this);
 
         const { productCategories } = this.state;
 
