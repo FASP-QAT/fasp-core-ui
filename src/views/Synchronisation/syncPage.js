@@ -1349,10 +1349,10 @@ export default class syncPage extends Component {
                 <Form name='simpleForm'>
                   <Col md="12 pl-0">
 
-                    <div className="d-md-flex">
-                      <FormGroup className="col-md-2 comparebtntext">
+                    <div className="row">
+                      <FormGroup className="col-md-4 ">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                        <div className="controls SelectGo ">
+                        <div className="controls  ">
                           <InputGroup>
                             <Input type="select"
                               bsSize="sm"
@@ -1367,7 +1367,9 @@ export default class syncPage extends Component {
                         </div>
 
                       </FormGroup>
-                      <div className="col-md-11 ml-2 mt-2">
+                      
+                    </div>
+                    <div className="col-md-12 pl-0 mt-0 mb-2">
                         <ul class="legendcommitversion">
                           <li><span class="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
                           <li><span class=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.newDataCurrentVersion')} </span></li>
@@ -1378,7 +1380,6 @@ export default class syncPage extends Component {
 
                         </ul>
                       </div>
-                    </div>
                   </Col>
                 </Form>
                 <div id="detailsDiv">
