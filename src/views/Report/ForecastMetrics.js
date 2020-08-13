@@ -348,6 +348,7 @@ class ForecastMetrics extends Component {
 
 
   handleChange(countrysId) {
+    console.log(countrysId)
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })

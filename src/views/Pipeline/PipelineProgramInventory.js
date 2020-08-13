@@ -84,41 +84,8 @@ export default class PipelineProgramInventory extends Component {
             }
         }
 
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // var json = this.el.getJson();
-                // for (var i = 0; i < json.length; i++) {
-                //     var map = new Map(Object.entries(json[i]));
-                //     var planningUnitValue = map.get("7");
-                //     if (planningUnitValue == value && y != i) {
-                //         this.el.setStyle(col, "background-color", "transparent");
-                //         this.el.setStyle(col, "background-color", "yellow");
-                //         this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
-                //         i = json.length;
-                //     } else {
-                // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
-                // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
-                // var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                // this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                // this.el.setValueFromCoords(4, y, quantity, true);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                // }
-                // }
-
-                var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                this.el.setValueFromCoords(4, y, quantity, true);
-
-            }
-        }
+       
+        
 
     }
 
@@ -174,11 +141,12 @@ export default class PipelineProgramInventory extends Component {
                 dataSourceId: dataSourceId,
                 regionId: map.get("2"),
                 inventoryDate: map.get("3"),
-                manualAdjustment: map.get("4"),
-                notes: map.get("5"),
-                active: map.get("6"),
-                realmCountryPlanningUnitId: map.get("7"),
-                multiplier: map.get("8")
+                inventory: map.get("4"),
+                manualAdjustment: map.get("5"),
+                notes: map.get("6"),
+                // active: map.get("6"),
+                // realmCountryPlanningUnitId: map.get("7"),
+                // multiplier: map.get("8")
             }
             inventoryArray.push(inventoryJson);
         }
@@ -254,24 +222,19 @@ export default class PipelineProgramInventory extends Component {
                                     data = [];
                                     data[0] = inventoryList[j].planningUnitId;
                                     data[1] = inventoryList[j].dataSourceId;
-
                                     if (regionList.length == 1) {
                                         data[2] = regionList[0].id;
                                     } else {
                                         data[2] = inventoryList[j].regionId;
-                                    }
-
+                                    };
                                     data[3] = inventoryList[j].inventoryDate;
-                                    data[4] = inventoryList[j].manualAdjustment;
-
+                                    data[4] = inventoryList[j].inventory;
+                                    data[5] = inventoryList[j].manualAdjustment;
                                     if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
-                                        data[5] = '';
+                                        data[6] = '';
                                     } else {
-                                        data[5] = inventoryList[j].notes;
+                                        data[6] = inventoryList[j].notes;
                                     }
-                                    data[6] = true;
-                                    data[7] = inventoryList[j].realmCountryPlanningUnitId;
-                                    data[8] = inventoryList[j].multiplier
                                     inventoryDataArr.push(data);
                                 }
 
@@ -308,6 +271,11 @@ export default class PipelineProgramInventory extends Component {
                                             options: { format: 'MM-YYYY' }
 
                                         },
+                                        {
+                                            title: i18n.t('static.inventory.inventory'),
+                                            type: 'text'
+
+                                        },
 
                                         {
                                             title: i18n.t('static.inventory.manualAdjustment'),
@@ -316,24 +284,7 @@ export default class PipelineProgramInventory extends Component {
                                         {
                                             title: 'Note',
                                             type: 'text'
-                                        },
-                                        {
-                                            title: i18n.t('static.inventory.active'),
-                                            type: 'checkbox'
-                                        },
-                                        {
-                                            title: "Realm Country Planning Unit",
-                                            type: 'dropdown',
-                                            source: realmCountryPlanningUnitList,
-                                            filter: this.dropdownFilter
-
-                                        },
-                                        {
-                                            title: "Multiplier",
-                                            type: 'text',
-                                            readonly: true
-                                        },
-
+                                        }
                                     ],
                                     pagination: 10,
                                     search: true,
