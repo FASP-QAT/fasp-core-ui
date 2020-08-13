@@ -1304,7 +1304,6 @@ class PlanningUnitCapacity extends Component {
             }
         }
 
-
         //End Date
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
@@ -1325,6 +1324,36 @@ class PlanningUnitCapacity extends Component {
 
             }
         }
+
+        //validatation for startDate is smaller than endDate
+        if (x == 2 || x == 3) {
+
+            // console.log("INNOVA--startDate--> ", this.el.getValueFromCoords(2, y));//startDate
+            // console.log("INNOVA--endDate--> ", this.el.getValueFromCoords(3, y));//endDate
+
+            if (moment(this.el.getValueFromCoords(2, y)).isSameOrBefore(moment(this.el.getValueFromCoords(3, y)))) {
+                // console.log("IS AFTER");
+                var col1 = ("C").concat(parseInt(y) + 1);
+                var col2 = ("D").concat(parseInt(y) + 1);
+                this.el.setStyle(col1, "background-color", "transparent");
+                this.el.setComments(col1, "");
+                this.el.setStyle(col2, "background-color", "transparent");
+                this.el.setComments(col2, "");
+
+            } else {
+                // console.log("IS BEFORE");
+                var col1 = ("C").concat(parseInt(y) + 1);
+                var col2 = ("D").concat(parseInt(y) + 1);
+                this.el.setStyle(col1, "background-color", "transparent");
+                this.el.setStyle(col1, "background-color", "yellow");
+                this.el.setComments(col1, i18n.t('static.common.startdateCompare'));
+
+                this.el.setStyle(col2, "background-color", "transparent");
+                this.el.setStyle(col2, "background-color", "yellow");
+                this.el.setComments(col2, i18n.t('static.common.startdateCompare'));
+            }
+        }
+
 
         //Capacity
         if (x == 4) {
@@ -1408,6 +1437,30 @@ class PlanningUnitCapacity extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+
+                //validatation for startDate is smaller than endDate
+                var col1 = ("C").concat(parseInt(y) + 1);
+                var col2 = ("D").concat(parseInt(y) + 1);
+
+                if (moment(this.el.getValueFromCoords(2, y)).isSameOrBefore(moment(this.el.getValueFromCoords(3, y)))) {
+                    // console.log("IS AFTER");
+
+                    this.el.setStyle(col1, "background-color", "transparent");
+                    this.el.setComments(col1, "");
+                    this.el.setStyle(col2, "background-color", "transparent");
+                    this.el.setComments(col2, "");
+                } else {
+                    // console.log("IS BEFORE");
+                    this.el.setStyle(col1, "background-color", "transparent");
+                    this.el.setStyle(col1, "background-color", "yellow");
+                    this.el.setComments(col1, i18n.t('static.common.startdateCompare'));
+
+                    this.el.setStyle(col2, "background-color", "transparent");
+                    this.el.setStyle(col2, "background-color", "yellow");
+                    this.el.setComments(col2, i18n.t('static.common.startdateCompare'));
+                    valid = false;
+                }
+
 
                 //Capacity
                 var col = ("E").concat(parseInt(y) + 1);

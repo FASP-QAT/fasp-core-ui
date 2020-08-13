@@ -259,8 +259,8 @@ class StockAdjustmentComponent extends Component {
         let versionId = document.getElementById("versionId").value;
         this.setState({
             planningUnits: [],
-            planningUnitValues:[],
-            planningUnitLabels:[]
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
             if (versionId.includes('Local')) {
                 const lan = 'en';
@@ -342,7 +342,7 @@ class StockAdjustmentComponent extends Component {
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
-          })
+        })
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -484,9 +484,9 @@ class StockAdjustmentComponent extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
-       let startY=150+(this.state.planningUnitValues.length*3)
+        let startY = 150 + (this.state.planningUnitValues.length * 3)
         let content = {
-            margin: { top: 80 ,bottom:50},
+            margin: { top: 80, bottom: 50 },
             startY: startY,
             head: [headers],
             body: data,
@@ -523,7 +523,7 @@ class StockAdjustmentComponent extends Component {
             console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
 
-            planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value).toString())
+                planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -563,7 +563,7 @@ class StockAdjustmentComponent extends Component {
                         planningUnitIds.map(planningUnitId => {
                             dates.map(dt => {
 
-                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId &&c.actualQty==0)
+                                var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId && c.actualQty == 0)
                                 console.log("3--->", list)
                                 if (list.length > 0) {
                                     var adjustment = 0;
@@ -890,14 +890,14 @@ class StockAdjustmentComponent extends Component {
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}<span className="planningunitstockAdjustment-box-icon fa fa-sort-desc"></span></Label>
                                     {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
                                     <div className="controls SelectGo">
-                                           <MultiSelect
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="md"
-                                                value={this.state.planningUnitValues}
-                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                            />
+                                        <MultiSelect
+                                            name="planningUnitId"
+                                            id="planningUnitId"
+                                            bsSize="md"
+                                            value={this.state.planningUnitValues}
+                                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                        />
 
                                     </div>
                                 </FormGroup>
@@ -907,35 +907,38 @@ class StockAdjustmentComponent extends Component {
 
 
 
-                        <ToolkitProvider
-                            keyField="regionId"
-                            data={this.state.data}
-                            columns={columns}
-                            search={{ searchFormatted: true }}
-                            hover
-                            filter={filterFactory()}
-                        >
-                            {
-                                props => (
+                        {
+                            this.state.data.length > 0 &&
+                            < ToolkitProvider
+                                keyField="regionId"
+                                data={this.state.data}
+                                columns={columns}
+                                search={{ searchFormatted: true }}
+                                hover
+                                filter={filterFactory()}
+                            >
+                                {
+                                    props => (
 
-                                    <div className="TableCust">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
+                                        <div className="TableCust">
+                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+                                                <SearchBar {...props.searchProps} />
+                                                <ClearSearchButton {...props.searchProps} />
+                                            </div>
+                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                pagination={paginationFactory(options)}
+                                                /* rowEvents={{
+                                                     onClick: (e, row, rowIndex) => {
+                                                         this.editRegion(row);
+                                                     }
+                                                 }}*/
+                                                {...props.baseProps}
+                                            />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(options)}
-                                            /* rowEvents={{
-                                                 onClick: (e, row, rowIndex) => {
-                                                     this.editRegion(row);
-                                                 }
-                                             }}*/
-                                            {...props.baseProps}
-                                        />
-                                    </div>
-                                )
-                            }
-                        </ToolkitProvider>
+                                    )
+                                }
+                            </ToolkitProvider>
+                        }
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -949,7 +952,7 @@ class StockAdjustmentComponent extends Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 }
