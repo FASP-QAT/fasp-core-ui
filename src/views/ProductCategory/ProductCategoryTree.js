@@ -143,62 +143,77 @@ export default class ProductCategoryTree extends Component {
         this.setState({ nodename: event.target.value });
     }
     getProductCategoryListByRealmId() {
-        AuthenticationService.setupAxiosInterceptors();
-        ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        productCategoryList: response.data
-                    });
+        let realmId = document.getElementById("realmId").value;
+        if (realmId == 0) {
+            this.setState({
+                message: i18n.t('static.common.realmtext'),
+                color: 'red'
+            });
+            this.hideSecondComponent();
 
-                    var treeData = getTreeFromFlatData({
-                        flatData: this.state.productCategoryList.map(
-                            node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
-                        getKey: node => node.id, // resolve a node's key
-                        getParentKey: node => node.parentId, // resolve a node's parent's key
-                        rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
-                    });
 
-                    this.state.productCategoryList.map(item => {
-                        if (item.id > this.state.maxId) {
-                            this.setState({ maxId: item.id })
-                        }
+        } else {
+            this.setState({
+                message: '',
+            });
+            AuthenticationService.setupAxiosInterceptors();
+            ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            productCategoryList: response.data
+                        });
 
-                    });
-                    console.log("treeData------>", treeData);
+                        var treeData = getTreeFromFlatData({
+                            flatData: this.state.productCategoryList.map(
+                                node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
+                            getKey: node => node.id, // resolve a node's key
+                            getParentKey: node => node.parentId, // resolve a node's parent's key
+                            rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
+                        });
 
-                    this.setState({ treeData: treeData });
-                    document.getElementById("treeDiv").style.display = "block";
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                    this.hideSecondComponent();
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                        this.hideSecondComponent();
+                        this.state.productCategoryList.map(item => {
+                            if (item.id > this.state.maxId) {
+                                this.setState({ maxId: item.id })
+                            }
+
+                        });
+                        console.log("treeData------>", treeData);
+
+                        this.setState({ treeData: treeData });
+                        document.getElementById("treeDiv").style.display = "block";
                     } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                this.hideSecondComponent();
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                this.hideSecondComponent();
-                                console.log("Error code unkown");
-                                break;
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                        this.hideSecondComponent();
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                            this.hideSecondComponent();
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    this.hideSecondComponent();
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    this.hideSecondComponent();
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        }
+
 
     }
     addNewNode() {
@@ -506,7 +521,7 @@ export default class ProductCategoryTree extends Component {
                                                     type="select" name="realmId" id="realmId"
                                                 // onChange={this.getProductCategoryListByRealmId}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
                                                     {realms}
                                                 </Input>
                                                 <InputGroupAddon addonType="append">

@@ -425,7 +425,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="productCategoryId"
                                                     bsSize="sm"
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                                    {/* <option value="0">{i18n.t('static.common.all')}</option> */}
                                                     {productCategoryList}
                                                 </Input>
 
