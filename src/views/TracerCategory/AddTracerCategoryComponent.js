@@ -11,6 +11,7 @@ import i18n from '../../i18n';
 
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { BUDGET_NAME_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.tracercategory.tracercategory');
 
 
@@ -26,6 +27,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         tracerCategoryName: Yup.string()
+            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.tracerCategory.tracercategorytext'))
     })
 }
@@ -276,7 +278,7 @@ class AddTracerCategoryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/tracerCategory/listTracerCategory/` + 'red/'+ i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/tracerCategory/listTracerCategory/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

@@ -2,7 +2,7 @@ import axios from "axios"
 import { API_URL } from '../Constants.js'
 
 class PipelineService {
-    savePipelineJson(json,fileName) {
+    savePipelineJson(json, fileName) {
         return axios.post(`${API_URL}/api/pipelineJson/${fileName}`, json, {}
         );
     }
@@ -83,11 +83,38 @@ class PipelineService {
         return axios.get(`${API_URL}/api/qatTemp/planningUnitListFinalInventry/${json}`, {}
         );
     }
-   submitProgram(pipelineId) {
-        return axios.post(`${API_URL}/api/pipeline/programdata/${pipelineId}`,  {}
+    submitProgram(pipelineId) {
+        return axios.post(`${API_URL}/api/pipeline/programdata/${pipelineId}`, {}
+        );
+    }
+    getQatTempDataSourceList(json) {
+
+        return axios.get(`${API_URL}/api/qatTemp/datasource/${json}`, {}
         );
     }
 
+    addProgramToQatTempDataSource(json, pipelineId) {
+        return axios.put(`${API_URL}/api/pipeline/datasource/${pipelineId}`, json, {}
+        );
+    }
+    getQatTempFundingSourceList(json) {
+        return axios.get(`${API_URL}/api/qatTemp/fundingsource/${json}`, {}
+        );
+    }
+
+    addQatTempFundingSource(json, pipelineId) {
+        return axios.put(`${API_URL}/api/pipeline/fundingsource/${pipelineId}`, json, {}
+        );
+    }
+    getQatTempProcurementAgentList(json) {
+        return axios.get(`${API_URL}/api/qatTemp/procurementagent/${json}`, {}
+        );
+    }
+
+    addQatTempProcurementAgent(json, pipelineId) {
+        return axios.put(`${API_URL}/api/pipeline/procurementagent/${pipelineId}`, json, {}
+        );
+    }
 }
 
 export default new PipelineService();
