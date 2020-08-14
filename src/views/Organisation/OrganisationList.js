@@ -330,7 +330,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { NavLink } from 'react-router-dom'
-import {Col, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button} from 'reactstrap';
+import { Col, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button } from 'reactstrap';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
@@ -420,14 +420,14 @@ export default class OrganisationListComponent extends Component {
                 },
                     () => {
 
-                        let organisations = this.state.organisations;
+                        let organisations = this.state.selSource;
                         // console.log("organisations---->", organisations);
                         let organisationsArray = [];
                         let count = 0;
 
                         for (var j = 0; j < organisations.length; j++) {
                             data = [];
-                            data[0] = organisations[j].organisationsId
+                            data[0] = organisations[j].organisationId
                             data[1] = organisations[j].organisationCode
                             data[2] = getLabelText(organisations[j].label, this.state.lang)
                             data[3] = getLabelText(organisations[j].realm.label, this.state.lang)
@@ -498,14 +498,14 @@ export default class OrganisationListComponent extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
                             onselection: this.selected,
-                             oneditionend: this.onedit,
+                            oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowExport: false,
                             paginationOptions: [10, 25, 50],
                             position: 'top',
                             contextMenu: false
                         };
-                        var  organisationsEl = jexcel(document.getElementById("tableDiv"), options);
+                        var organisationsEl = jexcel(document.getElementById("tableDiv"), options);
                         this.el = organisationsEl;
                         this.setState({
                             organisationsEl: organisationsEl, loading: false
@@ -584,8 +584,8 @@ export default class OrganisationListComponent extends Component {
                 )
             }, this);
 
-        
-        
+
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -627,7 +627,7 @@ export default class OrganisationListComponent extends Component {
                             </FormGroup>
                         </Col>
                         <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
-                     </CardBody>
+                    </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -655,15 +655,16 @@ export default class OrganisationListComponent extends Component {
         }
     }
     selected = function (instance, cell, x, y, value) {
-
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
-                this.props.history.push({
-                    pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { role }
-                });
+            if( this.state.selSource.length != 0 ){
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                    this.props.history.push({
+                        pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { role }
+                    });
+                }
             }
         }
     }.bind(this);
