@@ -363,6 +363,7 @@ export default class OrganisationListComponent extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -392,6 +393,99 @@ export default class OrganisationListComponent extends Component {
             });
         }
     }
+    buildJexcel() {
+        let organisations = this.state.selSource;
+        // console.log("organisations---->", organisations);
+        let organisationsArray = [];
+        let count = 0;
+
+        for (var j = 0; j < organisations.length; j++) {
+            data = [];
+            data[0] = organisations[j].organisationId
+            data[1] = organisations[j].organisationCode
+            data[2] = getLabelText(organisations[j].label, this.state.lang)
+            data[3] = getLabelText(organisations[j].realm.label, this.state.lang)
+            data[4] = organisations[j].active;
+
+            organisationsArray[count] = data;
+            count++;
+        }
+        if (organisations.length == 0) {
+            data = [];
+            organisationsArray[0] = data;
+        }
+        // console.log("organisationsArray---->", organisationsArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = organisationsArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'organisationsId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.organisation.organisationcode'),
+                    type: 'text',
+                    readOnly: true
+                }
+                ,
+                {
+                    title: i18n.t('static.organisation.organisationName'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.realm.realm'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false
+        };
+        var organisationsEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = organisationsEl;
+        this.setState({
+            organisationsEl: organisationsEl, loading: false
+        })
+    }
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
@@ -400,7 +494,7 @@ export default class OrganisationListComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realms: response.data, loading: false
-                    })
+                    }, () => { this.buildJexcel() })
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -417,106 +511,7 @@ export default class OrganisationListComponent extends Component {
                 this.setState({
                     organisations: response.data,
                     selSource: response.data
-                },
-                    () => {
-
-                        let organisations = this.state.selSource;
-                        // console.log("organisations---->", organisations);
-                        let organisationsArray = [];
-                        let count = 0;
-
-                        for (var j = 0; j < organisations.length; j++) {
-                            data = [];
-                            data[0] = organisations[j].organisationId
-                            data[1] = organisations[j].organisationCode
-                            data[2] = getLabelText(organisations[j].label, this.state.lang)
-                            data[3] = getLabelText(organisations[j].realm.label, this.state.lang)
-                            data[4] = organisations[j].active;
-
-                            organisationsArray[count] = data;
-                            count++;
-                        }
-                        if (organisations.length == 0) {
-                            data = [];
-                            organisationsArray[0] = data;
-                        }
-                        // console.log("organisationsArray---->", organisationsArray);
-                        this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
-                        var json = [];
-                        var data = organisationsArray;
-
-                        var options = {
-                            data: data,
-                            columnDrag: true,
-                            // colWidths: [150, 150, 100],
-                            colHeaderClasses: ["Reqasterisk"],
-                            columns: [
-                                {
-                                    title: 'organisationsId',
-                                    type: 'hidden',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.organisation.organisationcode'),
-                                    type: 'text',
-                                    readOnly: true
-                                }
-                                ,
-                                {
-                                    title: i18n.t('static.organisation.organisationName'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.realm.realm'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    type: 'dropdown',
-                                    title: i18n.t('static.common.status'),
-                                    readOnly: true,
-                                    source: [
-                                        { id: true, name: i18n.t('static.common.active') },
-                                        { id: false, name: i18n.t('static.common.disabled') }
-                                    ]
-                                },
-                            ],
-                            text: {
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                show: '',
-                                entries: '',
-                            },
-                            onload: this.loaded,
-                            pagination: 10,
-                            search: true,
-                            columnSorting: true,
-                            tableOverflow: true,
-                            wordWrap: true,
-                            allowInsertColumn: false,
-                            allowManualInsertColumn: false,
-                            allowDeleteRow: false,
-                            onselection: this.selected,
-                            oneditionend: this.onedit,
-                            copyCompatibility: true,
-                            allowExport: false,
-                            paginationOptions: [10, 25, 50],
-                            position: 'top',
-                            contextMenu: false
-                        };
-                        var organisationsEl = jexcel(document.getElementById("tableDiv"), options);
-                        this.el = organisationsEl;
-                        this.setState({
-                            organisationsEl: organisationsEl, loading: false
-                        })
-
-
-
-                    })
-
-
-
+                }, () => { this.buildJexcel() })
             })
 
     }
@@ -605,7 +600,7 @@ export default class OrganisationListComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv ">
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -658,7 +653,7 @@ export default class OrganisationListComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if( this.state.selSource.length != 0 ){
+            if (this.state.selSource.length != 0) {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
                     this.props.history.push({
                         pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
