@@ -216,14 +216,14 @@ export default class PipelineProgramPlanningUnits extends Component {
         }
         //Shelf Life
         if (x == 11) {
-            var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = /^[0-9\b]+$/;
             var col = ("L").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));

@@ -816,14 +816,14 @@ class StockAdjustmentComponent extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className=" mt-3">
+                    <CardBody className="pt-1">
 
                         <Col md="12 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
-                                    <div className="controls SelectGo Regioncalender">
-                                        <InputGroup>
+                            <div className="row">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <div className="controls  edit">
+                                       
                                             <Picker
                                                 ref="pickRange"
                                                 years={{ min: 2013 }}
@@ -836,14 +836,14 @@ class StockAdjustmentComponent extends Component {
                                                 <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                             </Picker>
 
-                                        </InputGroup>
+                                       
                                     </div>
                                 </FormGroup>
 
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -867,9 +867,9 @@ class StockAdjustmentComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -886,10 +886,10 @@ class StockAdjustmentComponent extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}<span className="planningunitstockAdjustment-box-icon fa fa-sort-desc"></span></Label>
-                                    {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
-                                    <div className="controls SelectGo">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls ">
                                         <MultiSelect
                                             name="planningUnitId"
                                             id="planningUnitId"

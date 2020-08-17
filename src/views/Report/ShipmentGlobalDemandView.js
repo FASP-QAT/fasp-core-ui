@@ -2994,7 +2994,7 @@ class ShipmentGlobalDemandView extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className=" pt-lg-0">
+                    <CardBody className=" pt-lg-0 pb-lg-0">
                         <div ref={ref}>
 
                             <Form >
@@ -3184,12 +3184,12 @@ class ShipmentGlobalDemandView extends Component {
                                     </div>
                                 </Col>
                             </Form>
-                            <Col md="12 pl-0  mt-4">
-                                <div className="row grid-divider">
+                            <Col md="12 pl-0  ">
+                                <div className="row grid-divider ">
                                     {
                                         this.state.planningUnitSplit.length > 0 &&
                                         <Col md="8 pl-0">
-                                            <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
+                                            <div className="chart-wrapper" >
                                                 <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
                                             </div>
                                         </Col>
@@ -3220,9 +3220,7 @@ class ShipmentGlobalDemandView extends Component {
                                 </Col>
                             } */}
 
-                            <br></br>
-
-                            <Col md="12 pl-0">
+                            <Col md="12 pl-0 pb-lg-1">
                                 <div className="globalviwe-scroll">
                                     <div className="row">
                                         <div className="col-md-12">
