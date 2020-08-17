@@ -533,7 +533,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
-                            name: 'QAT Problem List',
+                            name: i18n.t('static.dashboard.qatProblemList'),
                             url: '/report/problemList',
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
@@ -805,7 +805,13 @@ class DefaultLayout extends Component {
                             url: '/report/shipmentGlobalDemandView',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.qatProblemList'),
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
                         ]
                       }
                     ]

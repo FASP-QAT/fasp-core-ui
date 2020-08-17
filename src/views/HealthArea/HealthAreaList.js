@@ -381,10 +381,10 @@ export default class HealthAreaListComponent extends Component {
 
         for (var j = 0; j < healthAreas.length; j++) {
             data = [];
-            data[0] = healthAreas[j].healthAreasId
+            data[0] = healthAreas[j].healthAreaId
             data[1] = getLabelText(healthAreas[j].realm.label, this.state.lang)
             data[2] = getLabelText(healthAreas[j].label, this.state.lang)
-            data[0] = healthAreas[j].healthAreaCode
+            data[3] = healthAreas[j].healthAreaCode
             data[4] = healthAreas[j].active;
             healthAreasArray[count] = data;
             count++;
@@ -405,7 +405,7 @@ export default class HealthAreaListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'healthAreasId',
+                    title: 'healthAreaId',
                     type: 'hidden',
                     readOnly: true
                 },
@@ -503,7 +503,7 @@ export default class HealthAreaListComponent extends Component {
                     this.setState({
                         realms: response.data, loading: false
                     },
-                    () => {this.buildJexcel()})
+                        () => { this.buildJexcel() })
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -523,7 +523,7 @@ export default class HealthAreaListComponent extends Component {
                         healthAreas: response.data,
                         selSource: response.data, loading: false
                     },
-                        () => {this.buildJexcel()})
+                        () => { this.buildJexcel() })
                 }
                 else {
 
@@ -671,12 +671,13 @@ export default class HealthAreaListComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
-                this.props.history.push({
-                    pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
-            }
+            console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
+            //     this.props.history.push({
+            //         pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
+            //         // state: { currency: currency }
+            //     });
+            // }
         }
     }.bind(this);
     addHealthArea() {

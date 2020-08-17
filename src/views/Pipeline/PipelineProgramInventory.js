@@ -84,6 +84,17 @@ export default class PipelineProgramInventory extends Component {
             }
         }
 
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
        
         
 
@@ -106,8 +117,8 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = map.get("7");
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = map.get("3");
             if (value != "" && !isNaN(parseInt(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -140,13 +151,13 @@ export default class PipelineProgramInventory extends Component {
                 planningUnitId: map.get("0"),
                 dataSourceId: dataSourceId,
                 regionId: map.get("2"),
-                inventoryDate: map.get("3"),
-                inventory: map.get("4"),
-                manualAdjustment: map.get("5"),
-                notes: map.get("6"),
+                inventoryDate: map.get("5"),
+                inventory: map.get("6"),
+                manualAdjustment: map.get("7"),
+                notes: map.get("8"),
                 // active: map.get("6"),
-                // realmCountryPlanningUnitId: map.get("7"),
-                // multiplier: map.get("8")
+                realmCountryPlanningUnitId: map.get("3"),
+                multiplier: map.get("4")
             }
             inventoryArray.push(inventoryJson);
         }
@@ -227,13 +238,15 @@ export default class PipelineProgramInventory extends Component {
                                     } else {
                                         data[2] = inventoryList[j].regionId;
                                     };
-                                    data[3] = inventoryList[j].inventoryDate;
-                                    data[4] = inventoryList[j].inventory;
-                                    data[5] = inventoryList[j].manualAdjustment;
+                                    data[3] = inventoryList[j].realmCountryPlanningUnitId;
+                                    data[4] = inventoryList[j].multiplier
+                                    data[5] = inventoryList[j].inventoryDate;
+                                    data[6] = inventoryList[j].inventory;
+                                    data[7] = inventoryList[j].manualAdjustment;
                                     if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
-                                        data[6] = '';
+                                        data[8] = '';
                                     } else {
-                                        data[6] = inventoryList[j].notes;
+                                        data[8] = inventoryList[j].notes;
                                     }
                                     inventoryDataArr.push(data);
                                 }
@@ -264,6 +277,18 @@ export default class PipelineProgramInventory extends Component {
                                             type: 'dropdown',
                                             source: regionList
 
+                                        },
+                                        {
+                                            title: "Realm Country Planning Unit",
+                                            type: 'dropdown',
+                                            source: realmCountryPlanningUnitList,
+                                            filter: this.dropdownFilter
+
+                                        },
+                                        {
+                                            title: "Multiplier",
+                                            type: 'text',
+                                            readonly: true
                                         },
                                         {
                                             title: i18n.t('static.inventory.inventoryDate'),
