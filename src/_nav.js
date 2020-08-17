@@ -62,7 +62,7 @@
 //             },
 //             {
 //               name: 'Dimension',
-//               url: 'diamension/diamensionlist',
+//               url: 'dimension/listDimension',
 //               icon: 'fa fa-map'
 //             }
 //             ,

@@ -144,7 +144,7 @@ export default class AddDimensionComponent extends Component {
                                     console.log(this.state.dimension)
                                     DimensionService.addDimension(this.state.dimension).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/diamension/diamensionlist/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/dimension/listDimension/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -240,7 +240,7 @@ export default class AddDimensionComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dimension/listDimension/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

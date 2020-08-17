@@ -173,7 +173,7 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: i18n.t('static.dashboard.dimension'),
-                            url: '/diamension/diamensionlist',
+                            url: '/dimension/listDimension',
                             icon: 'fa fa-map',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_DIMENSION') ? false : true) }
                           }
@@ -190,7 +190,7 @@ class DefaultLayout extends Component {
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) },
                             children: [{
                               name: i18n.t('static.dashboard.realm'),
-                              url: '/realm/realmlist',
+                              url: '/realm/listRealm',
                               icon: 'fa fa-th-large',
                               // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
                             }, {

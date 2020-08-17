@@ -527,8 +527,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/diamension/diamensionlist":
-                case "/diamension/diamensionlist/:color/:message":
+                case "/dimension/listDimension":
+                case "/dimension/listDimension/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
@@ -559,8 +559,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/realm/realmlist":
-                case "/realm/realmlist/:color/:message":
+                case "/realm/listRealm":
+                case "/realm/listRealm/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
                         return true;
                     }
@@ -1119,7 +1119,6 @@ class AuthenticationService {
         }
     }
     hexToRgbA(hex) {
-        console.log("hex---" + hex);
         var c;
         if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
             c = hex.substring(1).split('');

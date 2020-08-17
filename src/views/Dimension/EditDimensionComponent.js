@@ -136,7 +136,7 @@ export default class UpdateDimensionComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dimension/listDimension/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     } render() {
         return (
             <div className="animated fadeIn">
@@ -155,7 +155,7 @@ export default class UpdateDimensionComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DimensionService.updateDimension(this.state.dimension).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/diamension/diamensionlist/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/dimension/listDimension/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode

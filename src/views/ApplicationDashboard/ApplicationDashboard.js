@@ -716,7 +716,7 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/realm/realmlist")}>List Realms</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realm/listRealm")}>List Realms</DropdownItem>
                             <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
 
                           </DropdownMenu>
