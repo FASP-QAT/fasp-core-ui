@@ -88,9 +88,9 @@ export default class PipelineProgramDataStepFive extends Component {
                 </FormGroup>
                 <br></br>
                 <FormGroup>
-                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                     &nbsp;
-                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.endProgramInfoStepFour}>Next <i className="fa fa-angle-double-right"></i></Button>
+                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.endProgramInfoStepFour}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                     &nbsp;
                     </FormGroup>
 

@@ -57,19 +57,10 @@ export default class PipelineProgramProcurementAgent extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    var procurementAgentValue = map.get("1");
-                    if (procurementAgentValue == value && y != i) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "Funding Source aready exist");
-                        i = json.length;
-                    } else {
+               
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
-                    }
-                }
+                   
             }
             // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
             // instance.jexcel.setValue(columnName, '');
