@@ -19,6 +19,7 @@ import PipelineProgramShipment from './PipelineProgramShipment';
 import PipelineProgramDataSource from './PipelineProgramDataSource';
 import PipelineProgramFundingSource from './PipelineProgramFundingSource';
 import PipelineProgramProcurementAgent from './PipelineProgramProcurementAgent';
+import i18n from '../../i18n';
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -915,14 +916,14 @@ export default class PipelineProgramSetup extends Component {
                                 </ProgressBar>
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="progressetuptext1">Program Info</li>
-                                        <li className="progressetuptext2">Planning Units</li>
-                                        <li className="progressetuptext3">Data Source</li>
-                                        <li className="progressetuptext4">Funding Source</li>
-                                        <li className="progressetuptext5">Procurement Agent</li>
-                                        <li className="progressetuptext6">Consumption</li>
-                                        <li className="progressetuptext7">Inventory</li>
-                                        <li className="progressetuptext8">Shipment</li>
+                                        <li className="progressetuptext1">{i18n.t('static.pipeline.programInfo')}</li>
+                                        <li className="progressetuptext2">{i18n.t('static.dashboard.planningunit')}</li>
+                                        <li className="progressetuptext3">{i18n.t('static.inventory.dataSource')}</li>
+                                        <li className="progressetuptext4">{i18n.t('static.budget.fundingsource')}</li>
+                                        <li className="progressetuptext5">{i18n.t('static.dashboard.procurementagentheader')}</li>
+                                        <li className="progressetuptext6">{i18n.t('static.supplyPlan.consumption')}</li>
+                                        <li className="progressetuptext7">{i18n.t('static.inventory.inventory')}</li>
+                                        <li className="progressetuptext8">{i18n.t('static.shipment.shipment')}</li>
                                         {/* <li className="progressbartext6">Program Data</li>
                                         <li className="progressbartext7">Planning Units</li> */}
                                     </ul>
@@ -933,7 +934,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <strong>Program Info</strong>{' '}
+                                                <strong>{i18n.t('static.pipeline.programInfo')}</strong>{' '}
                                             </CardHeader>
                                             <CardBody>
                                                 <ProgressBar
@@ -1003,11 +1004,11 @@ export default class PipelineProgramSetup extends Component {
                                                 <div className="d-sm-down-none  progressbar">
                                                     <ul>
                                                         {/* <li className="progresdatatext1">Realm</li> */}
-                                                        <li className="progresdatatext1">Country</li>
-                                                        <li className="progresdatatext2">Technical Area</li>
-                                                        <li className="progresdatatext3">Organisation</li>
-                                                        <li className="progresdatatext4">Region</li>
-                                                        <li className="progresdatatext5">Program Data</li>
+                                                        <li className="progresdatatext1">{i18n.t('static.program.realmcountry')}</li>
+                                                        <li className="progresdatatext2">{i18n.t('static.dashboard.healthareaheader')}</li>
+                                                        <li className="progresdatatext3">{i18n.t('static.organisation.organisationheader')}</li>
+                                                        <li className="progresdatatext4">{i18n.t('static.inventory.region')}</li>
+                                                        <li className="progresdatatext5">{i18n.t('static.pipeline.programData')}</li>
                                                     </ul>
                                                 </div>
                                                 <br></br>
@@ -1047,7 +1048,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                          <Card>
                                             <CardHeader>
-                                               <strong>Program Planning Units</strong>{' '}
+                                               <strong>{i18n.t('static.dashboard.programPlanningUnit')}</strong>{' '}
                                         </CardHeader>
                                             <CardBody  className="pt-0">
                                                 {/* <h3>Program Planning Units</h3> */}
@@ -1062,8 +1063,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardFooter> */}
                                          <CardFooter>
                                                 <span className="red">
-                                                    *Planning Unit cells in yellow color indicates that either the same planning unit is being selected twice or the planning unit which you are trying to map does not exist.
-                                                    please created ticket for the planning units which do not exist.
+                                                    {i18n.t('static.pipeline.duplicatePlanningUnittext')}
                                                 </span>
                                             </CardFooter>
                                         </Card> 
@@ -1078,7 +1078,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                        <Card>
                                             <CardHeader>
-                                               <strong>Data Source</strong>{' '}
+                                               <strong>  {i18n.t('static.dashboard.datasourcehaeder')} </strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
@@ -1105,7 +1105,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                        <Card>
                                             <CardHeader>
-                                               <strong>Funding Source</strong>{' '}
+                                               <strong>  {i18n.t('static.budget.fundingsource')} </strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
@@ -1131,7 +1131,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                               <strong>Procurement Agent</strong>{' '}
+                                               <strong>  {i18n.t('static.report.procurementAgentName')} </strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
@@ -1157,7 +1157,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                               <strong>Consumption Details</strong>{' '}
+                                               <strong>  {i18n.t('static.dashboard.consumptiondetails')} </strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                                 {/* <h3>Consumption</h3> */}
@@ -1182,7 +1182,7 @@ export default class PipelineProgramSetup extends Component {
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <strong>Inventory Details</strong>{' '}
+                                                <strong>  {i18n.t('static.dashboard.inventorydetails')}</strong>{' '}
                                             </CardHeader>
                                             <CardBody className="pt-0">
                                         {/* <h3>Inventory</h3> */}
@@ -1201,17 +1201,17 @@ export default class PipelineProgramSetup extends Component {
                                         <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSeven}>Save <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
-                                </div>
+                                </div>  
                                 <div id="stepEight">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <CardHeader>
-                                                <strong>Shipment Details</strong>{' '}
-                                            </CardHeader>
+                                                <strong>  {i18n.t('static.report.shipmentDetailReport')} </strong>{' '}
+                                            </CardHeader>   
                                             <CardBody className="pt-0">
                                                 {/*<h3>Shipments</h3>*/}
                                                 </CardBody>
-                                                {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepSeven} {...this.props}></PipelineProgramShipment>}
+                                                {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} items={this.state} previousToStepFour={this.previousToStepSeven} {...this.props}></PipelineProgramShipment>}
                                           
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
