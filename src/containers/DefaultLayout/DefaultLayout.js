@@ -430,6 +430,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.supplyPlan'),
