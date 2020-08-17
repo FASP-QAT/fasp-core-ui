@@ -341,7 +341,7 @@ export default class ReactListComponent extends Component {
                     loading: false
                 },
                     () => {
-                        let realmList = this.state.realmList;
+                        let realmList = this.state.selRealm;
                         // console.log("realmList---->", realmList);
                         let realmArray = [];
                         let count = 0;
@@ -406,7 +406,7 @@ export default class ReactListComponent extends Component {
 
                             ],
                             text: {
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                 show: '',
                                 entries: '',
                             },
@@ -477,10 +477,12 @@ export default class ReactListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM')) {
-                this.props.history.push({
-                    pathname: `/realm/updateRealm/${this.el.getValueFromCoords(0, x)}`,
-                });
+            if (this.state.selRealm.length != 0) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM')) {
+                    this.props.history.push({
+                        pathname: `/realm/updateRealm/${this.el.getValueFromCoords(0, x)}`,
+                    });
+                }
             }
         }
     }.bind(this);
@@ -548,13 +550,13 @@ export default class ReactListComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 ">
-                        <div className="table-responsive">
-                            <div id="tableDiv" className="LanguageremoveReadonlybackground">
-                            </div>
+                    <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
+
                     </CardBody>
                 </Card>
+
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
