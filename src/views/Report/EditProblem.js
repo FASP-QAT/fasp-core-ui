@@ -439,6 +439,7 @@ export default class EditLanguageComponent extends Component {
                     if (problemReportId != 0) {
                         const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
                         console.log("problemReport--->", problemReport);
+                        // var outputString = problemReport.realmProblem.problem.label.label_en.replace("<%X", problemReport.realmProblem.data1);
                         this.setState({
                             problemReport: problemReport,
                             data: problemReport.problemTransList
@@ -728,7 +729,7 @@ export default class EditLanguageComponent extends Component {
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b >Problem Details</b></a></li></ul>
                                                         <div className="row">
                                                             <FormGroup className="col-md-6 ">
-                                                                <Label for="program">{i18n.t('static.program.programCode')}</Label>
+                                                                <Label for="program">{i18n.t('static.program.program')}</Label>
                                                                 <Input type="text"
                                                                     name="program"
                                                                     id="program"
@@ -810,9 +811,9 @@ export default class EditLanguageComponent extends Component {
                                                                 <FormFeedback className="red">{errors.createdDate}</FormFeedback>
                                                             </FormGroup>
 
-                                                            <FormGroup className="col-md-6 ">
+                                                            {/* <FormGroup className="col-md-6 ">
                                                                 <Label for="problemDescription">{i18n.t('static.report.problemDescription')}</Label>
-                                                                <Input type="text"
+                                                                <Input type="hidden"
                                                                     name="problemDescription"
                                                                     id="problemDescription"
                                                                     bsSize="sm"
@@ -824,7 +825,7 @@ export default class EditLanguageComponent extends Component {
                                                                     value={getLabelText(this.state.problemReport.realmProblem.problem.label, this.state.lang)}
                                                                     required />
                                                                 <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
-                                                            </FormGroup>
+                                                            </FormGroup> */}
 
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="problemDescription">{i18n.t('static.report.problemStatus')}</Label>

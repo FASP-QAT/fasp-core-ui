@@ -1060,5 +1060,13 @@
     "static.supplyPlan.qatProduct":"QAT Product",
     "static.supplyPlan.minMonthsOfStock":"Min Months Of Stock",
     "static.supplyPlan.shelfLife": "Shelf Life",
-    "static.supplyPlan.qatGenerated":"QAT Generated"
+    "static.supplyPlan.qatGenerated":"QAT Generated",
+    "static.dashboard.qatProblemList":"QAT Problem List",
+    "static.dashboard.qatProblem":"QAT Problem",
+    "static.dashboard.add.problem":"Add Problem",
+    "static.report.country":"Country",
+    "static.report.totalSeaLeadTime":"Total Sea Lead Time",
+    "static.report.totalAirLeadTime":"Total Air Lead Time",
+    "static.report.localProcurementAgentLeadTime":"Local Procurement Agent Lead Time",
+    "static.report.plannedToSubmitLeadTime":"Planned To Submitted Lead Time"
 }

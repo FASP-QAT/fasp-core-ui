@@ -89,13 +89,17 @@ class SupplierLeadTimes extends Component {
         // csvRow.push("");
         // csvRow.push(i18n.t('static.report.procurementAgentName') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
         // csvRow.push("");
+        
+        // console.log("this.state.planningUnitLabels===>",this.state.planningUnitLabels);
+        // console.log("this.state.procurementAgentLabels===>",this.state.procurementAgentLabels);
+
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push(i18n.t('static.planningunit.planningunit') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push('');
 
         this.state.procurementAgentLabels.map(ele =>
-            csvRow.push(i18n.t('static.report.procurementAgentName') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-        csvRow.push('')
+            csvRow.push((i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        csvRow.push('');
 
 
         // csvRow.push('')
@@ -110,14 +114,15 @@ class SupplierLeadTimes extends Component {
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [headers];
 
+        console.log("output list--->",this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push([
                 (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                ele.plannedToDraftLeadTime,
-                ele.draftToSubmittedLeadTime,
+                (getLabelText(ele.procurementAgent.label, this.state.lang) ==null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ele.plannedSubmittedLeadTime,
+                // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
                 ele.approvedToShippedLeadTime,
                 ele.shippedToArrivedBySeaLeadTime,
@@ -188,8 +193,9 @@ class SupplierLeadTimes extends Component {
                     })
                     var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                   
                     planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, (110+(this.state.planningUnitLabels.length*3)), planningText)
+                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
                 }
 
             }
@@ -219,8 +225,8 @@ class SupplierLeadTimes extends Component {
             getLabelText(ele.program.label, this.state.lang),
             getLabelText(ele.planningUnit.label, this.state.lang),
             getLabelText(ele.procurementAgent.label, this.state.lang),
-            ele.plannedToDraftLeadTime,
-            ele.draftToSubmittedLeadTime,
+            ele.plannedSubmittedLeadTime,
+            // ele.draftToSubmittedLeadTime,
             ele.submittedToApprovedLeadTime,
             ele.approvedToShippedLeadTime,
             ele.shippedToArrivedBySeaLeadTime,
@@ -230,10 +236,10 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-        let startY=110+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
+        let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
       
         let content = {
-            margin: { top: 95 ,bottom:75},
+            margin: { top: 110 ,bottom:75},
             startY: startY,
             head: [headers],
             body: data,
@@ -828,7 +834,7 @@ class SupplierLeadTimes extends Component {
                                         for (var j = 0; j < filteredList.length; j++) {
                                             var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).submittedToApprovedLeadTime;
                                             var approvedToShippedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).approvedToShippedLeadTime;
-                                            var draftToSubmittedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).draftToSubmittedLeadTime;
+                                            // var draftToSubmittedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).draftToSubmittedLeadTime;
 
                                             var json = {
                                                 planningUnit: filteredList[j].planningUnit,
@@ -837,14 +843,15 @@ class SupplierLeadTimes extends Component {
                                                 approvedToShippedLeadTime: approvedToShippedLeadTime,
                                                 program: program,
                                                 country: result.realmCountry.country,
-                                                plannedToDraftLeadTime: result.plannedToDraftLeadTime,
-                                                draftToSubmittedLeadTime: draftToSubmittedLeadTime,
+                                                plannedSubmittedLeadTime: result.plannedToSubmittedLeadTime,
+                                                // draftToSubmittedLeadTime: draftToSubmittedLeadTime,
                                                 shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
                                                 arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
                                                 submittedToApprovedLeadTime: submittedToApprovedLeadTime,
-                                                totalAirLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
-                                                totalSeaLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                               
+                                                totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                                totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
                                             }
                                             var noProcurmentAgentJson = {
                                                 planningUnit: filteredList[j].planningUnit,
@@ -860,14 +867,14 @@ class SupplierLeadTimes extends Component {
                                                 approvedToShippedLeadTime: result.approvedToShippedLeadTime,
                                                 program: program,
                                                 country: result.realmCountry.country,
-                                                plannedToDraftLeadTime: result.plannedToDraftLeadTime,
-                                                draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
+                                                plannedSubmittedLeadTime: result.plannedToSubmittedLeadTime,
+                                                // draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
                                                 shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
                                                 arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
                                                 submittedToApprovedLeadTime: result.submittedToApprovedLeadTime,
-                                                totalAirLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
-                                                totalSeaLeadTime: parseFloat(result.plannedToDraftLeadTime) + parseFloat(result.draftToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                                totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
+                                                totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
                                             }
                                             outPutList.push(noProcurmentAgentJson);
                                             outPutList.push(json);
@@ -942,18 +949,18 @@ class SupplierLeadTimes extends Component {
         const columns = [
             {
                 dataField: 'country.label',
-                text: 'Country',
+                text: i18n.t('static.report.country'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '150px' },
+                style: { width: '150px' }, 
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
             {
                 dataField: 'program.label',
-                text: 'Program',
+                text: i18n.t('static.program.program'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -964,7 +971,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'planningUnit.label',
-                text: 'Planning Unit',
+                text: i18n.t('static.planningunit.planningunit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -975,7 +982,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'procurementAgent.label',
-                text: 'Procurement Agent',
+                text: i18n.t('static.report.procurementAgentName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -985,27 +992,27 @@ class SupplierLeadTimes extends Component {
                 }
             },
             {
-                dataField: 'plannedToDraftLeadTime',
-                text: 'Planned To Draft Lead Time',
+                dataField: 'plannedSubmittedLeadTime',
+                text: i18n.t('static.report.plannedToSubmitLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
 
             },
-            {
-                dataField: 'draftToSubmittedLeadTime',
-                text: 'Draft To Submitted Lead Time',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
+            // {
+            //     dataField: 'draftToSubmittedLeadTime',
+            //     text: 'Draft To Submitted Lead Time',
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     style: { width: '80px' },
 
-            },
+            // },
 
             {
                 dataField: 'submittedToApprovedLeadTime',
-                text: 'Submitted To Approved Lead Time',
+                text: i18n.t('static.program.submittoapproveleadtime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1015,7 +1022,7 @@ class SupplierLeadTimes extends Component {
 
             {
                 dataField: 'approvedToShippedLeadTime',
-                text: 'Approved To Shipped Lead Time',
+                text:i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1024,7 +1031,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'shippedToArrivedBySeaLeadTime',
-                text: 'Shipped To Arrived By Sea LeadTime',
+                text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1033,7 +1040,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'shippedToArrivedByAirLeadTime',
-                text: 'Shipped To Arrived By Air LeadTime',
+                text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1042,7 +1049,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'arrivedToDeliveredLeadTime',
-                text: 'Arrived To Delivered LeadTime',
+                text: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1051,7 +1058,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'totalSeaLeadTime',
-                text: 'Total Sea Lead Time',
+                text:i18n.t('static.report.totalSeaLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1062,7 +1069,7 @@ class SupplierLeadTimes extends Component {
             // totalSeaLeadTime: parseInt(result.plannedToDraftLeadTime) + parseInt(result.draftToSubmittedLeadTime) + parseInt(result.shippedToArrivedBySeaLeadTime) + parseInt(result.arrivedToDeliveredLeadTime) + parseInt(result.approvedToShippedLeadTime) + parseInt(submittedToApprovedLeadTime),
             {
                 dataField: 'totalAirLeadTime',
-                text: 'Total Air LeadTime',
+                text: i18n.t('static.report.totalAirLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1071,7 +1078,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'localProcurementAgentLeadTime',
-                text: 'Local Procurement LeadTime',
+                text: i18n.t('static.report.localProcurementAgentLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
