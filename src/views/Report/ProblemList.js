@@ -501,7 +501,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pb-lg-0">
+                    <CardBody className=" pb-lg-2 pt-lg-0">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>

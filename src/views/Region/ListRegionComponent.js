@@ -12,7 +12,9 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 
 const entityname = i18n.t('static.region.region');
@@ -60,6 +62,33 @@ class RegionListComponent extends Component {
             // state: { region }
         });
     }
+    selected = function (instance, cell, x, y, value) {
+        
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+                this.props.history.push({
+                    pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+                });
+            }
+        }
+    }.bind(this);
+    selected = function (instance, cell, x, y, value) {
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            if( this.state.selSource.length != 0 ){
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                    this.props.history.push({
+                        pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { role }
+                    });
+                }
+            }
+        }
+    }.bind(this);
     addRegion(region) {
         this.props.history.push({
             pathname: "/region/addRegion"
@@ -72,11 +101,113 @@ class RegionListComponent extends Component {
             .then(response => {
                 console.log(response.data);
                 if (response.status == 200) {
+
                     this.setState({
                         regionList: response.data,
                         selRegion: response.data,
                         loading: false
-                    })
+                    },
+                        () => {
+
+                            let regionList = this.state.regionList;
+                            // console.log("regionList---->", regionList);
+                            let regionListArray = [];
+                            let count = 0;
+                            for (var j = 0; j < regionList.length; j++) {
+                                data = [];
+                                data[0] = regionList[j].regionId
+                                data[1] = getLabelText(regionList[j].realmCountry.country.label, this.state.lang)
+                                data[2] = getLabelText(regionList[j].label, this.state.lang)
+                                data[3] = regionList[j].capacityCbm
+                                data[4] = regionList[j].gln
+                                data[5] = regionList[j].active;
+                                regionListArray[count] = data;
+                                count++;
+                            }
+                            if (regionList.length == 0) {
+                                data = [];
+                                regionListArray[0] = data;
+                            }
+                            // console.log("regionListArray---->", regionListArray);
+                            this.el = jexcel(document.getElementById("tableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = regionListArray;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                // colWidths: [150, 150, 100,150, 150, 100,100],
+                                colHeaderClasses: ["Reqasterisk"],
+                                columns: [
+                                    {
+                                        title: 'regionListId',
+                                        type: 'hidden',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.region.country'),
+                                        type: 'text',
+                                        readOnly: true
+                                    }
+                                    ,
+                                    {
+                                        title: i18n.t('static.region.region'),
+                                        type: 'text',
+                                        readOnly: true
+                                    }
+                                    ,
+                                    {
+                                        title: i18n.t('static.region.capacitycbm'),
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.region.gln'),
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        type: 'dropdown',
+                                        title: i18n.t('static.common.status'),
+                                        readOnly: true,
+                                        source: [
+                                            { id: true, name: i18n.t('static.common.active') },
+                                            { id: false, name: i18n.t('static.common.disabled') }
+                                        ]
+                                    },
+                                ],
+                                text: {
+                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                    show: '',
+                                    entries: '',
+                                },
+                                onload: this.loaded,
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onselection: this.selected,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                allowExport: false,
+                                paginationOptions: [10, 25, 50],
+                                position: 'top',
+                                contextMenu: false,
+                               
+                            };
+                            var regionEl = jexcel(document.getElementById("tableDiv"), options);
+                            this.el = regionEl;
+                            this.setState({
+                                regionEl: regionEl, loading: false
+                            })
+
+
+
+                        })
                 } else {
                     this.setState({ message: response.data.messageCode },
                         () => {
@@ -147,7 +278,9 @@ class RegionListComponent extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -166,76 +299,6 @@ class RegionListComponent extends Component {
                     </option>
                 )
             }, this);
-
-        const columns = [
-            {
-                dataField: 'realmCountry.country.label',
-                text: i18n.t('static.region.country'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.region.region'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'capacityCbm',
-                text: i18n.t('static.region.capacitycbm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'gln',
-                text: i18n.t('static.region.gln'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selRegion.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -246,11 +309,11 @@ class RegionListComponent extends Component {
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.regionreport')}</strong>{' '} */}
-                       
+
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -270,36 +333,7 @@ class RegionListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                        </Col>
-                        <ToolkitProvider
-                            keyField="regionId"
-                            data={this.state.selRegion}
-                            columns={columns}
-                            search={{ searchFormatted: true }}
-                            hover
-                            filter={filterFactory()}
-                        >
-                            {
-                                props => (
-
-                                    <div className="TableCust">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
-                                        </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(options)}
-                                            /* rowEvents={{
-                                                 onClick: (e, row, rowIndex) => {
-                                                     this.editRegion(row);
-                                                 }
-                                             }}*/
-                                            {...props.baseProps}
-                                        />
-                                    </div>
-                                )
-                            }
-                        </ToolkitProvider>
+                        </Col><div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

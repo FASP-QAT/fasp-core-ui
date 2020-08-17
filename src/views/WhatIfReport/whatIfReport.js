@@ -216,7 +216,8 @@ export default class WhatIfReportComponent extends React.Component {
             expiredStockDetails: [],
             expiredStockDetailsTotal: 0,
             showShipments: 0,
-            paColors: []
+            paColors: [],
+            programSelect: ""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -259,6 +260,62 @@ export default class WhatIfReportComponent extends React.Component {
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.updateState = this.updateState.bind(this)
         this.updateFieldData = this.updateFieldData.bind(this);
+    }
+
+    roundN = num => {
+        if (num != '') {
+            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        } else {
+            return ''
+        }
+    }
+
+    formatter = value => {
+        if (value != '' && !isNaN(Number.parseInt(value))) {
+            // var cell1 = this.roundN(value)
+            // cell1 += '';
+            // var x = cell1.split('.');
+            // var x1 = x[0];
+            // var x2 = x.length > 1 ? '.' + x[1] : '';
+            // var rgx = /(\d+)(\d{3})/;
+            // while (rgx.test(x1)) {
+            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            // }
+            // return x1 + x2;
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (isNaN(Number.parseInt(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
+    formatterDouble = value => {
+        if (value != '' && !isNaN(Number.parseInt(value))) {
+            var cell1 = this.roundN(value)
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (isNaN(Number.parseInt(value))) {
+            return value;
+        } else {
+            return ''
+        }
     }
 
     updateFieldData(value) {
@@ -313,7 +370,7 @@ export default class WhatIfReportComponent extends React.Component {
                     })
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
-                    this.formSubmit(this.state.monthCount);
+                    this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     this.setState({
                         message: i18n.t('static.whatIf.supplyPlanReset'),
                         color: 'green',
@@ -417,7 +474,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 1) {
@@ -461,7 +518,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 } else if (this.state.scenarioId == 2) {
                     var consumptionList = programJson.consumptionList;
@@ -503,7 +560,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
@@ -537,7 +594,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 5) {
@@ -572,7 +629,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 6) {
@@ -608,7 +665,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         document.getElementById("consumptionScenariosFields").style.display = "none";
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
 
                     }.bind(this)
                 }
@@ -704,8 +761,8 @@ export default class WhatIfReportComponent extends React.Component {
     exportCSV = () => {
 
         var csvRow = [];
-        csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.program.program') + ' , ' + (((this.state.programSelect).label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (((this.state.planningUnit).label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -824,10 +881,10 @@ export default class WhatIfReportComponent extends React.Component {
                 })
                 if (i == 1) {
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                    doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 8, 80, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                 }
@@ -886,7 +943,7 @@ export default class WhatIfReportComponent extends React.Component {
         var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr, consumptionArr, shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr, closingBalanceArr, monthsOfStockArr, amcgArr, minStocArr, maxStockArr, unmetDemandArr];
+        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map(c => this.formatter(c)), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), minStocArr.map(c => this.formatter(c)), maxStockArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -949,8 +1006,8 @@ export default class WhatIfReportComponent extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: programJson1.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id
                         }
                         proList[i] = programJson
                     }
@@ -962,11 +1019,13 @@ export default class WhatIfReportComponent extends React.Component {
         }.bind(this);
     };
 
-    getPlanningUnitList(event) {
+    getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         this.setState({
             display: 'none',
-            planningUnitChange: false
+            planningUnitChange: false,
+            programSelect: value,
+            programId: value.value
         })
         var db1;
         var storeOS;
@@ -984,7 +1043,7 @@ export default class WhatIfReportComponent extends React.Component {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(document.getElementById("programId").value);
+            var programRequest = programDataOs.get(value.value);
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -1033,7 +1092,7 @@ export default class WhatIfReportComponent extends React.Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var programId = (value.value).split("_")[0];
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -2410,7 +2469,7 @@ export default class WhatIfReportComponent extends React.Component {
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
             });
-            this.formSubmit(monthCountConsumption);
+            this.formSubmit(this.state.planningUnit, monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
             this.setState({
                 shipments: !this.state.shipments
@@ -2427,7 +2486,7 @@ export default class WhatIfReportComponent extends React.Component {
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments
             });
-            this.formSubmit(monthCountAdjustments);
+            this.formSubmit(this.state.planningUnit, monthCountAdjustments);
         } else if (supplyPlanType == 'expiredStock') {
             var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
             console.log("startDate", startDate)
@@ -2505,7 +2564,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     rightClicked() {
@@ -2513,7 +2572,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount)
     }
 
     leftClickedConsumption() {
@@ -2521,7 +2580,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(monthCountConsumption)
+        this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
 
     rightClickedConsumption() {
@@ -2529,7 +2588,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        this.formSubmit(monthCountConsumption);
+        this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
 
     leftClickedAdjustments() {
@@ -2537,7 +2596,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(monthCountAdjustments)
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
 
     rightClickedAdjustments() {
@@ -2545,7 +2604,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        this.formSubmit(monthCountAdjustments);
+        this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
 
     // Consumption Functionality
@@ -3638,7 +3697,7 @@ export default class WhatIfReportComponent extends React.Component {
                             color: 'green',
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -5230,7 +5289,7 @@ export default class WhatIfReportComponent extends React.Component {
                             color: 'green',
                             inventoryChangedFlag: 0
                         })
-                        this.formSubmit(this.state.monthCount);
+                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -5393,7 +5452,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.shipped'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#6a82a8',
+                        backgroundColor: '#7372cb',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -5417,7 +5476,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 2,
                         type: 'line',
                         yAxisID: 'A',
-                        borderColor: '#4dbd74',
+                        borderColor: '#d0cece',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -5433,7 +5492,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 3,
                         yAxisID: 'A',
                         backgroundColor: 'transparent',
-                        borderColor: '#F48521',
+                        borderColor: '#f45c45',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -5450,7 +5509,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 4,
                         yAxisID: 'B',
                         backgroundColor: 'transparent',
-                        borderColor: '#ED5626',
+                        borderColor: '#8be665',
                         borderStyle: 'dotted',
                         ticks: {
                             fontSize: 2,
@@ -5467,7 +5526,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 5,
                         yAxisID: 'B',
                         backgroundColor: 'rgba(255,193,8,0.2)',
-                        borderColor: '#118b70',
+                        borderColor: '#59cacc',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
                         fill: '+1',
@@ -5487,7 +5546,7 @@ export default class WhatIfReportComponent extends React.Component {
                         stack: 6,
                         yAxisID: 'B',
                         backgroundColor: 'rgba(0,0,0,0)',
-                        borderColor: '#EDB944',
+                        borderColor: '#59cacc',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
                         fill: true,
@@ -5703,7 +5762,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             this.state.suggestedShipmentsTotalData.map(item1 => {
                                                 if (item1.suggestedOrderQty.toString() != "") {
                                                     if (item1.isEmergencyOrder == 1) {
-                                                        return (<td align="right" bgcolor='red' className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                        return (<td align="right" bgcolor='red' style={{ color: "#FFF" }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                     } else {
                                                         return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                     }
@@ -6289,18 +6348,15 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="row">
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls">
-                                        <InputGroup>
-                                            <Input type="select"
-                                                bsSize="sm"
-                                                value={this.state.programId}
-                                                name="programId" id="programId"
-                                                onChange={this.getPlanningUnitList}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {programs}
-                                            </Input>
-                                        </InputGroup>
+                                    <div className="controls ">
+                                        <Select
+                                            name="programSelect"
+                                            id="programSelect"
+                                            bsSize="sm"
+                                            options={this.state.programList}
+                                            value={this.state.programSelect}
+                                            onChange={(e) => { this.getPlanningUnitList(e); }}
+                                        />
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-4 mb-1">
@@ -6317,7 +6373,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </div>
                                 </FormGroup>
                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-
+                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                             </div>
                             <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
                                 <ul className="legendcommitversion list-group">

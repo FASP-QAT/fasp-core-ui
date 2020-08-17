@@ -21,8 +21,8 @@ import PlanningUnitService from '../../api/PlanningUnitService.js';
 
 
 
-const entityname = i18n.t('static.dashboard.manualTagging');
-export default class ManualTagging extends Component {
+const entityname = i18n.t('static.dashboard.delinking');
+export default class ShipmentDelinking extends Component {
 
     constructor(props) {
         super(props);
@@ -32,43 +32,23 @@ export default class ManualTagging extends Component {
             loading: true,
             programs: [],
             planningUnits: [],
-            outputListAfterSearch: [],
-            artmisList: [],
             shipmentId: ''
         }
-        this.addNewCountry = this.addNewCountry.bind(this);
-        this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
-        this.getOrderDetails = this.getOrderDetails.bind(this);
-        this.link = this.link.bind(this);
+        this.delinkShipment = this.delinkShipment.bind(this);
         this.getProgramList = this.getProgramList.bind(this);
     }
-    link() {
-        var orderNo = document.getElementById("orderNo").value;
-        var primeLineNo = document.getElementById("primeLineNo").value;
-
-        ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
+    delinkShipment(event, row) {
+        event.stopPropagation();
+        console.log("shipment id row---"+row.shipmentId);
+        ManualTaggingService.delinkShipment(row.shipmentId)
             .then(response => {
                 console.log("link response===", response);
-                this.toggleLarge();
                 this.filterData();
-            })
-    }
-    getOrderDetails() {
-        var orderNo = document.getElementById("orderNo").value;
-        var primeLineNo = document.getElementById("primeLineNo").value;
-        ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(orderNo, primeLineNo)
-            .then(response => {
-                console.log("artmis response===", response);
-                var artmisList = [];
-                artmisList.push(response.data);
-                this.setState({
-                    artmisList
-                })
             })
     }
     hideFirstComponent() {
@@ -89,7 +69,7 @@ export default class ManualTagging extends Component {
     filterData() {
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        ManualTaggingService.getShipmentListForManualTagging(programId, planningUnitId)
+        ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
             .then(response => {
                 console.log("manual tagging response===", response);
                 this.setState({
@@ -98,24 +78,6 @@ export default class ManualTagging extends Component {
             })
     }
 
-
-    addNewCountry() {
-        if (navigator.onLine) {
-            this.props.history.push(`/country/addCountry`)
-        } else {
-            alert("You must be Online.")
-        }
-
-    }
-    editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
-            console.log(country);
-            this.props.history.push({
-                pathname: `/country/editCountry/${country.countryId}`,
-                // state: { country: country }
-            });
-        }
-    }
     getProgramList() {
         ProgramService.getProgramList()
             .then(response => {
@@ -138,27 +100,6 @@ export default class ManualTagging extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         this.getProgramList();
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
-
     }
 
     getPlanningUnitList() {
@@ -296,92 +237,16 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
-            }
-        ];
-
-        const columns1 = [
-            {
-                dataField: 'roNo',
-                text: 'RO No.',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             },
             {
-                dataField: 'roPrimeLineNo',
-                text: 'RO Prime Line No.',
-                sort: true,
+                dataField: 'shipmentId',
+                text: "De-link",
                 align: 'center',
                 headerAlign: 'center',
-                // formatter: this.formatLabel
-            }, {
-                dataField: 'orderType',
-                text: 'Order Type',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            {
-                dataField: 'planningUnitSkuCode',
-                text: 'Planning Unit SKU Code',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            {
-                dataField: 'procurementUnitSkuCode',
-                text: 'Procurement Unit SKU Code',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'quantity',
-                text: 'Quantity',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'currentEstimatedDeliveryDate',
-                text: 'Current Estimated Delivery Date',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'supplierName',
-                text: 'Supplier Name',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'price',
-                text: 'Price',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'shippingCost',
-                text: 'Shipping Cost',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'status',
-                text: 'Status',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                formatter: (cellContent, row) => {
+                    return (<Button type="button" size="sm" color="success" title="De-link Shipment" onClick={(event) => this.delinkShipment(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                    )
+                }
             }
         ];
         const options = {
@@ -480,19 +345,7 @@ export default class ManualTagging extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
 
-                                                    var outputListAfterSearch = [];
-                                                    outputListAfterSearch.push(row);
-
-                                                    this.setState({
-                                                        shipmentId: row.shipmentId,
-                                                        outputListAfterSearch
-                                                    })
-                                                    this.toggleLarge();
-                                                }
-                                            }}
                                             {...props.baseProps}
                                         />
                                     </div>
@@ -500,106 +353,6 @@ export default class ManualTagging extends Component {
                             }
                         </ToolkitProvider>
 
-                        {/* Consumption modal */}
-                        <Modal isOpen={this.state.manualTag}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                                <strong>Search ERP Orders</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <Col md="12 pl-0">
-                                    <div className="d-md-flex">
-                                        <FormGroup className="col-md-3 pl-0">
-                                            <Label htmlFor="appendedInputButton">Order No</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="text"
-                                                        name="orderNo"
-                                                        id="orderNo"
-                                                        bsSize="sm"
-                                                    >
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Prime Line No</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="text"
-                                                        name="primeLineNo"
-                                                        id="primeLineNo"
-                                                        bsSize="sm"
-                                                    >
-                                                    </Input>
-                                                    <InputGroupAddon addonType="append">
-                                                        <Button color="secondary Gobtn btn-sm" onClick={this.getOrderDetails}>{i18n.t('static.common.go')}</Button>
-                                                    </InputGroupAddon>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                    </div>
-                                </Col>
-                                <div>
-                                    <ToolkitProvider
-                                        keyField="optList"
-                                        data={this.state.artmisList}
-                                        columns={columns1}
-                                        search={{ searchFormatted: true }}
-                                        hover
-                                        filter={filterFactory()}
-                                    >
-                                        {
-                                            props => (
-                                                <div className="TableCust">
-
-                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-
-                                                        rowEvents={{
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
-                                                </div>
-                                            )
-                                        }
-                                    </ToolkitProvider>
-                                </div><br />
-                                <div>
-                                    <ToolkitProvider
-                                        keyField="optList"
-                                        data={this.state.outputListAfterSearch}
-                                        columns={columns}
-                                        search={{ searchFormatted: true }}
-                                        hover
-                                        filter={filterFactory()}
-                                    >
-                                        {
-                                            props => (
-                                                <div className="TableCust">
-                                                    {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
-                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                        // pagination={paginationFactory(options)}
-                                                        rowEvents={{
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
-                                                </div>
-                                            )
-                                        }
-                                    </ToolkitProvider>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i> Link</Button>{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Consumption modal */}
                     </CardBody>
                 </Card>
                 {/* <div style={{ display: this.state.loading ? "block" : "none" }}>

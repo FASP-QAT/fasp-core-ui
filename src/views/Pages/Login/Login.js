@@ -303,7 +303,7 @@ class Login extends Component {
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
-                                      <i className="icon-user Loginicon"></i>
+                                      <i className="cui-user Loginicon"></i>
                                     </InputGroupText>
                                   </InputGroupAddon>
                                   <Input
@@ -322,7 +322,7 @@ class Login extends Component {
                                 <InputGroup className="mb-4">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
-                                      <i className="icon-lock Loginicon"></i>
+                                      <i className="cui-lock-locked Loginicon"></i>
                                     </InputGroupText>
                                   </InputGroupAddon>
                                   <Input

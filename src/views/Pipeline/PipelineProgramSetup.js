@@ -16,6 +16,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import PipelineProgramShipment from './PipelineProgramShipment';
+import PipelineProgramDataSource from './PipelineProgramDataSource';
+import PipelineProgramFundingSource from './PipelineProgramFundingSource';
+import PipelineProgramProcurementAgent from './PipelineProgramProcurementAgent';
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -59,6 +62,7 @@ export default class PipelineProgramSetup extends Component {
                 approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
+                shelfLife:'',
                 healthArea: {
                     id: ''
                 },
@@ -174,12 +178,15 @@ export default class PipelineProgramSetup extends Component {
     }
 
     finishedStepOne() {
-        this.setState({ pipelineProgramSetupPer: 25 });
+        this.setState({ pipelineProgramSetupPer: 14.28 });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'block';
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
 
     }
     finishedStepTwo() {
@@ -188,32 +195,29 @@ export default class PipelineProgramSetup extends Component {
         //     alert("Please resolve all error and then proceed.");
         // }
         // else {
-        // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
-        var planningUnits = this.refs.child.savePlanningUnits();
-        var checkValidation = this.refs.child.checkValidation();
-        AuthenticationService.setupAxiosInterceptors();
-        PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
-            then(response => {
-                if (response.status == "200") {
-                    // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
-                    //     if (response.status == "200") {
-                    if (checkValidation == true) {
-                        this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
-                        document.getElementById('stepOne').style.display = 'none';
-                        document.getElementById('stepTwo').style.display = 'none';
-                        document.getElementById('stepThree').style.display = 'block';
-                        document.getElementById('stepFour').style.display = 'none';
-                        document.getElementById('stepFive').style.display = 'none';
-                    }
-                    else {
-                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
-                        // this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
-                        // document.getElementById('stepOne').style.display = 'none';
-                        // document.getElementById('stepTwo').style.display = 'none';
-                        // document.getElementById('stepThree').style.display = 'block';
-                        // document.getElementById('stepFour').style.display = 'none';
-                        // document.getElementById('stepFive').style.display = 'none';
-                    }
+            // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
+            var planningUnits = this.refs.child.savePlanningUnits();
+            var checkValidation = this.refs.child.checkValidation();
+            AuthenticationService.setupAxiosInterceptors();
+            PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
+                then(response => {
+                    if (response.status == "200") {
+                        // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
+                        //     if (response.status == "200") {
+                        if (checkValidation == true) {
+                            this.setState({ pipelineProgramSetupPer: 28.56, consumptionStatus: true });
+                            document.getElementById('stepOne').style.display = 'none';
+                            document.getElementById('stepTwo').style.display = 'none';
+                            document.getElementById('stepThree').style.display = 'block';
+                            document.getElementById('stepFour').style.display = 'none';
+                            document.getElementById('stepFive').style.display = 'none';
+                            document.getElementById('stepSix').style.display = 'none';
+                            document.getElementById('stepSeven').style.display = 'none';
+                            document.getElementById('stepEight').style.display = 'none';
+                        }
+                        else {
+                            alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        }
 
                     // } else {
                     //     this.setState({
@@ -234,21 +238,56 @@ export default class PipelineProgramSetup extends Component {
 
     }
     finishedStepThree() {
-        var consumption = this.refs.consumptionChild.saveConsumption();
-        var checkValidation = this.refs.consumptionChild.checkValidation();
+        var datasources = this.refs.datasourcechild.saveDataSource();
+        var checkValidation = this.refs.datasourcechild.checkValidation();
         // console.log("consumption save------>",consumption);
         AuthenticationService.setupAxiosInterceptors();
-        PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
+        PipelineService.addProgramToQatTempDataSource(datasources, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
                 if (response.status == "200") {
                     if (checkValidation == true) {
-                        this.setState({ pipelineProgramSetupPer: 75, inventoryStatus: true });
+                        this.setState({ pipelineProgramSetupPer: 42.48, inventoryStatus: true });
                         document.getElementById('stepOne').style.display = 'none';
                         document.getElementById('stepTwo').style.display = 'none';
                         document.getElementById('stepThree').style.display = 'none';
                         document.getElementById('stepFour').style.display = 'block';
                         document.getElementById('stepFive').style.display = 'none';
+                        document.getElementById('stepSix').style.display = 'none';
+                        document.getElementById('stepSeven').style.display = 'none';
+                        document.getElementById('stepEight').style.display = 'none';
+                    }
+                    else {
+                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                    }
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+
+            });
+    }
+    finishedStepFour=()=> {
+        var consumption = this.refs.fundingSourceChild.saveFundingSource();
+        var checkValidation = this.refs.fundingSourceChild.checkValidation();
+        // console.log("consumption save------>",consumption);
+        AuthenticationService.setupAxiosInterceptors();
+        PipelineService.addQatTempFundingSource(consumption, this.props.match.params.pipelineId).
+            then(response => {
+                // console.log("consumption add response--->", response);
+                if (response.status == "200") {
+                    if (checkValidation == true) {
+                        this.setState({ pipelineProgramSetupPer: 57.12, inventoryStatus: true });
+                        document.getElementById('stepOne').style.display = 'none';
+                        document.getElementById('stepTwo').style.display = 'none';
+                        document.getElementById('stepThree').style.display = 'none';
+                        document.getElementById('stepFour').style.display = 'none';
+                        document.getElementById('stepFive').style.display = 'block';
+                        document.getElementById('stepSix').style.display = 'none';
+                        document.getElementById('stepSeven').style.display = 'none';
+                        document.getElementById('stepEight').style.display = 'none';
+                   
                     }
                     else {
                         alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
@@ -267,7 +306,70 @@ export default class PipelineProgramSetup extends Component {
 
             });
     }
-    finishedStepFour() {
+
+    finishedStepFive=()=> {
+        var inventory = this.refs.procurementAgentChild.saveProcurementAgent();
+        var checkValidation = this.refs.procurementAgentChild.checkValidation();
+        console.log("inventory-----data---", inventory);
+        AuthenticationService.setupAxiosInterceptors();
+        PipelineService.addQatTempProcurementAgent(inventory, this.props.match.params.pipelineId).
+            then(response => {
+                if (response.status == "200") {
+
+                    if (checkValidation == true) {
+                        this.setState({ pipelineProgramSetupPer: 71.4, shipmentStatus: true });
+
+                        document.getElementById('stepOne').style.display = 'none';
+                        document.getElementById('stepTwo').style.display = 'none';
+                        document.getElementById('stepThree').style.display = 'none';
+                        document.getElementById('stepFour').style.display = 'none';
+                        document.getElementById('stepFive').style.display = 'none';
+                        document.getElementById('stepSix').style.display = 'block';
+                        document.getElementById('stepSeven').style.display = 'none';
+                        document.getElementById('stepEight').style.display = 'none';
+                    } else {
+                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                    }
+
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            });
+    }
+    finishedStepSix=()=> {
+        var consumption = this.refs.consumptionChild.saveConsumption();
+        var checkValidation = this.refs.consumptionChild.checkValidation();
+        console.log("inventory-----data---", consumption);
+        AuthenticationService.setupAxiosInterceptors();
+        PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
+            then(response => {
+                if (response.status == "200") {
+
+                    if (checkValidation == true) {
+                        this.setState({ pipelineProgramSetupPer: 85.68, shipmentStatus: true });
+
+                        document.getElementById('stepOne').style.display = 'none';
+                        document.getElementById('stepTwo').style.display = 'none';
+                        document.getElementById('stepThree').style.display = 'none';
+                        document.getElementById('stepFour').style.display = 'none';
+                        document.getElementById('stepFive').style.display = 'none';
+                        document.getElementById('stepSix').style.display = 'none';
+                        document.getElementById('stepSeven').style.display = 'block';
+                        document.getElementById('stepEight').style.display = 'none';
+                    } else {
+                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                    }
+
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            });
+    }
+    finishedStepSeven=()=> {
         var inventory = this.refs.inventoryChild.saveInventory();
         var checkValidation = this.refs.inventoryChild.checkValidation();
         console.log("inventory-----data---", inventory);
@@ -277,13 +379,16 @@ export default class PipelineProgramSetup extends Component {
                 if (response.status == "200") {
                     console.log("save indentory date====>", response);
                     if (checkValidation == true) {
-                        this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
+                        this.setState({ pipelineProgramSetupPer: 85.68, shipmentStatus: true });
 
                         document.getElementById('stepOne').style.display = 'none';
                         document.getElementById('stepTwo').style.display = 'none';
                         document.getElementById('stepThree').style.display = 'none';
                         document.getElementById('stepFour').style.display = 'none';
-                        document.getElementById('stepFive').style.display = 'block';
+                        document.getElementById('stepFive').style.display = 'none';
+                        document.getElementById('stepSix').style.display = 'none';
+                        document.getElementById('stepSeven').style.display = 'none';
+                        document.getElementById('stepEight').style.display = 'block';
                     } else {
                         alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
                         // this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
@@ -300,9 +405,10 @@ export default class PipelineProgramSetup extends Component {
                     })
                 }
             });
+    
     }
 
-    finishedStepFive() {
+    finishedStepEignt=()=> {
         console.log("final commit -------------->")
     }
 
@@ -359,38 +465,87 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
 
     }
 
     previousToStepTwo() {
-        this.setState({ pipelineProgramSetupPer: 25 });
+        this.setState({ pipelineProgramSetupPer: 14.28 });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'block';
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
 
     }
 
     previousToStepThree() {
-        this.setState({ pipelineProgramSetupPer: 50 });
+        this.setState({ pipelineProgramSetupPer: 28.56 });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
         document.getElementById('stepThree').style.display = 'block';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
 
     }
 
     previousToStepFour() {
-        this.setState({ pipelineProgramSetupPer: 75 });
+        this.setState({ pipelineProgramSetupPer: 42.84 });
         document.getElementById('stepOne').style.display = 'none';
         document.getElementById('stepTwo').style.display = 'none';
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'block';
         document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
 
     }
+    previousToStepFive=() =>{
+        this.setState({ pipelineProgramSetupPer: 57.12 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'block';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
+
+    }
+    previousToStepSix=()=> {
+        this.setState({ pipelineProgramSetupPer: 71.4 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'block';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
+
+    }
+    previousToStepSeven=()=> {
+        this.setState({ pipelineProgramSetupPer: 85.68 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'block';
+        document.getElementById('stepEight').style.display = 'none';
+
+    }
+
 
     dataChange(event) {
         let { program } = this.state;
@@ -432,6 +587,9 @@ export default class PipelineProgramSetup extends Component {
         }
         if (event.target.name == 'shippedToArrivedByAirLeadTime') {
             program.shippedToArrivedByAirLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shelfLife') {
+            program.shelfLife = event.target.value;
         }
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
@@ -612,6 +770,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+        document.getElementById('stepEight').style.display = 'none';
 
     }
     render() {
@@ -691,6 +852,43 @@ export default class PipelineProgramSetup extends Component {
                                             // <h2>5</h2>
                                         )}
                                     </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="../../../../public/assets/img/numbers/number6.png"
+                                            // src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
+                                            />
+                                            // <h2>5</h2>
+                                        )}
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="../../../../public/assets/img/numbers/number7.png"
+                                            // src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
+                                            />
+                                            // <h2>5</h2>
+                                        )}
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="../../../../public/assets/img/numbers/number8.png"
+                                            // src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
+                                            />
+                                            // <h2>5</h2>
+                                        )}
+                                    </Step>
+
                                     {/* <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
@@ -719,9 +917,12 @@ export default class PipelineProgramSetup extends Component {
                                     <ul>
                                         <li className="progressetuptext1">Program Info</li>
                                         <li className="progressetuptext2">Planning Units</li>
-                                        <li className="progressetuptext3">Consumption</li>
-                                        <li className="progressetuptext4">Inventory</li>
-                                        <li className="progressetuptext5">Shipment</li>
+                                        <li className="progressetuptext3">Data Source</li>
+                                        <li className="progressetuptext4">Funding Source</li>
+                                        <li className="progressetuptext5">Procurement Agent</li>
+                                        <li className="progressetuptext6">Consumption</li>
+                                        <li className="progressetuptext7">Inventory</li>
+                                        <li className="progressetuptext8">Shipment</li>
                                         {/* <li className="progressbartext6">Program Data</li>
                                         <li className="progressbartext7">Planning Units</li> */}
                                     </ul>
@@ -758,6 +959,7 @@ export default class PipelineProgramSetup extends Component {
                                                             />
                                                         )}
                                                     </Step>
+                                                   
                                                     <Step transition="scale">
                                                         {({ accomplished }) => (
                                                             <img
@@ -786,6 +988,8 @@ export default class PipelineProgramSetup extends Component {
                                                             />
                                                         )}
                                                     </Step>
+                                                
+                                                    
                                                     {/* <Step transition="scale">
                                                         {({ accomplished }) => (
                                                             <img
@@ -841,28 +1045,28 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepTwo">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                         <Card>
                                             <CardHeader>
                                                <strong>Program Planning Units</strong>{' '}
-                                            </CardHeader>
-                                            <CardBody  className="pt-0"> */}
-                                        {/* <h3>Program Planning Units</h3> */}
-                                        <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId} realmId={this.state.program.realmCountry.realm.realmId}></PipelineProgramPlanningUnits>
-                                        {/* </CardBody> */}
-                                        {/* <CardFooter>
+                                        </CardHeader>
+                                            <CardBody  className="pt-0">
+                                                {/* <h3>Program Planning Units</h3> */}
+                                                <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId} items={this.state} realmId={this.state.program.realmCountry.realm.realmId}></PipelineProgramPlanningUnits>
+                                            </CardBody>
+                                            {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        {/* <CardFooter>
+                                         <CardFooter>
                                                 <span className="red">
                                                     *Planning Unit cells in yellow color indicates that either the same planning unit is being selected twice or the planning unit which you are trying to map does not exist.
                                                     please created ticket for the planning units which do not exist.
                                                 </span>
                                             </CardFooter>
-                                        </Card> */}
+                                        </Card> 
                                         <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
@@ -872,23 +1076,23 @@ export default class PipelineProgramSetup extends Component {
                                 </div>
                                 <div id="stepThree">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                       <Card>
                                             <CardHeader>
-                                               <strong>Consumption Details</strong>{' '}
+                                               <strong>Data Source</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0"> */}
-                                        {/* <h3>Consumption</h3> */}
-                                        {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
-                                        {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>}
-                                        {/* </CardBody> */}
-                                        {/* <CardFooter>
+                                            <CardBody className="pt-0">
+                                                {/* <h3>Consumption</h3> */}
+                                                {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
+                                               <PipelineProgramDataSource ref="datasourcechild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramDataSource>
+                                            </CardBody>
+                                         {/*  <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
-                                            </CardFooter> */}
-                                        {/* </Card> */}
+                                            </CardFooter>*/}
+                                       </Card> 
                                         <br /><br />
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
@@ -896,16 +1100,94 @@ export default class PipelineProgramSetup extends Component {
                                         &nbsp;
                                     </Col>
                                 </div>
+                                
                                 <div id="stepFour">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                       <Card>
+                                            <CardHeader>
+                                               <strong>Funding Source</strong>{' '}
+                                            </CardHeader>
+                                            <CardBody className="pt-0">
+                                                {/* <h3>Consumption</h3> */}
+                                                {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
+                                                 <PipelineProgramFundingSource ref="fundingSourceChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramFundingSource>
+                                            </CardBody>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                &nbsp;
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                                &nbsp;
+
+                                            </CardFooter>*/}
+                                        </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Save<i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
+                                    </Col>
+                                </div>
+                                
+                                <div id="stepFive">
+                                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                                        <Card>
+                                            <CardHeader>
+                                               <strong>Procurement Agent</strong>{' '}
+                                            </CardHeader>
+                                            <CardBody className="pt-0">
+                                                {/* <h3>Consumption</h3> */}
+                                                {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
+                                               <PipelineProgramProcurementAgent ref="procurementAgentChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramProcurementAgent>
+                                            </CardBody>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                &nbsp;
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                                &nbsp;
+
+                                            </CardFooter> */}
+                                        </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Save<i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
+                                    </Col>
+                                </div>
+                                
+                                <div id="stepSix">
+                                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                                        <Card>
+                                            <CardHeader>
+                                               <strong>Consumption Details</strong>{' '}
+                                            </CardHeader>
+                                            <CardBody className="pt-0">
+                                                {/* <h3>Consumption</h3> */}
+                                                {/* {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId} pipelineConsumptionList={this.state.pipelineConsumptionList}></PipelineProgramConsumption>} */}
+                                                {this.state.consumptionStatus && <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>}
+                                            </CardBody>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                &nbsp;
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                                &nbsp;
+
+                                            </CardFooter> */}
+                                        </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSix}>Save<i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
+                                    </Col>
+                                </div>
+                                <div id="stepSeven">
+                                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                                        <Card>
                                             <CardHeader>
                                                 <strong>Inventory Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0"> */}
+                                            <CardBody className="pt-0">
                                         {/* <h3>Inventory</h3> */}
                                         {this.state.inventoryStatus && <PipelineProgramInventory pipelineId={this.props.match.params.pipelineId} ref="inventoryChild"></PipelineProgramInventory>}
-                                        {/* </CardBody> */}
+                                         </CardBody> 
                                         {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
@@ -913,32 +1195,32 @@ export default class PipelineProgramSetup extends Component {
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        {/* </Card> */}
-                                        <br /><br />
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Back</Button>
+                                        </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Save <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepSeven}>Save <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </Col>
                                 </div>
-                                <div id="stepFive">
+                                <div id="stepEight">
                                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                        {/* <Card>
+                                        <Card>
                                             <CardHeader>
                                                 <strong>Shipment Details</strong>{' '}
                                             </CardHeader>
-                                            <CardBody className="pt-0"> */}
-                                        {/*<h3>Shipments</h3>*/}
-                                        {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>}
-                                        {/* </CardBody> */}
-                                        {/* <CardFooter>
+                                            <CardBody className="pt-0">
+                                                {/*<h3>Shipments</h3>*/}
+                                                </CardBody>
+                                                {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepSeven} {...this.props}></PipelineProgramShipment>}
+                                          
+                                            {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
 
                                             </CardFooter> */}
-                                        {/* </Card> */}
+                                         </Card>
                                     </Col>
                                 </div>
                             </CardBody>

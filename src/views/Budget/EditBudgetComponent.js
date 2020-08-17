@@ -13,7 +13,7 @@ import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
-import { DATE_FORMAT_SM,DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
+import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
@@ -27,6 +27,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
+            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -37,6 +38,7 @@ const validationSchema = function (values) {
         // stopDate: Yup.string()
         //     .required(i18n.t('static.budget.stopdatetext'))
         budgetCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })

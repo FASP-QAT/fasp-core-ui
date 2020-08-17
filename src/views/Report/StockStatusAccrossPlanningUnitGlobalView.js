@@ -761,7 +761,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                     this.state.programs.map(ele1 => {
                                       return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
                                         item => {
-                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{item.programData.filter(c => c.program.code == ele1)[0].outputString}</td>)
+                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos)}</td>)
                                         }
 
                                       )

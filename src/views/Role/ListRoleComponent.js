@@ -334,7 +334,8 @@ class ListRoleComponent extends Component {
                                     }
                                 ],
                                 text: {
-                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                     show: '',
                                     entries: '',
                                 },
@@ -445,10 +446,9 @@ class ListRoleComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0  ">
-                        <div className="table-responsive">
-                            <div id="tableDiv" className="LanguageremoveReadonlybackground">
-                            </div>
+                    <CardBody className="pb-md-0">
+                        <div  className="">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                         </div>
                     </CardBody>
                 </Card>

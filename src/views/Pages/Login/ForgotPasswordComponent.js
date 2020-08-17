@@ -114,7 +114,7 @@ class ForgotPasswordComponent extends Component {
                                 <Card className="mx-4 " style={{ display: this.state.loading ? "none" : "block" }}>
 
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
+                                        <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={initialValues}
