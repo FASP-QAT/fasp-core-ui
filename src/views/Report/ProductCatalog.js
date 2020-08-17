@@ -97,9 +97,11 @@ class ProductCatalog extends Component {
         var csvRow = [];
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
-        csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        // csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
-        csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        // csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
         csvRow.push('')
         // this.state.programLabels.map(ele =>

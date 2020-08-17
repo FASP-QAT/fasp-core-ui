@@ -26,6 +26,7 @@ export function qatProblemActions() {
         // console.log("QPA 1====>", realmId);
         var programList = [];
         var programRequestList = [];
+        var versionIDs = [];
 
         db1 = e.target.result;
         var transaction = db1.transaction(['programData'], 'readwrite');
@@ -46,6 +47,7 @@ export function qatProblemActions() {
             let username = decryptedUser.username;
 
             var latestVersionProgramList = [];
+
             for (var i = 0; i < getRequest.result.length; i++) {
                 // console.log("QPA 2=====>  in for");
                 var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
@@ -54,22 +56,24 @@ export function qatProblemActions() {
                 // console.log("QPA 2====>", programJson);
                 programList.push(programJson);
                 programRequestList.push(getRequest.result[i]);
-            }
-
-
-            for (var d = 0; d < programList.length; d++) {
-                var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
-                if (index == -1) {
-                    latestVersionProgramList.push(programList[d]);
-                } else {
-                    var versionId = latestVersionProgramList[index].currentVersion.versionId;
-                    if (versionId < programList[d].currentVersion.versionId) {
-                        latestVersionProgramList[index] = programList[d];
-                    }
-                }
+                versionIDs.push(getRequest.result[i].version);
 
             }
-            programList = latestVersionProgramList;
+
+
+            // for (var d = 0; d < programList.length; d++) {
+            //     var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
+            //     if (index == -1) {
+            //         latestVersionProgramList.push(programList[d]);
+            //     } else {
+            //         var versionId = latestVersionProgramList[index].currentVersion.versionId;
+            //         if (versionId < programList[d].currentVersion.versionId) {
+            //             latestVersionProgramList[index] = programList[d];
+            //         }
+            //     }
+
+            // }
+            // programList = latestVersionProgramList;
             // console.log("QPA 3====>", programList);
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
@@ -93,12 +97,12 @@ export function qatProblemActions() {
                 }.bind(this);
                 problemRequest.onsuccess = function (e) {
 
-                    problemList = problemRequest.result;
-                    if (realmId == -1) {
-                        problemList = problemList;
-                    } else {
-                        problemList = problemList.filter(c => c.realm.id == realmId);
-                    }
+                    // problemList = problemRequest.result;
+                    // if (realmId == -1) {
+                    //     problemList = problemList;
+                    // } else {
+                    //     problemList = problemList.filter(c => c.realm.id == realmId);
+                    // }
                     var planningUnitResult = [];
                     planningUnitResult = planningunitRequest.result;
 
@@ -121,11 +125,14 @@ export function qatProblemActions() {
 
                         // console.log("QPA 5====>", planningUnitResult);
                         for (var pp = 0; pp < programList.length; pp++) {
+                            var versionID = versionIDs[pp];
+                            console.log("programList[PP]===", programList[pp], "version of program==>", versionID);
                             var problemActionIndex = 0;
                             problemActionList = programList[pp].problemReportList;
                             problemActionIndex = programList[pp].problemReportList.length;
                             var regionList = programList[pp].regionList;
                             // console.log("QPA 6====>", regionList)
+                            problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
                             planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                             // console.log("QPA 7====>", planningUnitList);
                             for (var r = 0; r < regionList.length; r++) {
@@ -149,7 +156,8 @@ export function qatProblemActions() {
                                                     && c.region.id == regionList[r].regionId
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
-                                                    && c.realmProblem.problem.problemId == 1);
+                                                    && c.realmProblem.problem.problemId == 1
+                                                    && c.versionId == versionID);
                                             if (filteredConsumptionList.length == 0) {
                                                 // console.log("index====>", index);
                                                 if (index == -1) {
@@ -160,7 +168,7 @@ export function qatProblemActions() {
                                                             label: programList[pp].label,
                                                             programCode: programList[pp].programCode
                                                         },
-                                                        versionId: programList[pp].currentVersion.versionId,
+                                                        versionId: versionID,
                                                         realmProblem: problemList[prob],
 
                                                         dt: moment(Date.now()).format('YYYY-MM-DD'),
@@ -230,7 +238,7 @@ export function qatProblemActions() {
                                                 }
 
                                             } else {
-                                                if (index != -1) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1) {
                                                     // console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]);
                                                     // problemActionList[index].isFound = 0;
                                                     var filterObj = problemActionList[index];
@@ -296,7 +304,8 @@ export function qatProblemActions() {
                                                     && c.region.id == regionList[r].regionId
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
-                                                    && c.realmProblem.problem.problemId == 2);
+                                                    && c.realmProblem.problem.problemId == 2
+                                                    && c.versionId == versionID);
 
                                             if (filterInventoryList.length == 0) {
                                                 if (index == -1) {
@@ -307,7 +316,7 @@ export function qatProblemActions() {
                                                             label: programList[pp].label,
                                                             programCode: programList[pp].programCode
                                                         },
-                                                        versionId: programList[pp].currentVersion.versionId,
+                                                        versionId: versionID,
                                                         realmProblem: problemList[prob],
 
                                                         dt: moment(Date.now()).format('YYYY-MM-DD'),
@@ -375,7 +384,7 @@ export function qatProblemActions() {
                                                     // problemActionList[index].isFound = 1;
                                                 }
                                             } else {
-                                                if (index != -1) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1) {
                                                     // problemActionList[index].isFound = 0;
                                                     //console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
                                                     var filterObj = problemActionList[index];
@@ -444,12 +453,14 @@ export function qatProblemActions() {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                && c.realmProblem.problem.problemId == 3);
+                                                                && c.realmProblem.problem.problemId == 3
+                                                                && c.versionId == versionID);
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
-                                                                && c.realmProblem.problem.problemId == 3);
+                                                                && c.realmProblem.problem.problemId == 3
+                                                                && c.versionId == versionID);
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -464,7 +475,7 @@ export function qatProblemActions() {
                                                                 label: programList[pp].label,
                                                                 programCode: programList[pp].programCode
                                                             },
-                                                            versionId: programList[pp].currentVersion.versionId,
+                                                            versionId: versionID,
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
@@ -647,7 +658,8 @@ export function qatProblemActions() {
                                                     && c.region.id == regionList[r].regionId
                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                     && c.program.id == programList[pp].programId
-                                                    && c.realmProblem.problem.problemId == 8);
+                                                    && c.realmProblem.problem.problemId == 8
+                                                    && c.versionId == versionID);
 
                                             if (filteredConsumptionListTwo.length != 18) {
                                                 if (index == -1) {
@@ -658,7 +670,7 @@ export function qatProblemActions() {
                                                             label: programList[pp].label,
                                                             programCode: programList[pp].programCode
                                                         },
-                                                        versionId: programList[pp].currentVersion.versionId,
+                                                        versionId: versionID,
                                                         realmProblem: problemList[prob],
 
                                                         dt: moment(Date.now()).format("YYYY-MM-DD"),
@@ -728,7 +740,7 @@ export function qatProblemActions() {
                                                 }
 
                                             } else {
-                                                if (index != -1) {
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1) {
                                                     // problemActionList[index].isFound = 0;
                                                     // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                     var filterObj = problemActionList[index];
@@ -796,12 +808,14 @@ export function qatProblemActions() {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                && c.realmProblem.problem.problemId == 4);
+                                                                && c.realmProblem.problem.problemId == 4
+                                                                && c.versionId == versionID);
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
-                                                                && c.realmProblem.problem.problemId == 4);
+                                                                && c.realmProblem.problem.problemId == 4
+                                                                && c.versionId == versionID);
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -816,7 +830,7 @@ export function qatProblemActions() {
                                                                 label: programList[pp].label,
                                                                 programCode: programList[pp].programCode
                                                             },
-                                                            versionId: programList[pp].currentVersion.versionId,
+                                                            versionId: versionID,
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
@@ -1003,12 +1017,14 @@ export function qatProblemActions() {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                && c.realmProblem.problem.problemId == 5);
+                                                                && c.realmProblem.problem.problemId == 5
+                                                                && c.versionId == versionID);
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
-                                                                && c.realmProblem.problem.problemId == 5);
+                                                                && c.realmProblem.problem.problemId == 5
+                                                                && c.versionId == versionID);
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1023,7 +1039,7 @@ export function qatProblemActions() {
                                                                 label: programList[pp].label,
                                                                 programCode: programList[pp].programCode
                                                             },
-                                                            versionId: programList[pp].currentVersion.versionId,
+                                                            versionId: versionID,
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
@@ -1211,12 +1227,14 @@ export function qatProblemActions() {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                && c.realmProblem.problem.problemId == 6);
+                                                                && c.realmProblem.problem.problemId == 6
+                                                                && c.versionId == versionID);
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
-                                                                && c.realmProblem.problem.problemId == 6);
+                                                                && c.realmProblem.problem.problemId == 6
+                                                                && c.versionId == versionID);
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1231,7 +1249,7 @@ export function qatProblemActions() {
                                                                 label: programList[pp].label,
                                                                 programCode: programList[pp].programCode
                                                             },
-                                                            versionId: programList[pp].currentVersion.versionId,
+                                                            versionId: versionID,
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
@@ -1419,12 +1437,14 @@ export function qatProblemActions() {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.shipmentId == filteredShipmentList[s].shipmentId
-                                                                && c.realmProblem.problem.problemId == 7);
+                                                                && c.realmProblem.problem.problemId == 7
+                                                                && c.versionId == versionID);
                                                     } else {
                                                         indexShipment = problemActionList.findIndex(
                                                             c => c.program.id == programList[pp].programId
                                                                 && c.index == filteredShipmentList[s].index
-                                                                && c.realmProblem.problem.problemId == 7);
+                                                                && c.realmProblem.problem.problemId == 7
+                                                                && c.versionId == versionID);
                                                     }
 
                                                     if (indexShipment == -1) {
@@ -1439,7 +1459,7 @@ export function qatProblemActions() {
                                                                 label: programList[pp].label,
                                                                 programCode: programList[pp].programCode
                                                             },
-                                                            versionId: programList[pp].currentVersion.versionId,
+                                                            versionId: versionID,
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
@@ -1623,7 +1643,8 @@ export function qatProblemActions() {
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
-                                                        && c.realmProblem.problem.problemId == 10);
+                                                        && c.realmProblem.problem.problemId == 10
+                                                        && c.versionId == versionID);
 
                                                 if (consumptionList.length > problemList[prob].data2) {
                                                     var conQtyArray = [];
@@ -1663,7 +1684,7 @@ export function qatProblemActions() {
                                                                     label: programList[pp].label,
                                                                     programCode: programList[pp].programCode
                                                                 },
-                                                                versionId: programList[pp].currentVersion.versionId,
+                                                                versionId: versionID,
                                                                 realmProblem: problemList[prob],
 
                                                                 dt: moment(Date.now()).format("YYYY-MM-DD"),
@@ -1729,7 +1750,7 @@ export function qatProblemActions() {
                                                     }
                                                     else {
                                                         console.log("dont flag problem=====>");
-                                                        if (index != -1) {
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1) {
                                                             // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -1819,7 +1840,8 @@ export function qatProblemActions() {
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
-                                                        && c.realmProblem.problem.problemId == 10);
+                                                        && c.realmProblem.problem.problemId == 10
+                                                        && c.versionId == versionID);
 
                                                 if (consumptionList.length > problemList[prob].data2) {
                                                     var conQtyArray = [];
@@ -1859,7 +1881,7 @@ export function qatProblemActions() {
                                                                     label: programList[pp].label,
                                                                     programCode: programList[pp].programCode
                                                                 },
-                                                                versionId: programList[pp].currentVersion.versionId,
+                                                                versionId: versionID,
                                                                 realmProblem: problemList[prob],
 
                                                                 dt: moment(Date.now()).format("YYYY-MM-DD"),
@@ -1925,7 +1947,7 @@ export function qatProblemActions() {
                                                     }
                                                     else {
                                                         // console.log("dont flag problem=====>");
-                                                        if (index != -1) {
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1) {
                                                             // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -1997,7 +2019,8 @@ export function qatProblemActions() {
                                                         && c.region.id == regionList[r].regionId
                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                         && c.program.id == programList[pp].programId
-                                                        && c.realmProblem.problem.problemId == 10);
+                                                        && c.realmProblem.problem.problemId == 10
+                                                        && c.versionId == versionID);
 
                                                 if (consumptionList.length > problemList[prob].data2) {
                                                     var conQtyArray = [];
@@ -2037,7 +2060,7 @@ export function qatProblemActions() {
                                                                     label: programList[pp].label,
                                                                     programCode: programList[pp].programCode
                                                                 },
-                                                                versionId: programList[pp].currentVersion.versionId,
+                                                                versionId: versionID,
                                                                 realmProblem: problemList[prob],
 
                                                                 dt: moment(Date.now()).format("YYYY-MM-DD"),
@@ -2103,7 +2126,7 @@ export function qatProblemActions() {
                                                     }
                                                     else {
                                                         // console.log("dont flag problem=====>");
-                                                        if (index != -1) {
+                                                        if (index != -1 && problemActionList[index].problemStatus.id == 1) {
                                                             // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
@@ -2158,13 +2181,13 @@ export function qatProblemActions() {
                                         // console.log("problemList[prob]problemList[prob]problemList[prob]=====>", problemList[prob]);
                                         if (problemList[prob].problem.problemId == 11) {
 
-                                            // alert("in if 11");
-                                            // var m = moment(Date.now()).utcOffset('-0500').format("YYYY-MM-DD");
-                                            // var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
-                                            // var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
+                                            // problem for mos is less then min having shipments within lead time 0-6 months ============
 
                                             var mosArray = [];
-                                            for (var mosCounter = 0; mosCounter <= 6; mosCounter++) {
+                                            // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                            // problemList[prob].data1=0
+                                            // problemList[prob].data2=6
+                                            for (var mosCounter = problemList[prob].data1; mosCounter <= problemList[prob].data2; mosCounter++) {
                                                 console.log("mosCounter====>", mosCounter);
                                                 var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                 var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
@@ -2355,7 +2378,14 @@ export function qatProblemActions() {
                                                         }
                                                     }
                                                     var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
-                                                    var totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    console.log("stockForBatchNumber===>", stockForBatchNumber);
+                                                    var totalStockForBatchNumber = 0;
+                                                    if (stockForBatchNumber != undefined) {
+                                                        totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    } else {
+
+                                                    }
+
                                                     var consumptionList = programJson.consumptionList;
                                                     var consumptionBatchArray = [];
 
@@ -2401,7 +2431,8 @@ export function qatProblemActions() {
                                                 var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                                                 var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
                                                 var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
-                                                var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).format("YYYY-MM-DD");
                                                 for (var i = 0; createdDate < curDate; i++) {
                                                     createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
                                                     var consumptionQty = 0;
@@ -2564,7 +2595,8 @@ export function qatProblemActions() {
                                                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                                                 var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
                                                 var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
-                                                var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).subtract(1, 'months').format("YYYY-MM-DD");
                                                 var openingBalance = 0;
                                                 var expiredStockQty = 0;
                                                 for (var i = 0; createdDate < curDate; i++) {
@@ -2652,8 +2684,8 @@ export function qatProblemActions() {
                                                 mosArray.push(
                                                     {
                                                         mos: mos,
-                                                        maxForMonths: maxForMonths,
-                                                        minForMonths: minForMonths,
+                                                        maxForMonths: minForMonths,
+                                                        minForMonths: maxForMonths,
                                                         month: m,
                                                         closingBalance: closingBalance,
                                                         amcCalcualted: amcCalcualted
@@ -2662,7 +2694,3618 @@ export function qatProblemActions() {
                                             }
                                             console.log("planningUnitId====>", planningUnitId);
                                             console.log("mosArray============>$@##", mosArray);
+                                            // for loop on array mosArray
+                                            var monthWithMosLessThenMin = '';
+                                            for (var element = 0; element < mosArray.length; element++) {
+                                                console.log("mos element===>", mosArray[element]);
+                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                    monthWithMosLessThenMin = mosArray[element].month;
+                                                    break;
+                                                } else {
+                                                }
+                                            }
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    // && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 11
+                                                    && c.versionId == versionID);
 
+                                            if (monthWithMosLessThenMin != '') {
+                                                console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
+                                                console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+
+                                                var shipmentListForMonths = programList[pp].shipmentList;
+                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+
+
+                                                if (filteredShipmentListForMonths.length > 0) {
+                                                    console.log("flag a problem mos is less then min and have shipment withing lead times");
+                                                    if (index == -1) {
+                                                        var json = {
+                                                            problemReportId: 0,
+                                                            program: {
+                                                                id: programList[pp].programId,
+                                                                label: programList[pp].label,
+                                                                programCode: programList[pp].programCode
+                                                            },
+                                                            versionId: versionID,
+                                                            realmProblem: problemList[prob],
+
+                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                            region: {
+                                                                id: regionList[r].regionId,
+                                                                label: regionList[r].label
+                                                            },
+                                                            planningUnit: {
+                                                                id: planningUnitList[p].planningUnit.id,
+                                                                label: planningUnitList[p].planningUnit.label,
+
+                                                            },
+                                                            shipmentId: '',
+                                                            data5: '',
+
+                                                            problemActionIndex: problemActionIndex,
+
+                                                            problemStatus: {
+                                                                id: 1,
+                                                                label: { label_en: 'Open' }
+                                                            },
+                                                            problemType: {
+                                                                id: 1,
+                                                                label: {
+                                                                    label_en: 'Automatic'
+                                                                }
+                                                            }, createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            problemTransList: [
+                                                                {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 461,
+                                                                            label_en: "Open",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: "Open",
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                }
+                                                            ]
+                                                        }
+                                                        problemActionList.push(json);
+                                                        problemActionIndex++;
+                                                    } else {
+                                                    }
+                                                } else {
+                                                    console.log("dont falg problem mos is not less then min ");
+                                                }
+                                            } else {
+                                                console.log("no months with MOS less then min ===#########");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                    console.log("//////at this point resolve the problem.");
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
+                                        }
+
+                                        if (problemList[prob].problem.problemId == 16) {
+                                            // Inventory is above max with shipment(s) in the next 1-6 months. Critical = High============
+                                            console.log("in problem id======>16", problemList[prob].data1, "====", problemList[prob].data2);
+                                            var mosArray = [];
+                                            // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                            // problemList[prob].data1=0
+                                            // problemList[prob].data2=6
+                                            for (var mosCounter = problemList[prob].data1; mosCounter <= problemList[prob].data2; mosCounter++) {
+                                                console.log("mosCounter====>", mosCounter);
+                                                var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
+                                                var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
+
+                                                // }
+                                                var programId = programList[pp].programId;
+                                                var regionId = -1;
+                                                var planningUnitId = planningUnitList[p].planningUnit.id;
+
+                                                var programPlanningUnit = planningUnitList[p];
+                                                var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
+                                                var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
+
+                                                var regionListFiltered = regionList;
+                                                // console.log("regionList----->", regionList);
+
+                                                var programJson = programList[pp];
+                                                // console.log("************ProgramJson***********", programJson);
+                                                var shelfLife = programPlanningUnit.shelfLife;
+                                                var monthsInPastForAMC = programPlanningUnit.monthsInPastForAmc;
+                                                var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+                                                var consumptionQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = consumptionList.filter(c => (c.consumptionDate >= mStartDate && c.consumptionDate <= mEndDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        var count = 0;
+                                                        for (var k = 0; k < c.length; k++) {
+                                                            if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                count++;
+                                                            } else {
+
+                                                            }
+                                                        }
+                                                        if (count == 0) {
+                                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                        } else {
+                                                            if (c[j].actualFlag.toString() == 'true') {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                var consumptionQtyForEB = consumptionQty;
+                                                // Calculations for AMC
+                                                var amcBeforeArray = [];
+                                                var amcAfterArray = [];
+                                                for (var c = 0; c < monthsInPastForAMC; c++) {
+                                                    var month1MonthsBefore = moment(mStartDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1Before = moment(mEndDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsBefore && con.consumptionDate <= currentMonth1Before);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcBeforeArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcBeforeArray;
+                                                        if (amcArrayForMonth.length == monthsInPastForAMC) {
+                                                            c = monthsInPastForAMC;
+                                                        }
+                                                    }
+
+                                                }
+
+                                                for (var c = 0; c < monthsInFutureForAMC; c++) {
+                                                    var month1MonthsAfter = moment(mStartDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1After = moment(mEndDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsAfter && con.consumptionDate <= currentMonth1After);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcAfterArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcAfterArray;
+                                                        if (amcArrayForMonth.length == monthsInFutureForAMC) {
+                                                            c = monthsInFutureForAMC;
+                                                        }
+                                                    }
+
+                                                }
+                                                var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                                var amcArrayFilteredForMonth = amcArray;
+                                                var countAMC = amcArrayFilteredForMonth.length;
+                                                var sumOfConsumptions = 0;
+                                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                                }
+                                                if (countAMC != 0) {
+                                                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+
+                                                    // Calculations for Min stock
+                                                    var maxForMonths = 0;
+                                                    var realm = programJson.realmCountry.realm;
+                                                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                                    if (DEFAULT_MIN_MONTHS_OF_STOCK > minMonthsOfStock) {
+                                                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                                    } else {
+                                                        maxForMonths = minMonthsOfStock
+                                                    }
+                                                    var minStock = parseInt(parseInt(amcCalcualted) * parseInt(maxForMonths));
+
+
+                                                    // Calculations for Max Stock
+                                                    var minForMonths = 0;
+                                                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + reorderFrequencyInMonths)) {
+                                                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                                    } else {
+                                                        minForMonths = (maxForMonths + reorderFrequencyInMonths);
+                                                    }
+                                                    var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));
+                                                } else {
+                                                }
+
+
+                                                // Inventory part
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                if (regionId != -1) {
+                                                    inventoryList = inventoryList.filter(c => c.region.id == regionId)
+                                                }
+                                                var adjustmentQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                    }
+                                                }
+                                                var c1 = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region == null);
+                                                for (var j = 0; j < c1.length; j++) {
+                                                    adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                }
+
+                                                // Shipments updated part
+
+                                                // Shipments part
+                                                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= mStartDate && c.expectedDeliveryDate <= mEndDate))
+                                                var shipmentTotalQty = 0;
+                                                for (var j = 0; j < shipmentArr.length; j++) {
+                                                    shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                }
+
+                                                // Calculations for exipred stock
+                                                var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
+                                                var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                                                for (var ma = 0; ma < myArray.length; ma++) {
+                                                    var shipmentList = programJson.shipmentList;
+                                                    var shipmentBatchArray = [];
+                                                    for (var ship = 0; ship < shipmentList.length; ship++) {
+                                                        var batchInfoList = shipmentList[ship].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                                                        }
+                                                    }
+                                                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                                                    // var totalStockForBatchNumber = stockForBatchNumber.qty;
+
+                                                    var totalStockForBatchNumber = 0;
+                                                    if (stockForBatchNumber != undefined) {
+                                                        totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    } else {
+
+                                                    }
+
+                                                    var consumptionList = programJson.consumptionList;
+                                                    var consumptionBatchArray = [];
+
+                                                    for (var con = 0; con < consumptionList.length; con++) {
+                                                        var batchInfoList = consumptionList[con].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                                                        }
+                                                    }
+                                                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    if (consumptionForBatchNumber == undefined) {
+                                                        consumptionForBatchNumber = [];
+                                                    }
+                                                    var consumptionQty = 0;
+                                                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                                                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                                                    }
+                                                    var inventoryList = programJson.inventoryList;
+                                                    var inventoryBatchArray = [];
+                                                    for (var inv = 0; inv < inventoryList.length; inv++) {
+                                                        var batchInfoList = inventoryList[inv].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                                                        }
+                                                    }
+                                                    var inventoryForBatchNumber = [];
+                                                    if (inventoryBatchArray.length > 0) {
+                                                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    }
+                                                    if (inventoryForBatchNumber == undefined) {
+                                                        inventoryForBatchNumber = [];
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                                                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                                                    }
+                                                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                                                    myArray[ma].remainingQty = remainingBatchQty;
+                                                }
+                                                // console.log("MyArray", myArray);
+
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).format("YYYY-MM-DD");
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var unallocatedConsumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                var qty = 0;
+                                                                if (c[j].batchInfoList.length > 0) {
+                                                                    for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                        qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                    }
+                                                                }
+                                                                var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                    var qty = 0;
+                                                                    if (c[j].batchInfoList.length > 0) {
+                                                                        for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                            qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                        }
+                                                                    }
+                                                                    var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))));
+                                                    // console.log("--------------------------------------------------------------");
+                                                    // console.log("Start date", startDate);
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty > 0) {
+                                                                if (batchDetailsForParticularPeriod.length > 0) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                    unallocatedAdjustmentQty = 0;
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty > 0) {
+                                                            if (batchDetailsForParticularPeriod.length > 0) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                unallocatedAdjustmentQty = 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                                                    for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
+                                                        // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
+                                                        // console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
+                                                        if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                            unallocatedConsumptionQty = 0
+                                                        } else {
+                                                            var rq = batchDetailsForParticularPeriod[ua].remainingQty;
+                                                            myArray[index].remainingQty = 0;
+                                                            unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                                        }
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty < 0) {
+                                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                        unallocatedAdjustmentQty = 0
+                                                                    } else {
+                                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                        myArray[index].remainingQty = 0;
+                                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                    }
+                                                                }
+                                                            } else {
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty < 0) {
+                                                            for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                    myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                    unallocatedAdjustmentQty = 0
+                                                                } else {
+                                                                    var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                    myArray[index].remainingQty = 0;
+                                                                    unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                }
+                                                            }
+                                                        } else {
+                                                        }
+                                                    }
+
+                                                }
+
+                                                // console.log("My array after accounting all the calcuklations", myArray);
+                                                var expiredStockArr = myArray;
+
+                                                // Calculation of opening and closing balance
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).subtract(1, 'months').format("YYYY-MM-DD");
+                                                var openingBalance = 0;
+                                                var expiredStockQty = 0;
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    // console.log("main consumption====>", consumptionQty);
+                                                    // Inventory part
+                                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                    var adjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                    }
+                                                    var adjustmentQtyForEB = adjustmentQty;
+
+                                                    // Shipments part
+                                                    var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                    var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                                                    var shipmentTotalQty = 0;
+                                                    for (var j = 0; j < shipmentArr.length; j++) {
+                                                        shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                    }
+
+                                                    var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(endDate).format("YYYY-MM-DD"))));
+                                                    expiredStockQty = 0;
+                                                    for (var j = 0; j < expiredStock.length; j++) {
+                                                        expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                                                    }
+
+                                                    var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty) - parseInt(expiredStockQty);
+                                                    if (closingBalance < 0) {
+                                                        closingBalance = 0;
+                                                    }
+
+                                                    openingBalance = closingBalance;
+                                                }
+
+                                                // Calculations for monthsOfStock
+                                                // console.log("closing balance===>", closingBalance, "AMC====>", amcCalcualted);
+                                                if (closingBalance != 0 && amcCalcualted != 0 && closingBalance != "" && amcCalcualted != "") {
+                                                    var mos = parseFloat(closingBalance / amcCalcualted).toFixed(2);
+                                                } else {
+                                                    var mos = "";
+                                                }
+                                                // console.log("mos----------->", mos);
+                                                // console.log("minStock mos", maxForMonths);
+                                                // console.log("maxStock mos", minForMonths);
+                                                mosArray.push(
+                                                    {
+                                                        mos: mos,
+                                                        maxForMonths: minForMonths,
+                                                        minForMonths: maxForMonths,
+                                                        month: m,
+                                                        closingBalance: closingBalance,
+                                                        amcCalcualted: amcCalcualted
+                                                    });
+
+                                            }
+                                            // console.log("planningUnitId====>", planningUnitId);
+                                            // console.log("mosArray============>$@##", mosArray);
+                                            // for loop on array mosArray
+                                            // var monthWithMosLessThenMin = '';
+                                            var monthWithMosGreaterThenMax = '';
+                                            for (var element = 0; element < mosArray.length; element++) {
+                                                // console.log("mos element===>", mosArray[element]);
+                                                if (mosArray[element].mos > mosArray[element].maxForMonths) {
+                                                    monthWithMosGreaterThenMax = mosArray[element].month;
+                                                    break;
+                                                } else {
+                                                }
+                                            }
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    // && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 16
+                                                    && c.versionId == versionID);
+
+                                            if (monthWithMosGreaterThenMax != '') {
+                                                // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
+                                                var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
+                                                // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                var shipmentListForMonths = programList[pp].shipmentList;
+                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                if (filteredShipmentListForMonths.length > 0) {
+                                                    console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                    if (index == -1) {
+                                                        var json = {
+                                                            problemReportId: 0,
+                                                            program: {
+                                                                id: programList[pp].programId,
+                                                                label: programList[pp].label,
+                                                                programCode: programList[pp].programCode
+                                                            },
+                                                            versionId: versionID,
+                                                            realmProblem: problemList[prob],
+
+                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                            region: {
+                                                                id: regionList[r].regionId,
+                                                                label: regionList[r].label
+                                                            },
+                                                            planningUnit: {
+                                                                id: planningUnitList[p].planningUnit.id,
+                                                                label: planningUnitList[p].planningUnit.label,
+
+                                                            },
+                                                            shipmentId: '',
+                                                            data5: '',
+
+                                                            problemActionIndex: problemActionIndex,
+
+                                                            problemStatus: {
+                                                                id: 1,
+                                                                label: { label_en: 'Open' }
+                                                            },
+                                                            problemType: {
+                                                                id: 1,
+                                                                label: {
+                                                                    label_en: 'Automatic'
+                                                                }
+                                                            }, createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            problemTransList: [
+                                                                {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 461,
+                                                                            label_en: "Open",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: "Open",
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                }
+                                                            ]
+                                                        }
+                                                        problemActionList.push(json);
+                                                        problemActionIndex++;
+                                                    } else {
+                                                    }
+                                                } else {
+                                                    console.log("dont falg problem mos is not greater then max ####### ");
+                                                }
+                                            } else {
+                                                console.log("no months with MOS greater then max ===#########");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                    console.log("//////at this point resolve the problem. ###########");
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
+                                        }
+
+                                        if (problemList[prob].problem.problemId == 17) {
+
+                                            // problem for mos less then min and no shipment in coming  6 months 
+                                            console.log("in problem id======>17", problemList[prob].data1, "====", problemList[prob].data2);
+
+                                            var mosArray = [];
+                                            // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                            // problemList[prob].data1=0
+                                            // problemList[prob].data2=6
+                                            for (var mosCounter = problemList[prob].data1; mosCounter <= problemList[prob].data2; mosCounter++) {
+                                                console.log("mosCounter====>", mosCounter);
+                                                var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
+                                                var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
+
+                                                // }
+                                                var programId = programList[pp].programId;
+                                                var regionId = -1;
+                                                var planningUnitId = planningUnitList[p].planningUnit.id;
+
+                                                var programPlanningUnit = planningUnitList[p];
+                                                var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
+                                                var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
+
+                                                var regionListFiltered = regionList;
+                                                // console.log("regionList----->", regionList);
+
+                                                var programJson = programList[pp];
+                                                console.log("************ProgramJson***********", programJson);
+                                                var shelfLife = programPlanningUnit.shelfLife;
+                                                var monthsInPastForAMC = programPlanningUnit.monthsInPastForAmc;
+                                                var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+                                                var consumptionQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = consumptionList.filter(c => (c.consumptionDate >= mStartDate && c.consumptionDate <= mEndDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        var count = 0;
+                                                        for (var k = 0; k < c.length; k++) {
+                                                            if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                count++;
+                                                            } else {
+
+                                                            }
+                                                        }
+                                                        if (count == 0) {
+                                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                        } else {
+                                                            if (c[j].actualFlag.toString() == 'true') {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                var consumptionQtyForEB = consumptionQty;
+                                                // Calculations for AMC
+                                                var amcBeforeArray = [];
+                                                var amcAfterArray = [];
+                                                for (var c = 0; c < monthsInPastForAMC; c++) {
+                                                    var month1MonthsBefore = moment(mStartDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1Before = moment(mEndDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsBefore && con.consumptionDate <= currentMonth1Before);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcBeforeArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcBeforeArray;
+                                                        if (amcArrayForMonth.length == monthsInPastForAMC) {
+                                                            c = monthsInPastForAMC;
+                                                        }
+                                                    }
+
+                                                }
+
+                                                for (var c = 0; c < monthsInFutureForAMC; c++) {
+                                                    var month1MonthsAfter = moment(mStartDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1After = moment(mEndDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsAfter && con.consumptionDate <= currentMonth1After);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcAfterArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcAfterArray;
+                                                        if (amcArrayForMonth.length == monthsInFutureForAMC) {
+                                                            c = monthsInFutureForAMC;
+                                                        }
+                                                    }
+
+                                                }
+                                                var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                                var amcArrayFilteredForMonth = amcArray;
+                                                var countAMC = amcArrayFilteredForMonth.length;
+                                                var sumOfConsumptions = 0;
+                                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                                }
+                                                if (countAMC != 0) {
+                                                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+
+                                                    // Calculations for Min stock
+                                                    var maxForMonths = 0;
+                                                    var realm = programJson.realmCountry.realm;
+                                                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                                    if (DEFAULT_MIN_MONTHS_OF_STOCK > minMonthsOfStock) {
+                                                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                                    } else {
+                                                        maxForMonths = minMonthsOfStock
+                                                    }
+                                                    var minStock = parseInt(parseInt(amcCalcualted) * parseInt(maxForMonths));
+
+
+                                                    // Calculations for Max Stock
+                                                    var minForMonths = 0;
+                                                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + reorderFrequencyInMonths)) {
+                                                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                                    } else {
+                                                        minForMonths = (maxForMonths + reorderFrequencyInMonths);
+                                                    }
+                                                    var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));
+                                                } else {
+                                                }
+
+
+                                                // Inventory part
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                if (regionId != -1) {
+                                                    inventoryList = inventoryList.filter(c => c.region.id == regionId)
+                                                }
+                                                var adjustmentQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                    }
+                                                }
+                                                var c1 = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region == null);
+                                                for (var j = 0; j < c1.length; j++) {
+                                                    adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                }
+
+                                                // Shipments updated part
+
+                                                // Shipments part
+                                                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= mStartDate && c.expectedDeliveryDate <= mEndDate))
+                                                var shipmentTotalQty = 0;
+                                                for (var j = 0; j < shipmentArr.length; j++) {
+                                                    shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                }
+
+                                                // Calculations for exipred stock
+                                                var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
+                                                var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                                                for (var ma = 0; ma < myArray.length; ma++) {
+                                                    var shipmentList = programJson.shipmentList;
+                                                    var shipmentBatchArray = [];
+                                                    for (var ship = 0; ship < shipmentList.length; ship++) {
+                                                        var batchInfoList = shipmentList[ship].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                                                        }
+                                                    }
+                                                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                                                    // var totalStockForBatchNumber = stockForBatchNumber.qty;
+
+                                                    var totalStockForBatchNumber = 0;
+                                                    if (stockForBatchNumber != undefined) {
+                                                        totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    } else {
+
+                                                    }
+
+                                                    var consumptionList = programJson.consumptionList;
+                                                    var consumptionBatchArray = [];
+
+                                                    for (var con = 0; con < consumptionList.length; con++) {
+                                                        var batchInfoList = consumptionList[con].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                                                        }
+                                                    }
+                                                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    if (consumptionForBatchNumber == undefined) {
+                                                        consumptionForBatchNumber = [];
+                                                    }
+                                                    var consumptionQty = 0;
+                                                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                                                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                                                    }
+                                                    var inventoryList = programJson.inventoryList;
+                                                    var inventoryBatchArray = [];
+                                                    for (var inv = 0; inv < inventoryList.length; inv++) {
+                                                        var batchInfoList = inventoryList[inv].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                                                        }
+                                                    }
+                                                    var inventoryForBatchNumber = [];
+                                                    if (inventoryBatchArray.length > 0) {
+                                                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    }
+                                                    if (inventoryForBatchNumber == undefined) {
+                                                        inventoryForBatchNumber = [];
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                                                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                                                    }
+                                                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                                                    myArray[ma].remainingQty = remainingBatchQty;
+                                                }
+                                                // console.log("MyArray", myArray);
+
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).format("YYYY-MM-DD");
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var unallocatedConsumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                var qty = 0;
+                                                                if (c[j].batchInfoList.length > 0) {
+                                                                    for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                        qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                    }
+                                                                }
+                                                                var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                    var qty = 0;
+                                                                    if (c[j].batchInfoList.length > 0) {
+                                                                        for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                            qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                        }
+                                                                    }
+                                                                    var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))));
+                                                    // console.log("--------------------------------------------------------------");
+                                                    // console.log("Start date", startDate);
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty > 0) {
+                                                                if (batchDetailsForParticularPeriod.length > 0) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                    unallocatedAdjustmentQty = 0;
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty > 0) {
+                                                            if (batchDetailsForParticularPeriod.length > 0) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                unallocatedAdjustmentQty = 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                                                    for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
+                                                        // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
+                                                        // console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
+                                                        if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                            unallocatedConsumptionQty = 0
+                                                        } else {
+                                                            var rq = batchDetailsForParticularPeriod[ua].remainingQty;
+                                                            myArray[index].remainingQty = 0;
+                                                            unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                                        }
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty < 0) {
+                                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                        unallocatedAdjustmentQty = 0
+                                                                    } else {
+                                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                        myArray[index].remainingQty = 0;
+                                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                    }
+                                                                }
+                                                            } else {
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty < 0) {
+                                                            for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                    myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                    unallocatedAdjustmentQty = 0
+                                                                } else {
+                                                                    var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                    myArray[index].remainingQty = 0;
+                                                                    unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                }
+                                                            }
+                                                        } else {
+                                                        }
+                                                    }
+
+                                                }
+
+                                                // console.log("My array after accounting all the calcuklations", myArray);
+                                                var expiredStockArr = myArray;
+
+                                                // Calculation of opening and closing balance
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).subtract(1, 'months').format("YYYY-MM-DD");
+                                                var openingBalance = 0;
+                                                var expiredStockQty = 0;
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    // console.log("main consumption====>", consumptionQty);
+                                                    // Inventory part
+                                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                    var adjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                    }
+                                                    var adjustmentQtyForEB = adjustmentQty;
+
+                                                    // Shipments part
+                                                    var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                    var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                                                    var shipmentTotalQty = 0;
+                                                    for (var j = 0; j < shipmentArr.length; j++) {
+                                                        shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                    }
+
+                                                    var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(endDate).format("YYYY-MM-DD"))));
+                                                    expiredStockQty = 0;
+                                                    for (var j = 0; j < expiredStock.length; j++) {
+                                                        expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                                                    }
+                                                    // console.log("created date 0===>", createdDate);
+                                                    // console.log("planning Unit====>", planningUnitId);
+                                                    // console.log("$$$$$$ 1====>", openingBalance);
+                                                    // console.log("$$$$$$ 2====>", shipmentTotalQty);
+                                                    // console.log("$$$$$$ 3====>", adjustmentQty);
+                                                    // console.log("$$$$$$ 4====>", consumptionQty);
+                                                    // console.log("$$$$$$ 5====>", expiredStockQty)
+                                                    var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty) - parseInt(expiredStockQty);
+                                                    if (closingBalance < 0) {
+                                                        closingBalance = 0;
+                                                    }
+                                                    // console.log("closing balance===>", closingBalance);
+                                                    // console.log("amc cAlculated===>", amcCalcualted);
+                                                    openingBalance = closingBalance;
+                                                }
+                                                // console.log("Total exipred stock", totalExpiredStockArr);
+                                                // Calculations for monthsOfStock
+                                                // console.log("closing balance===>", closingBalance, "AMC====>", amcCalcualted);
+                                                if (closingBalance != 0 && amcCalcualted != 0 && closingBalance != "" && amcCalcualted != "") {
+                                                    var mos = parseFloat(closingBalance / amcCalcualted).toFixed(2);
+                                                } else {
+                                                    var mos = "";
+                                                }
+                                                // console.log("mos----------->", mos);
+                                                // console.log("minStock mos", maxForMonths);
+                                                // console.log("maxStock mos", minForMonths);
+
+                                                mosArray.push(
+                                                    {
+                                                        mos: mos,
+                                                        maxForMonths: minForMonths,
+                                                        minForMonths: maxForMonths,
+                                                        month: m,
+                                                        closingBalance: closingBalance,
+                                                        amcCalcualted: amcCalcualted
+                                                    });
+
+                                            }
+                                            console.log("planningUnitId====>", planningUnitId);
+                                            console.log("mosArray============>$@##", mosArray);
+                                            // for loop on array mosArray
+                                            var monthWithMosLessThenMin = '';
+                                            for (var element = 0; element < mosArray.length; element++) {
+                                                console.log("mos element===>", mosArray[element]);
+                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                    monthWithMosLessThenMin = mosArray[element].month;
+                                                    break;
+                                                } else {
+                                                }
+                                            }
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    // && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 17
+                                                    && c.versionId == versionID);
+
+                                            if (monthWithMosLessThenMin != '') {
+                                                console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
+                                                console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+
+                                                var shipmentListForMonths = programList[pp].shipmentList;
+                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+
+
+                                                if (filteredShipmentListForMonths.length == 0) {
+                                                    console.log("flag a problem mos is less then min and dont have shipment withing lead times");
+                                                    if (index == -1) {
+                                                        var json = {
+                                                            problemReportId: 0,
+                                                            program: {
+                                                                id: programList[pp].programId,
+                                                                label: programList[pp].label,
+                                                                programCode: programList[pp].programCode
+                                                            },
+                                                            versionId: versionID,
+                                                            realmProblem: problemList[prob],
+
+                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                            region: {
+                                                                id: regionList[r].regionId,
+                                                                label: regionList[r].label
+                                                            },
+                                                            planningUnit: {
+                                                                id: planningUnitList[p].planningUnit.id,
+                                                                label: planningUnitList[p].planningUnit.label,
+
+                                                            },
+                                                            shipmentId: '',
+                                                            data5: '',
+
+                                                            problemActionIndex: problemActionIndex,
+
+                                                            problemStatus: {
+                                                                id: 1,
+                                                                label: { label_en: 'Open' }
+                                                            },
+                                                            problemType: {
+                                                                id: 1,
+                                                                label: {
+                                                                    label_en: 'Automatic'
+                                                                }
+                                                            }, createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            problemTransList: [
+                                                                {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 461,
+                                                                            label_en: "Open",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: "Open",
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                }
+                                                            ]
+                                                        }
+                                                        problemActionList.push(json);
+                                                        problemActionIndex++;
+                                                    } else {
+                                                    }
+                                                } else {
+                                                    console.log("dont falg problem mos is  less then min but have shipment in lead times ");
+                                                }
+                                            } else {
+                                                console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                    console.log("//////at this point resolve the problem.");
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
+
+                                        }
+                                        if (problemList[prob].problem.problemId == 18) {
+
+                                            // problem for mos is less then min having shipments within lead time 7-18 months ============
+                                            console.log("in problem id======>18", problemList[prob].data1, "====", problemList[prob].data2);
+                                            var mosArray = [];
+                                            // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                            // problemList[prob].data1=0
+                                            // problemList[prob].data2=6
+                                            for (var mosCounter18 = parseInt(problemList[prob].data1); mosCounter18 <= parseInt(problemList[prob].data2); mosCounter18++) {
+                                                console.log("mosCounter18====>", mosCounter18);
+                                                var m = moment(Date.now()).add(mosCounter18, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
+                                                var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
+
+                                                // }
+                                                var programId = programList[pp].programId;
+                                                var regionId = -1;
+                                                var planningUnitId = planningUnitList[p].planningUnit.id;
+
+                                                var programPlanningUnit = planningUnitList[p];
+                                                var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
+                                                var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
+
+                                                var regionListFiltered = regionList;
+                                                // console.log("regionList----->", regionList);
+
+                                                var programJson = programList[pp];
+                                                console.log("************ProgramJson***********", programJson);
+                                                var shelfLife = programPlanningUnit.shelfLife;
+                                                var monthsInPastForAMC = programPlanningUnit.monthsInPastForAmc;
+                                                var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+                                                var consumptionQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = consumptionList.filter(c => (c.consumptionDate >= mStartDate && c.consumptionDate <= mEndDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        var count = 0;
+                                                        for (var k = 0; k < c.length; k++) {
+                                                            if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                count++;
+                                                            } else {
+
+                                                            }
+                                                        }
+                                                        if (count == 0) {
+                                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                        } else {
+                                                            if (c[j].actualFlag.toString() == 'true') {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                var consumptionQtyForEB = consumptionQty;
+                                                // Calculations for AMC
+                                                var amcBeforeArray = [];
+                                                var amcAfterArray = [];
+                                                for (var c = 0; c < monthsInPastForAMC; c++) {
+                                                    var month1MonthsBefore = moment(mStartDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1Before = moment(mEndDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsBefore && con.consumptionDate <= currentMonth1Before);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcBeforeArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcBeforeArray;
+                                                        if (amcArrayForMonth.length == monthsInPastForAMC) {
+                                                            c = monthsInPastForAMC;
+                                                        }
+                                                    }
+
+                                                }
+
+                                                for (var c = 0; c < monthsInFutureForAMC; c++) {
+                                                    var month1MonthsAfter = moment(mStartDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1After = moment(mEndDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsAfter && con.consumptionDate <= currentMonth1After);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcAfterArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcAfterArray;
+                                                        if (amcArrayForMonth.length == monthsInFutureForAMC) {
+                                                            c = monthsInFutureForAMC;
+                                                        }
+                                                    }
+
+                                                }
+                                                var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                                var amcArrayFilteredForMonth = amcArray;
+                                                var countAMC = amcArrayFilteredForMonth.length;
+                                                var sumOfConsumptions = 0;
+                                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                                }
+                                                if (countAMC != 0) {
+                                                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+
+                                                    // Calculations for Min stock
+                                                    var maxForMonths = 0;
+                                                    var realm = programJson.realmCountry.realm;
+                                                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                                    if (DEFAULT_MIN_MONTHS_OF_STOCK > minMonthsOfStock) {
+                                                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                                    } else {
+                                                        maxForMonths = minMonthsOfStock
+                                                    }
+                                                    var minStock = parseInt(parseInt(amcCalcualted) * parseInt(maxForMonths));
+
+
+                                                    // Calculations for Max Stock
+                                                    var minForMonths = 0;
+                                                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + reorderFrequencyInMonths)) {
+                                                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                                    } else {
+                                                        minForMonths = (maxForMonths + reorderFrequencyInMonths);
+                                                    }
+                                                    var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));
+                                                } else {
+                                                }
+
+
+                                                // Inventory part
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                if (regionId != -1) {
+                                                    inventoryList = inventoryList.filter(c => c.region.id == regionId)
+                                                }
+                                                var adjustmentQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                    }
+                                                }
+                                                var c1 = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region == null);
+                                                for (var j = 0; j < c1.length; j++) {
+                                                    adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                }
+
+                                                // Shipments updated part
+
+                                                // Shipments part
+                                                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= mStartDate && c.expectedDeliveryDate <= mEndDate))
+                                                var shipmentTotalQty = 0;
+                                                for (var j = 0; j < shipmentArr.length; j++) {
+                                                    shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                }
+
+                                                // Calculations for exipred stock
+                                                var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
+                                                var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                                                for (var ma = 0; ma < myArray.length; ma++) {
+                                                    var shipmentList = programJson.shipmentList;
+                                                    var shipmentBatchArray = [];
+                                                    for (var ship = 0; ship < shipmentList.length; ship++) {
+                                                        var batchInfoList = shipmentList[ship].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                                                        }
+                                                    }
+                                                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                                                    console.log("stockForBatchNumber===>", stockForBatchNumber);
+                                                    var totalStockForBatchNumber = 0;
+                                                    if (stockForBatchNumber != undefined) {
+                                                        totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    } else {
+
+                                                    }
+
+                                                    var consumptionList = programJson.consumptionList;
+                                                    var consumptionBatchArray = [];
+
+                                                    for (var con = 0; con < consumptionList.length; con++) {
+                                                        var batchInfoList = consumptionList[con].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                                                        }
+                                                    }
+                                                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    if (consumptionForBatchNumber == undefined) {
+                                                        consumptionForBatchNumber = [];
+                                                    }
+                                                    var consumptionQty = 0;
+                                                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                                                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                                                    }
+                                                    var inventoryList = programJson.inventoryList;
+                                                    var inventoryBatchArray = [];
+                                                    for (var inv = 0; inv < inventoryList.length; inv++) {
+                                                        var batchInfoList = inventoryList[inv].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                                                        }
+                                                    }
+                                                    var inventoryForBatchNumber = [];
+                                                    if (inventoryBatchArray.length > 0) {
+                                                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    }
+                                                    if (inventoryForBatchNumber == undefined) {
+                                                        inventoryForBatchNumber = [];
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                                                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                                                    }
+                                                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                                                    myArray[ma].remainingQty = remainingBatchQty;
+                                                }
+                                                // console.log("MyArray", myArray);
+
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).format("YYYY-MM-DD");
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var unallocatedConsumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                var qty = 0;
+                                                                if (c[j].batchInfoList.length > 0) {
+                                                                    for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                        qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                    }
+                                                                }
+                                                                var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                    var qty = 0;
+                                                                    if (c[j].batchInfoList.length > 0) {
+                                                                        for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                            qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                        }
+                                                                    }
+                                                                    var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))));
+                                                    // console.log("--------------------------------------------------------------");
+                                                    // console.log("Start date", startDate);
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty > 0) {
+                                                                if (batchDetailsForParticularPeriod.length > 0) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                    unallocatedAdjustmentQty = 0;
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty > 0) {
+                                                            if (batchDetailsForParticularPeriod.length > 0) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                unallocatedAdjustmentQty = 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                                                    for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
+                                                        // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
+                                                        // console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
+                                                        if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                            unallocatedConsumptionQty = 0
+                                                        } else {
+                                                            var rq = batchDetailsForParticularPeriod[ua].remainingQty;
+                                                            myArray[index].remainingQty = 0;
+                                                            unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                                        }
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty < 0) {
+                                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                        unallocatedAdjustmentQty = 0
+                                                                    } else {
+                                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                        myArray[index].remainingQty = 0;
+                                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                    }
+                                                                }
+                                                            } else {
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty < 0) {
+                                                            for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                    myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                    unallocatedAdjustmentQty = 0
+                                                                } else {
+                                                                    var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                    myArray[index].remainingQty = 0;
+                                                                    unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                }
+                                                            }
+                                                        } else {
+                                                        }
+                                                    }
+
+                                                }
+
+                                                // console.log("My array after accounting all the calcuklations", myArray);
+                                                var expiredStockArr = myArray;
+
+                                                // Calculation of opening and closing balance
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).subtract(1, 'months').format("YYYY-MM-DD");
+                                                var openingBalance = 0;
+                                                var expiredStockQty = 0;
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    // console.log("main consumption====>", consumptionQty);
+                                                    // Inventory part
+                                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                    var adjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                    }
+                                                    var adjustmentQtyForEB = adjustmentQty;
+
+                                                    // Shipments part
+                                                    var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                    var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                                                    var shipmentTotalQty = 0;
+                                                    for (var j = 0; j < shipmentArr.length; j++) {
+                                                        shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                    }
+
+                                                    var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(endDate).format("YYYY-MM-DD"))));
+                                                    expiredStockQty = 0;
+                                                    for (var j = 0; j < expiredStock.length; j++) {
+                                                        expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                                                    }
+                                                    // console.log("created date 0===>", createdDate);
+                                                    // console.log("planning Unit====>", planningUnitId);
+                                                    // console.log("$$$$$$ 1====>", openingBalance);
+                                                    // console.log("$$$$$$ 2====>", shipmentTotalQty);
+                                                    // console.log("$$$$$$ 3====>", adjustmentQty);
+                                                    // console.log("$$$$$$ 4====>", consumptionQty);
+                                                    // console.log("$$$$$$ 5====>", expiredStockQty)
+                                                    var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty) - parseInt(expiredStockQty);
+                                                    if (closingBalance < 0) {
+                                                        closingBalance = 0;
+                                                    }
+                                                    // console.log("closing balance===>", closingBalance);
+                                                    // console.log("amc cAlculated===>", amcCalcualted);
+                                                    openingBalance = closingBalance;
+                                                }
+                                                // console.log("Total exipred stock", totalExpiredStockArr);
+                                                // Calculations for monthsOfStock
+                                                // console.log("closing balance===>", closingBalance, "AMC====>", amcCalcualted);
+                                                if (closingBalance != 0 && amcCalcualted != 0 && closingBalance != "" && amcCalcualted != "") {
+                                                    var mos = parseFloat(closingBalance / amcCalcualted).toFixed(2);
+                                                } else {
+                                                    var mos = "";
+                                                }
+                                                // console.log("mos----------->", mos);
+                                                // console.log("minStock mos", maxForMonths);
+                                                // console.log("maxStock mos", minForMonths);
+
+                                                mosArray.push(
+                                                    {
+                                                        mos: mos,
+                                                        maxForMonths: minForMonths,
+                                                        minForMonths: maxForMonths,
+                                                        month: m,
+                                                        closingBalance: closingBalance,
+                                                        amcCalcualted: amcCalcualted
+                                                    });
+
+                                            }
+                                            console.log("planningUnitId====>", planningUnitId);
+                                            console.log("mosArray============>$@##", mosArray);
+                                            // for loop on array mosArray
+                                            var monthWithMosLessThenMin = '';
+                                            for (var element = 0; element < mosArray.length; element++) {
+                                                console.log("mos element===>", mosArray[element]);
+                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                    monthWithMosLessThenMin = mosArray[element].month;
+                                                    break;
+                                                } else {
+                                                }
+                                            }
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    // && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 18
+                                                    && c.versionId == versionID);
+
+                                            if (monthWithMosLessThenMin != '') {
+                                                console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
+                                                console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+
+                                                var shipmentListForMonths = programList[pp].shipmentList;
+                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+
+
+                                                if (filteredShipmentListForMonths.length > 0) {
+                                                    console.log("flag a problem mos is less then min and have shipment withing lead times");
+                                                    if (index == -1) {
+                                                        var json = {
+                                                            problemReportId: 0,
+                                                            program: {
+                                                                id: programList[pp].programId,
+                                                                label: programList[pp].label,
+                                                                programCode: programList[pp].programCode
+                                                            },
+                                                            versionId: versionID,
+                                                            realmProblem: problemList[prob],
+
+                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                            region: {
+                                                                id: regionList[r].regionId,
+                                                                label: regionList[r].label
+                                                            },
+                                                            planningUnit: {
+                                                                id: planningUnitList[p].planningUnit.id,
+                                                                label: planningUnitList[p].planningUnit.label,
+
+                                                            },
+                                                            shipmentId: '',
+                                                            data5: '',
+
+                                                            problemActionIndex: problemActionIndex,
+
+                                                            problemStatus: {
+                                                                id: 1,
+                                                                label: { label_en: 'Open' }
+                                                            },
+                                                            problemType: {
+                                                                id: 1,
+                                                                label: {
+                                                                    label_en: 'Automatic'
+                                                                }
+                                                            }, createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            problemTransList: [
+                                                                {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 461,
+                                                                            label_en: "Open",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: "Open",
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                }
+                                                            ]
+                                                        }
+                                                        problemActionList.push(json);
+                                                        problemActionIndex++;
+                                                    } else {
+                                                    }
+                                                } else {
+                                                    console.log("dont falg problem mos is not less then min ");
+                                                }
+                                            } else {
+                                                console.log("no months with MOS less then min ===#########");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                    console.log("//////at this point resolve the problem.");
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
+
+                                        }
+                                        if (problemList[prob].problem.problemId == 19) {
+                                            // Inventory is above max with shipment(s) in the next 7-18 months. Critical = High============
+                                            console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
+                                            var mosArray = [];
+                                            // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                            // problemList[prob].data1=0
+                                            // problemList[prob].data2=6
+                                            for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
+                                                // console.log("mosCounter====>", mosCounter);
+                                                var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
+                                                var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
+
+                                                // }
+                                                var programId = programList[pp].programId;
+                                                var regionId = -1;
+                                                var planningUnitId = planningUnitList[p].planningUnit.id;
+
+                                                var programPlanningUnit = planningUnitList[p];
+                                                var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
+                                                var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
+
+                                                var regionListFiltered = regionList;
+                                                // console.log("regionList----->", regionList);
+
+                                                var programJson = programList[pp];
+                                                // console.log("************ProgramJson***********", programJson);
+                                                var shelfLife = programPlanningUnit.shelfLife;
+                                                var monthsInPastForAMC = programPlanningUnit.monthsInPastForAmc;
+                                                var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+                                                var consumptionQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = consumptionList.filter(c => (c.consumptionDate >= mStartDate && c.consumptionDate <= mEndDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        var count = 0;
+                                                        for (var k = 0; k < c.length; k++) {
+                                                            if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                count++;
+                                                            } else {
+
+                                                            }
+                                                        }
+                                                        if (count == 0) {
+                                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                        } else {
+                                                            if (c[j].actualFlag.toString() == 'true') {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                var consumptionQtyForEB = consumptionQty;
+                                                // Calculations for AMC
+                                                var amcBeforeArray = [];
+                                                var amcAfterArray = [];
+                                                for (var c = 0; c < monthsInPastForAMC; c++) {
+                                                    var month1MonthsBefore = moment(mStartDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1Before = moment(mEndDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsBefore && con.consumptionDate <= currentMonth1Before);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcBeforeArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcBeforeArray;
+                                                        if (amcArrayForMonth.length == monthsInPastForAMC) {
+                                                            c = monthsInPastForAMC;
+                                                        }
+                                                    }
+
+                                                }
+
+                                                for (var c = 0; c < monthsInFutureForAMC; c++) {
+                                                    var month1MonthsAfter = moment(mStartDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1After = moment(mEndDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsAfter && con.consumptionDate <= currentMonth1After);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcAfterArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcAfterArray;
+                                                        if (amcArrayForMonth.length == monthsInFutureForAMC) {
+                                                            c = monthsInFutureForAMC;
+                                                        }
+                                                    }
+
+                                                }
+                                                var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                                var amcArrayFilteredForMonth = amcArray;
+                                                var countAMC = amcArrayFilteredForMonth.length;
+                                                var sumOfConsumptions = 0;
+                                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                                }
+                                                if (countAMC != 0) {
+                                                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+
+                                                    // Calculations for Min stock
+                                                    var maxForMonths = 0;
+                                                    var realm = programJson.realmCountry.realm;
+                                                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                                    if (DEFAULT_MIN_MONTHS_OF_STOCK > minMonthsOfStock) {
+                                                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                                    } else {
+                                                        maxForMonths = minMonthsOfStock
+                                                    }
+                                                    var minStock = parseInt(parseInt(amcCalcualted) * parseInt(maxForMonths));
+
+
+                                                    // Calculations for Max Stock
+                                                    var minForMonths = 0;
+                                                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + reorderFrequencyInMonths)) {
+                                                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                                    } else {
+                                                        minForMonths = (maxForMonths + reorderFrequencyInMonths);
+                                                    }
+                                                    var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));
+                                                } else {
+                                                }
+
+
+                                                // Inventory part
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                if (regionId != -1) {
+                                                    inventoryList = inventoryList.filter(c => c.region.id == regionId)
+                                                }
+                                                var adjustmentQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                    }
+                                                }
+                                                var c1 = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region == null);
+                                                for (var j = 0; j < c1.length; j++) {
+                                                    adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                }
+
+                                                // Shipments updated part
+
+                                                // Shipments part
+                                                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= mStartDate && c.expectedDeliveryDate <= mEndDate))
+                                                var shipmentTotalQty = 0;
+                                                for (var j = 0; j < shipmentArr.length; j++) {
+                                                    shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                }
+
+                                                // Calculations for exipred stock
+                                                var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
+                                                var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                                                for (var ma = 0; ma < myArray.length; ma++) {
+                                                    var shipmentList = programJson.shipmentList;
+                                                    var shipmentBatchArray = [];
+                                                    for (var ship = 0; ship < shipmentList.length; ship++) {
+                                                        var batchInfoList = shipmentList[ship].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                                                        }
+                                                    }
+                                                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                                                    // var totalStockForBatchNumber = stockForBatchNumber.qty;
+
+                                                    var totalStockForBatchNumber = 0;
+                                                    if (stockForBatchNumber != undefined) {
+                                                        totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    } else {
+
+                                                    }
+
+                                                    var consumptionList = programJson.consumptionList;
+                                                    var consumptionBatchArray = [];
+
+                                                    for (var con = 0; con < consumptionList.length; con++) {
+                                                        var batchInfoList = consumptionList[con].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                                                        }
+                                                    }
+                                                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    if (consumptionForBatchNumber == undefined) {
+                                                        consumptionForBatchNumber = [];
+                                                    }
+                                                    var consumptionQty = 0;
+                                                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                                                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                                                    }
+                                                    var inventoryList = programJson.inventoryList;
+                                                    var inventoryBatchArray = [];
+                                                    for (var inv = 0; inv < inventoryList.length; inv++) {
+                                                        var batchInfoList = inventoryList[inv].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                                                        }
+                                                    }
+                                                    var inventoryForBatchNumber = [];
+                                                    if (inventoryBatchArray.length > 0) {
+                                                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    }
+                                                    if (inventoryForBatchNumber == undefined) {
+                                                        inventoryForBatchNumber = [];
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                                                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                                                    }
+                                                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                                                    myArray[ma].remainingQty = remainingBatchQty;
+                                                }
+                                                // console.log("MyArray", myArray);
+
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).format("YYYY-MM-DD");
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var unallocatedConsumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                var qty = 0;
+                                                                if (c[j].batchInfoList.length > 0) {
+                                                                    for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                        qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                    }
+                                                                }
+                                                                var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                    var qty = 0;
+                                                                    if (c[j].batchInfoList.length > 0) {
+                                                                        for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                            qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                        }
+                                                                    }
+                                                                    var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))));
+                                                    // console.log("--------------------------------------------------------------");
+                                                    // console.log("Start date", startDate);
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty > 0) {
+                                                                if (batchDetailsForParticularPeriod.length > 0) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                    unallocatedAdjustmentQty = 0;
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty > 0) {
+                                                            if (batchDetailsForParticularPeriod.length > 0) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                unallocatedAdjustmentQty = 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                                                    for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
+                                                        // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
+                                                        // console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
+                                                        if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                            unallocatedConsumptionQty = 0
+                                                        } else {
+                                                            var rq = batchDetailsForParticularPeriod[ua].remainingQty;
+                                                            myArray[index].remainingQty = 0;
+                                                            unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                                        }
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty < 0) {
+                                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                        unallocatedAdjustmentQty = 0
+                                                                    } else {
+                                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                        myArray[index].remainingQty = 0;
+                                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                    }
+                                                                }
+                                                            } else {
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty < 0) {
+                                                            for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                    myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                    unallocatedAdjustmentQty = 0
+                                                                } else {
+                                                                    var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                    myArray[index].remainingQty = 0;
+                                                                    unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                }
+                                                            }
+                                                        } else {
+                                                        }
+                                                    }
+
+                                                }
+
+                                                // console.log("My array after accounting all the calcuklations", myArray);
+                                                var expiredStockArr = myArray;
+
+                                                // Calculation of opening and closing balance
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).subtract(1, 'months').format("YYYY-MM-DD");
+                                                var openingBalance = 0;
+                                                var expiredStockQty = 0;
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    // console.log("main consumption====>", consumptionQty);
+                                                    // Inventory part
+                                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                    var adjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                    }
+                                                    var adjustmentQtyForEB = adjustmentQty;
+
+                                                    // Shipments part
+                                                    var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                    var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                                                    var shipmentTotalQty = 0;
+                                                    for (var j = 0; j < shipmentArr.length; j++) {
+                                                        shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                    }
+
+                                                    var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(endDate).format("YYYY-MM-DD"))));
+                                                    expiredStockQty = 0;
+                                                    for (var j = 0; j < expiredStock.length; j++) {
+                                                        expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                                                    }
+
+                                                    var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty) - parseInt(expiredStockQty);
+                                                    if (closingBalance < 0) {
+                                                        closingBalance = 0;
+                                                    }
+
+                                                    openingBalance = closingBalance;
+                                                }
+
+                                                // Calculations for monthsOfStock
+                                                // console.log("closing balance===>", closingBalance, "AMC====>", amcCalcualted);
+                                                if (closingBalance != 0 && amcCalcualted != 0 && closingBalance != "" && amcCalcualted != "") {
+                                                    var mos = parseFloat(closingBalance / amcCalcualted).toFixed(2);
+                                                } else {
+                                                    var mos = "";
+                                                }
+                                                // console.log("mos----------->", mos);
+                                                // console.log("minStock mos", maxForMonths);
+                                                // console.log("maxStock mos", minForMonths);
+                                                mosArray.push(
+                                                    {
+                                                        mos: mos,
+                                                        maxForMonths: minForMonths,
+                                                        minForMonths: maxForMonths,
+                                                        month: m,
+                                                        closingBalance: closingBalance,
+                                                        amcCalcualted: amcCalcualted
+                                                    });
+
+                                            }
+                                            // console.log("planningUnitId====>", planningUnitId);
+                                            // console.log("mosArray============>$@##", mosArray);
+                                            // for loop on array mosArray
+                                            // var monthWithMosLessThenMin = '';
+                                            var monthWithMosGreaterThenMax = '';
+                                            for (var element = 0; element < mosArray.length; element++) {
+                                                // console.log("mos element===>", mosArray[element]);
+                                                if (mosArray[element].mos > mosArray[element].maxForMonths) {
+                                                    monthWithMosGreaterThenMax = mosArray[element].month;
+                                                    break;
+                                                } else {
+                                                }
+                                            }
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    // && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 19
+                                                    && c.versionId == versionID);
+
+                                            if (monthWithMosGreaterThenMax != '') {
+                                                // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
+                                                var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
+                                                // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                var shipmentListForMonths = programList[pp].shipmentList;
+                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                if (filteredShipmentListForMonths.length > 0) {
+                                                    console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                    if (index == -1) {
+                                                        var json = {
+                                                            problemReportId: 0,
+                                                            program: {
+                                                                id: programList[pp].programId,
+                                                                label: programList[pp].label,
+                                                                programCode: programList[pp].programCode
+                                                            },
+                                                            versionId: versionID,
+                                                            realmProblem: problemList[prob],
+
+                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                            region: {
+                                                                id: regionList[r].regionId,
+                                                                label: regionList[r].label
+                                                            },
+                                                            planningUnit: {
+                                                                id: planningUnitList[p].planningUnit.id,
+                                                                label: planningUnitList[p].planningUnit.label,
+
+                                                            },
+                                                            shipmentId: '',
+                                                            data5: '',
+
+                                                            problemActionIndex: problemActionIndex,
+
+                                                            problemStatus: {
+                                                                id: 1,
+                                                                label: { label_en: 'Open' }
+                                                            },
+                                                            problemType: {
+                                                                id: 1,
+                                                                label: {
+                                                                    label_en: 'Automatic'
+                                                                }
+                                                            }, createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            problemTransList: [
+                                                                {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 461,
+                                                                            label_en: "Open",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: "Open",
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                }
+                                                            ]
+                                                        }
+                                                        problemActionList.push(json);
+                                                        problemActionIndex++;
+                                                    } else {
+                                                    }
+                                                } else {
+                                                    console.log("dont falg problem mos is not greater then max ####### ");
+                                                }
+                                            } else {
+                                                console.log("no months with MOS greater then max ===#########");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                    console.log("//////at this point resolve the problem. ###########");
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
+
+                                        }
+                                        if (problemList[prob].problem.problemId == 20) {
+
+                                            // problem for mos less then min and no shipment in future 7 to 18 months 
+                                            console.log("in problem id======>20", problemList[prob].data1, "====", problemList[prob].data2);
+
+                                            var mosArray = [];
+                                            // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
+                                            // problemList[prob].data1=0
+                                            // problemList[prob].data2=6
+                                            for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
+                                                console.log("mosCounter====>", mosCounter);
+                                                var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
+                                                var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
+
+                                                // }
+                                                var programId = programList[pp].programId;
+                                                var regionId = -1;
+                                                var planningUnitId = planningUnitList[p].planningUnit.id;
+
+                                                var programPlanningUnit = planningUnitList[p];
+                                                var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
+                                                var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
+
+                                                var regionListFiltered = regionList;
+                                                // console.log("regionList----->", regionList);
+
+                                                var programJson = programList[pp];
+                                                console.log("************ProgramJson***********", programJson);
+                                                var shelfLife = programPlanningUnit.shelfLife;
+                                                var monthsInPastForAMC = programPlanningUnit.monthsInPastForAmc;
+                                                var monthsInFutureForAMC = programPlanningUnit.monthsInFutureForAmc;
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+
+                                                var consumptionQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = consumptionList.filter(c => (c.consumptionDate >= mStartDate && c.consumptionDate <= mEndDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        var count = 0;
+                                                        for (var k = 0; k < c.length; k++) {
+                                                            if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                count++;
+                                                            } else {
+
+                                                            }
+                                                        }
+                                                        if (count == 0) {
+                                                            consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                        } else {
+                                                            if (c[j].actualFlag.toString() == 'true') {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                var consumptionQtyForEB = consumptionQty;
+                                                // Calculations for AMC
+                                                var amcBeforeArray = [];
+                                                var amcAfterArray = [];
+                                                for (var c = 0; c < monthsInPastForAMC; c++) {
+                                                    var month1MonthsBefore = moment(mStartDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1Before = moment(mEndDate).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsBefore && con.consumptionDate <= currentMonth1Before);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcBeforeArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcBeforeArray;
+                                                        if (amcArrayForMonth.length == monthsInPastForAMC) {
+                                                            c = monthsInPastForAMC;
+                                                        }
+                                                    }
+
+                                                }
+
+                                                for (var c = 0; c < monthsInFutureForAMC; c++) {
+                                                    var month1MonthsAfter = moment(mStartDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var currentMonth1After = moment(mEndDate).add(c, 'months').format("YYYY-MM-DD");
+                                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate >= month1MonthsAfter && con.consumptionDate <= currentMonth1After);
+                                                    if (consumptionListForAMC.length > 0) {
+                                                        var consumptionQty = 0;
+                                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
+                                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+
+                                                            if (count == 0) {
+                                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            } else {
+                                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                                }
+                                                            }
+                                                        }
+                                                        amcAfterArray.push({ consumptionQty: consumptionQty });
+                                                        var amcArrayForMonth = amcAfterArray;
+                                                        if (amcArrayForMonth.length == monthsInFutureForAMC) {
+                                                            c = monthsInFutureForAMC;
+                                                        }
+                                                    }
+
+                                                }
+                                                var amcArray = amcBeforeArray.concat(amcAfterArray);
+                                                var amcArrayFilteredForMonth = amcArray;
+                                                var countAMC = amcArrayFilteredForMonth.length;
+                                                var sumOfConsumptions = 0;
+                                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
+                                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
+                                                }
+                                                if (countAMC != 0) {
+                                                    var amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+
+                                                    // Calculations for Min stock
+                                                    var maxForMonths = 0;
+                                                    var realm = programJson.realmCountry.realm;
+                                                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                                    if (DEFAULT_MIN_MONTHS_OF_STOCK > minMonthsOfStock) {
+                                                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                                    } else {
+                                                        maxForMonths = minMonthsOfStock
+                                                    }
+                                                    var minStock = parseInt(parseInt(amcCalcualted) * parseInt(maxForMonths));
+
+
+                                                    // Calculations for Max Stock
+                                                    var minForMonths = 0;
+                                                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + reorderFrequencyInMonths)) {
+                                                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                                    } else {
+                                                        minForMonths = (maxForMonths + reorderFrequencyInMonths);
+                                                    }
+                                                    var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));
+                                                } else {
+                                                }
+
+
+                                                // Inventory part
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                if (regionId != -1) {
+                                                    inventoryList = inventoryList.filter(c => c.region.id == regionId)
+                                                }
+                                                var adjustmentQty = 0;
+                                                for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                    var c = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                    for (var j = 0; j < c.length; j++) {
+                                                        adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                    }
+                                                }
+                                                var c1 = inventoryList.filter(c => (c.inventoryDate >= mStartDate && c.inventoryDate <= mEndDate) && c.region == null);
+                                                for (var j = 0; j < c1.length; j++) {
+                                                    adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                }
+
+                                                // Shipments updated part
+
+                                                // Shipments part
+                                                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= mStartDate && c.expectedDeliveryDate <= mEndDate))
+                                                var shipmentTotalQty = 0;
+                                                for (var j = 0; j < shipmentArr.length; j++) {
+                                                    shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                }
+
+                                                // Calculations for exipred stock
+                                                var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
+                                                var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+                                                for (var ma = 0; ma < myArray.length; ma++) {
+                                                    var shipmentList = programJson.shipmentList;
+                                                    var shipmentBatchArray = [];
+                                                    for (var ship = 0; ship < shipmentList.length; ship++) {
+                                                        var batchInfoList = shipmentList[ship].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+                                                        }
+                                                    }
+                                                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+                                                    // var totalStockForBatchNumber = stockForBatchNumber.qty;
+
+                                                    var totalStockForBatchNumber = 0;
+                                                    if (stockForBatchNumber != undefined) {
+                                                        totalStockForBatchNumber = stockForBatchNumber.qty;
+                                                    } else {
+
+                                                    }
+
+                                                    var consumptionList = programJson.consumptionList;
+                                                    var consumptionBatchArray = [];
+
+                                                    for (var con = 0; con < consumptionList.length; con++) {
+                                                        var batchInfoList = consumptionList[con].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+                                                        }
+                                                    }
+                                                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    if (consumptionForBatchNumber == undefined) {
+                                                        consumptionForBatchNumber = [];
+                                                    }
+                                                    var consumptionQty = 0;
+                                                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+                                                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+                                                    }
+                                                    var inventoryList = programJson.inventoryList;
+                                                    var inventoryBatchArray = [];
+                                                    for (var inv = 0; inv < inventoryList.length; inv++) {
+                                                        var batchInfoList = inventoryList[inv].batchInfoList;
+                                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+                                                        }
+                                                    }
+                                                    var inventoryForBatchNumber = [];
+                                                    if (inventoryBatchArray.length > 0) {
+                                                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+                                                    }
+                                                    if (inventoryForBatchNumber == undefined) {
+                                                        inventoryForBatchNumber = [];
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+                                                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+                                                    }
+                                                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+                                                    myArray[ma].remainingQty = remainingBatchQty;
+                                                }
+                                                // console.log("MyArray", myArray);
+
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var inventoryList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(6, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).format("YYYY-MM-DD");
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var unallocatedConsumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                var qty = 0;
+                                                                if (c[j].batchInfoList.length > 0) {
+                                                                    for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                        qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                    }
+                                                                }
+                                                                var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                    var qty = 0;
+                                                                    if (c[j].batchInfoList.length > 0) {
+                                                                        for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                            qty += parseInt((c[j].batchInfoList)[a].consumptionQty);
+                                                                        }
+                                                                    }
+                                                                    var remainingQty = parseInt((c[j].consumptionQty)) - parseInt(qty);
+                                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))));
+                                                    // console.log("--------------------------------------------------------------");
+                                                    // console.log("Start date", startDate);
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty > 0) {
+                                                                if (batchDetailsForParticularPeriod.length > 0) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                    unallocatedAdjustmentQty = 0;
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty > 0) {
+                                                            if (batchDetailsForParticularPeriod.length > 0) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+                                                                unallocatedAdjustmentQty = 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(startDate).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
+                                                    for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
+                                                        // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
+                                                        // console.log("Unallocated consumption", unallocatedConsumptionQty);
+                                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
+                                                        if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
+                                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
+                                                            unallocatedConsumptionQty = 0
+                                                        } else {
+                                                            var rq = batchDetailsForParticularPeriod[ua].remainingQty;
+                                                            myArray[index].remainingQty = 0;
+                                                            unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                                                        }
+                                                    }
+                                                    var adjustmentQty = 0;
+                                                    var unallocatedAdjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                            var qty1 = 0;
+                                                            if (c[j].batchInfoList.length > 0) {
+                                                                for (var a = 0; a < c[j].batchInfoList.length; a++) {
+                                                                    qty1 += parseFloat(parseInt((c[j].batchInfoList)[a].adjustmentQty) * c[j].multiplier);
+                                                                }
+                                                            }
+                                                            var remainingQty = parseFloat((c[j].adjustmentQty * c[j].multiplier)) - parseFloat(qty1);
+                                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
+                                                            if (unallocatedAdjustmentQty < 0) {
+                                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                    // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                        unallocatedAdjustmentQty = 0
+                                                                    } else {
+                                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                        myArray[index].remainingQty = 0;
+                                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                    }
+                                                                }
+                                                            } else {
+                                                            }
+
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        unallocatedAdjustmentQty = parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                        if (unallocatedAdjustmentQty < 0) {
+                                                            for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua != 0; ua--) {
+                                                                // console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                // console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+                                                                var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+                                                                if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+                                                                    myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+                                                                    unallocatedAdjustmentQty = 0
+                                                                } else {
+                                                                    var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+                                                                    myArray[index].remainingQty = 0;
+                                                                    unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+                                                                }
+                                                            }
+                                                        } else {
+                                                        }
+                                                    }
+
+                                                }
+
+                                                // console.log("My array after accounting all the calcuklations", myArray);
+                                                var expiredStockArr = myArray;
+
+                                                // Calculation of opening and closing balance
+                                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                                                var createdDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                var firstDataEntryDate = moment('2017-01-01').format("YYYY-MM-DD");
+                                                // var curDate = moment(mEndDate).add(5, 'months').format("YYYY-MM-DD");
+                                                var curDate = moment(mEndDate).subtract(1, 'months').format("YYYY-MM-DD");
+                                                var openingBalance = 0;
+                                                var expiredStockQty = 0;
+                                                for (var i = 0; createdDate < curDate; i++) {
+                                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                                    var consumptionQty = 0;
+                                                    var startDate = moment(createdDate).startOf('month').format("YYYY-MM-DD");
+                                                    var endDate = moment(createdDate).endOf('month').format("YYYY-MM-DD");
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = consumptionList.filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            var count = 0;
+                                                            for (var k = 0; k < c.length; k++) {
+                                                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
+                                                                    count++;
+                                                                } else {
+
+                                                                }
+                                                            }
+                                                            if (count == 0) {
+                                                                consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                            } else {
+                                                                if (c[j].actualFlag.toString() == 'true') {
+                                                                    consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                    // console.log("main consumption====>", consumptionQty);
+                                                    // Inventory part
+                                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                                                    var adjustmentQty = 0;
+                                                    for (var reg = 0; reg < regionListFiltered.length; reg++) {
+                                                        var c = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region != null && c.region.id == regionListFiltered[reg].regionId);
+                                                        for (var j = 0; j < c.length; j++) {
+                                                            adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
+                                                        }
+                                                    }
+                                                    var c1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+                                                    for (var j = 0; j < c1.length; j++) {
+                                                        adjustmentQty += parseFloat((c1[j].adjustmentQty * c1[j].multiplier));
+                                                    }
+                                                    var adjustmentQtyForEB = adjustmentQty;
+
+                                                    // Shipments part
+                                                    var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                                    var shipmentArr = shipmentList.filter(c => (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                                                    var shipmentTotalQty = 0;
+                                                    for (var j = 0; j < shipmentArr.length; j++) {
+                                                        shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                                    }
+
+                                                    var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(startDate).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(endDate).format("YYYY-MM-DD"))));
+                                                    expiredStockQty = 0;
+                                                    for (var j = 0; j < expiredStock.length; j++) {
+                                                        expiredStockQty += parseInt((expiredStock[j].remainingQty));
+                                                    }
+                                                    // console.log("created date 0===>", createdDate);
+                                                    // console.log("planning Unit====>", planningUnitId);
+                                                    // console.log("$$$$$$ 1====>", openingBalance);
+                                                    // console.log("$$$$$$ 2====>", shipmentTotalQty);
+                                                    // console.log("$$$$$$ 3====>", adjustmentQty);
+                                                    // console.log("$$$$$$ 4====>", consumptionQty);
+                                                    // console.log("$$$$$$ 5====>", expiredStockQty)
+                                                    var closingBalance = parseInt(openingBalance) + parseInt(shipmentTotalQty) + parseFloat(adjustmentQty) - parseInt(consumptionQty) - parseInt(expiredStockQty);
+                                                    if (closingBalance < 0) {
+                                                        closingBalance = 0;
+                                                    }
+                                                    // console.log("closing balance===>", closingBalance);
+                                                    // console.log("amc cAlculated===>", amcCalcualted);
+                                                    openingBalance = closingBalance;
+                                                }
+                                                // console.log("Total exipred stock", totalExpiredStockArr);
+                                                // Calculations for monthsOfStock
+                                                // console.log("closing balance===>", closingBalance, "AMC====>", amcCalcualted);
+                                                if (closingBalance != 0 && amcCalcualted != 0 && closingBalance != "" && amcCalcualted != "") {
+                                                    var mos = parseFloat(closingBalance / amcCalcualted).toFixed(2);
+                                                } else {
+                                                    var mos = "";
+                                                }
+                                                // console.log("mos----------->", mos);
+                                                // console.log("minStock mos", maxForMonths);
+                                                // console.log("maxStock mos", minForMonths);
+
+                                                mosArray.push(
+                                                    {
+                                                        mos: mos,
+                                                        maxForMonths: minForMonths,
+                                                        minForMonths: maxForMonths,
+                                                        month: m,
+                                                        closingBalance: closingBalance,
+                                                        amcCalcualted: amcCalcualted
+                                                    });
+
+                                            }
+                                            console.log("planningUnitId====>", planningUnitId);
+                                            console.log("mosArray============>$@##", mosArray);
+                                            // for loop on array mosArray
+                                            var monthWithMosLessThenMin = '';
+                                            for (var element = 0; element < mosArray.length; element++) {
+                                                console.log("mos element===>", mosArray[element]);
+                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                    monthWithMosLessThenMin = mosArray[element].month;
+                                                    break;
+                                                } else {
+                                                }
+                                            }
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    // && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 20
+                                                    && c.versionId == versionID);
+
+                                            if (monthWithMosLessThenMin != '') {
+                                                console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
+                                                console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+
+                                                var shipmentListForMonths = programList[pp].shipmentList;
+                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+
+
+                                                if (filteredShipmentListForMonths.length == 0) {
+                                                    console.log("flag a problem mos is less then min and dont have shipment withing lead times");
+                                                    if (index == -1) {
+                                                        var json = {
+                                                            problemReportId: 0,
+                                                            program: {
+                                                                id: programList[pp].programId,
+                                                                label: programList[pp].label,
+                                                                programCode: programList[pp].programCode
+                                                            },
+                                                            versionId: versionID,
+                                                            realmProblem: problemList[prob],
+
+                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                            region: {
+                                                                id: regionList[r].regionId,
+                                                                label: regionList[r].label
+                                                            },
+                                                            planningUnit: {
+                                                                id: planningUnitList[p].planningUnit.id,
+                                                                label: planningUnitList[p].planningUnit.label,
+
+                                                            },
+                                                            shipmentId: '',
+                                                            data5: '',
+
+                                                            problemActionIndex: problemActionIndex,
+
+                                                            problemStatus: {
+                                                                id: 1,
+                                                                label: { label_en: 'Open' }
+                                                            },
+                                                            problemType: {
+                                                                id: 1,
+                                                                label: {
+                                                                    label_en: 'Automatic'
+                                                                }
+                                                            }, createdBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedBy: {
+                                                                userId: userId,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            problemTransList: [
+                                                                {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 461,
+                                                                            label_en: "Open",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: "Open",
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                }
+                                                            ]
+                                                        }
+                                                        problemActionList.push(json);
+                                                        problemActionIndex++;
+                                                    } else {
+                                                    }
+                                                } else {
+                                                    console.log("dont falg problem mos is  less then min but have shipment in lead times ");
+                                                }
+                                            } else {
+                                                console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1 && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].version == versionID) {
+                                                    console.log("//////at this point resolve the problem.");
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
+
+                                        }
+                                        if (problemList[prob].problem.problemId == 21) {
+                                            var consumptionList = programList[pp].consumptionList;
+                                            consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+
+                                            var tMinusOneDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                            var tMinusTwoDate = moment(Date.now()).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
+                                            var tMinusThreeDate = moment(Date.now()).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
+                                            console.log("tMinusOneDate--->",tMinusOneDate);
+                                            console.log("tMinusOneDate--->",tMinusTwoDate);
+                                            console.log("tMinusOneDate--->",tMinusThreeDate);
+
+                                            var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true");
+                                            var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true");
+                                            var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true");
+
+                                            console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
+                                            console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
+                                            console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+
+                                            var index = problemActionList.findIndex(
+                                                c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                    && c.region.id == regionList[r].regionId
+                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                    && c.program.id == programList[pp].programId
+                                                    && c.realmProblem.problem.problemId == 21
+                                                    && c.versionId == versionID);
+
+                                            if (consumptionListFortMinusOneDate.length > 0 && consumptionListFortMinusThreeDate.length > 0 && consumptionListFortMinusTwoDate.length == 0) {
+                                                console.log("rais prob--------");
+                                                if (index == -1) {
+                                                    var json = {
+                                                        problemReportId: 0,
+                                                        program: {
+                                                            id: programList[pp].programId,
+                                                            label: programList[pp].label,
+                                                            programCode: programList[pp].programCode
+                                                        },
+                                                        versionId: versionID,
+                                                        realmProblem: problemList[prob],
+
+                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                        region: {
+                                                            id: regionList[r].regionId,
+                                                            label: regionList[r].label
+                                                        },
+                                                        planningUnit: {
+                                                            id: planningUnitList[p].planningUnit.id,
+                                                            label: planningUnitList[p].planningUnit.label,
+
+                                                        },
+                                                        shipmentId: '',
+                                                        data5: '',
+
+                                                        problemActionIndex: problemActionIndex,
+
+                                                        problemStatus: {
+                                                            id: 1,
+                                                            label: { label_en: 'Open' }
+                                                        },
+                                                        problemType: {
+                                                            id: 1,
+                                                            label: {
+                                                                label_en: 'Automatic'
+                                                            }
+                                                        }, createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                        lastModifiedBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                        problemTransList: [
+                                                            {
+                                                                problemReportTransId: '',
+                                                                problemStatus: {
+                                                                    id: 1,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 461,
+                                                                        label_en: "Open",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                },
+                                                                notes: "Open",
+                                                                createdBy: {
+                                                                    userId: userId,
+                                                                    username: username
+                                                                },
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            }
+                                                        ]
+                                                    }
+                                                    problemActionList.push(json);
+                                                    problemActionIndex++;
+                                                } else {
+                                                    // problemActionList[index].isFound = 1;
+                                                }
+
+                                            } else {
+                                                console.log("dont rais prob--------");
+                                                if (index != -1 && problemActionList[index].problemStatus.id == 1) {
+                                                    console.log("resolve the problem problem id 21");
+                                                    // problemActionList[index].isFound = 0;
+                                                    var filterObj = problemActionList[index];
+                                                    var transList = filterObj.problemTransList;
+                                                    let tempProblemTransObj = {
+                                                        problemReportTransId: '',
+                                                        problemStatus: {
+                                                            id: 2,
+                                                            label: {
+                                                                active: true,
+                                                                labelId: 462,
+                                                                label_en: "Resolved",
+                                                                label_sp: null,
+                                                                label_fr: null,
+                                                                label_pr: null
+                                                            }
+                                                        },
+                                                        notes: 'Resolved',
+                                                        createdBy: {
+                                                            userId: userId,
+                                                            username: username
+                                                        },
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                    }
+                                                    transList.push(tempProblemTransObj);
+                                                    filterObj.problemTransList = transList;
+
+                                                    var problemStatusObject = {
+                                                        id: 2,
+                                                        label: {
+                                                            active: true,
+                                                            labelId: 462,
+                                                            label_en: "Resolved",
+                                                            label_sp: null,
+                                                            label_fr: null,
+                                                            label_pr: null
+                                                        }
+                                                    }
+                                                    filterObj.problemStatus = problemStatusObject;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -2684,8 +6327,10 @@ export function qatProblemActions() {
                             }.bind(this);
                             putRequest.onsuccess = function (event) {
                             }.bind(this);
+
+                            console.log("problemList for each program=====>", problemActionList);
                         }
-                        console.log("final problemList=====>", problemActionList);
+
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
