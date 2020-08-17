@@ -865,7 +865,7 @@ export default class PipelineProgramShipment extends Component {
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
         this.el.destroy();
 
-        var data = this.state.pipelineShipmentData.map((item, index) => [item.planningUnit, item.dataSource, item.procurementAgent, item.fundingSource, item.shipmentStatus, item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, item.quantity, item.rate, item.freightCost, item.quantity * item.rate, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.plannedDate).format("YYYY-MM-DD"), moment(item.submittedDate).format("YYYY-MM-DD"), moment(item.approvedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.arrivedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
+        var data = this.state.pipelineShipmentData.map((item, index) => [item.planningUnit, item.dataSource, item.procurementAgent, item.fundingSource, item.shipmentStatus, item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, item.quantity, item.rate, item.freightCost==0?item.quantity*this.props.items.program.seaFreightPerc:item.freightCost, item.quantity * item.rate, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.plannedDate).format("YYYY-MM-DD"), moment(item.submittedDate).format("YYYY-MM-DD"), moment(item.approvedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.arrivedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         // json[0] = data;
         var options = {
             data: data,

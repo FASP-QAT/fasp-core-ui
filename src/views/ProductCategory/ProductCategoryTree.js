@@ -255,7 +255,7 @@ export default class ProductCategoryTree extends Component {
             this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
         } else {//duplicate found
             this.setState({
-                message: 'Duplicate product category name found',
+                message: 'Duplicate Product Category Name Found',
                 color: 'red'
             })
             this.hideSecondComponent();
