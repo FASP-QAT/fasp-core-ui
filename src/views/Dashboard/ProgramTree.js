@@ -19,7 +19,7 @@ import HealthAreaService from "../../api/HealthAreaService"
 import ProgramService from "../../api/ProgramService"
 import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
@@ -467,7 +467,7 @@ class Program extends Component {
                             console.log("Version", version)
                             var db1;
                             getDatabase();
-                            var openRequest = indexedDB.open('fasp', 1);
+                            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
                             openRequest.onsuccess = function (e) {
                                 db1 = e.target.result;
                                 var transaction = db1.transaction(['programData'], 'readwrite');

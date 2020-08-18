@@ -13,7 +13,7 @@ import getLabelText from '../../CommonComponent/getLabelText.js';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import i18n from '../../i18n';
@@ -73,7 +73,7 @@ export default class ExportProgram extends Component {
         const lan = 'en'
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onsuccess = function (e) {
             console.log("in success");
             db1 = e.target.result;
@@ -119,7 +119,7 @@ export default class ExportProgram extends Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var transaction = db1.transaction(['programData'], 'readwrite');

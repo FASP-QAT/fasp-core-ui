@@ -525,7 +525,7 @@
 //             const lan = 'en';
 //             var db1;
 //             getDatabase();
-//             var openRequest = indexedDB.open('fasp', 1);
+//             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //             openRequest.onsuccess = function (e) {
 //                 db1 = e.target.result;
 //                 var transaction = db1.transaction(['CountryData'], 'readwrite');
@@ -573,7 +573,7 @@
 //             var db1;
 //             var storeOS;
 //             getDatabase();
-//             var openRequest = indexedDB.open('fasp', 1);
+//             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //             openRequest.onsuccess = function (e) {
 //                 db1 = e.target.result;
 //                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -720,7 +720,7 @@
 
 //         var db1;
 //         getDatabase();
-//         var openRequest = indexedDB.open('fasp', 1);
+//         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //         openRequest.onsuccess = function (e) {
 //             db1 = e.target.result;
 //             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -778,7 +778,7 @@
 //                 var db1;
 //                 var storeOS;
 //                 getDatabase();
-//                 var openRequest = indexedDB.open('fasp', 1);
+//                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //                 openRequest.onsuccess = function (e) {
 //                     db1 = e.target.result;
 //                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -863,7 +863,7 @@
 //                 var storeOS;
 //                 getDatabase();
 //                 var regionList = [];
-//                 var openRequest = indexedDB.open('fasp', 1);
+//                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //                 openRequest.onerror = function (event) {
 //                     this.setState({
 //                         message: i18n.t('static.program.errortext')
@@ -1426,7 +1426,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -1871,7 +1871,7 @@ class ShipmentGlobalDemandView extends Component {
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
 
-        doc.addImage(canvasImg, 'png', width / 2, startYtable, 300, 200, 'b', 'CANVAS');
+        doc.addImage(canvasImg, 'png', width / 2, startYtable, 280, 140, 'b', 'CANVAS');
 
         // let tableHeadLength = this.state.table1Headers.length;
         let length = this.state.table1Headers.length + 1;
@@ -2027,7 +2027,7 @@ class ShipmentGlobalDemandView extends Component {
                 var storeOS;
                 getDatabase();
                 var regionList = [];
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -2392,7 +2392,7 @@ class ShipmentGlobalDemandView extends Component {
             var db2;
             var sStatusResult = [];
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db2 = e.target.result;
                 var sStatusTransaction = db2.transaction(['shipmentStatus'], 'readwrite');
@@ -2458,7 +2458,7 @@ class ShipmentGlobalDemandView extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['fundingSource'], 'readwrite');
@@ -2515,7 +2515,7 @@ class ShipmentGlobalDemandView extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -2595,7 +2595,7 @@ class ShipmentGlobalDemandView extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -2682,7 +2682,7 @@ class ShipmentGlobalDemandView extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -2994,7 +2994,7 @@ class ShipmentGlobalDemandView extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className=" pt-lg-0">
+                    <CardBody className=" pt-lg-0 pb-lg-0">
                         <div ref={ref}>
 
                             <Form >
@@ -3184,12 +3184,12 @@ class ShipmentGlobalDemandView extends Component {
                                     </div>
                                 </Col>
                             </Form>
-                            <Col md="12 pl-0  mt-4">
-                                <div className="row grid-divider">
+                            <Col md="12 pl-0  ">
+                                <div className="row grid-divider ">
                                     {
                                         this.state.planningUnitSplit.length > 0 &&
                                         <Col md="8 pl-0">
-                                            <div className="chart-wrapper" style={{ marginTop: '-5%' }}>
+                                            <div className="chart-wrapper" >
                                                 <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
                                             </div>
                                         </Col>
@@ -3220,9 +3220,7 @@ class ShipmentGlobalDemandView extends Component {
                                 </Col>
                             } */}
 
-                            <br></br>
-
-                            <Col md="12 pl-0">
+                            <Col md="12 pl-0 pb-lg-1">
                                 <div className="globalviwe-scroll">
                                     <div className="row">
                                         <div className="col-md-12">

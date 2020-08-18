@@ -317,7 +317,7 @@ class ApplicationDashboard extends Component {
     // var db1;
     // var storeOS;
     // getDatabase();
-    // var openRequest = indexedDB.open('fasp', 1);
+    // var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     // openRequest.onsuccess = function (e) {
     //   var realmId = AuthenticationService.getRealmId();
     //   var programList = [];
@@ -716,7 +716,7 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/realm/realmlist")}>List Realms</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/realm/listRealm")}>List Realms</DropdownItem>
                             <DropdownItem onClick={() => this.redirectToCrud("/realm/addrealm")}>Add Realm</DropdownItem>
 
                           </DropdownMenu>
@@ -769,7 +769,7 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>View Supply Plans Waiting for Approval</DropdownItem>
 
                           </DropdownMenu>
                         </Dropdown>
@@ -988,7 +988,7 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/supplyPlan")}>View Supply Plans Waiting for Approval</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>View Supply Plans Waiting for Approval</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>

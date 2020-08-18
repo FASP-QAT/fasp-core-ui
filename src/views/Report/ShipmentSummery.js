@@ -919,7 +919,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -1383,7 +1383,7 @@ class ShipmentSummery extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1477,7 +1477,7 @@ class ShipmentSummery extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1535,7 +1535,7 @@ class ShipmentSummery extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -1647,7 +1647,7 @@ class ShipmentSummery extends Component {
                 var storeOS;
                 getDatabase();
                 var regionList = [];
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -2077,7 +2077,7 @@ class ShipmentSummery extends Component {
                             }
                         </Offline>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="" >
                             <div ref={ref}>
                                 <Form >
@@ -2237,7 +2237,7 @@ class ShipmentSummery extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.data.length > 0 &&
-                                                <Table id="mytable1" responsive className="table-bordered text-center mt-2">
+                                                <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
                                                     <thead>
                                                         <tr>
                                                             <th style={{ width: '225px', cursor: 'pointer' }}></th>
@@ -2277,8 +2277,8 @@ class ShipmentSummery extends Component {
                                     </div>
 
 
-                                    <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
+                                    <div className="row ">
+                                        <div className="col-md-12 pl-0 pr-0 mb-2">
                                             {this.state.data.length > 0 &&
                                                 <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>

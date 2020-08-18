@@ -489,7 +489,7 @@ class RealmCountry extends Component {
                     console.log(response.data);
                     if (response.status == "200") {
                         console.log(response);
-                        this.props.history.push(`/realm/realmlist/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
                             message: response.data.messageCode
@@ -653,7 +653,7 @@ class RealmCountry extends Component {
         )
     }
     cancelClicked() {
-        this.props.history.push(`/realm/realmlist/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

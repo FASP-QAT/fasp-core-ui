@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText.js';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -113,7 +113,7 @@ export default class DownloadProgram extends Component {
                     console.log("Json length", json.length)
                     var db1;
                     getDatabase();
-                    var openRequest = indexedDB.open('fasp', 1);
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
                     openRequest.onsuccess = function (e) {
                         console.log("in success");
                         db1 = e.target.result;

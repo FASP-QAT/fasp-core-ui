@@ -11,7 +11,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import moment from "moment";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE } from '../../Constants.js';
+import { SECRET_KEY, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 const initialValues = {
@@ -108,7 +108,7 @@ class AddRoleComponent extends Component {
   componentDidMount() {
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
@@ -181,7 +181,7 @@ class AddRoleComponent extends Component {
     var db1;
     var storeOS;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
@@ -228,7 +228,7 @@ class AddRoleComponent extends Component {
         this.setState({ programId: programId });
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         var regionList = []
         openRequest.onerror = function (event) {
           this.setState({
@@ -284,7 +284,7 @@ class AddRoleComponent extends Component {
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     var regionList = []
     openRequest.onerror = function (event) {
       this.setState({

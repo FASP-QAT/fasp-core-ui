@@ -5,7 +5,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
-import { DATE_FORMAT_CAP } from '../../Constants.js';
+import { DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js';
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
@@ -67,7 +67,7 @@ export default class ConsumptionDetails extends React.Component {
         const lan = 'en';
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -116,7 +116,7 @@ export default class ConsumptionDetails extends React.Component {
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');

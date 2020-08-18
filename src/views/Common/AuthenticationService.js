@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Online } from "react-detect-offline";
 import jwt_decode from 'jwt-decode'
-import { API_URL } from '../../Constants.js'
+import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
@@ -217,7 +217,7 @@ class AuthenticationService {
         } else {
             var db;
             var customerObjectStore;
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
 
             openRequest.onupgradeneeded = function (e) {
                 var db = e.target.result;
@@ -351,7 +351,7 @@ class AuthenticationService {
             var db;
             var customerObjectStore;
             var userObj = 0;
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
 
             openRequest.onupgradeneeded = function (e) {
                 db = e.target.result;
@@ -527,8 +527,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/diamension/diamensionlist":
-                case "/diamension/diamensionlist/:color/:message":
+                case "/dimension/listDimension":
+                case "/dimension/listDimension/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
@@ -559,8 +559,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/realm/realmlist":
-                case "/realm/realmlist/:color/:message":
+                case "/realm/listRealm":
+                case "/realm/listRealm/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
                         return true;
                     }
@@ -1117,6 +1117,18 @@ class AuthenticationService {
         if (url.includes("/program/listProgram")) {
             return "Programs";
         }
+    }
+    hexToRgbA(hex) {
+        var c;
+        if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+            c = hex.substring(1).split('');
+            if (c.length == 3) {
+                c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+            }
+            c = '0x' + c.join('');
+            return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)';
+        }
+        throw new Error('Bad Hex');
     }
 
 }

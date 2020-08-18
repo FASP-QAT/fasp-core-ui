@@ -642,7 +642,8 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             type="number"
                                                             min="0"
-                                                            name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
+                                                            name="seaFreightPerc" id="seaFreightPerc" />
+                                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
 

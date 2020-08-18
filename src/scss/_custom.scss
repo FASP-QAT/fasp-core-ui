@@ -2020,10 +2020,16 @@ input::placeholder {
 //   background-color: #e0d24d!important;
 // }
 
-.background-red td:not(:last-child){
+// .background-red td:not(:last-child){
+  .background-red {
   // background-color: red;
   background-color: #cc4e4e!important;
 }
+
+.background-red-problemList td:not(:last-child){
+    // background-color: red;
+    background-color: #cc4e4e!important;
+  }
 .background-orange td:not(:last-child){
   // background-color: red;
   background-color: #e07847!important;
@@ -2064,7 +2070,7 @@ input::placeholder {
 }
 .supplyplan-larrow-dataentry-adjustment{
   float: left;
-  margin-left: 91px !important;
+  margin-left: 103px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2514,9 +2520,15 @@ input::placeholder {
     border:none!important;
   }
 
+  .regionTdWidthAdjustments{
+    overflow: hidden!important;
+    min-width: 120px!important;
+    word-wrap: break-word!important;
+  }
+
   .supplyplanTdWidthForMonths{
     overflow: hidden!important;
-    min-width: 56px!important;
+    min-width: 70px!important;
   }
   .BorderNoneSupplyPlan{
     border:none!important;
@@ -3051,10 +3063,19 @@ border-radius: 2em;
 .go1084040746 svg{
   visibility: hidden !important;
 }
+.go626121005 span {
+  display: inline!important;
+  padding-left: 5px;
+}
+// .go2139093995 svg{
+//   visibility: hidden !important;
+// }
 .go355775859 .gray svg{
   visibility: hidden !important;
 }
-
+.go2139093995 .gray {
+  color: #697069!important;
+}
 .react-bs-table-no-data{
   text-align: center!important;
 }
@@ -3096,4 +3117,7 @@ border-radius: 2em;
 .HomeIcon{
   color: #20a8d8;
   font-size: 20px;
+}
+.WhatifInputFeild {
+  width: 212px;
 }

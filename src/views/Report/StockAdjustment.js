@@ -1,3 +1,963 @@
+// import React, { Component } from 'react';
+// import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+// import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+// import i18n from '../../i18n'
+// import RegionService from "../../api/RegionService";
+// import AuthenticationService from '../Common/AuthenticationService.js';
+// import getLabelText from '../../CommonComponent/getLabelText';
+// import RealmCountryService from "../../api/RealmCountryService.js";
+
+// import BootstrapTable from 'react-bootstrap-table-next';
+// import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+// import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+// import paginationFactory from 'react-bootstrap-table2-paginator';
+// import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// import pdfIcon from '../../assets/img/pdf.png';
+// import csvicon from '../../assets/img/csv.png';
+// import Picker from 'react-month-picker';
+// import MonthBox from '../../CommonComponent/MonthBox.js';
+// import ProgramService from '../../api/ProgramService';
+// import CryptoJS from 'crypto-js'
+// import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js'
+// import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+// import ProductService from '../../api/ProductService';
+// import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+// import moment from 'moment';
+// import jsPDF from "jspdf";
+// import "jspdf-autotable";
+// import { LOGO } from '../../CommonComponent/Logo.js';
+// import ReportService from '../../api/ReportService';
+// import MultiSelect from 'react-multi-select-component';
+
+// const pickerLang = {
+//     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+//     from: 'From', to: 'To',
+// }
+
+
+
+// class StockAdjustmentComponent extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             regionList: [],
+//             message: '',
+//             selRegion: [],
+//             realmCountryList: [],
+//             programs: [],
+//             versions: [],
+//             planningUnits: [],
+//             planningUnitValues: [],
+//             planningUnitLabels: [],
+//             data: [],
+//             lang: localStorage.getItem('lang'),
+//             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+//             loading: false
+//         }
+//         this.formatLabel = this.formatLabel.bind(this);
+//         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+//         this.handleRangeChange = this.handleRangeChange.bind(this);
+//         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+//     }
+
+//     makeText = m => {
+//         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+//         return '?'
+//     }
+
+//     getPrograms = () => {
+//         if (navigator.onLine) {
+//             AuthenticationService.setupAxiosInterceptors();
+//             let realmId = AuthenticationService.getRealmId();
+//             ProgramService.getProgramByRealmId(realmId)
+//                 .then(response => {
+//                     // console.log(JSON.stringify(response.data))
+//                     this.setState({
+//                         programs: response.data
+//                     }, () => { this.consolidatedProgramList() })
+//                 }).catch(
+//                     error => {
+//                         this.setState({
+//                             programs: []
+//                         }, () => { this.consolidatedProgramList() })
+//                         if (error.message === "Network Error") {
+//                             this.setState({ message: error.message });
+//                         } else {
+//                             switch (error.response ? error.response.status : "") {
+//                                 case 500:
+//                                 case 401:
+//                                 case 404:
+//                                 case 406:
+//                                 case 412:
+//                                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+//                                     break;
+//                                 default:
+//                                     this.setState({ message: 'static.unkownError' });
+//                                     break;
+//                             }
+//                         }
+//                     }
+//                 );
+
+//         } else {
+//             console.log('offline')
+//             this.consolidatedProgramList()
+//         }
+
+//     }
+//     consolidatedProgramList = () => {
+//         const lan = 'en';
+//         const { programs } = this.state
+//         var proList = programs;
+
+//         var db1;
+//         getDatabase();
+//         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+//         openRequest.onsuccess = function (e) {
+//             db1 = e.target.result;
+//             var transaction = db1.transaction(['programData'], 'readwrite');
+//             var program = transaction.objectStore('programData');
+//             var getRequest = program.getAll();
+
+//             getRequest.onerror = function (event) {
+//                 // Handle errors!
+//             };
+//             getRequest.onsuccess = function (event) {
+//                 var myResult = [];
+//                 myResult = getRequest.result;
+//                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+//                 for (var i = 0; i < myResult.length; i++) {
+//                     if (myResult[i].userId == userId) {
+//                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+//                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+//                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+//                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+//                         // console.log(programNameLabel)
+
+//                         var f = 0
+//                         for (var k = 0; k < this.state.programs.length; k++) {
+//                             if (this.state.programs[k].programId == programData.programId) {
+//                                 f = 1;
+//                                 console.log('already exist')
+//                             }
+//                         }
+//                         if (f == 0) {
+//                             proList.push(programData)
+//                         }
+//                     }
+
+
+//                 }
+
+//                 this.setState({
+//                     programs: proList
+//                 })
+
+//             }.bind(this);
+
+//         }.bind(this);
+
+
+//     }
+
+
+//     filterVersion = () => {
+//         let programId = document.getElementById("programId").value;
+//         if (programId != 0) {
+
+//             const program = this.state.programs.filter(c => c.programId == programId)
+//             // console.log(program)
+//             if (program.length == 1) {
+//                 if (navigator.onLine) {
+//                     this.setState({
+//                         versions: []
+//                     }, () => {
+//                         this.setState({
+//                             versions: program[0].versionList.filter(function (x, i, a) {
+//                                 return a.indexOf(x) === i;
+//                             })
+//                         }, () => { this.consolidatedVersionList(programId) });
+//                     });
+
+
+//                 } else {
+//                     this.setState({
+//                         versions: []
+//                     }, () => { this.consolidatedVersionList(programId) })
+//                 }
+//             } else {
+
+//                 this.setState({
+//                     versions: []
+//                 })
+
+//             }
+//         } else {
+//             this.setState({
+//                 versions: []
+//             })
+//         }
+//         this.fetchData();
+//     }
+//     consolidatedVersionList = (programId) => {
+//         const lan = 'en';
+//         const { versions } = this.state
+//         var verList = versions;
+
+//         var db1;
+//         getDatabase();
+//         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+//         openRequest.onsuccess = function (e) {
+//             db1 = e.target.result;
+//             var transaction = db1.transaction(['programData'], 'readwrite');
+//             var program = transaction.objectStore('programData');
+//             var getRequest = program.getAll();
+
+//             getRequest.onerror = function (event) {
+//                 // Handle errors!
+//             };
+//             getRequest.onsuccess = function (event) {
+//                 var myResult = [];
+//                 myResult = getRequest.result;
+//                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+//                 for (var i = 0; i < myResult.length; i++) {
+//                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
+//                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+//                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+//                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+//                         var programData = databytes.toString(CryptoJS.enc.Utf8)
+//                         var version = JSON.parse(programData).currentVersion
+
+//                         version.versionId = `${version.versionId} (Local)`
+//                         verList.push(version)
+
+//                     }
+
+
+//                 }
+
+//                 // console.log(verList)
+//                 this.setState({
+//                     versions: verList.filter(function (x, i, a) {
+//                         return a.indexOf(x) === i;
+//                     })
+//                 })
+
+//             }.bind(this);
+
+
+
+//         }.bind(this)
+
+
+//     }
+
+//     getPlanningUnit = () => {
+//         let programId = document.getElementById("programId").value;
+//         let versionId = document.getElementById("versionId").value;
+//         this.setState({
+//             planningUnits: [],
+//             planningUnitValues: [],
+//             planningUnitLabels: []
+//         }, () => {
+//             if (versionId.includes('Local')) {
+//                 const lan = 'en';
+//                 var db1;
+//                 var storeOS;
+//                 getDatabase();
+//                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+//                 openRequest.onsuccess = function (e) {
+//                     db1 = e.target.result;
+//                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+//                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+//                     var planningunitRequest = planningunitOs.getAll();
+//                     var planningList = []
+//                     planningunitRequest.onerror = function (event) {
+//                         // Handle errors!
+//                     };
+//                     planningunitRequest.onsuccess = function (e) {
+//                         var myResult = [];
+//                         myResult = planningunitRequest.result;
+//                         var programId = (document.getElementById("programId").value).split("_")[0];
+//                         var proList = []
+//                         // console.log(myResult)
+//                         for (var i = 0; i < myResult.length; i++) {
+//                             if (myResult[i].program.id == programId) {
+
+//                                 proList[i] = myResult[i]
+//                             }
+//                         }
+//                         this.setState({
+//                             planningUnits: proList, message: ''
+//                         }, () => {
+//                             this.fetchData();
+//                         })
+//                     }.bind(this);
+//                 }.bind(this)
+
+
+//             }
+//             else {
+//                 AuthenticationService.setupAxiosInterceptors();
+
+//                 //let productCategoryId = document.getElementById("productCategoryId").value;
+//                 ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+//                     // console.log('**' + JSON.stringify(response.data))
+//                     this.setState({
+//                         planningUnits: response.data, message: ''
+//                     }, () => {
+//                         this.fetchData();
+//                     })
+//                 })
+//                     .catch(
+//                         error => {
+//                             this.setState({
+//                                 planningUnits: [],
+//                             })
+//                             if (error.message === "Network Error") {
+//                                 this.setState({ message: error.message });
+//                             } else {
+//                                 switch (error.response ? error.response.status : "") {
+//                                     case 500:
+//                                     case 401:
+//                                     case 404:
+//                                     case 406:
+//                                     case 412:
+//                                         this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+//                                         break;
+//                                     default:
+//                                         this.setState({ message: 'static.unkownError' });
+//                                         break;
+//                                 }
+//                             }
+//                         }
+//                     );
+//             }
+//         });
+
+//     }
+
+//     handlePlanningUnitChange = (planningUnitIds) => {
+//         planningUnitIds = planningUnitIds.sort(function (a, b) {
+//             return parseInt(a.value) - parseInt(b.value);
+//         })
+//         this.setState({
+//             planningUnitValues: planningUnitIds.map(ele => ele),
+//             planningUnitLabels: planningUnitIds.map(ele => ele.label)
+//         }, () => {
+
+//             this.fetchData()
+//         })
+//     }
+
+
+//     handleRangeChange(value, text, listIndex) {
+//         //
+//     }
+//     handleRangeDissmis(value) {
+//         this.setState({ rangeValue: value }, () => {
+//             this.fetchData()
+//         })
+//     }
+
+//     _handleClickRangeBox(e) {
+//         this.refs.pickRange.show()
+//     }
+//     formatter = (value) => {
+
+//         var cell1 = value
+//         cell1 += '';
+//         var x = cell1.split('.');
+//         var x1 = x[0];
+//         var x2 = x.length > 1 ? '.' + x[1] : '';
+//         var rgx = /(\d+)(\d{3})/;
+//         while (rgx.test(x1)) {
+//             x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//         }
+//         return x1 + x2;
+//     }
+
+//     exportCSV(columns) {
+
+//         var csvRow = [];
+//         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+//         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+//         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+//         this.state.planningUnitLabels.map(ele =>
+//             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+//         csvRow.push('')
+//         csvRow.push('')
+//         csvRow.push('')
+//         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+//         csvRow.push('')
+
+//         const headers = [];
+//         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+
+
+//         var A = [headers]
+//         this.state.data.map(ele => A.push([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]));
+//         for (var i = 0; i < A.length; i++) {
+//             // console.log(A[i])
+//             csvRow.push(A[i].join(","))
+
+//         }
+
+//         var csvString = csvRow.join("%0A")
+//         // console.log('csvString' + csvString)
+//         var a = document.createElement("a")
+//         a.href = 'data:attachment/csv,' + csvString
+//         a.target = "_Blank"
+//         a.download = i18n.t('static.report.stockAdjustment') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+//         document.body.appendChild(a)
+//         a.click()
+//     }
+
+//     exportPDF = (columns) => {
+//         const addFooters = doc => {
+
+//             const pageCount = doc.internal.getNumberOfPages()
+
+//             doc.setFont('helvetica', 'bold')
+//             doc.setFontSize(6)
+//             for (var i = 1; i <= pageCount; i++) {
+//                 doc.setPage(i)
+
+//                 doc.setPage(i)
+//                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+//                     align: 'center'
+//                 })
+//                 doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+//                     align: 'center'
+//                 })
+
+
+//             }
+//         }
+//         const addHeaders = doc => {
+
+//             const pageCount = doc.internal.getNumberOfPages()
+
+//             for (var i = 1; i <= pageCount; i++) {
+//                 doc.setFontSize(12)
+//                 doc.setFont('helvetica', 'bold')
+//                 doc.setPage(i)
+//                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+//                 doc.setTextColor("#002f6c");
+//                 doc.text(i18n.t('static.report.stockAdjustment'), doc.internal.pageSize.width / 2, 60, {
+//                     align: 'center'
+//                 })
+//                 if (i == 1) {
+//                     doc.setFontSize(8)
+//                     doc.setFont('helvetica', 'normal')
+//                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+//                         align: 'left'
+//                     })
+//                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+//                         align: 'left'
+//                     })
+
+//                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+//                         align: 'left'
+//                     })
+//                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+//                     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+
+//                 }
+
+//             }
+//         }
+
+//         const unit = "pt";
+//         const size = "A4"; // Use A1, A2, A3 or A4
+//         const orientation = "landscape"; // portrait or landscape
+
+//         const marginLeft = 10;
+//         const doc = new jsPDF(orientation, unit, size);
+
+//         doc.setFontSize(8);
+
+
+
+//         const headers = [];
+//         columns.map((item, idx) => { headers[idx] = (item.text) });
+//         let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+//         let startY = 150 + (this.state.planningUnitValues.length * 3)
+//         let content = {
+//             margin: { top: 80, bottom: 50 },
+//             startY: startY,
+//             head: [headers],
+//             body: data,
+//             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+//             columnStyles: {
+//                 0: { cellWidth: 170 },
+//                 1: { cellWidth: 171.89 },
+//                 6: { cellWidth: 100 }
+//             }
+//         };
+
+//         doc.autoTable(content);
+//         addHeaders(doc)
+//         addFooters(doc)
+//         doc.save(i18n.t('static.report.stockAdjustment') + ".pdf")
+//     }
+
+
+
+//     fetchData = () => {
+//         let versionId = document.getElementById("versionId").value;
+//         let programId = document.getElementById("programId").value;
+
+//         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+//         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+//         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+//         console.log("versionId----", versionId);
+//         console.log("programId----", programId);
+//         console.log("planningUnitIds---", planningUnitIds);
+
+
+//         if (programId > 0 && versionId != -1 && this.state.planningUnitValues.length > 0) {
+//             console.log("INSIDE IF-----------------");
+//             if (versionId.includes('Local')) {
+
+//                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
+//                 var db1;
+//                 var storeOS;
+//                 getDatabase();
+//                 var regionList = [];
+//                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+//                 openRequest.onerror = function (event) {
+//                     this.setState({
+//                         message: i18n.t('static.program.errortext')
+//                     })
+//                 }.bind(this);
+//                 openRequest.onsuccess = function (e) {
+//                     db1 = e.target.result;
+//                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+//                     var version = (versionId.split('(')[0]).trim()
+//                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+//                     var program = `${programId}_v${version}_uId_${userId}`
+//                     var programDataOs = programDataTransaction.objectStore('programData');
+//                     console.log("1----", program)
+//                     var programRequest = programDataOs.get(program);
+//                     programRequest.onerror = function (event) {
+//                         this.setState({
+//                             message: i18n.t('static.program.errortext')
+//                         })
+//                     }.bind(this);
+//                     programRequest.onsuccess = function (e) {
+//                         console.log("2----", programRequest)
+//                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+//                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+//                         var programJson = JSON.parse(programData);
+//                         var inventoryList = []
+//                         // &&( c.inventoryDate>=startDate&& c.inventoryDate<=endDate)
+//                         planningUnitIds.map(planningUnitId =>
+//                             inventoryList = [...inventoryList, ...((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate)))]);
+//                         var dates = new Set(inventoryList.map(ele => ele.inventoryDate))
+//                         var data = []
+//                         planningUnitIds.map(planningUnitId => {
+//                             dates.map(dt => {
+
+//                                 var list = inventoryList.filter(c => c.inventoryDate === dt && c.planningUnit.id == planningUnitId && c.actualQty == 0)
+//                                 console.log("3--->", list)
+//                                 if (list.length > 0) {
+//                                     var adjustment = 0;
+//                                     list.map(ele => adjustment = adjustment + ele.adjustmentQty);
+
+//                                     var json = {
+//                                         program: programJson,
+//                                         inventoryDate: moment(dt).format('MMM YYYY'),
+//                                         planningUnit: list[0].planningUnit,
+//                                         stockAdjustemntQty: adjustment,
+//                                         lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+//                                         lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+//                                         notes: list[0].notes,
+//                                         dataSource: list[0].dataSource
+//                                     }
+//                                     data.push(json)
+//                                 } else {
+
+//                                 }
+//                             })
+//                         })
+//                         console.log(data)
+//                         this.setState({
+//                             data: data
+//                             , message: ''
+//                         })
+//                     }.bind(this)
+//                 }.bind(this)
+//             } else {
+//                 var inputjson = {
+//                     programId: programId,
+//                     versionId: versionId,
+//                     startDate: new moment(startDate),
+//                     stopDate: new moment(endDate),
+//                     planningUnitIds: planningUnitIds
+//                 }
+//                 AuthenticationService.setupAxiosInterceptors();
+//                 console.log("inputJson---->", inputjson);
+//                 ReportService.stockAdjustmentList(inputjson)
+//                     .then(response => {
+
+//                         console.log("RESP-------->", response.data);
+//                         this.setState({
+//                             data: response.data,
+//                             message: ''
+//                         }
+//                         )
+//                     }).catch(
+//                         error => {
+//                             this.setState({
+//                                 data: []
+//                             })
+//                             if (error.message === "Network Error") {
+//                                 this.setState({ message: error.message });
+//                             } else {
+//                                 switch (error.response ? error.response.status : "") {
+//                                     case 500:
+//                                     case 401:
+//                                     case 404:
+//                                     case 406:
+//                                     case 412:
+//                                         this.setState({ message: i18n.t(error.response.data.messageCode) });
+//                                         break;
+//                                     default:
+//                                         this.setState({ message: 'static.unkownError' });
+//                                         break;
+//                                 }
+//                             }
+//                         }
+//                     );
+
+
+//             }
+//         } else if (programId == 0) {
+//             this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+
+//         } else if (versionId == -1) {
+//             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+//         } else {
+//             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+//         }
+//     }
+
+//     componentDidMount() {
+//         this.getPrograms()
+
+//     }
+
+//     formatLabel(cell, row) {
+//         return getLabelText(cell, this.state.lang);
+//     }
+
+//     render() {
+
+//         const { SearchBar, ClearSearchButton } = Search;
+//         const customTotal = (from, to, size) => (
+//             <span className="react-bootstrap-table-pagination-total">
+//                 {i18n.t('static.common.result', { from, to, size })}
+//             </span>
+//         );
+//         const { programs } = this.state
+//         // console.log(programs)
+//         const { versions } = this.state;
+//         let versionList = versions.length > 0
+//             && versions.map((item, i) => {
+//                 return (
+//                     <option key={i} value={item.versionId}>
+//                         {item.versionId}
+//                     </option>
+//                 )
+//             }, this);
+
+//         const { planningUnits } = this.state
+//         let planningUnitList = planningUnits.length > 0
+//             && planningUnits.map((item, i) => {
+//                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+//             }, this);
+
+//         const { realmCountryList } = this.state;
+//         let realmCountries = realmCountryList.length > 0
+//             && realmCountryList.map((item, i) => {
+//                 return (
+//                     <option key={i} value={item.realmCountryId}>
+//                         {getLabelText(item.country.label, this.state.lang)}
+//                     </option>
+//                 )
+//             }, this);
+
+
+//         const { rangeValue } = this.state
+
+
+
+//         const columns = [
+//             {
+//                 dataField: 'dataSource.label',
+//                 text: i18n.t('static.datasource.datasource'),
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '170px' },
+//                 formatter: (cell, row) => {
+//                     return getLabelText(cell, this.state.lang);
+//                 }
+//             },
+//             {
+//                 dataField: 'planningUnit.label',
+//                 text: i18n.t('static.report.planningUnit'),
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '170px' },
+//                 formatter: (cell, row) => {
+//                     return getLabelText(cell, this.state.lang);
+//                 }
+//             },
+//             {
+//                 dataField: 'inventoryDate',
+//                 text: i18n.t('static.report.month'),
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '80px' },
+//                 formatter: (cell, row) => {
+//                     return new moment(cell).format('MMM YYYY');
+//                 }
+//             },
+//             {
+//                 dataField: 'stockAdjustemntQty',
+//                 text: i18n.t('static.report.stockAdjustment'),
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '80px' },
+//                 formatter: this.formatter
+
+//             },
+//             {
+//                 dataField: 'lastModifiedBy.username',
+//                 text: i18n.t('static.report.lastmodifiedby'),
+//                 sort: true,
+//                 align: 'center',
+//                 style: { width: '80px' },
+//                 headerAlign: 'center'
+//             },
+//             {
+//                 dataField: 'lastModifiedDate',
+//                 text: i18n.t('static.report.lastmodifieddate'),
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '80px' },
+//                 formatter: (cell, row) => {
+//                     return new moment(cell).format(`${DATE_FORMAT_CAP}`);
+//                 }
+//             },
+//             {
+//                 dataField: 'notes',
+//                 text: i18n.t('static.program.notes'),
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '100px' },
+//             }
+
+//         ];
+//         const options = {
+//             hidePageListOnlyOnePage: true,
+//             firstPageText: i18n.t('static.common.first'),
+//             prePageText: i18n.t('static.common.back'),
+//             nextPageText: i18n.t('static.common.next'),
+//             lastPageText: i18n.t('static.common.last'),
+//             nextPageTitle: i18n.t('static.common.firstPage'),
+//             prePageTitle: i18n.t('static.common.prevPage'),
+//             firstPageTitle: i18n.t('static.common.nextPage'),
+//             lastPageTitle: i18n.t('static.common.lastPage'),
+//             showTotal: true,
+//             paginationTotalRenderer: customTotal,
+//             disablePageTitle: true,
+//             sizePerPageList: [{
+//                 text: '10', value: 10
+//             }, {
+//                 text: '30', value: 30
+//             }
+//                 ,
+//             {
+//                 text: '50', value: 50
+//             },
+//             {
+//                 text: 'All', value: this.state.selRegion.length
+//             }]
+//         }
+//         return (
+//             <div className="animated">
+//                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+//                     this.setState({ message: message })
+//                 }} />
+//                 <h5>{i18n.t(this.props.match.params.message)}</h5>
+//                 <h5 className="red">{i18n.t(this.state.message)}</h5>
+//                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
+//                     <div className="Card-header-reporticon">
+//                         {/* <i className="icon-menu"></i><strong>Stock Adjustment Report</strong>{' '} */}
+//                         {this.state.data.length > 0 &&
+//                             <div className="card-header-actions">
+//                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+//                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+//                             </div>
+//                         }
+//                     </div>
+//                     <CardBody className="pt-1">
+
+//                         <Col md="12 pl-0">
+//                             <div className="row">
+//                                 <FormGroup className="col-md-3">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+//                                     <div className="controls  edit">
+
+//                                             <Picker
+//                                                 ref="pickRange"
+//                                                 years={{ min: 2013 }}
+//                                                 value={rangeValue}
+//                                                 lang={pickerLang}
+//                                                 //theme="light"
+//                                                 onChange={this.handleRangeChange}
+//                                                 onDismiss={this.handleRangeDissmis}
+//                                             >
+//                                                 <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+//                                             </Picker>
+
+
+//                                     </div>
+//                                 </FormGroup>
+
+
+//                                 <FormGroup className="col-md-3">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+//                                     <div className="controls ">
+//                                         <InputGroup>
+//                                             <Input
+//                                                 type="select"
+//                                                 name="programId"
+//                                                 id="programId"
+//                                                 bsSize="sm"
+//                                                 onChange={this.filterVersion}
+//                                             >
+//                                                 <option value="0">{i18n.t('static.common.select')}</option>
+//                                                 {programs.length > 0
+//                                                     && programs.map((item, i) => {
+//                                                         return (
+//                                                             <option key={i} value={item.programId}>
+//                                                                 {getLabelText(item.label, this.state.lang)}
+//                                                             </option>
+//                                                         )
+//                                                     }, this)}
+
+//                                             </Input>
+
+//                                         </InputGroup>
+//                                     </div>
+//                                 </FormGroup>
+//                                 <FormGroup className="col-md-3">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+//                                     <div className="controls ">
+//                                         <InputGroup>
+//                                             <Input
+//                                                 type="select"
+//                                                 name="versionId"
+//                                                 id="versionId"
+//                                                 bsSize="sm"
+//                                                 onChange={(e) => { this.getPlanningUnit(); }}
+//                                             >
+//                                                 <option value="-1">{i18n.t('static.common.select')}</option>
+//                                                 {versionList}
+//                                             </Input>
+
+//                                         </InputGroup>
+//                                     </div>
+//                                 </FormGroup>
+
+//                                 <FormGroup className="col-md-3">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+//                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+//                                     <div className="controls ">
+//                                         <MultiSelect
+//                                             name="planningUnitId"
+//                                             id="planningUnitId"
+//                                             bsSize="md"
+//                                             value={this.state.planningUnitValues}
+//                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
+//                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+//                                         />
+
+//                                     </div>
+//                                 </FormGroup>
+//                             </div>
+//                         </Col>
+
+
+
+
+//                         {
+//                             this.state.data.length > 0 &&
+//                             < ToolkitProvider
+//                                 keyField="regionId"
+//                                 data={this.state.data}
+//                                 columns={columns}
+//                                 search={{ searchFormatted: true }}
+//                                 hover
+//                                 filter={filterFactory()}
+//                             >
+//                                 {
+//                                     props => (
+
+//                                         <div className="TableCust">
+//                                             <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
+//                                                 <SearchBar {...props.searchProps} />
+//                                                 <ClearSearchButton {...props.searchProps} />
+//                                             </div>
+//                                             <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+//                                                 pagination={paginationFactory(options)}
+//                                                 /* rowEvents={{
+//                                                      onClick: (e, row, rowIndex) => {
+//                                                          this.editRegion(row);
+//                                                      }
+//                                                  }}*/
+//                                                 {...props.baseProps}
+//                                             />
+//                                         </div>
+//                                     )
+//                                 }
+//                             </ToolkitProvider>
+//                         }
+//                     </CardBody>
+//                 </Card>
+//                 <div style={{ display: this.state.loading ? "block" : "none" }}>
+//                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+//                         <div className="align-items-center">
+//                             <div ><h4> <strong>Loading...</strong></h4></div>
+
+//                             <div className="spinner-border blue ml-4" role="status">
+
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div >
+//         );
+//     }
+// }
+// export default StockAdjustmentComponent;
+
 import React, { Component } from 'react';
 import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
@@ -18,7 +978,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -28,6 +988,9 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
 import MultiSelect from 'react-multi-select-component';
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -58,6 +1021,7 @@ class StockAdjustmentComponent extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
 
     makeText = m => {
@@ -112,7 +1076,7 @@ class StockAdjustmentComponent extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -207,7 +1171,7 @@ class StockAdjustmentComponent extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -267,7 +1231,7 @@ class StockAdjustmentComponent extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -505,6 +1469,112 @@ class StockAdjustmentComponent extends Component {
     }
 
 
+    buildJExcel() {
+        let stockAdjustmentList = this.state.data;
+        // console.log("stockAdjustmentList---->", stockAdjustmentList);
+        let stockAdjustmentArray = [];
+        let count = 0;
+
+        for (var j = 0; j < stockAdjustmentList.length; j++) {
+            data = [];
+            data[0] = getLabelText(stockAdjustmentList[j].dataSource.label, this.state.lang)
+            data[1] = getLabelText(stockAdjustmentList[j].planningUnit.label, this.state.lang)
+            data[2] = new moment(stockAdjustmentList[j].inventoryDate).format('MMM YYYY')
+            data[3] = (stockAdjustmentList[j].stockAdjustemntQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
+            data[4] = stockAdjustmentList[j].lastModifiedBy.username;
+            data[5] = new moment(stockAdjustmentList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`);
+            data[6] = stockAdjustmentList[j].notes;
+
+            stockAdjustmentArray[count] = data;
+            count++;
+        }
+        if (stockAdjustmentList.length == 0) {
+            data = [];
+            stockAdjustmentArray[0] = data;
+        }
+        // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = stockAdjustmentArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: i18n.t('static.datasource.datasource'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.planningUnit'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.month'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.stockAdjustment'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.lastmodifiedby'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.lastmodifieddate'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    readOnly: true
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+
+
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false,
+        };
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
+        this.setState({
+            languageEl: languageEl
+        })
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+
 
     fetchData = () => {
         let versionId = document.getElementById("versionId").value;
@@ -528,7 +1598,7 @@ class StockAdjustmentComponent extends Component {
                 var storeOS;
                 getDatabase();
                 var regionList = [];
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -589,7 +1659,9 @@ class StockAdjustmentComponent extends Component {
                         this.setState({
                             data: data
                             , message: ''
-                        })
+                        }, () => {
+                            this.buildJExcel();
+                        });
                     }.bind(this)
                 }.bind(this)
             } else {
@@ -609,13 +1681,17 @@ class StockAdjustmentComponent extends Component {
                         this.setState({
                             data: response.data,
                             message: ''
-                        }
-                        )
+                        }, () => {
+                            this.buildJExcel();
+                        });
                     }).catch(
                         error => {
                             this.setState({
                                 data: []
-                            })
+                            }, () => {
+                                this.el = jexcel(document.getElementById("tableDiv"), '');
+                                this.el.destroy();
+                            });
                             if (error.message === "Network Error") {
                                 this.setState({ message: error.message });
                             } else {
@@ -638,13 +1714,22 @@ class StockAdjustmentComponent extends Component {
 
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
 
         } else if (versionId == -1) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
 
         } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
 
         }
     }
@@ -816,34 +1901,34 @@ class StockAdjustmentComponent extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className=" mt-3">
+                    <CardBody className="pt-1">
 
                         <Col md="12 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="Region-box-icon fa fa-sort-desc"></span></Label>
-                                    <div className="controls SelectGo Regioncalender">
-                                        <InputGroup>
-                                            <Picker
-                                                ref="pickRange"
-                                                years={{ min: 2013 }}
-                                                value={rangeValue}
-                                                lang={pickerLang}
-                                                //theme="light"
-                                                onChange={this.handleRangeChange}
-                                                onDismiss={this.handleRangeDissmis}
-                                            >
-                                                <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                            </Picker>
+                            <div className="row">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <div className="controls  edit">
 
-                                        </InputGroup>
+                                        <Picker
+                                            ref="pickRange"
+                                            years={{ min: 2013 }}
+                                            value={rangeValue}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+
+
                                     </div>
                                 </FormGroup>
 
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -867,9 +1952,9 @@ class StockAdjustmentComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -886,10 +1971,10 @@ class StockAdjustmentComponent extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}<span className="planningunitstockAdjustment-box-icon fa fa-sort-desc"></span></Label>
-                                    {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
-                                    <div className="controls SelectGo">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls ">
                                         <MultiSelect
                                             name="planningUnitId"
                                             id="planningUnitId"
@@ -905,40 +1990,11 @@ class StockAdjustmentComponent extends Component {
                         </Col>
 
 
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
 
 
-                        {
-                            this.state.data.length > 0 &&
-                            < ToolkitProvider
-                                keyField="regionId"
-                                data={this.state.data}
-                                columns={columns}
-                                search={{ searchFormatted: true }}
-                                hover
-                                filter={filterFactory()}
-                            >
-                                {
-                                    props => (
 
-                                        <div className="TableCust">
-                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
-                                                <SearchBar {...props.searchProps} />
-                                                <ClearSearchButton {...props.searchProps} />
-                                            </div>
-                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                pagination={paginationFactory(options)}
-                                                /* rowEvents={{
-                                                     onClick: (e, row, rowIndex) => {
-                                                         this.editRegion(row);
-                                                     }
-                                                 }}*/
-                                                {...props.baseProps}
-                                            />
-                                        </div>
-                                    )
-                                }
-                            </ToolkitProvider>
-                        }
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
