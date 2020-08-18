@@ -668,6 +668,7 @@ class AddprogramPlanningUnit extends Component {
                                             // alert("hi");
                                             let myReasponse = response.data;
                                             var productDataArr = []
+                                            console.log("my response---->",myReasponse);;
                                             // if (myReasponse.length > 0) {
                                             this.setState({ rows: myReasponse });
                                             var data = [];

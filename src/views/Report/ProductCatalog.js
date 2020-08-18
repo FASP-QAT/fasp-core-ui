@@ -194,7 +194,7 @@ class ProductCatalog extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text('Product Catalog', doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.productCatalogReport'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
