@@ -1418,8 +1418,18 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                 }
                 console.log("ProList", proList);
+                var programIdd = this.props.match.params.programId;
+                console.log("programIdd", programIdd);
+                if (programIdd != '' && programIdd != undefined) {
+                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
+                    this.setState({
+                        programSelect: programSelect,
+                        programId: programIdd
+                    })
+                    this.getPlanningUnitList(programSelect);
+                }
                 this.setState({
-                    programList: proList
+                    programList: proList,
                 })
             }.bind(this);
         }.bind(this);
@@ -1528,6 +1538,15 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     }
                                 }
+                            }
+                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            if (planningUnitIdProp != '' && planningUnitIdProp!=undefined) {
+                                var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                this.setState({
+                                    planningUnit: planningUnit,
+                                    planningUnitId: planningUnitIdProp
+                                })
+                                this.formSubmit(planningUnit, this.state.monthCount);
                             }
                             this.setState({
                                 planningUnitList: proList,
