@@ -2020,7 +2020,8 @@ input::placeholder {
 //   background-color: #e0d24d!important;
 // }
 
-.background-red td:not(:last-child){
+// .background-red td:not(:last-child){
+  .background-red {
   // background-color: red;
   background-color: #cc4e4e!important;
 }

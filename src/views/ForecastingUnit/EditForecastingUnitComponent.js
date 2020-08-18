@@ -334,7 +334,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}<span className="red Reqasterisk">*</span><span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
                                                         <Input type="text"
                                                             name="genericLabel"
                                                             id="genericLabel"

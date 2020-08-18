@@ -74,6 +74,7 @@ class SupplyPlanVersionAndReview extends Component {
             matricsList: [],
             dropdownOpen: false,
             radioSelected: 2,
+            versionTypeList: [],
             statuses: [],
             programs: [],
             countries: [],
@@ -97,6 +98,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.checkValue = this.checkValue.bind(this);
         this.editprogramStatus = this.editprogramStatus.bind(this)
+        this.getVersionTypeList = this.getVersionTypeList.bind(this);
     }
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -108,6 +110,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.getCountrylist();
         this.getPrograms()
         this.getStatusList()
+        this.getVersionTypeList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -225,6 +228,15 @@ class SupplyPlanVersionAndReview extends Component {
             );
 
     }
+    getVersionTypeList() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getVersionTypeList().then(response => {
+            console.log('**' + JSON.stringify(response.data))
+            this.setState({
+                versionTypeList: response.data
+            })
+        })
+    }
     getStatusList() {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
@@ -259,50 +271,32 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
     fetchData() {
+        console.log("function called-------------------------------")
         let programId = document.getElementById("programId").value;
         let countryId = document.getElementById("countryId").value;
         let versionStatusId = document.getElementById("versionStatusId").value;
+        let versionTypeId = document.getElementById("versionTypeId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-if(programId!=0&& countryId!=0){
-        AuthenticationService.setupAxiosInterceptors();
-        ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    matricsList: response.data,
-                    message:''
-                })
-            }).catch(
-                error => {
+        console.log("versionTypeId---------------"+versionTypeId);
+        if (programId != 0 && countryId != 0) {
+            AuthenticationService.setupAxiosInterceptors();
+            console.log("startDate---"+startDate)
+            ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
+                .then(response => {
+                    console.log(response)
                     this.setState({
-                        matricsList: []
+                        matricsList: response.data,
+                        message: ''
                     })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-            }
-            else if (countryId == 0){
-                this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext') });
-            }
-            else {
-                this.setState({ matricsList: [], message: i18n.t('static.common.selectProgram') });
-            }   
+                })
+        }
+        else if (countryId == 0) {
+            this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext') });
+        }
+        else {
+            this.setState({ matricsList: [], message: i18n.t('static.common.selectProgram') });
+        }
 
     }
 
@@ -326,7 +320,7 @@ if(programId!=0&& countryId!=0){
 
         var A = [headers]
 
-        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), ( moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', elt.notes!=null?(elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20'):''
+        this.state.matricsList.map(elt => A.push([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
         ]));
 
 
@@ -427,15 +421,15 @@ if(programId!=0&& countryId!=0){
         const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '', elt.notes]);
 
         let content = {
-            margin: { top: 80 ,bottom:50},
+            margin: { top: 80, bottom: 50 },
             startY: 200,
             head: header,
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' , cellWidth: 75 },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
             columnStyles: {
                 0: { cellWidth: 131.89 },
                 8: { cellWidth: 105 },
-              }
+            }
         };
 
         //  doc.text(title, marginLeft, 40);
@@ -480,6 +474,15 @@ if(programId!=0&& countryId!=0){
             )
 
         }, this);
+
+        const { versionTypeList } = this.state;
+        let versionTypes = versionTypeList.length > 0
+            && versionTypeList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{getLabelText(item.label, this.state.lang)}</option>
+                )
+            }, this);
+
         const { statuses } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
@@ -597,9 +600,9 @@ if(programId!=0&& countryId!=0){
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                 formatter: (cellContent, row) => {
+                formatter: (cellContent, row) => {
                     return (
-                        (row.versionStatus.id == 2)? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null):null
+                        (row.versionStatus.id == 2) ? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
                         // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
@@ -738,6 +741,19 @@ if(programId!=0&& countryId!=0){
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                            <div className="controls">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="versionTypeId"
+                                                        id="versionTypeId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData(e) }}
+                                                    >  <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        {versionTypes}</Input>
+                                                </InputGroup>    </div></FormGroup>
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
@@ -780,7 +796,7 @@ if(programId!=0&& countryId!=0){
                                                                 rowEvents={{
                                                                     onClick: (e, row, rowIndex) => {
                                                                         if (row.versionStatus.id == 1
-                                                                             && row.versionType.id==2
+                                                                            && row.versionType.id == 2
                                                                         )
                                                                             this.editprogramStatus(row);
                                                                     }
