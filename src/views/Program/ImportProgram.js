@@ -13,7 +13,7 @@ import getLabelText from '../../CommonComponent/getLabelText.js';
 import * as JsStoreFunction from "../../CommonComponent/JsStoreFunctions.js"
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import { SECRET_KEY } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import JSZip from 'jszip';
 import CryptoJS from 'crypto-js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -88,7 +88,7 @@ export default class ImportProgram extends Component {
                 var selectedPrgArr = this.state.programId;
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
                 openRequest.onsuccess = function (e) {
                     console.log("in success");
                     db1 = e.target.result;

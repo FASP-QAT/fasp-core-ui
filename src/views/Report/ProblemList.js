@@ -1,4 +1,4 @@
-import { DATE_FORMAT_CAP } from '../../Constants';
+import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants';
 import React from "react";
 import ReactDOM from 'react-dom';
 import jexcel from 'jexcel';
@@ -71,7 +71,7 @@ export default class ConsumptionDetails extends React.Component {
         const lan = 'en';
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -162,7 +162,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var db1;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             var procurementAgentList = [];
             var fundingSourceList = [];
             var budgetList = [];

@@ -10,7 +10,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
@@ -145,7 +145,7 @@ export default class StockStatusMatrix extends React.Component {
         var data = [];
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
           var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
@@ -927,7 +927,7 @@ console.log('shiplist',shiplist)
       if (versionId.includes('Local')) {
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
 
@@ -1058,7 +1058,7 @@ console.log('shiplist',shiplist)
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1152,7 +1152,7 @@ console.log('shiplist',shiplist)
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1215,7 +1215,7 @@ console.log('shiplist',shiplist)
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
           var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');

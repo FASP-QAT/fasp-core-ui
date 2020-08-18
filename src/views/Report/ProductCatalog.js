@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -433,7 +433,7 @@ class ProductCatalog extends Component {
 
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -514,7 +514,7 @@ class ProductCatalog extends Component {
 
             var db1;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var transaction = db1.transaction(['productCategory'], 'readwrite');
@@ -586,7 +586,7 @@ class ProductCatalog extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -673,7 +673,7 @@ class ProductCatalog extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -723,7 +723,7 @@ class ProductCatalog extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -842,7 +842,7 @@ class ProductCatalog extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['procurementAgent'], 'readwrite');
@@ -941,7 +941,7 @@ class ProductCatalog extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')

@@ -317,7 +317,7 @@ class ApplicationDashboard extends Component {
     // var db1;
     // var storeOS;
     // getDatabase();
-    // var openRequest = indexedDB.open('fasp', 1);
+    // var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     // openRequest.onsuccess = function (e) {
     //   var realmId = AuthenticationService.getRealmId();
     //   var programList = [];

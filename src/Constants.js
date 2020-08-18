@@ -49,3 +49,5 @@ export const UNIT_LABEL_REGEX=/^([a-zA-Z0-9/+-]+\s)*[a-zA-Z0-9/+-]+$/
 export const NEGATIVE_INTEGER_NO_REGEX=/^[-+]?\d*$/
 export const ALPHABET_NUMBER_REGEX=/^([a-zA-Z0-9])*[a-zA-Z0-9]+$/
 export const BUDGET_NAME_REGEX=/^([a-zA-Z0-9,-]+\s)*[a-zA-Z0-9,-]+$/
+export const INDEXED_DB_NAME="fasp"
+export const INDEXED_DB_VERSION=1
