@@ -28,6 +28,7 @@ import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunction
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
+import QatProblemActions from '../../CommonComponent/QatProblemActions'
 const entityname = i18n.t('static.report.problem');
 
 export default class ConsumptionDetails extends React.Component {
@@ -48,7 +49,8 @@ export default class ConsumptionDetails extends React.Component {
             data: [],
             message: '',
             planningUnitId: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
@@ -61,11 +63,16 @@ export default class ConsumptionDetails extends React.Component {
         this.buttonFormatter = this.buttonFormatter.bind(this);
         this.addMapping = this.addMapping.bind(this);
         this.getNote = this.getNote.bind(this);
+        this.updateState=this.updateState.bind(this);
 
     }
 
+    updateState(ekValue){
+        this.setState({loading:ekValue});
+    }
+
     componentDidMount = function () {
-        qatProblemActions();
+        // qatProblemActions();
         let problemStatusId = document.getElementById('problemStatusId').value;
         console.log("problemStatusId ---------> ", problemStatusId);
         const lan = 'en';
@@ -138,7 +145,7 @@ export default class ConsumptionDetails extends React.Component {
         // console.log('in rowClassNameFormat')
         // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
         if (row.realmProblem.criticality.id == 3) {
-            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
+            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red-problemList' : '';
         } else if (row.realmProblem.criticality.id == 2) {
             return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
         } else {
@@ -488,12 +495,13 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated">
+                <QatProblemActions updateState={this.updateState}></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -501,7 +509,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pb-lg-2 pt-lg-0">
+                    <CardBody  className="pb-lg-0">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>
@@ -509,7 +517,7 @@ export default class ConsumptionDetails extends React.Component {
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input type="select"
-                                                bsSize="sm" 
+                                                bsSize="sm"
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
                                                 onChange={this.fetchData}
@@ -598,7 +606,17 @@ export default class ConsumptionDetails extends React.Component {
                         </FormGroup>
                     </CardFooter> */}
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div >
         );

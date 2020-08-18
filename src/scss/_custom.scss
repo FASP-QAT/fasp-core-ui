@@ -2025,6 +2025,11 @@ input::placeholder {
   // background-color: red;
   background-color: #cc4e4e!important;
 }
+
+.background-red-problemList td:not(:last-child){
+    // background-color: red;
+    background-color: #cc4e4e!important;
+  }
 .background-orange td:not(:last-child){
   // background-color: red;
   background-color: #e07847!important;
