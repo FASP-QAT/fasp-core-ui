@@ -7,7 +7,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
+import { SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS, CANCELLED_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -73,7 +73,7 @@ export default class syncPage extends Component {
   componentDidMount() {
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         commitVersionError: i18n.t('static.program.errortext')
@@ -288,7 +288,7 @@ export default class syncPage extends Component {
         })
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
           this.setState({
             commitVersionError: i18n.t('static.program.errortext')
@@ -1537,7 +1537,7 @@ export default class syncPage extends Component {
         var programId = document.getElementById('programId').value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
           this.setState({
             commitVersionError: i18n.t('static.program.errortext')
