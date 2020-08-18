@@ -647,7 +647,7 @@ export default class SupplyPlanComponent extends React.Component {
                         type: 'line',
                         stack: 5,
                         yAxisID: 'B',
-                        backgroundColor: 'rgba(255,193,8,0.2)',
+                        backgroundColor: 'transparent',
                         borderColor: '#59cacc',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
@@ -1414,17 +1414,20 @@ export default class SupplyPlanComponent extends React.Component {
                             label: programJson1.programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
-                        proList[i] = programJson
+                        proList.push(programJson);
                     }
                 }
+                console.log("ProList", proList);
                 this.setState({
                     programList: proList
                 })
             }.bind(this);
         }.bind(this);
+        console.log("After component did mount");
     };
 
     getPlanningUnitList(value) {
+        console.log("Vlue", value);
         document.getElementById("planningUnitId").value = 0;
         this.setState({
             display: 'none',
@@ -1464,7 +1467,7 @@ export default class SupplyPlanComponent extends React.Component {
                         name: getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
-                    regionList[i] = regionJson
+                    regionList.push(regionJson);
 
                 }
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');

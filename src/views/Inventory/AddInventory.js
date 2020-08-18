@@ -184,7 +184,7 @@ export default class AddInventory extends Component {
                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                                 value: myResult[i].planningUnit.id
                             }
-                            proList[i] = productJson
+                            proList.push(productJson)
                         }
                     }
                     console.log("proList---" + proList);
