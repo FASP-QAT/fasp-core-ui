@@ -11,7 +11,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, TBD_PROCUREMENT_AGENT_ID, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, TBD_PROCUREMENT_AGENT_ID, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -647,7 +647,7 @@ export default class SupplyPlanComponent extends React.Component {
                         type: 'line',
                         stack: 5,
                         yAxisID: 'B',
-                        backgroundColor: 'rgba(255,193,8,0.2)',
+                        backgroundColor: 'transparent',
                         borderColor: '#59cacc',
                         borderStyle: 'dotted',
                         borderDash: [10, 10],
@@ -1381,7 +1381,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -1414,17 +1414,20 @@ export default class SupplyPlanComponent extends React.Component {
                             label: programJson1.programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
-                        proList[i] = programJson
+                        proList.push(programJson);
                     }
                 }
+                console.log("ProList", proList);
                 this.setState({
                     programList: proList
                 })
             }.bind(this);
         }.bind(this);
+        console.log("After component did mount");
     };
 
     getPlanningUnitList(value) {
+        console.log("Vlue", value);
         document.getElementById("planningUnitId").value = 0;
         this.setState({
             display: 'none',
@@ -1438,7 +1441,7 @@ export default class SupplyPlanComponent extends React.Component {
         var regionList = [];
         var dataSourceList = [];
         var dataSourceListAll = [];
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -1464,7 +1467,7 @@ export default class SupplyPlanComponent extends React.Component {
                         name: getLabelText(programJson.regionList[i].label, this.state.lang),
                         id: programJson.regionList[i].regionId
                     }
-                    regionList[i] = regionJson
+                    regionList.push(regionJson);
 
                 }
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -1634,7 +1637,7 @@ export default class SupplyPlanComponent extends React.Component {
         var storeOS;
         getDatabase();
         var regionList = [];
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -3062,7 +3065,7 @@ export default class SupplyPlanComponent extends React.Component {
             var storeOS;
             getDatabase();
             var regionList = [];
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -4037,7 +4040,7 @@ export default class SupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -4148,7 +4151,7 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -4206,7 +4209,7 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -4450,7 +4453,7 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')

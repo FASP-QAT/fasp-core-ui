@@ -1,11 +1,11 @@
 // const db1="";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../Constants.js'
 
 export function getDatabase() {
     var db1;
     var storeOS;
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     openRequest.onupgradeneeded = function (e) {
         db1 = e.target.result;
         if (!db1.objectStoreNames.contains('programData')) {

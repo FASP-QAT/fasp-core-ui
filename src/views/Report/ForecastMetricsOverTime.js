@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -436,7 +436,7 @@ PercentageFormatter=num=>{
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
@@ -532,7 +532,7 @@ PercentageFormatter=num=>{
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
@@ -590,7 +590,7 @@ PercentageFormatter=num=>{
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
           var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -684,7 +684,7 @@ PercentageFormatter=num=>{
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
 

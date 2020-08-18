@@ -15,7 +15,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
@@ -169,7 +169,7 @@ export default class SyncMasterData extends Component {
                             var db1;
                             var storeOS;
                             getDatabase();
-                            var openRequest = indexedDB.open('fasp', 1);
+                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
@@ -258,7 +258,7 @@ export default class SyncMasterData extends Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 var realmId = AuthenticationService.getRealmId();
                 db1 = e.target.result;

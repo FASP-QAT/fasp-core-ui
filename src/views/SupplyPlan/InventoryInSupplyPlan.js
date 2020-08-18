@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, INTEGER_NO_REGEX, INVENTORY_DATA_SOURCE_TYPE, NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS } from "../../Constants";
+import { SECRET_KEY, INTEGER_NO_REGEX, INVENTORY_DATA_SOURCE_TYPE, NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 
@@ -43,7 +43,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var realmCountryPlanningUnitList = [];
         var myVar = "";
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
         }.bind(this);
@@ -875,7 +875,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')

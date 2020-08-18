@@ -11,7 +11,7 @@ import moment from "moment";
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import Select from 'react-select';
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -527,7 +527,7 @@ class EditSupplyPlanStatus extends Component {
                 batchInfoList: batchList,
                 batchInfoListAllForInventory: batchInfoList
             })
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
             openRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -758,7 +758,7 @@ class EditSupplyPlanStatus extends Component {
             shipmentListUnFiltered: programJson.shipmentList
         })
 
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -931,7 +931,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             batchInfoListAll: batchInfoListAll
         })
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -1931,7 +1931,7 @@ class EditSupplyPlanStatus extends Component {
         var db1;
         getDatabase();
         var regionList = [];
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
@@ -2792,7 +2792,7 @@ class EditSupplyPlanStatus extends Component {
         var storeOS;
         getDatabase();
         var dataSourceListAll = [];
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (e) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')

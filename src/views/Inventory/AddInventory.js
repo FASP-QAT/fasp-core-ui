@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -74,7 +74,7 @@ export default class AddInventory extends Component {
     componentDidMount() {
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -130,7 +130,7 @@ export default class AddInventory extends Component {
         var storeOS;
         var regionList = [];
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -184,7 +184,7 @@ export default class AddInventory extends Component {
                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                                 value: myResult[i].planningUnit.id
                             }
-                            proList[i] = productJson
+                            proList.push(productJson)
                         }
                     }
                     console.log("proList---" + proList);
@@ -205,7 +205,7 @@ export default class AddInventory extends Component {
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),

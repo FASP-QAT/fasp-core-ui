@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Online } from "react-detect-offline";
 import jwt_decode from 'jwt-decode'
-import { API_URL } from '../../Constants.js'
+import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
@@ -217,7 +217,7 @@ class AuthenticationService {
         } else {
             var db;
             var customerObjectStore;
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
 
             openRequest.onupgradeneeded = function (e) {
                 var db = e.target.result;
@@ -351,7 +351,7 @@ class AuthenticationService {
             var db;
             var customerObjectStore;
             var userObj = 0;
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
 
             openRequest.onupgradeneeded = function (e) {
                 db = e.target.result;

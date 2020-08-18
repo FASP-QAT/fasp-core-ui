@@ -8,7 +8,7 @@ import {
     APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS,
     NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK,
     ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE,
-    FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE
+    FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, INDEXED_DB_VERSION, INDEXED_DB_NAME
 
 } from '../Constants.js'
 import CryptoJS from 'crypto-js';
@@ -20,7 +20,7 @@ export function qatProblemActions() {
     var db1;
     var storeOS;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
     openRequest.onsuccess = function (e) {
         var realmId = AuthenticationService.getRealmId();
         // console.log("QPA 1====>", realmId);

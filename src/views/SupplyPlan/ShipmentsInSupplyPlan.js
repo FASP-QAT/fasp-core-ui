@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from "../../Constants";
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -55,7 +55,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var dataSourceList = [];
         var currencyList = [];
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
         }.bind(this);
@@ -1755,7 +1755,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             }.bind(this);
@@ -2176,7 +2176,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             }.bind(this);
@@ -2660,7 +2660,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             }.bind(this);
