@@ -67,6 +67,399 @@ class AddprogramPlanningUnit extends Component {
         }, 8000);
     }
 
+    componentDidMount() {
+        var list = [];
+        var productCategoryList = [];
+        // var realmId = document.getElementById("realmId").value;
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProductCategoryServcie.getProductCategoryListByRealmId(1)
+            .then(response => {
+
+                if (response.status == 200) {
+                    console.log("productCategory response----->", response.data);
+                    for (var k = 0; k < (response.data).length; k++) {
+                        var spaceCount = response.data[k].sortOrder.split(".").length;
+                        console.log("spaceCOunt--->", spaceCount);
+                        var indendent = "";
+                        for (var p = 1; p <= spaceCount - 1; p++) {
+                            if (p == 1) {
+                                indendent = indendent.concat("|_");
+                            } else {
+                                indendent = indendent.concat("_");
+                            }
+                        }
+                        console.log("ind", indendent);
+                        console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+                        var productCategoryJson = {
+                            name: (response.data[k].payload.label.label_en),
+                            id: response.data[k].payload.productCategoryId
+                        }
+                        productCategoryList.push(productCategoryJson);
+
+                    }
+
+                    PlanningUnitService.getActivePlanningUnitList()
+                        .then(response => {
+                            if (response.status == 200) {
+                                this.setState({
+                                    planningUnitList: response.data
+                                });
+                                for (var k = 0; k < (response.data).length; k++) {
+                                    var planningUnitJson = {
+                                        name: response.data[k].label.label_en,
+                                        id: response.data[k].planningUnitId
+                                    }
+                                    list.push(planningUnitJson);
+                                }
+
+
+                                AuthenticationService.setupAxiosInterceptors();
+                                ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
+                                    .then(response => {
+                                        if (response.status == 200) {
+                                            // alert("hi");
+                                            let myReasponse = response.data;
+                                            var productDataArr = []
+                                            // if (myReasponse.length > 0) {
+                                            this.setState({ rows: myReasponse });
+                                            var data = [];
+                                            if (myReasponse.length != 0) {
+                                                for (var j = 0; j < myReasponse.length; j++) {
+                                                    data = [];
+                                                    data[0] = 0;
+                                                    data[1] = myReasponse[j].planningUnit.id;
+                                                    data[2] = myReasponse[j].reorderFrequencyInMonths;
+                                                    data[3] = myReasponse[j].minMonthsOfStock;
+                                                    data[4] = myReasponse[j].monthsInFutureForAmc;
+                                                    data[5] = myReasponse[j].monthsInPastForAmc;
+                                                    data[6] = myReasponse[j].localProcurementLeadTime;
+                                                    data[7] = myReasponse[j].shelfLife;
+                                                    data[8] = myReasponse[j].catalogPrice;
+                                                    data[9] = myReasponse[j].programPlanningUnitId;
+                                                    data[10] = myReasponse[j].active;
+                                                    data[11] = 0;
+                                                    data[12] = myReasponse[j].program.id;
+                                                    productDataArr.push(data);
+                                                }
+                                            }
+
+                                            if (productDataArr.length == 0) {
+                                                data = [];
+                                                data[0] = 0;
+                                                data[1] = "";
+                                                data[2] = "";
+                                                data[3] = "";
+                                                data[4] = "";
+                                                data[5] = "";
+                                                data[6] = "";
+                                                data[7] = "";
+                                                data[8] = 0;
+                                                data[9] = 0;
+                                                data[10] = 1;
+                                                data[11] = 1;
+                                                data[12] = this.props.match.params.programId;
+                                                productDataArr[0] = data;
+                                            }
+
+
+                                            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                            this.el.destroy();
+                                            var json = [];
+                                            var data = productDataArr;
+                                            var options = {
+                                                data: data,
+                                                columnDrag: true,
+                                                colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                columns: [
+                                                    {
+                                                        title: 'Product Category',
+                                                        type: 'dropdown',
+                                                        source: productCategoryList
+                                                    },
+                                                    {
+                                                        title: 'Planning Unit',
+                                                        type: 'autocomplete',
+                                                        source: list,
+                                                        filter: this.dropdownFilter
+                                                    },
+                                                    {
+                                                        title: 'Reorder frequency in months',
+                                                        type: 'number',
+
+                                                    },
+                                                    {
+                                                        title: 'Min month of stock',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Months In Future For AMC',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Months In Past For AMC',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Local Procurment Lead Time(Months)',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Shelf Life(Months)',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Catalog Price (USD)',
+                                                        type: 'number'
+                                                    },
+                                                    {
+                                                        title: 'Id',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Active',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Changed Flag',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'ProgramId',
+                                                        type: 'hidden'
+                                                    }
+
+
+                                                ],
+                                                pagination: 10,
+                                                search: true,
+                                                columnSorting: true,
+                                                tableOverflow: true,
+                                                wordWrap: true,
+                                                paginationOptions: [10, 25, 50, 100],
+                                                position: 'top',
+                                                allowInsertColumn: false,
+                                                allowManualInsertColumn: false,
+                                                allowDeleteRow: true,
+                                                onchange: this.changed,
+                                                oneditionend: this.onedit,
+                                                copyCompatibility: true,
+                                                text: {
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    show: '',
+                                                    entries: '',
+                                                },
+                                                onload: this.loaded,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    var items = [];
+                                                    //Add consumption batch info
+
+
+                                                    if (y == null) {
+                                                        // Insert a new column
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        // Delete a column
+                                                        // if (obj.options.allowDeleteColumn == true) {
+                                                        //     items.push({
+                                                        //         title: obj.options.text.deleteSelectedColumns,
+                                                        //         onclick: function () {
+                                                        //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                        //         }
+                                                        //     });
+                                                        // }
+
+                                                        // Rename column
+                                                        // if (obj.options.allowRenameColumn == true) {
+                                                        //     items.push({
+                                                        //         title: obj.options.text.renameThisColumn,
+                                                        //         onclick: function () {
+                                                        //             obj.setHeader(x);
+                                                        //         }
+                                                        //     });
+                                                        // }
+
+                                                        // Sorting
+                                                        if (obj.options.columnSorting == true) {
+                                                            // Line
+                                                            items.push({ type: 'line' });
+
+                                                            items.push({
+                                                                title: obj.options.text.orderAscending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 0);
+                                                                }
+                                                            });
+                                                            items.push({
+                                                                title: obj.options.text.orderDescending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 1);
+                                                                }
+                                                            });
+                                                        }
+                                                    } else {
+                                                        // Insert new row before
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowBefore'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = 0;
+                                                                    data[1] = "";
+                                                                    data[2] = "";
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = 0;
+                                                                    data[9] = 0;
+                                                                    data[10] = 1;
+                                                                    data[11] = 1;
+                                                                    data[12] = this.props.match.params.programId;
+                                                                    obj.insertRow(data, parseInt(y), 1);
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        // after
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowAfter'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = 0;
+                                                                    data[1] = "";
+                                                                    data[2] = "";
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = 0;
+                                                                    data[9] = 0;
+                                                                    data[10] = 1;
+                                                                    data[11] = 1;
+                                                                    data[12] = this.props.match.params.programId;
+                                                                    obj.insertRow(data, parseInt(y));
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        // Delete a row
+                                                        if (obj.options.allowDeleteRow == true) {
+                                                            // region id
+                                                            if (obj.getRowData(y)[9] == 0) {
+                                                                items.push({
+                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                    onclick: function () {
+                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+
+                                                        if (x) {
+                                                            if (obj.options.allowComments == true) {
+                                                                items.push({ type: 'line' });
+
+                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                items.push({
+                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                    onclick: function () {
+                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                    }
+                                                                });
+
+                                                                if (title) {
+                                                                    items.push({
+                                                                        title: obj.options.text.clearComments,
+                                                                        onclick: function () {
+                                                                            obj.setComments([x, y], '');
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // Line
+                                                    items.push({ type: 'line' });
+
+                                                    // Save
+                                                    if (obj.options.allowExport) {
+                                                        items.push({
+                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                            shortcut: 'Ctrl + S',
+                                                            onclick: function () {
+                                                                obj.download(true);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    return items;
+                                                }.bind(this)
+                                            };
+                                            var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                            this.el = elVar;
+                                            this.setState({ mapPlanningUnitEl: elVar });
+                                            // }
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            })
+                                        }
+                                    }).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({ message: error.message });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                                                    case 500:
+                                                    case 401:
+                                                    case 404:
+                                                    case 406:
+                                                    case 412:
+                                                        this.setState({ message: error.response.data.messageCode });
+                                                        break;
+                                                    default:
+                                                        this.setState({ message: 'static.unkownError' });
+                                                        console.log("Error code unkown");
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
+
+                            } else {
+                                list = [];
+                            }
+                        });
+                } else {
+                    productCategoryList = []
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            });
+
+    }
+
     addRowInJexcel = function () {
         var json = this.el.getJson();
         var data = [];
@@ -614,381 +1007,7 @@ class AddprogramPlanningUnit extends Component {
             console.log("Something went wrong");
         }
     }
-    componentDidMount() {
-        var list = [];
-        var productCategoryList = [];
-        // var realmId = document.getElementById("realmId").value;
 
-        AuthenticationService.setupAxiosInterceptors();
-        ProductCategoryServcie.getProductCategoryListByRealmId(1)
-            .then(response => {
-
-                if (response.status == 200) {
-                    console.log("productCategory response----->", response.data);
-                    for (var k = 0; k < (response.data).length; k++) {
-                        var spaceCount = response.data[k].sortOrder.split(".").length;
-                        console.log("spaceCOunt--->", spaceCount);
-                        var indendent = "";
-                        for (var p = 1; p <= spaceCount - 1; p++) {
-                            if (p == 1) {
-                                indendent = indendent.concat("|_");
-                            } else {
-                                indendent = indendent.concat("_");
-                            }
-                        }
-                        console.log("ind", indendent);
-                        console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
-                        var productCategoryJson = {
-                            name: (response.data[k].payload.label.label_en),
-                            id: response.data[k].payload.productCategoryId
-                        }
-                        productCategoryList.push(productCategoryJson);
-
-                    }
-
-                    PlanningUnitService.getActivePlanningUnitList()
-                        .then(response => {
-                            if (response.status == 200) {
-                                this.setState({
-                                    planningUnitList: response.data
-                                });
-                                for (var k = 0; k < (response.data).length; k++) {
-                                    var planningUnitJson = {
-                                        name: response.data[k].label.label_en,
-                                        id: response.data[k].planningUnitId
-                                    }
-                                    list.push(planningUnitJson);
-                                }
-
-
-                                AuthenticationService.setupAxiosInterceptors();
-                                ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
-                                    .then(response => {
-                                        if (response.status == 200) {
-                                            // alert("hi");
-                                            let myReasponse = response.data;
-                                            var productDataArr = []
-                                            // if (myReasponse.length > 0) {
-                                            this.setState({ rows: myReasponse });
-                                            var data = [];
-                                            if (myReasponse.length != 0) {
-                                                for (var j = 0; j < myReasponse.length; j++) {
-                                                    data = [];
-                                                    data[0] = 0;
-                                                    data[1] = myReasponse[j].planningUnit.id;
-                                                    data[2] = myReasponse[j].reorderFrequencyInMonths;
-                                                    data[3] = myReasponse[j].minMonthsOfStock;
-                                                    data[4] = myReasponse[j].monthsInFutureForAmc;
-                                                    data[5] = myReasponse[j].monthsInPastForAmc;
-                                                    data[6] = myReasponse[j].localProcurementLeadTime;
-                                                    data[7] = myReasponse[j].shelfLife;
-                                                    data[8] = myReasponse[j].catalogPrice;
-                                                    data[9] = myReasponse[j].programPlanningUnitId;
-                                                    data[10] = myReasponse[j].active;
-                                                    data[11] = 0;
-                                                    data[12] = myReasponse[j].program.id;
-                                                    productDataArr.push(data);
-                                                }
-                                            } else {
-                                                console.log("list length is 0.");
-                                            }
-
-                                            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                            this.el.destroy();
-                                            var json = [];
-                                            var data = productDataArr;
-                                            var options = {
-                                                data: data,
-                                                columnDrag: true,
-                                                colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                columns: [
-                                                    {
-                                                        title: 'Product Category',
-                                                        type: 'dropdown',
-                                                        source: productCategoryList
-                                                    },
-                                                    {
-                                                        title: 'Planning Unit',
-                                                        type: 'autocomplete',
-                                                        source: list,
-                                                        filter: this.dropdownFilter
-                                                    },
-                                                    {
-                                                        title: 'Reorder frequency in months',
-                                                        type: 'number',
-
-                                                    },
-                                                    {
-                                                        title: 'Min month of stock',
-                                                        type: 'number'
-                                                    },
-                                                    {
-                                                        title: 'Months In Future For AMC',
-                                                        type: 'number'
-                                                    },
-                                                    {
-                                                        title: 'Months In Past For AMC',
-                                                        type: 'number'
-                                                    },
-                                                    {
-                                                        title: 'Local Procurment Lead Time(Months)',
-                                                        type: 'number'
-                                                    },
-                                                    {
-                                                        title: 'Shelf Life(Months)',
-                                                        type: 'number'
-                                                    },
-                                                    {
-                                                        title: 'Catalog Price (USD)',
-                                                        type: 'number'
-                                                    },
-                                                    {
-                                                        title: 'Id',
-                                                        type: 'hidden'
-                                                    },
-                                                    {
-                                                        title: 'Active',
-                                                        type: 'hidden'
-                                                    },
-                                                    {
-                                                        title: 'Changed Flag',
-                                                        type: 'hidden'
-                                                    },
-                                                    {
-                                                        title: 'ProgramId',
-                                                        type: 'hidden'
-                                                    }
-
-
-                                                ],
-                                                pagination: 10,
-                                                search: true,
-                                                columnSorting: true,
-                                                tableOverflow: true,
-                                                wordWrap: true,
-                                                paginationOptions: [10, 25, 50, 100],
-                                                position: 'top',
-                                                allowInsertColumn: false,
-                                                allowManualInsertColumn: false,
-                                                allowDeleteRow: true,
-                                                onchange: this.changed,
-                                                oneditionend: this.onedit,
-                                                copyCompatibility: true,
-                                                text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                    show: '',
-                                                    entries: '',
-                                                },
-                                                onload: this.loaded,
-                                                contextMenu: function (obj, x, y, e) {
-                                                    var items = [];
-                                                    //Add consumption batch info
-
-
-                                                    if (y == null) {
-                                                        // Insert a new column
-                                                        if (obj.options.allowInsertColumn == true) {
-                                                            items.push({
-                                                                title: obj.options.text.insertANewColumnBefore,
-                                                                onclick: function () {
-                                                                    obj.insertColumn(1, parseInt(x), 1);
-                                                                }
-                                                            });
-                                                        }
-
-                                                        if (obj.options.allowInsertColumn == true) {
-                                                            items.push({
-                                                                title: obj.options.text.insertANewColumnAfter,
-                                                                onclick: function () {
-                                                                    obj.insertColumn(1, parseInt(x), 0);
-                                                                }
-                                                            });
-                                                        }
-
-                                                        // Delete a column
-                                                        // if (obj.options.allowDeleteColumn == true) {
-                                                        //     items.push({
-                                                        //         title: obj.options.text.deleteSelectedColumns,
-                                                        //         onclick: function () {
-                                                        //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                        //         }
-                                                        //     });
-                                                        // }
-
-                                                        // Rename column
-                                                        // if (obj.options.allowRenameColumn == true) {
-                                                        //     items.push({
-                                                        //         title: obj.options.text.renameThisColumn,
-                                                        //         onclick: function () {
-                                                        //             obj.setHeader(x);
-                                                        //         }
-                                                        //     });
-                                                        // }
-
-                                                        // Sorting
-                                                        if (obj.options.columnSorting == true) {
-                                                            // Line
-                                                            items.push({ type: 'line' });
-
-                                                            items.push({
-                                                                title: obj.options.text.orderAscending,
-                                                                onclick: function () {
-                                                                    obj.orderBy(x, 0);
-                                                                }
-                                                            });
-                                                            items.push({
-                                                                title: obj.options.text.orderDescending,
-                                                                onclick: function () {
-                                                                    obj.orderBy(x, 1);
-                                                                }
-                                                            });
-                                                        }
-                                                    } else {
-                                                        // Insert new row before
-                                                        if (obj.options.allowInsertRow == true) {
-                                                            items.push({
-                                                                title: i18n.t('static.common.insertNewRowBefore'),
-                                                                onclick: function () {
-                                                                    var data = [];
-                                                                    data[0] = 0;
-                                                                    data[1] = "";
-                                                                    data[2] = "";
-                                                                    data[3] = "";
-                                                                    data[4] = "";
-                                                                    data[5] = "";
-                                                                    data[6] = "";
-                                                                    data[7] = "";
-                                                                    data[8] = 0;
-                                                                    data[9] = 0;
-                                                                    data[10] = 1;
-                                                                    data[11] = 1;
-                                                                    data[12] = this.props.match.params.programId;
-                                                                    obj.insertRow(data, parseInt(y), 1);
-                                                                }.bind(this)
-                                                            });
-                                                        }
-                                                        // after
-                                                        if (obj.options.allowInsertRow == true) {
-                                                            items.push({
-                                                                title: i18n.t('static.common.insertNewRowAfter'),
-                                                                onclick: function () {
-                                                                    var data = [];
-                                                                    data[0] = 0;
-                                                                    data[1] = "";
-                                                                    data[2] = "";
-                                                                    data[3] = "";
-                                                                    data[4] = "";
-                                                                    data[5] = "";
-                                                                    data[6] = "";
-                                                                    data[7] = "";
-                                                                    data[8] = 0;
-                                                                    data[9] = 0;
-                                                                    data[10] = 1;
-                                                                    data[11] = 1;
-                                                                    data[12] = this.props.match.params.programId;
-                                                                    obj.insertRow(data, parseInt(y));
-                                                                }.bind(this)
-                                                            });
-                                                        }
-                                                        // Delete a row
-                                                        if (obj.options.allowDeleteRow == true) {
-                                                            // region id
-                                                            if (obj.getRowData(y)[9] == 0) {
-                                                                items.push({
-                                                                    title: obj.options.text.deleteSelectedRows,
-                                                                    onclick: function () {
-                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
-
-                                                        if (x) {
-                                                            if (obj.options.allowComments == true) {
-                                                                items.push({ type: 'line' });
-
-                                                                var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                                items.push({
-                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                    onclick: function () {
-                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                    }
-                                                                });
-
-                                                                if (title) {
-                                                                    items.push({
-                                                                        title: obj.options.text.clearComments,
-                                                                        onclick: function () {
-                                                                            obj.setComments([x, y], '');
-                                                                        }
-                                                                    });
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-
-                                                    // Line
-                                                    items.push({ type: 'line' });
-
-                                                    // Save
-                                                    if (obj.options.allowExport) {
-                                                        items.push({
-                                                            title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            shortcut: 'Ctrl + S',
-                                                            onclick: function () {
-                                                                obj.download(true);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    return items;
-                                                }.bind(this)
-                                            };
-                                            var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-                                            this.el = elVar;
-                                            this.setState({ mapPlanningUnitEl: elVar });
-                                            // }
-                                        } else {
-                                            this.setState({
-                                                message: response.data.messageCode
-                                            })
-                                        }
-                                    }).catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({ message: error.message });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
-                                                    case 500:
-                                                    case 401:
-                                                    case 404:
-                                                    case 406:
-                                                    case 412:
-                                                        this.setState({ message: error.response.data.messageCode });
-                                                        break;
-                                                    default:
-                                                        this.setState({ message: 'static.unkownError' });
-                                                        console.log("Error code unkown");
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    );
-
-                            } else {
-                                list = [];
-                            }
-                        });
-                } else {
-                    productCategoryList = []
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            });
-
-    }
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
