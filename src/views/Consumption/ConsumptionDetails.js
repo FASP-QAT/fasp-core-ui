@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from 'react-dom';
 import jexcel from 'jexcel';
+import "../../../node_modules/jsuites/dist/jsuites.basic.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody,

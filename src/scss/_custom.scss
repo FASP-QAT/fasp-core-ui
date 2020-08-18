@@ -2048,7 +2048,7 @@ input::placeholder {
 }
 .supplyplan-larrow-dataentry-adjustment{
   float: left;
-  margin-left: 91px !important;
+  margin-left: 103px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2498,9 +2498,15 @@ input::placeholder {
     border:none!important;
   }
 
+  .regionTdWidthAdjustments{
+    overflow: hidden!important;
+    min-width: 120px!important;
+    word-wrap: break-word!important;
+  }
+
   .supplyplanTdWidthForMonths{
     overflow: hidden!important;
-    min-width: 56px!important;
+    min-width: 70px!important;
   }
   .BorderNoneSupplyPlan{
     border:none!important;
@@ -3064,4 +3070,8 @@ border-radius: 2em;
   border: 1px solid #e4e7ea!important;
   color: #697069!important;
   height: 0px!important;
+}
+
+.req{
+ color: red!important;
 }

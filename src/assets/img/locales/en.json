@@ -792,7 +792,7 @@
     "static.supplyPlan.forecastedConsumption": "Forecasted Consumption",
     "static.supplyPlan.actualConsumption": "Actual Consumption",
     "static.supplyPlan.total": "Total",
-    "static.supplyPlan.adjustmentsDetails": "Adjustments And Inventory Details",
+    "static.supplyPlan.adjustmentsDetails": "Adjustments And Inventory",
     "static.supplyPlan.suggestedShipmentDetails": "Suggested Shipment Details",
     "static.supplyPlan.psmShipmentsDetails": "PSM Shipment Details",
     "static.supplyPlan.saveBudget": "Save Budget",
@@ -886,7 +886,7 @@
     "static.message.allAclAccess": "Either provide All access or specific access.",
     "static.dashboard.months": "Months",
     "static.consumption.consumptionFlag": "Consumption Flag",
-    "static.supplyPlan.inventoryType": "Inventory Type",
+    "static.supplyPlan.inventoryType": "Data Type",
     "static.program.isincludeplannedshipment": "Include Planned Shipments",
     "static.program.validversion": "Please Select Version",
     "static.dashboard.regionreport": "Region Report",
@@ -1061,5 +1061,14 @@
     "static.supplyPlan.minMonthsOfStock":"Min Months Of Stock",
     "static.supplyPlan.shelfLife": "Shelf Life",
     "static.supplyPlan.qatGenerated":"QAT Generated",
-    "static.jexcel.pages":"pages"
+    "static.jexcel.pages":"pages",
+    "static.supplyPlan.notAllRegionsHaveActualStock":"Not all regions reporting inventory",
+    "static.supplyPlan.projectedInventory":"Projected Inventory",
+    "static.supplyPlan.autoAdjustment":"Auto adjustment",
+    "static.supplyPlan.finalInventory":"Final Inventory",
+    "static.supplyPlan.alternatePlanningUnit":"Alternate Reporting Unit",
+    "static.supplyPlan.quantityCountryProduct":"Quantity (Country Product)",
+    "static.supplyPlan.quantityQATProduct":"Quantity (QAT Product)",
+    "static.whatIf.supplyPlanSaved":"Supply plan saved successfully.",
+    "static.supplyPlan.saveShipmentDates":"Save Shipment Dates"
 }

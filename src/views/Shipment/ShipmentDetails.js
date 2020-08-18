@@ -1,8 +1,8 @@
 import React from "react";
 import {
     Card, CardBody,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody
+    Label, FormGroup,
+    CardFooter, Button, Col, Form, Modal, ModalHeader, ModalFooter, ModalBody
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -295,21 +295,6 @@ export default class ShipmentDetails extends React.Component {
     }
 
     render() {
-        const { programList } = this.state;
-        let programs = programList.length > 0
-            && programList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { planningUnitList } = this.state;
-        let planningUnits = planningUnitList.length > 0
-            && planningUnitList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -361,7 +346,6 @@ export default class ShipmentDetails extends React.Component {
 
                         <Col xs="12" sm="12" className="p-0">
                             {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} shipmentPage="shipmentDataEntry" />}
-                            {/* {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} />} */}
                             <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
