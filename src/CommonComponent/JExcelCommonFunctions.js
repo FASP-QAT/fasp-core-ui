@@ -105,7 +105,7 @@ export function jExcelLoadedFunctionOnlyHideRow(instance) {
     elInstance.hideIndex(0);
 }
 
-export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0) {
+export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0) {
     if (type == "text") {
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "") {
@@ -128,9 +128,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            console.log("isNaN(Number.parseInt(value))", Number.parseInt(value));
-            console.log("(greaterThan0 == 1 && value < 0)", (greaterThan0 == 1 && value <= 0));
-            if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && value <= 0)) {
+            if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
