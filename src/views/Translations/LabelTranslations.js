@@ -73,7 +73,8 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'text' },
                     ],
                     text: {
-                        showingPage: 'Showing {0} to {1} of {1}',
+                        // showingPage: 'Showing {0} to {1} of {1}',
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                         show: '',
                         entries: '',
                     },

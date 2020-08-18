@@ -165,8 +165,9 @@ class AddRoleComponent extends Component {
         getRequestP.onsuccess = function (event) {
           var probList = [];
           probList = getRequestP.result;
-          console.log("problemList====>", probList);
-          this.setState({ problemList: probList });
+          var filteredList=probList.filter(c=>c.problemType.id !=1)
+          console.log("problemList====>", filteredList);
+          this.setState({ problemList: filteredList });
 
         }.bind(this);
 
@@ -548,7 +549,7 @@ class AddRoleComponent extends Component {
                       <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
                         <CardBody className="pt-2 pb-0">
                           <FormGroup>
-                            <Label for="programCode">Program<span className="red Reqasterisk">*</span></Label>
+                            <Label for="programCode">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
                             <Input
                               type="select"
                               name="programId"
@@ -568,7 +569,7 @@ class AddRoleComponent extends Component {
                             <FormFeedback className="red">{errors.programId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="programCode">Planning Unit<span className="red Reqasterisk">*</span></Label>
+                            <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                             <Input
                               type="select"
                               name="planningUnitId"
@@ -586,20 +587,20 @@ class AddRoleComponent extends Component {
                             <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label>Region</Label>
+                            <Label>{i18n.t('static.region.region')}</Label>
                             <Input type="select"
                               bsSize="sm"
                               name="regionId"
                               id="regionId"
 
                             >
-                              <option value="0">Please select</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {regions}
                             </Input>
                             <FormFeedback className="red">{errors.createdDate}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label>Problem <span className="red Reqasterisk">*</span></Label>
+                            <Label>{i18n.t('static.report.problem')} <span className="red Reqasterisk">*</span></Label>
                             <Input type="select"
                               bsSize="sm"
                               name="problemId"
@@ -610,7 +611,7 @@ class AddRoleComponent extends Component {
                               onBlur={handleBlur}
                               required
                             >
-                              <option value="">Please select</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {problems}
                             </Input>
                             <FormFeedback className="red">{errors.problemId}</FormFeedback>

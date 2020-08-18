@@ -55,7 +55,7 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, "");
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
+           /* var col = ("H").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(7, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -65,7 +65,7 @@ export default class PipelineProgramInventory extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-            }
+            }*/
 
         }
         return valid;
@@ -84,41 +84,19 @@ export default class PipelineProgramInventory extends Component {
             }
         }
 
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                // var json = this.el.getJson();
-                // for (var i = 0; i < json.length; i++) {
-                //     var map = new Map(Object.entries(json[i]));
-                //     var planningUnitValue = map.get("7");
-                //     if (planningUnitValue == value && y != i) {
-                //         this.el.setStyle(col, "background-color", "transparent");
-                //         this.el.setStyle(col, "background-color", "yellow");
-                //         this.el.setComments(col, "Realm Country Planning Unit Allready Exists");
-                //         i = json.length;
-                //     } else {
-                // var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                // console.log("this.el.getValueFromCoords(4, y)==",this.el.getValueFromCoords(4, y));
-                // console.log("rmPlanningUnit.multiplier",rmPlanningUnit.multiplier);
-                // var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                // this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                // this.el.setValueFromCoords(4, y, quantity, true);
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                // }
-                // }
-
-                var rmPlanningUnit = this.state.realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                var quantity = this.el.getValueFromCoords(4, y) / rmPlanningUnit.multiplier;
-                this.el.setValueFromCoords(8, y, rmPlanningUnit.multiplier, true);
-                this.el.setValueFromCoords(4, y, quantity, true);
-
             }
         }
+       
+        
 
     }
 
@@ -139,8 +117,8 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = map.get("7");
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = map.get("3");
             if (value != "" && !isNaN(parseInt(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -173,12 +151,13 @@ export default class PipelineProgramInventory extends Component {
                 planningUnitId: map.get("0"),
                 dataSourceId: dataSourceId,
                 regionId: map.get("2"),
-                inventoryDate: map.get("3"),
-                manualAdjustment: map.get("4"),
-                notes: map.get("5"),
-                active: map.get("6"),
-                realmCountryPlanningUnitId: map.get("7"),
-                multiplier: map.get("8")
+                inventoryDate: map.get("5"),
+                inventory: map.get("6"),
+                manualAdjustment: map.get("7"),
+                notes: map.get("8"),
+                // active: map.get("6"),
+                realmCountryPlanningUnitId: map.get("3"),
+                multiplier: map.get("4")
             }
             inventoryArray.push(inventoryJson);
         }
@@ -254,24 +233,21 @@ export default class PipelineProgramInventory extends Component {
                                     data = [];
                                     data[0] = inventoryList[j].planningUnitId;
                                     data[1] = inventoryList[j].dataSourceId;
-
                                     if (regionList.length == 1) {
                                         data[2] = regionList[0].id;
                                     } else {
                                         data[2] = inventoryList[j].regionId;
-                                    }
-
-                                    data[3] = inventoryList[j].inventoryDate;
-                                    data[4] = inventoryList[j].manualAdjustment;
-
+                                    };
+                                    data[3] = inventoryList[j].realmCountryPlanningUnitId;
+                                    data[4] = inventoryList[j].multiplier
+                                    data[5] = inventoryList[j].inventoryDate;
+                                    data[6] = inventoryList[j].inventory;
+                                    data[7] = inventoryList[j].manualAdjustment;
                                     if (inventoryList[j].notes === null || inventoryList[j].notes === ' NULL') {
-                                        data[5] = '';
+                                        data[8] = '';
                                     } else {
-                                        data[5] = inventoryList[j].notes;
+                                        data[8] = inventoryList[j].notes;
                                     }
-                                    data[6] = true;
-                                    data[7] = inventoryList[j].realmCountryPlanningUnitId;
-                                    data[8] = inventoryList[j].multiplier
                                     inventoryDataArr.push(data);
                                 }
 
@@ -303,25 +279,6 @@ export default class PipelineProgramInventory extends Component {
 
                                         },
                                         {
-                                            title: i18n.t('static.inventory.inventoryDate'),
-                                            type: 'calendar',
-                                            options: { format: 'MM-YYYY' }
-
-                                        },
-
-                                        {
-                                            title: i18n.t('static.inventory.manualAdjustment'),
-                                            type: 'text'
-                                        },
-                                        {
-                                            title: 'Note',
-                                            type: 'text'
-                                        },
-                                        {
-                                            title: i18n.t('static.inventory.active'),
-                                            type: 'checkbox'
-                                        },
-                                        {
                                             title: "Realm Country Planning Unit",
                                             type: 'dropdown',
                                             source: realmCountryPlanningUnitList,
@@ -333,7 +290,26 @@ export default class PipelineProgramInventory extends Component {
                                             type: 'text',
                                             readonly: true
                                         },
+                                        {
+                                            title: i18n.t('static.inventory.inventoryDate'),
+                                            type: 'calendar',
+                                            options: { format: 'MM-YYYY' }
 
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.inventory'),
+                                            type: 'text'
+
+                                        },
+
+                                        {
+                                            title: i18n.t('static.inventory.manualAdjustment'),
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: 'Note',
+                                            type: 'text'
+                                        }
                                     ],
                                     pagination: 10,
                                     search: true,

@@ -392,6 +392,7 @@ export default class UnitListComponent extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -445,12 +446,111 @@ export default class UnitListComponent extends Component {
             const selSource = this.state.unitList.filter(c => c.dimension.id == dimensionId)
             this.setState({
                 selSource
+            }, () => {
+                this.buildJExcel();
             });
         } else {
             this.setState({
                 selSource: this.state.unitList
+            }, () => {
+                this.buildJExcel();
             });
         }
+    }
+
+    buildJExcel() {
+        let unitList = this.state.selSource;
+        console.log("unit---->", unitList);
+        let unitListArray = [];
+        let count = 0;
+
+        for (var j = 0; j < unitList.length; j++) {
+            data = [];
+            data[0] = unitList[j].unitId
+            data[1] = getLabelText(unitList[j].label, this.state.lang)
+            data[2] = unitList[j].unitCode;
+            data[3] = getLabelText(unitList[j].dimension.label, this.state.lang)
+            data[4] = unitList[j].active;
+
+            unitListArray[count] = data;
+            count++;
+        }
+        if (unitList.length == 0) {
+            data = [];
+            unitListArray[0] = data;
+        }
+        // console.log("unitListArray---->", unitListArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = unitListArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'unitId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.unit.unit'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.unit.unitCode'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.dimension.dimension'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+
+
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false
+        };
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
+        this.setState({
+            languageEl: languageEl, loading: false
+        })
+
     }
 
     componentDidMount() {
@@ -481,101 +581,7 @@ export default class UnitListComponent extends Component {
                     selSource: response.data
                 },
                     () => {
-
-                        let unitList = this.state.unitList;
-                        console.log("unit---->", unitList);
-                        let unitListArray = [];
-                        let count = 0;
-
-                        for (var j = 0; j < unitList.length; j++) {
-                            data = [];
-                            data[0] = unitList[j].unitId
-                            data[1] = getLabelText(unitList[j].label, this.state.lang)
-                            data[2] = unitList[j].unitCode;
-                            data[3] = getLabelText(unitList[j].dimension.label, this.state.lang)
-                            data[4] = unitList[j].active;
-
-                            unitListArray[count] = data;
-                            count++;
-                        }
-                        if (unitList.length == 0) {
-                            data = [];
-                            unitListArray[0] = data;
-                        }
-                        // console.log("unitListArray---->", unitListArray);
-                        this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
-                        var json = [];
-                        var data = unitListArray;
-
-                        var options = {
-                            data: data,
-                            columnDrag: true,
-                            // colWidths: [150, 150, 100],
-                            colHeaderClasses: ["Reqasterisk"],
-                            columns: [
-                                {
-                                    title: 'unitId',
-                                    type: 'hidden',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.unit.unit'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.unit.unitCode'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    title: i18n.t('static.dimension.dimension'),
-                                    type: 'text',
-                                    readOnly: true
-                                },
-                                {
-                                    type: 'dropdown',
-                                    title: i18n.t('static.common.status'),
-                                    readOnly: true,
-                                    source: [
-                                        { id: true, name: i18n.t('static.common.active') },
-                                        { id: false, name: i18n.t('static.common.disabled') }
-                                    ]
-                                },
-                            ],
-                            text: {
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                show: '',
-                                entries: '',
-                            },
-                            onload: this.loaded,
-                            pagination: 10,
-                            search: true,
-                            columnSorting: true,
-                            tableOverflow: true,
-                            wordWrap: true,
-                            allowInsertColumn: false,
-                            allowManualInsertColumn: false,
-                            allowDeleteRow: false,
-                            onselection: this.selected,
-
-
-                            oneditionend: this.onedit,
-                            copyCompatibility: true,
-                            allowExport: false,
-                            paginationOptions: [10, 25, 50],
-                            position: 'top',
-                            contextMenu: false
-                        };
-                        var languageEl = jexcel(document.getElementById("tableDiv"), options);
-                        this.el = languageEl;
-                        this.setState({
-                            languageEl: languageEl, loading: false
-                        })
-
-
-
+                        this.buildJExcel();
                     })
             } else {
                 this.setState({
@@ -587,31 +593,10 @@ export default class UnitListComponent extends Component {
 
             }
         })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     console.log("Error code unkown");
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
 
         UnitService.getUnitListAll()
             .then(response => {
-                console.log(response)
+                console.log("Unit--->", response.data);
 
                 this.setState({
                     unitList: response.data,
@@ -619,26 +604,7 @@ export default class UnitListComponent extends Component {
                 })
 
             })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+
 
     }
     loaded = function (instance, cell, x, y, value) {
@@ -646,7 +612,7 @@ export default class UnitListComponent extends Component {
     }
 
     formatLabel(cell, row) {
-        console.log("----------jjjjjjj", cell);
+        // console.log("----------jjjjjjj", cell);
         return getLabelText(cell, this.state.lang);
     }
     render() {

@@ -47,7 +47,8 @@ export default class ConsumptionDetails extends React.Component {
             problemStatusList: [],
             data: [],
             message: '',
-            planningUnitId: ''
+            planningUnitId: '',
+            lang: localStorage.getItem('lang')
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
@@ -394,7 +395,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '230px' },
+                style: { width: '250px' },
                 formatter: (cell, row) => {
                     // return getLabelText(cell, this.state.lang);
                     return getSuggestion(row, this.state.lang);
@@ -406,7 +407,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '140px' },
+                style: { width: '90px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -422,21 +423,21 @@ export default class ConsumptionDetails extends React.Component {
             //         return getLabelText(cell, this.state.lang);
             //     }
             // },
-            {
-                dataField: 'problemType.label',
-                text: i18n.t('static.report.problemType'),
-                sort: true,
-                align: 'center',
-                style: { width: '100px' },
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
+            // {
+            //     dataField: 'problemType.label',
+            //     text: i18n.t('static.report.problemType'),
+            //     sort: true,
+            //     align: 'center',
+            //     style: { width: '100px' },
+            //     headerAlign: 'center',
+            //     style: { width: '100px' },
+            //     formatter: (cell, row) => {
+            //         return getLabelText(cell, this.state.lang);
+            //     }
+            // },
             {
                 dataField: 'problemTransList',
-                text: 'Note',
+                text: i18n.t('static.program.notes'),
                 sort: true,
                 align: 'center',
                 style: { width: '100px' },
@@ -500,7 +501,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pb-lg-0">
+                    <CardBody className=" pb-lg-2 pt-lg-0">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>
@@ -508,12 +509,13 @@ export default class ConsumptionDetails extends React.Component {
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input type="select"
-                                                bsSize="sm"
+                                                bsSize="sm" 
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
                                                 onChange={this.fetchData}
                                             >
-                                                <option value="0">Please select</option>
+                                                {/* <option value="0">Please select</option> */}
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs}
                                             </Input>
                                         </InputGroup>
@@ -530,7 +532,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 onChange={this.fetchData}
                                             // value={1}
                                             >
-                                                <option value="-1">All</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
                                                 {problemStatus}
                                             </Input>
                                         </InputGroup>
@@ -549,6 +551,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="1">Automatic</option>
                                                 <option value="2">Manual</option>
+                                                <option value="3">Automatic / Manual</option>
                                             </Input>
                                         </InputGroup>
                                     </div>

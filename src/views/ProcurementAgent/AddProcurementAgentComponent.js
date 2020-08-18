@@ -9,6 +9,8 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { SketchPicker } from 'react-color';
+import reactCSS from 'reactcss'
 
 import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.procurementagent.procurementagent')
@@ -19,7 +21,7 @@ const initialValues = {
     procurementAgentName: "",
     submittedToApprovedLeadTime: "",
     approvedToShippedLeadTime: "",
-    colorHtmlCode: "",
+    // colorHtmlCode: "",
 
 }
 
@@ -46,9 +48,9 @@ const validationSchema = function (values) {
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
         //     .min(0, i18n.t('static.program.validvaluetext'))
-        colorHtmlCode: Yup.string()
-            .max(6, i18n.t('static.common.max6digittext'))
-            .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
+        // colorHtmlCode: Yup.string()
+        //     .max(6, i18n.t('static.common.max6digittext'))
+        //     .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
 
 
     })
@@ -79,6 +81,15 @@ class AddProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            displayColorPicker: false,
+            background : '#000000',
+            color: {
+                // hex: '#fff'
+                r: '241',
+                g: '112',
+                b: '19',
+                a: '1',
+            },
             realms: [],
             procurementAgent: {
                 realm: {
@@ -103,6 +114,23 @@ class AddProcurementAgentComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    handleClick = () => {
+        this.setState({ displayColorPicker: !this.state.displayColorPicker })
+    };
+
+    handleClose = () => {
+        this.setState({ displayColorPicker: false })
+    };
+    handleChangeColor = (color) => {
+        console.log("color---", color);
+        let { procurementAgent } = this.state;
+        procurementAgent.colorHtmlCode = color.hex.toUpperCase();
+        this.setState({
+            color: color.rgb,
+            procurementAgent
+        },
+            () => { console.log("agent--------------", procurementAgent); });
+    };
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -157,7 +185,7 @@ class AddProcurementAgentComponent extends Component {
             procurementAgentName: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
-            colorHtmlCode: true,
+            // colorHtmlCode: true,
         }
         )
         this.validateForm(errors)
@@ -197,6 +225,36 @@ class AddProcurementAgentComponent extends Component {
     }
 
     render() {
+        const styles = reactCSS({
+            'default': {
+                color: {
+                    width: '100px',
+                    height: '17px',
+                    borderRadius: '2px',
+                    background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${this.state.color.b}, ${this.state.color.a})`,
+                    // background: '#000000',
+                },
+                swatch: {
+                    padding: '5px',
+                    background: '#fff',
+                    borderRadius: '1px',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                },
+                popover: {
+                    position: 'absolute',
+                    zIndex: '2',
+                },
+                cover: {
+                    position: 'fixed',
+                    top: '0px',
+                    right: '0px',
+                    bottom: '0px',
+                    left: '0px',
+                },
+            },
+        });
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -223,6 +281,7 @@ class AddProcurementAgentComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log("on submit---",this.state.procurementAgent)
                                     ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -313,7 +372,16 @@ class AddProcurementAgentComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
+                                                        <div bsSize="sm">
+                                                            <div style={styles.swatch} onClick={this.handleClick}>
+                                                                <div style={styles.color} />
+                                                            </div>
+                                                        </div>
+                                                        {this.state.displayColorPicker ? <div style={styles.popover}>
+                                                            <div style={styles.cover} onClick={this.handleClose} />
+                                                            <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
+                                                        </div> : null}
+                                                        {/* <Input type="text"
                                                             bsSize="sm"
                                                             name="colorHtmlCode"
                                                             id="colorHtmlCode"
@@ -324,8 +392,9 @@ class AddProcurementAgentComponent extends Component {
                                                             required
                                                             maxLength={6}
                                                             value={this.state.procurementAgent.colorHtmlCode}
-                                                        />
-                                                        <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback>
+                                                        /> */}
+                                                        {/* <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback> */}
+
                                                     </FormGroup>
 
                                                     <FormGroup>

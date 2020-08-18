@@ -10,6 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 import getLabelText from '../../CommonComponent/getLabelText';
+import { BUDGET_NAME_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.tracercategory.tracercategory');
 
 const initialValues = {
@@ -20,6 +21,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         tracerCategoryName: Yup.string()
+            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
     })
 }
@@ -146,7 +148,7 @@ class EditTracerCategoryComponent extends Component {
                     tracerCategory: response.data
                 });
             }
-            else{
+            else {
 
                 this.setState({
                     message: response.data.messageCode
@@ -186,7 +188,7 @@ class EditTracerCategoryComponent extends Component {
                                     TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/tracerCategory/listTracerCategory/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/tracerCategory/listTracerCategory/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -301,7 +303,7 @@ class EditTracerCategoryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/tracerCategory/listTracerCategory/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/tracerCategory/listTracerCategory/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
@@ -312,7 +314,7 @@ class EditTracerCategoryComponent extends Component {
             });
 
         })
-        
+
     }
 }
 

@@ -13,7 +13,9 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 const entityname = i18n.t('static.tracercategory.tracercategory');
 class ListTracerCategoryComponent extends Component {
     constructor(props) {
@@ -32,8 +34,13 @@ class ListTracerCategoryComponent extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
 
     }
+    buildJexcel() {
+        let supplierList = this.state.selSource;
+    }
+
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
@@ -73,6 +80,19 @@ class ListTracerCategoryComponent extends Component {
             });
         }
     }
+    selected = function (instance, cell, x, y, value) {
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+                this.props.history.push({
+                    pathname: `/tracerCategory/editTracerCategory/${this.el.getValueFromCoords(0, x)}`,
+                });
+            }
+        }
+    }.bind(this);
+
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -100,13 +120,106 @@ class ListTracerCategoryComponent extends Component {
                 this.setState({
                     tracerCategoryList: response.data,
                     selTracerCategory: response.data
-                })
+                },
+                    () => {
+
+                        let tracerCategoryList = this.state.tracerCategoryList;
+                        // console.log("tracerCategoryList---->", tracerCategoryList);
+                        let tracerCategory = [];
+                        let count = 0;
+
+                        for (var j = 0; j < tracerCategoryList.length; j++) {
+                            data = [];
+                            data[0] = tracerCategoryList[j].tracerCategoryId
+                            data[1] = getLabelText(tracerCategoryList[j].realm.label, this.state.lang)
+                            data[2] = getLabelText(tracerCategoryList[j].label, this.state.lang)
+                            data[3] = tracerCategoryList[j].active;
+                            tracerCategory[count] = data;
+                            count++;
+                        }
+                        if (tracerCategoryList.length == 0) {
+                            data = [];
+                            tracerCategory[0] = data;
+                        }
+                        // console.log("tracerCategory---->", tracerCategory);
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                        var json = [];
+                        var data = tracerCategory;
+
+                        var options = {
+                            data: data,
+                            columnDrag: true,
+                            // colWidths: [150, 150, 100],
+                            colHeaderClasses: ["Reqasterisk"],
+                            columns: [
+                                {
+                                    title: 'tracerCategoryId',
+                                    type: 'hidden',
+                                    readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.realm.realm'),
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.tracercategory.tracercategory'),
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    type: 'dropdown',
+                                    title: i18n.t('static.common.status'),
+                                    readOnly: true,
+                                    source: [
+                                        { id: true, name: i18n.t('static.common.active') },
+                                        { id: false, name: i18n.t('static.common.disabled') }
+                                    ]
+                                },
+                            ],
+                            text: {
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                show: '',
+                                entries: '',
+                            },
+                            onload: this.loaded,
+                            pagination: 10,
+                            search: true,
+                            columnSorting: true,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            allowDeleteRow: false,
+                            onselection: this.selected,
+
+
+                            oneditionend: this.onedit,
+                            copyCompatibility: true,
+                            allowExport: false,
+                            paginationOptions: [10, 25, 50],
+                            position: 'top',
+                            contextMenu: false
+                        };
+                        var tracerCategoryEl = jexcel(document.getElementById("tableDiv"), options);
+                        this.el = tracerCategoryEl;
+                        this.setState({
+                            tracerCategoryEl: tracerCategoryEl, loading: false
+                        })
+
+
+
+                    })
             })
 
     }
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
     }
     render() {
 
@@ -127,63 +240,6 @@ class ListTracerCategoryComponent extends Component {
                 )
             }, this);
 
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.tracercategory.tracercategory'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-
-
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selTracerCategory.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -202,7 +258,7 @@ class ListTracerCategoryComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -222,35 +278,7 @@ class ListTracerCategoryComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                        </Col>
-                        <ToolkitProvider
-                            keyField="tracerCategoryId"
-                            data={this.state.selTracerCategory}
-                            columns={columns}
-                            search={{ searchFormatted: true }}
-                            hover
-                            filter={filterFactory()}
-                        >
-                            {
-                                props => (
-                                    <div className="TableCust">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
-                                        </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(options)}
-                                            rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
-                                                    this.editTracerCategory(row);
-                                                }
-                                            }}
-                                            {...props.baseProps}
-                                        />
-                                    </div>
-                                )
-                            }
-                        </ToolkitProvider>
+                        </Col> <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

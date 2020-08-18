@@ -2077,7 +2077,7 @@ class ShipmentSummery extends Component {
                             }
                         </Offline>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <div className="" >
                             <div ref={ref}>
                                 <Form >
@@ -2237,7 +2237,7 @@ class ShipmentSummery extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.data.length > 0 &&
-                                                <Table id="mytable1" responsive className="table-bordered text-center mt-2">
+                                                <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
                                                     <thead>
                                                         <tr>
                                                             <th style={{ width: '225px', cursor: 'pointer' }}></th>
@@ -2277,8 +2277,8 @@ class ShipmentSummery extends Component {
                                     </div>
 
 
-                                    <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
+                                    <div className="row ">
+                                        <div className="col-md-12 pl-0 pr-0 mb-2">
                                             {this.state.data.length > 0 &&
                                                 <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
                                                     <thead>

@@ -14,6 +14,8 @@ import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from '../../Constants.js'
+
 
 export default class PipelineProgramShipment extends Component {
 
@@ -26,7 +28,7 @@ export default class PipelineProgramShipment extends Component {
             procurementAgentList: [],
             supplierList: [],
             fundingSourceList: [],
-            shipModes: ["Air", "Sea"],
+            shipModes: ["Air", "Sea/Land"],
             shipmentStatusList: [],
             lang: localStorage.getItem('lang'),
             isValidData: false,
@@ -48,22 +50,12 @@ export default class PipelineProgramShipment extends Component {
         var json = this.el.getJson();
         console.log(json)
         for (var y = 0; y < json.length; y++) {
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[0]).toString();
-            if (value != "" && value > 0) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            } else {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].dataSource).concat(" Does not exist."));
-            }
+
 
             // var list = this.state.planningUnitList;
 
-            var col = ("B").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[1]).toString();
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[0]).toString();
 
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -74,23 +66,20 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].planningUnit).concat(" Does not exist."));
             }
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[2]).toString();
-
-            if (value == "Invalid date" || value === "") {
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[1]).toString();
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-
+                this.el.setComments(col, (list[y].dataSource).concat(" Does not exist."));
             }
 
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[3]).toString();
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[2]).toString();
 
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -101,10 +90,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].procurementAgent).concat(" Does not exist."));
             }
-
-            var col = ("E").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[4]).toString();
-
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[3]).toString();
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -112,13 +99,24 @@ export default class PipelineProgramShipment extends Component {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setComments(col, (list[y].fundingSource).concat(" Does not exist."));
             }
-
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[4]).toString();
+            var shipmentStatusId = (this.el.getRowData(y)[4]).toString();
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                valid = false;
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, (list[y].shipmentStatus).concat(" Does not exist."));
+            }
             var col = ("F").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[5]).toString();
 
-            if (value != "" && value > 0) {
+            if (value != "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             } else {
@@ -127,6 +125,7 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
+
             var col = ("G").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[6]).toString();
 
@@ -139,21 +138,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
-
             var col = ("H").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[7]).toString();
-
-            if (value != "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            } else {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            }
-            var col = ("I").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[8]).toString();
 
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -164,7 +150,21 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
-            var col = ("J").concat(parseInt(y) + 1);
+
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[8]).toString();
+
+            if (value != "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                valid = false;
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                var col = ("J").concat(parseInt(y) + 1);
+            }
             var value = (this.el.getRowData(y)[9]).toString();
 
             if (value != "" && value >= 0) {
@@ -177,97 +177,137 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
 
-            // var col = ("K").concat(parseInt(y) + 1);
-            // var value = (this.el.getRowData(y)[10]).toString();
 
-            // if (value == "Invalid date" || value === "") {
-            //     valid = false;
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setStyle(col, "background-color", "yellow");
-            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[10]).toString();
 
-            // } else {
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setComments(col, "");
-
-            // }
-            var col = ("L").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[11]).toString();
-
-            if (value == "Invalid date" || value === "") {
+            if ((value == "Invalid date" || value === "") && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
 
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+
+                // }
+                var col = ("L").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[11]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+
+                var col = ("M").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[12]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+                var col = ("N").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[13]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+                var col = ("O").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[14]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+                var col = ("P").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[15]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+                var col = ("Q").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[16]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+                var col = ("R").concat(parseInt(y) + 1);
+                var value = (this.el.getRowData(y)[17]).toString();
+
+                if ((value == "Invalid date" || value === "") && (shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                    valid = false;
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                }
+
+
+
+
 
             }
-            var col = ("M").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[12]).toString();
-
-            if (value == "Invalid date" || value === "") {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-
-            }
-
-            var col = ("N").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[13]).toString();
-
-            if (value != "" && value > 0) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            } else {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].shipmentStatus).concat(" Does not exist."));
-            }
-
-            var col = ("O").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[14]).toString();
-
-            if (value != "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            } else {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            }
-            var col = ("P").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[15]).toString();
-            if (value != "" && value > 0) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            } else {
-                valid = false;
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, (list[y].fundingSource).concat(" Does not exist."));
-            }
-
+            this.setState({
+                isValidData: valid
+            })
 
         }
-        this.setState({
-            isValidData: valid
-        })
-
     }
 
     changed = function (instance, cell, x, y, value) {
         this.setState({ changedData: true })
         var regexDecimal = /^[0-9]+.[0-9]+$/
+        var shipmentStatusId = 0;
         if (x == 0) {
             var json = this.el.getJson();
             var col = ("A").concat(parseInt(y) + 1);
@@ -291,6 +331,7 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
+
         }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -299,14 +340,10 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
             }
         }
         if (x == 3) {
@@ -321,21 +358,39 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setComments(col, "");
             }
         }
+
         if (x == 4) {
-            var json = this.el.getJson();
+            shipmentStatusId = value
+            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
+
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+
             }
         }
         if (x == 5) {
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
+            }
+        }
+        if (x == 6) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -351,9 +406,9 @@ export default class PipelineProgramShipment extends Component {
                 }
             }
         }
-        if (x == 6) {
-            var reg = /^[0-9\b]+$/;
-            var col = ("G").concat(parseInt(y) + 1);
+        if (x == 7) {
+
+            var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -368,19 +423,7 @@ export default class PipelineProgramShipment extends Component {
                     this.el.setComments(col, "");
                 }
             }
-        }
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 8) {
+        } if (x == 8) {
             var reg = /^[0-9\b]+$/;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
@@ -397,8 +440,8 @@ export default class PipelineProgramShipment extends Component {
                     this.el.setComments(col, "");
                 }
             }
-        } if (x == 9) {
-            var reg = /^[0-9\b]+$/;
+        }
+        if (x == 9) {
             var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -415,26 +458,27 @@ export default class PipelineProgramShipment extends Component {
                 }
             }
         }
-        // if (x == 10) {
-        //     var col = ("K").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-        //     } else {
-        //         if (isNaN(Date.parse(value))) {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setStyle(col, "background-color", "yellow");
-        //             this.el.setComments(col, i18n.t('static.message.invaliddate'));
-        //         } else {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setComments(col, "");
-        //         }
-        //     }
-        // }
+
+        if (x == 10) {
+            var col = ("K").concat(parseInt(y) + 1);
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
         if (x == 11) {
             var col = ("L").concat(parseInt(y) + 1);
-            if (value == "") {
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -451,7 +495,7 @@ export default class PipelineProgramShipment extends Component {
         }
         if (x == 12) {
             var col = ("M").concat(parseInt(y) + 1);
-            if (value == "") {
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -465,50 +509,91 @@ export default class PipelineProgramShipment extends Component {
                     this.el.setComments(col, "");
                 }
             }
-        } if (x == 13) {
-            var col = ("N").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        } if (x == 14) {
-            var col = ("O").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-
         }
-
-        if (x == 15) {
-
-            // var reg = /^[0-9\b]+$/;
-            var col = ("P").concat(parseInt(y) + 1);
-            // alert(value);
-            if (value == "") {
+        if (x == 13) {
+            var col = ("N").concat(parseInt(y) + 1);
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                // } 
-                // else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                // }
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
-            // }
+        }
+        if (x == 14) {
+            var col = ("O").concat(parseInt(y) + 1);
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 15) {
+            var col = ("P").concat(parseInt(y) + 1);
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 16) {
+            var col = ("Q").concat(parseInt(y) + 1);
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 17) {
+            var col = ("R").concat(parseInt(y) + 1);
+            if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
         }
     }
 
@@ -780,59 +865,43 @@ export default class PipelineProgramShipment extends Component {
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
         this.el.destroy();
 
-        var data = this.state.pipelineShipmentData.map((item, index) =>
-            [
-                item.dataSource,
-                item.planningUnit,
-                moment(item.expectedDeliveryDate).format("YYYY-MM-DD"),
-                item.procurementAgent,
-                item.supplier,
-                item.quantity,
-                item.rate,
-                item.shipmentMode,
-                item.freightCost,
-                item.productCost,
-                '',
-                // moment(item.orderedDate).format("YYYY-MM-DD"), 
-                moment(item.shippedDate).format("YYYY-MM-DD"),
-                moment(item.receivedDate).format("YYYY-MM-DD"),
-                item.shipmentStatus, item.notes,
-                item.fundingSource,
-                item.active
-            ]);
+        var data = this.state.pipelineShipmentData.map((item, index) => [item.planningUnit, item.dataSource, item.procurementAgent, item.fundingSource, item.shipmentStatus, item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, item.quantity, item.rate, item.freightCost==0?item.quantity*this.props.items.program.seaFreightPerc:item.freightCost, item.quantity * item.rate, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.plannedDate).format("YYYY-MM-DD"), moment(item.submittedDate).format("YYYY-MM-DD"), moment(item.approvedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.arrivedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         // json[0] = data;
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100, 150, 150, 80, 80, 80, 80, 100, 100, 100, 100, 100, 180, 100, 80],
+            colWidths: [150, 150, 150, 150, 150, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100, 100, 100, 100, 180],
             columns: [
 
-                {
-                    title: i18n.t('static.datasource.datasource'),
-                    type: 'dropdown',
-                    source: this.state.dataSourceList
-                },
                 {
                     title: i18n.t('static.dashboard.planningunit'),
                     type: 'autocomplete',
                     source: this.state.planningUnitList
                     // readOnly: true
-                },
-                {
-                    title: i18n.t('static.shipment.edd'),
-                    type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
-
+                }, {
+                    title: i18n.t('static.datasource.datasource'),
+                    type: 'dropdown',
+                    source: this.state.dataSourceList
                 },
                 {
                     title: i18n.t('static.dashboard.procurementagent'),
                     type: 'dropdown',
                     source: this.state.procurementAgentList
                 }, {
-                    title: i18n.t('static.dashboard.supplier'),
-                    type: 'autocomplete',
-                    source: this.state.supplierList
+                    title: i18n.t('static.dashboard.fundingsource'),
+                    type: 'dropdown',
+                    source: this.state.fundingSourceList
+                },
+                {
+                    title: i18n.t('static.common.status'),
+                    type: 'dropdown',
+                    source: this.state.shipmentStatusList
                 }, {
+                    title: i18n.t('static.shipment.mode'),
+                    type: 'dropdown',
+                    source: this.state.shipModes
+                },
+                {
                     title: i18n.t('static.shipment.qty'),
                     type: 'text',
                     // source: regionList
@@ -843,10 +912,6 @@ export default class PipelineProgramShipment extends Component {
                     // source: regionList
                     // readOnly: true
                 }, {
-                    title: i18n.t('static.shipment.mode'),
-                    type: 'dropdown',
-                    source: this.state.shipModes
-                }, {
                     title: i18n.t('static.shipment.freightcost'),
                     type: 'text',
                     // source: dataSourceList
@@ -854,6 +919,11 @@ export default class PipelineProgramShipment extends Component {
                     title: i18n.t('static.shipment.productcost'),
                     type: 'text',
                     // source: dataSourceList
+                }, {
+                    title: i18n.t('static.shipment.edd'),
+                    type: 'calendar',
+                    options: { format: 'MM-DD-YYYY' }
+
                 },
                 {
                     title: i18n.t('static.shipment.ordereddate'),
@@ -861,7 +931,27 @@ export default class PipelineProgramShipment extends Component {
                     // options: { format: 'MM-DD-YYYY' }
 
                 }, {
+                    title: i18n.t('static.supplyPlan.plannedDate'),
+                    type: 'calendar',
+                    options: { format: 'MM-DD-YYYY' }
+
+                }, {
+                    title: i18n.t('static.supplyPlan.submittedDate'),
+                    type: 'calendar',
+                    options: { format: 'MM-DD-YYYY' }
+
+                }, {
+                    title: i18n.t('static.supplyPlan.approvedDate'),
+                    type: 'calendar',
+                    options: { format: 'MM-DD-YYYY' }
+
+                }, {
                     title: i18n.t('static.shipment.shipdate'),
+                    type: 'calendar',
+                    options: { format: 'MM-DD-YYYY' }
+
+                }, {
+                    title: i18n.t('static.supplyPlan.arrivedDate'),
                     type: 'calendar',
                     options: { format: 'MM-DD-YYYY' }
 
@@ -871,23 +961,12 @@ export default class PipelineProgramShipment extends Component {
                     options: { format: 'MM-DD-YYYY' }
 
                 },
-                {
-                    title: i18n.t('static.common.status'),
-                    type: 'dropdown',
-                    source: this.state.shipmentStatusList
-                },
+
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text'
                 },
-                {
-                    title: i18n.t('static.dashboard.fundingsource'),
-                    type: 'dropdown',
-                    source: this.state.fundingSourceList
-                }, {
-                    title: i18n.t('static.common.active'),
-                    type: 'checkbox'
-                },
+
                 {
                     title: 'Index',
                     type: 'hidden'
@@ -931,27 +1010,32 @@ export default class PipelineProgramShipment extends Component {
         var data = this.el.getJson().map(ele => ({
             "shipmentId": null,
             "procurementUnit": null,
-            "dataSource": ele[0],
-            "planningUnit": ele[1],
-            "expectedDeliveryDate": ele[2],
+
+            "planningUnit": ele[0],
+            "dataSource": ele[1],
+            "procurementAgent": ele[2],
+            "fundingSource": ele[3],
+            "shipmentStatus": ele[4],
+            "shipmentMode": ele[5],
             "suggestedQty": ele[6],
-            "procurementAgent": ele[3],
-            "supplier": ele[4],
-            "quantity": ele[5],
-            "rate": ele[6],
-            "shipmentMode": ele[7],
-            "productCost": ele[9],
+            "quantity": ele[6],
+            "rate": ele[7],
             "freightCost": ele[8],
-            "orderedDate": ele[10],
-            "shippedDate": ele[11],
-            "receivedDate": ele[12],
-            "shipmentStatus": ele[13],
-            "notes": ele[14],
+            "productCost": ele[9],
+            "expectedDeliveryDate": ele[10],
+            "orderedDate": ele[11],
+            "plannedDate": ele[12],
+            "submittedDate": ele[13],
+            "approvedDate": ele[14],
+            "shippedDate": ele[15],
+            "arrivedDate": ele[16],
+            "receivedDate": ele[17],
+            "notes": ele[18],
             "accountFlag": false,
             "erpFlag": false,
             "versionId": 0,
-            "fundingSource": ele[15],
-            "active": ele[16]
+
+            "active": true
         }))
         console.log(JSON.stringify(data))
         PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)

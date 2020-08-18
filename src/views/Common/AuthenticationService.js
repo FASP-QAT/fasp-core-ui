@@ -74,6 +74,25 @@ class AuthenticationService {
         }
     }
 
+    displayDashboardBasedOnRole() {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let roleList = [];
+            for (let i = 0; i <= decryptedUser.roleList.length; i++) {
+                let role = decryptedUser.roleList[i];
+                if (role != null && role != "") {
+                    roleList.push(role.roleId);
+                }
+            }
+            if (roleList.includes("ROLE_APPLICATION_ADMIN"))
+                return 1;
+            if (roleList.includes("ROLE_REALM_ADMIN"))
+                return 2;
+            return 3;
+        }
+    }
+
     getLoggedInUserId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         return decryptedCurUser;
@@ -508,8 +527,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/diamension/diamensionlist":
-                case "/diamension/diamensionlist/:color/:message":
+                case "/dimension/listDimension":
+                case "/dimension/listDimension/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
@@ -540,8 +559,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/realm/realmlist":
-                case "/realm/realmlist/:color/:message":
+                case "/realm/listRealm":
+                case "/realm/listRealm/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
                         return true;
                     }
@@ -727,6 +746,7 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/productCategory/productCategoryTree/:color/:message":
                 case "/productCategory/productCategoryTree":
                     if (bfunction.includes("ROLE_BF_PRODUCT_CATEGORY")) {
                         return true;
@@ -817,6 +837,7 @@ class AuthenticationService {
                     break;
                 case "/shipment/shipmentDetails":
                 case "/shipment/manualTagging":
+                case "/shipment/delinking":
                 case "/shipment/shipmentDetails/:message":
                 case "/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
@@ -974,6 +995,8 @@ class AuthenticationService {
                     }
                     break;
                 case "/ApplicationDashboard/:color/:message":
+                case "/ApplicationDashboard/:id":
+                case "/ApplicationDashboard/:id/:color/:message":
                 case "/ApplicationDashboard":
                     if (bfunction.includes("ROLE_BF_APPLICATION_DASHBOARD")) {
                         return true;
@@ -1094,6 +1117,18 @@ class AuthenticationService {
         if (url.includes("/program/listProgram")) {
             return "Programs";
         }
+    }
+    hexToRgbA(hex) {
+        var c;
+        if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+            c = hex.substring(1).split('');
+            if (c.length == 3) {
+                c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+            }
+            c = '0x' + c.join('');
+            return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)';
+        }
+        throw new Error('Bad Hex');
     }
 
 }

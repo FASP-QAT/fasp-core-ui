@@ -67,6 +67,12 @@ class DefaultLayout extends Component {
     });
 
   }
+  showDashboard(e) {
+    console.log("e------------------", e);
+    e.preventDefault();
+    var id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}`)
+  }
 
 
   render() {
@@ -74,7 +80,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} title={this.state.name} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} title={this.state.name} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -89,18 +95,18 @@ class DefaultLayout extends Component {
                   items:
                     [
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
-                      {
-                        name: i18n.t('static.dashboard.applicationdashboard'),
-                        url: '/ApplicationDashboard',
-                        icon: 'cui-dashboard icons',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_APPLICATION_DASHBOARD') ? false : true) }
-                      },
-                      {
-                        name: i18n.t('static.dashboard.realmdashboard'),
-                        url: '/RealmDashboard',
-                        icon: 'cui-dashboard icons',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.applicationdashboard'),
+                      //   url: '/ApplicationDashboard',
+                      //   icon: 'cui-dashboard icons',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_APPLICATION_DASHBOARD') ? false : true) }
+                      // },
+                      // {
+                      //   name: i18n.t('static.dashboard.realmdashboard'),
+                      //   url: '/RealmDashboard',
+                      //   icon: 'cui-dashboard icons',
+                      //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
+                      // },
                       //!this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       // {
                       //   name: i18n.t('static.dashboard.programdashboard'),
@@ -167,7 +173,7 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: i18n.t('static.dashboard.dimension'),
-                            url: '/diamension/diamensionlist',
+                            url: '/dimension/listDimension',
                             icon: 'fa fa-map',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_DIMENSION') ? false : true) }
                           }
@@ -184,7 +190,7 @@ class DefaultLayout extends Component {
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) },
                             children: [{
                               name: i18n.t('static.dashboard.realm'),
-                              url: '/realm/realmlist',
+                              url: '/realm/listRealm',
                               icon: 'fa fa-th-large',
                               // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
                             }, {
@@ -411,6 +417,12 @@ class DefaultLayout extends Component {
                             url: '/shipment/manualTagging',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                          },
+                          {
+                            name: 'Shipment De-linking',
+                            url: '/shipment/delinking',
+                            icon: 'fa fa-truck',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           }
                         ]
                       },
@@ -418,6 +430,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.supplyPlan'),
@@ -521,7 +534,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
-                            name: 'QAT Problem List',
+                            name: i18n.t('static.dashboard.qatProblemList'),
                             url: '/report/problemList',
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
@@ -793,7 +806,13 @@ class DefaultLayout extends Component {
                             url: '/report/shipmentGlobalDemandView',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.qatProblemList'),
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
                         ]
                       }
                     ]

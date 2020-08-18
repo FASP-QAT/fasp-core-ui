@@ -13,7 +13,7 @@ import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
-import { DATE_FORMAT_SM,DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
+import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
@@ -27,6 +27,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
+            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -37,6 +38,7 @@ const validationSchema = function (values) {
         // stopDate: Yup.string()
         //     .required(i18n.t('static.budget.stopdatetext'))
         budgetCode: Yup.string()
+            .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             .max(10, i18n.t('static.common.max10digittext'))
             .required(i18n.t('static.budget.budgetCodeText')),
     })
@@ -509,6 +511,39 @@ class EditBudgetComponent extends Component {
 
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <DatePicker
+                                                            id="startDate"
+                                                            name="startDate"
+                                                            bsSize="sm"
+                                                            minDate={this.addMonths(new Date(), -6)}
+                                                            selected={this.state.budget.startDate}
+                                                            onChange={(date) => { this.dataChangeDate(date) }}
+                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                            className="form-control-sm form-control date-color"
+                                                            disabledKeyboardNavigation
+                                                            autoComplete={"off"}
+                                                            dateFormat={DATE_FORMAT_SM}
+                                                        />
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <DatePicker
+                                                            id="stopDate"
+                                                            name="stopDate"
+                                                            bsSize="sm"
+                                                            minDate={this.state.budget.startDate}
+                                                            selected={this.state.budget.stopDate}
+                                                            onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                            className="form-control-sm form-control date-color"
+                                                            disabledKeyboardNavigation
+                                                            autoComplete={"off"}
+                                                            dateFormat={DATE_FORMAT_SM}
+                                                        />
+                                                    </FormGroup>
                                                     <FormGroup>
 
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -559,38 +594,6 @@ class EditBudgetComponent extends Component {
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                        <DatePicker
-                                                            id="startDate"
-                                                            name="startDate"
-                                                            bsSize="sm"
-                                                            minDate={this.addMonths(new Date(), -6)}
-                                                            selected={this.state.budget.startDate}
-                                                            onChange={(date) => { this.dataChangeDate(date) }}
-                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            className="form-control-sm form-control date-color"
-                                                            disabledKeyboardNavigation
-                                                            autoComplete={"off"}
-                                                            dateFormat={DATE_FORMAT_SM}
-                                                        />
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                        <DatePicker
-                                                            id="stopDate"
-                                                            name="stopDate"
-                                                            bsSize="sm"
-                                                            minDate={this.state.budget.startDate}
-                                                            selected={this.state.budget.stopDate}
-                                                            onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            className="form-control-sm form-control date-color"
-                                                            disabledKeyboardNavigation
-                                                            autoComplete={"off"}
-                                                            dateFormat={DATE_FORMAT_SM}
-                                                        />
-                                                    </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
@@ -625,9 +628,13 @@ class EditBudgetComponent extends Component {
             .then(response => {
                 if (response.data.startDate != null && response.data.startDate != "") {
                     // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                } else {
+                    response.data.startDate = "";
                 }
                 if (response.data.stopDate != null && response.data.stopDate != "") {
                     // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                } else {
+                    response.data.stopDate = "";
                 }
                 var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 response.data.budgetAmt = getBudgetAmount;
