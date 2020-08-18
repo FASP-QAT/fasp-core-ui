@@ -1246,8 +1246,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tbody>
                             </Table>
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
-                            <div className="table-responsive">
-                                <div id="adjustmentsTable" className="table-responsive" />
+                            <div className="table-responsive mt-3">
+                                <div id="adjustmentsTable" className="table-responsive " />
                             </div>
                             <h6 className="red">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                             <div className="table-responsive">
@@ -1289,7 +1289,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
 
                             <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('qtyCalculator')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
                             </div>
 
@@ -1298,7 +1298,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div id="shipmentDatesTable"></div>
                             </div>
                             <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                             </div>
                             <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
@@ -1306,7 +1306,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div id="shipmentBatchInfoTable"></div>
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button size="md" color="danger" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             </div>
                         </ModalBody>

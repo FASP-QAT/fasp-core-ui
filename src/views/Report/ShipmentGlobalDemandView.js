@@ -1871,7 +1871,7 @@ class ShipmentGlobalDemandView extends Component {
 
         canvasImg = canvas.toDataURL("image/png", 1.0);
 
-        doc.addImage(canvasImg, 'png', width / 2, startYtable, 300, 200, 'b', 'CANVAS');
+        doc.addImage(canvasImg, 'png', width / 2, startYtable, 280, 140, 'b', 'CANVAS');
 
         // let tableHeadLength = this.state.table1Headers.length;
         let length = this.state.table1Headers.length + 1;

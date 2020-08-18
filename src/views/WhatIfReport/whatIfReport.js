@@ -4150,8 +4150,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <div className="d-md-flex">
                                                     <FormGroup className="">
                                                         <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
-                                                        <div className="controls SelectGo">
-                                                            <InputGroup>
+                                                        <div className="controls WhatifInputFeild">
+                                                            {/* <InputGroup> */}
                                                                 <Input
                                                                     type="select"
                                                                     name="scenarioId"
@@ -4172,15 +4172,15 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
 
                                                                 </Input>
-                                                            </InputGroup>
+                                                            {/* </InputGroup> */}
                                                         </div>
                                                         <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                     </FormGroup>
                                                     <div id="consumptionScenariosFields" style={{ display: 'none' }}>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
-                                                            <div className="controls SelectGo">
-                                                                <InputGroup>
+                                                            <div className="controls WhatifInputFeild">
+                                                                {/* <InputGroup> */}
                                                                     <Input
                                                                         type="number"
                                                                         name="percentage"
@@ -4193,14 +4193,14 @@ export default class WhatIfReportComponent extends React.Component {
                                                                         onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                                     >
                                                                     </Input>
-                                                                </InputGroup>
+                                                                {/* </InputGroup> */}
                                                             </div>
                                                             <FormFeedback className="red">{errors.percentage}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                            <div className="controls SelectGo">
-                                                                <InputGroup>
+                                                            <div className="controls WhatifInputFeild">
+                                                                {/* <InputGroup> */}
                                                                     <DatePicker
                                                                         id="startDate"
                                                                         name="startDate"
@@ -4214,13 +4214,13 @@ export default class WhatIfReportComponent extends React.Component {
                                                                         autoComplete={"off"}
                                                                         dateFormat={DATE_FORMAT_SM}
                                                                     />
-                                                                </InputGroup>
+                                                                {/* </InputGroup> */}
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                            <div className="controls SelectGo">
-                                                                <InputGroup>
+                                                            <div className="controls WhatifInputFeild">
+                                                                {/* <InputGroup> */}
                                                                     <DatePicker
                                                                         id="stopDate"
                                                                         name="stopDate"
@@ -4234,7 +4234,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                         autoComplete={"off"}
                                                                         dateFormat={DATE_FORMAT_SM}
                                                                     />
-                                                                </InputGroup>
+                                                                {/* </InputGroup> */}
                                                             </div>
                                                         </FormGroup>
                                                     </div>
