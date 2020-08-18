@@ -477,7 +477,7 @@ class AddprogramPlanningUnit extends Component {
         data[11] = 1;
         data[12] = this.props.match.params.programId;
         this.el.insertRow(
-            data
+            data,0,1
         );
     }
 
