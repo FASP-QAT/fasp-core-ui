@@ -861,9 +861,6 @@ export default class ForecastingUnitListComponent extends Component {
                 this.setState({
                     forecastingUnitList: response.data,
                     selSource: response.data
-                },
-                () => {
-                    this.buildJexcel();
                 })
             } else {
                 this.setState({
