@@ -780,7 +780,7 @@ if(programId!=0&& countryId!=0){
                                                                 rowEvents={{
                                                                     onClick: (e, row, rowIndex) => {
                                                                         if (row.versionStatus.id == 1
-                                                                             && row.versionType.id==2
+                                                                             && row.versionType.id==1
                                                                         )
                                                                             this.editprogramStatus(row);
                                                                     }
