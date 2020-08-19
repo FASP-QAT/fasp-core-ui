@@ -20,7 +20,7 @@ import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ReportService from '../../api/ReportService';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -249,7 +249,7 @@ class Budgets extends Component {
 
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
 
                 var procurementAgentList = [];
                 var fundingSourceList = [];
@@ -420,7 +420,7 @@ class Budgets extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -519,7 +519,7 @@ class Budgets extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');

@@ -12,7 +12,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -75,7 +75,7 @@ export default class ConsumptionDetails extends React.Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
 
             db1 = e.target.result;
@@ -3243,7 +3243,7 @@ export default class ConsumptionDetails extends React.Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -3513,7 +3513,7 @@ export default class ConsumptionDetails extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var transaction = db1.transaction(['programData'], 'readwrite');
@@ -3832,7 +3832,7 @@ export default class ConsumptionDetails extends React.Component {
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -3894,7 +3894,7 @@ export default class ConsumptionDetails extends React.Component {
                 elInstance.setComments(col, "");
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
@@ -4263,7 +4263,7 @@ export default class ConsumptionDetails extends React.Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -4323,7 +4323,7 @@ export default class ConsumptionDetails extends React.Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -4376,7 +4376,7 @@ export default class ConsumptionDetails extends React.Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -4430,7 +4430,7 @@ export default class ConsumptionDetails extends React.Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 

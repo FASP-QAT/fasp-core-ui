@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, DATE_FORMAT_CAP } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -100,7 +100,7 @@ class AnnualShipmentCost extends Component {
                 var storeOS;
                 getDatabase();
                 var regionList = [];
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -367,7 +367,7 @@ class AnnualShipmentCost extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -757,7 +757,7 @@ class AnnualShipmentCost extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -851,7 +851,7 @@ class AnnualShipmentCost extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -994,7 +994,7 @@ class AnnualShipmentCost extends Component {
             var db3;
             var fSourceResult = [];
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
             openRequest.onsuccess = function (e) {
                 db3 = e.target.result;
                 var fSourceTransaction = db3.transaction(['fundingSource'], 'readwrite');
@@ -1054,7 +1054,7 @@ class AnnualShipmentCost extends Component {
             var db1;
             var papuResult = [];
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
@@ -1110,7 +1110,7 @@ class AnnualShipmentCost extends Component {
             var db2;
             var sStatusResult = [];
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
             openRequest.onsuccess = function (e) {
                 db2 = e.target.result;
                 var sStatusTransaction = db2.transaction(['shipmentStatus'], 'readwrite');

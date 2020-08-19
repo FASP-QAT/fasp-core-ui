@@ -5,10 +5,11 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from "../../Constants";
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
+
 
 export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
@@ -54,7 +55,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var dataSourceList = [];
         var currencyList = [];
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
         }.bind(this);
@@ -71,7 +72,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 shipmentStatusResult = shipmentStatusRequest.result.filter(c => c.active == true);
                 for (var k = 0; k < shipmentStatusResult.length; k++) {
                     var shipmentStatusJson = {
-                        name: getLabelText(shipmentStatusResult[k].label, this.state.lang),
+                        name: getLabelText(shipmentStatusResult[k].label, this.props.items.lang),
                         id: shipmentStatusResult[k].shipmentStatusId
                     }
                     shipmentStatusList.push(shipmentStatusJson);
@@ -162,7 +163,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
                                         if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE) {
                                             var dataSourceJson = {
-                                                name: getLabelText(dataSourceResult[k].label, this.state.lang),
+                                                name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                                 id: dataSourceResult[k].dataSourceId
                                             }
                                             dataSourceList.push(dataSourceJson);
@@ -182,7 +183,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     for (var k = 0; k < currencyResult.length; k++) {
 
                                         var currencyJson = {
-                                            name: getLabelText(currencyResult[k].label, this.state.lang),
+                                            name: getLabelText(currencyResult[k].label, this.props.items.lang),
                                             id: currencyResult[k].currencyId
                                         }
                                         currencyList.push(currencyJson);
@@ -312,7 +313,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         onchange: this.shipmentChanged,
                                         allowExport: false,
                                         text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                             show: '',
                                             entries: '',
                                         },
@@ -320,7 +321,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         updateTable: function (el, cell, x, y, source, value, id) {
                                             var elInstance = el.jexcel;
                                             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                                'K', 'L', 'M', 'N', 'O','P','Q','R','S','T','U','V','W']
+                                                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W']
                                             var rowData = elInstance.getRowData(y);
                                             var erpFlag = rowData[14];
                                             if (erpFlag.toString() == true) {
@@ -405,8 +406,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         if (rowData[14].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
                                                             tableEditable = false;
                                                         }
-                                                        var adjustedOrderQty=[];
-                                                        if(rowData[22]!="" || rowData[22]>0){
+                                                        var adjustedOrderQty = [];
+                                                        if (rowData[22] != "" || rowData[22] > 0) {
                                                             adjustedOrderQty.push({ id: 1, name: i18n.t('static.supplyPlan.suggestedOrderQty') })
                                                         }
                                                         adjustedOrderQty.push({ id: 2, name: i18n.t('static.supplyPlan.manualOrderQty') })
@@ -488,7 +489,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             editable: tableEditable,
                                                             onchange: this.shipmentQtyChanged,
                                                             text: {
-                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                                 show: '',
                                                                 entries: '',
                                                             },
@@ -552,7 +553,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 allowExport: false,
                                                                 editable: false,
                                                                 text: {
-                                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                                     show: '',
                                                                     entries: '',
                                                                 },
@@ -760,7 +761,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             onchange: this.shipmentDatesChanged,
                                                             editable: tableEditable,
                                                             text: {
-                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                                 show: '',
                                                                 entries: '',
                                                             },
@@ -1213,7 +1214,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             onchange: this.batchInfoChangedShipment,
                                                             allowExport: false,
                                                             text: {
-                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                                 show: '',
                                                                 entries: '',
                                                             },
@@ -1304,6 +1305,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     this.setState({
                                         shipmentsEl: myVar,
                                     })
+                                    var elInstance = myVar;
+                                    var json = elInstance.getJson();
+                                    for (var i = 0; i < json.length; i++) {
+                                        this.calculateLeadTimesOnChange(parseInt(i));
+                                    }
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -1478,15 +1484,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 8) {
-            checkValidtion("number", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1);
+            checkValidtion("number", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 0);
         }
 
         if (x == 10) {
-            checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1);
+            checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 0);
         }
 
         if (x == 12) {
-            checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1);
+            checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 0);
         }
 
         if (x == 18) {
@@ -1526,8 +1532,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (elInstance1 != undefined) {
                 elInstance1.setValueFromCoords(9, 0, value, true);
             }
-            console.log("x===2 value",elInstance.getRowData(0)[2]);
-            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1);
+            console.log("x===2 value", elInstance.getRowData(0)[2]);
+            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1, 0);
         }
 
         if (x == 4) {
@@ -1538,7 +1544,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 5) {
-            checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1);
+            checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1, 0);
         }
 
         if (x == 3) {
@@ -1586,11 +1592,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = this.state.qtyCalculatorTableEl;
         var y = 0;
         var valid = true;
-        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1);
+        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, INTEGER_NO_REGEX, 1, 0);
         if (validation == false) {
             valid = false;
         }
-        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1);
+        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, INTEGER_NO_REGEX, 1, 0);
         if (validation == false) {
             valid = false;
         }
@@ -1614,7 +1620,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkValidtion("text", "B", y, rowData[1], elInstance);
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, rowData[2], elInstance, INTEGER_NO_REGEX, 1);
+            checkValidtion("number", "C", y, rowData[2], elInstance, INTEGER_NO_REGEX, 1, 0);
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
@@ -1658,7 +1664,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation.toString() == "false") {
                     valid = false;
                 }
-                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, INTEGER_NO_REGEX, 1);
+                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, INTEGER_NO_REGEX, 1, 0);
                 if (validation.toString() == "false") {
                     valid = false;
                 }
@@ -1731,7 +1737,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     calculateLeadTimesOnChange(y) {
-        console.log("In calculate method")
+        console.log("In calculate method", y)
         // Logic for dates
         console.log("In valid")
         var elInstance = this.state.shipmentsEl;
@@ -1749,7 +1755,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             }.bind(this);
@@ -2170,7 +2176,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             }.bind(this);
@@ -2591,7 +2597,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("number", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1);
+                var validation = checkValidtion("number", "I", y, rowData[8], elInstance, INTEGER_NO_REGEX, 1, 0);
                 if (validation == false) {
                     valid = false;
                 }
@@ -2601,12 +2607,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1);
+                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 0);
                 if (validation == false) {
                     valid = false;
                 }
 
-                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1);
+                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 0);
                 if (validation == false) {
                     valid = false;
                 }
@@ -2654,7 +2660,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             }.bind(this);
@@ -2891,7 +2897,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentsEl: ""
                         })
                         if (this.props.shipmentPage != "shipmentDataEntry") {
-                            this.props.formSubmit(this.props.items.planningUnit, this.props.items.monthCount);
+                            if (this.props.shipmentPage != "supplyPlanCompare") {
+                                this.props.formSubmit(this.props.items.planningUnit, this.props.items.monthCount);
+                            } else {
+                                this.props.formSubmit(this.props.items.monthCount);
+                            }
                         }
                     }.bind(this)
                 }.bind(this)

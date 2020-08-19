@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from 'react-dom';
 import jexcel from 'jexcel';
+import "../../../node_modules/jsuites/dist/jsuites.basic.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody,
@@ -9,7 +11,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE } from '../../Constants.js'
+import { SECRET_KEY, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -75,7 +77,7 @@ export default class ConsumptionDetails extends React.Component {
     componentDidMount = function () {
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -131,7 +133,7 @@ export default class ConsumptionDetails extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
@@ -184,7 +186,7 @@ export default class ConsumptionDetails extends React.Component {
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -230,7 +232,7 @@ export default class ConsumptionDetails extends React.Component {
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -280,7 +282,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 
         var dataSourceList = []
         var regionList = []
@@ -1517,7 +1519,7 @@ export default class ConsumptionDetails extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),

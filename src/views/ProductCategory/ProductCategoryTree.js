@@ -28,7 +28,7 @@ const validationSchema = function (values, t) {
     console.log("made by us schema--->", values)
     return Yup.object().shape({
         productCategory: Yup.string()
-            .required("Product category name is required.")
+            .required("Product Category Name Is Required.")
 
     })
 }

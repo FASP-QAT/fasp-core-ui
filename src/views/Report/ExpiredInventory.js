@@ -12,7 +12,7 @@ import {
     SECRET_KEY, DATE_FORMAT_CAP,
     MONTHS_IN_PAST_FOR_SUPPLY_PLAN,
     TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
-    PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE
+    PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION
 } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProductService from '../../api/ProductService';
@@ -145,7 +145,7 @@ export default class ExpiredInventory extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -232,7 +232,7 @@ export default class ExpiredInventory extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -300,7 +300,7 @@ export default class ExpiredInventory extends Component {
                 var storeOS;
                 getDatabase();
                 var regionList = [];
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -813,7 +813,7 @@ export default class ExpiredInventory extends Component {
                     this.setState({ message: message })
                 }} />*/}
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
-                <h5  className="red">{i18n.t(this.state.message)}</h5>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Expired Inventory</strong> */}
@@ -866,7 +866,7 @@ export default class ExpiredInventory extends Component {
                                             </div>
 
                                         </FormGroup>
-                                        <FormGroup  className="col-md-3">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -886,7 +886,7 @@ export default class ExpiredInventory extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup  className="col-md-3">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -906,41 +906,41 @@ export default class ExpiredInventory extends Component {
                                         </FormGroup>
                                     </div>
                                 </Col>
-                        {/* </Form> */}
-                            <ToolkitProvider
-                                keyField="id"
-                                data={this.state.outPutList}
-                                columns={columns}
-                                search={{ searchFormatted: true }}
-                                hover
-                                filter={filterFactory()}
-                            >
-                                {
-                                    props => (
+                                {/* </Form> */}
+                                <ToolkitProvider
+                                    keyField="id"
+                                    data={this.state.outPutList}
+                                    columns={columns}
+                                    search={{ searchFormatted: true }}
+                                    hover
+                                    filter={filterFactory()}
+                                >
+                                    {
+                                        props => (
 
-                                        <div className="TableCust">
-                                            <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left expiredInventorySearchposition">
-                                                <SearchBar {...props.searchProps} />
-                                                <ClearSearchButton {...props.searchProps} />
+                                            <div className="TableCust">
+                                                <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left expiredInventorySearchposition">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div>
+                                                <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                    pagination={paginationFactory(tabelOptions)}
+                                                    /* rowEvents={{
+                                                         onClick: (e, row, rowIndex) => {
+                                                             this.editRegion(row);
+                                                         }
+                                                     }}*/
+                                                    {...props.baseProps}
+                                                />
                                             </div>
-                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                pagination={paginationFactory(tabelOptions)}
-                                                /* rowEvents={{
-                                                     onClick: (e, row, rowIndex) => {
-                                                         this.editRegion(row);
-                                                     }
-                                                 }}*/
-                                                {...props.baseProps}
-                                            />
-                                        </div>
-                                    )
-                                }
-                            </ToolkitProvider>
-                             </div> 
-                             </div> 
+                                        )
+                                    }
+                                </ToolkitProvider>
+                            </div>
+                        </div>
                     </CardBody>
                 </Card>
             </div>
-                );
-            }
+        );
+    }
 }

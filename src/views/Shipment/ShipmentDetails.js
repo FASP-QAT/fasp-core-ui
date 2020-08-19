@@ -1,12 +1,12 @@
 import React from "react";
 import {
     Card, CardBody,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody
+    Label, FormGroup,
+    CardFooter, Button, Col, Form, Modal, ModalHeader, ModalFooter, ModalBody
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -59,7 +59,7 @@ export default class ShipmentDetails extends React.Component {
     componentDidMount = function () {
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -113,7 +113,7 @@ export default class ShipmentDetails extends React.Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
@@ -146,7 +146,7 @@ export default class ShipmentDetails extends React.Component {
                                 name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                                 id: myResult[i].planningUnit.id
                             }
-                            proList[i] = productJson
+                            proList.push(productJson)
                         }
                     }
                     console.log("proList---" + proList);
@@ -169,7 +169,7 @@ export default class ShipmentDetails extends React.Component {
         var db1;
         var storeOS;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -202,7 +202,7 @@ export default class ShipmentDetails extends React.Component {
                             label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                             value: myResult[i].planningUnit.id
                         }
-                        proList[i] = productJson
+                        proList.push(productJson)
                     }
                 }
                 console.log("proList---" + proList);
@@ -221,7 +221,7 @@ export default class ShipmentDetails extends React.Component {
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -295,21 +295,6 @@ export default class ShipmentDetails extends React.Component {
     }
 
     render() {
-        const { programList } = this.state;
-        let programs = programList.length > 0
-            && programList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { planningUnitList } = this.state;
-        let planningUnits = planningUnitList.length > 0
-            && planningUnitList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -361,7 +346,6 @@ export default class ShipmentDetails extends React.Component {
 
                         <Col xs="12" sm="12" className="p-0">
                             {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} shipmentPage="shipmentDataEntry" />}
-                            {/* {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} />} */}
                             <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
