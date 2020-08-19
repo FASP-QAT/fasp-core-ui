@@ -158,7 +158,7 @@ export default class PipelineProgramDataStepOne extends Component {
 
                                     <FormGroup>
                                         {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
 
                                 </Form>

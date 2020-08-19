@@ -1555,9 +1555,11 @@ class ProductCatalog extends Component {
         var csvRow = [];
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
-        csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        // csvRow.push('Product Category' + ' , ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
-        csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        // csvRow.push('Tracer Category' + ' , ' + (document.getElementById("tracerCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'));
         csvRow.push('')
         csvRow.push('')
         // this.state.programLabels.map(ele =>
@@ -2936,12 +2938,13 @@ class ProductCatalog extends Component {
                     <CardBody className="pb-lg-2">
                         {/* <div ref={ref}> */}
                         <br />
-                        <Form >
+                     
                             <Col md="12 pl-0">
-                                <div className="d-md-flex Selectdiv2">
-                                    <FormGroup className="">
+                           
+                                <div className="row ">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -2964,9 +2967,9 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -2990,9 +2993,9 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -3017,8 +3020,9 @@ class ProductCatalog extends Component {
                                         </div>
                                     </FormGroup>
                                 </div>
+                             
                             </Col>
-                        </Form>
+                        
                         
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>

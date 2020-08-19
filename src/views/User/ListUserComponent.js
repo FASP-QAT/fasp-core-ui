@@ -604,7 +604,7 @@ class ListUserComponent extends Component {
 
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },
@@ -661,10 +661,12 @@ class ListUserComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
-                this.props.history.push({
-                    pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
-                });
+            if (this.state.selUserList.length != 0) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+                    this.props.history.push({
+                        pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
+                    });
+                }
             }
         }
     }.bind(this);
@@ -834,12 +836,11 @@ class ListUserComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <CardBody className="pb-lg-0 ">
-                            <div className="table-responsive">
-                                <div id="tableDiv" className="LanguageremoveReadonlybackground">
-                                </div>
+                       
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
-                        </CardBody>
+
+                       
 
                     </CardBody>
                 </Card>

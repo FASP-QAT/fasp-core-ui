@@ -686,5 +686,21 @@
     "static.dashboard.forecastmetrics": "Mesures de prévision",
     "static.report.historicalConsumptionDiff": "Diff consommation historique",
     "static.report.error": "Erreur de prévision",
-    "static.report.selectMonth": "Sélectionnez un mois"
+    "static.report.selectMonth": "Sélectionnez un mois",
+    "static.report.problemStatus":"État du problème",
+    "static.report.problemType":"Type de problème",
+    "static.program.programCode":"Code du problème",
+    "static.program.versionId":"ID de version",
+    "static.report.createdDate": "Date de création",
+    "static.report.problemDescription":"Description du problème",
+    "static.report.suggession":"Suggestion",
+    "static.dashboard.qatProblemList":"Liste des problèmes QAT",
+    "static.dashboard.qatProblem":"Problème QAT",
+    "static.dashboard.add.problem":"Ajouter un problème",
+    "static.jexcel.showing": "Montrant",
+    "static.jexcel.of": "de"
+    
+
+    
+
 }

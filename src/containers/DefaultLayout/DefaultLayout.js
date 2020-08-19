@@ -173,7 +173,7 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: i18n.t('static.dashboard.dimension'),
-                            url: '/diamension/diamensionlist',
+                            url: '/dimension/listDimension',
                             icon: 'fa fa-map',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_DIMENSION') ? false : true) }
                           }
@@ -190,7 +190,7 @@ class DefaultLayout extends Component {
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) },
                             children: [{
                               name: i18n.t('static.dashboard.realm'),
-                              url: '/realm/realmlist',
+                              url: '/realm/listRealm',
                               icon: 'fa fa-th-large',
                               // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
                             }, {
@@ -430,6 +430,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
+                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.supplyPlan'),
@@ -533,7 +534,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
                           {
-                            name: 'QAT Problem List',
+                            name: i18n.t('static.dashboard.qatProblemList'),
                             url: '/report/problemList',
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
@@ -805,7 +806,13 @@ class DefaultLayout extends Component {
                             url: '/report/shipmentGlobalDemandView',
                             icon: 'fa fa-wpforms',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
-                          }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.qatProblemList'),
+                            url: '/report/problemList',
+                            icon: 'fa fa-file-text-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                          },
                         ]
                       }
                     ]

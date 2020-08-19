@@ -620,17 +620,6 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
-                                                        <Input
-                                                            name="notes"
-                                                            id="notes"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
-                                                            type="textarea"
-                                                        />
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
                                                         <DatePicker
                                                             id="startDate"
@@ -663,6 +652,17 @@ class AddBudgetComponent extends Component {
                                                             autoComplete={"off"}
                                                             dateFormat={DATE_FORMAT_SM}
                                                         />
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
+                                                        <Input
+                                                            name="notes"
+                                                            id="notes"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            type="textarea"
+                                                        />
+                                                        <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

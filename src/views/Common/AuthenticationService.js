@@ -527,8 +527,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/diamension/diamensionlist":
-                case "/diamension/diamensionlist/:color/:message":
+                case "/dimension/listDimension":
+                case "/dimension/listDimension/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
                         return true;
                     }
@@ -559,8 +559,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/realm/realmlist":
-                case "/realm/realmlist/:color/:message":
+                case "/realm/listRealm":
+                case "/realm/listRealm/:color/:message":
                     if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
                         return true;
                     }
@@ -1117,6 +1117,18 @@ class AuthenticationService {
         if (url.includes("/program/listProgram")) {
             return "Programs";
         }
+    }
+    hexToRgbA(hex) {
+        var c;
+        if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+            c = hex.substring(1).split('');
+            if (c.length == 3) {
+                c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+            }
+            c = '0x' + c.join('');
+            return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)';
+        }
+        throw new Error('Bad Hex');
     }
 
 }

@@ -902,6 +902,7 @@ class SupplyPlanVersionAndReview extends Component {
             matricsList: [],
             dropdownOpen: false,
             radioSelected: 2,
+            versionTypeList: [],
             statuses: [],
             programs: [],
             countries: [],
@@ -1048,6 +1049,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.getCountrylist();
         this.getPrograms()
         this.getStatusList()
+        this.getVersionTypeList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -1165,6 +1167,15 @@ class SupplyPlanVersionAndReview extends Component {
             );
 
     }
+    getVersionTypeList() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getVersionTypeList().then(response => {
+            console.log('**' + JSON.stringify(response.data))
+            this.setState({
+                versionTypeList: response.data
+            })
+        })
+    }
     getStatusList() {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
@@ -1199,9 +1210,11 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
     fetchData() {
+        console.log("function called-------------------------------")
         let programId = document.getElementById("programId").value;
         let countryId = document.getElementById("countryId").value;
         let versionStatusId = document.getElementById("versionStatusId").value;
+        let versionTypeId = document.getElementById("versionTypeId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         if (programId != 0 && countryId != 0) {
@@ -1432,6 +1445,15 @@ class SupplyPlanVersionAndReview extends Component {
             )
 
         }, this);
+
+        const { versionTypeList } = this.state;
+        let versionTypes = versionTypeList.length > 0
+            && versionTypeList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{getLabelText(item.label, this.state.lang)}</option>
+                )
+            }, this);
+
         const { statuses } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
@@ -1691,6 +1713,19 @@ class SupplyPlanVersionAndReview extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                            <div className="controls">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="versionTypeId"
+                                                        id="versionTypeId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData(e) }}
+                                                    >  <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        {versionTypes}</Input>
+                                                </InputGroup>    </div></FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <div className="controls">

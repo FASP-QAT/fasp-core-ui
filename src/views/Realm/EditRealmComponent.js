@@ -208,7 +208,7 @@ export default class UpdateDataSourceComponent extends Component {
         realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
-        this.props.history.push(`/realm/realmList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     render() {
@@ -240,7 +240,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/realm/realmList/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
