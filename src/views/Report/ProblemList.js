@@ -675,12 +675,12 @@ export default class ConsumptionDetails extends React.Component {
         this.addMapping = this.addMapping.bind(this);
         this.getNote = this.getNote.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
-        this.updateState=this.updateState.bind(this);
+        this.updateState = this.updateState.bind(this);
 
     }
 
-    updateState(ekValue){
-        this.setState({loading:ekValue});
+    updateState(ekValue) {
+        this.setState({ loading: ekValue });
     }
 
     componentDidMount = function () {
@@ -711,7 +711,7 @@ export default class ConsumptionDetails extends React.Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
-                
+
                             name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
@@ -790,6 +790,7 @@ export default class ConsumptionDetails extends React.Component {
             data[13] = problemList[j].planningUnit.id
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
+            data[16] = problemList[j].realmProblem.criticality.id
 
 
             problemArray[count] = data;
@@ -822,76 +823,67 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.program.programCode'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.program.versionId'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.region.region'),
                     type: 'hidden',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'hidden',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.month'),
                     type: 'hidden',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.createdDate'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.suggession'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.problemStatus'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.common.action'),
                     type: 'hidden',
-                    readOnly: true
                 },
                 {
                     title: 'planningUnitId',
                     type: 'hidden',
-                    readOnly: true
                 },
                 {
                     title: 'problemId',
                     type: 'hidden',
-                    readOnly: true
                 },
                 {
                     title: 'actionUrl',
                     type: 'hidden',
-                    readOnly: true
+                },
+                {
+                    title: 'criticalitiId',
+                    type: 'hidden',
                 },
 
 
             ],
+            editable: false,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
@@ -899,27 +891,33 @@ export default class ConsumptionDetails extends React.Component {
             },
 
             updateTable: function (el, cell, x, y, source, value, id) {
-                console.log("INSIDE UPDATE TABLE");
-                var elInstance = el.jexcel;
-                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-                var rowData = elInstance.getRowData(y);
-                // console.log("elInstance---->", elInstance);
-                var stopDate = rowData[8];
-                var budgetAmt = rowData[5];
-                var usedUsdAmt = rowData[6];
-                // console.log("ABC----->", new Date(stopDate) < new Date() || (budgetAmt - usedUsdAmt) <= 0);
-                if (new Date(stopDate) < new Date() || (budgetAmt - usedUsdAmt) <= 0) {
 
-                    for (var i = 0; i < colArr.length; i++) {
-                        var col = ("B").concat(parseInt(y) + 1);
-                        // elInstance.setStyle(`B2`, 'background-color', 'transparent');
-                        // elInstance.setStyle(`B2`, 'background-color', 'red');
-                    }
-                } else {
+                var elInstance = el.jexcel;
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+                var rowData = elInstance.getRowData(y);
+
+                var criticalityId = rowData[16];
+                var problemStatusId = rowData[12];
+
+                if (criticalityId == 3 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                    }
+                } else if (criticalityId == 2 && problemStatusId == 1) {
+                    for (var i = 0; i < colArr.length; i++) {
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'orange');
+                    }
+                } else if (criticalityId == 1 && problemStatusId == 1) {
+                    for (var i = 0; i < colArr.length; i++) {
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'yellow');
                     }
                 }
+
+
+
             }.bind(this),
 
             onload: this.loaded,
@@ -1113,11 +1111,11 @@ export default class ConsumptionDetails extends React.Component {
         var versionId = row.versionId
         event.stopPropagation();
         // if (row.realmProblem.problem.problemId != 2) {
-            this.props.history.push({
-                // pathname: `/programProduct/addProgramProduct/${cell}`,
-                // pathname: `/report/addProblem`,
-                pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
-            });
+        this.props.history.push({
+            // pathname: `/programProduct/addProgramProduct/${cell}`,
+            // pathname: `/report/addProblem`,
+            pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
+        });
         // } else {
         //     this.props.history.push({
         //         pathname: `${cell}`,
@@ -1227,11 +1225,11 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '100px' }, 
+                style: { width: '100px' },
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format('MMM-YY');
-                        console.log("date===>",modifiedDate);
+                        console.log("date===>", modifiedDate);
                         return modifiedDate;
                     }
                 }
@@ -1322,7 +1320,7 @@ export default class ConsumptionDetails extends React.Component {
 
         return (
 
-            <div className="animated"> 
+            <div className="animated">
                 <QatProblemActions updateState={this.updateState}></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
@@ -1337,7 +1335,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody  className=" pt-lg-0">
+                    <CardBody className=" pt-lg-0">
                         <Col md="9 pl-1 pb-3">
                             <div className="row">
                                 <FormGroup className="col-md-4">
@@ -1395,8 +1393,8 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </Col>
                         <div className="ProgramListSearch">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                        </div>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
                         </div>
                     </CardBody>
 

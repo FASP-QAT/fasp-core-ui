@@ -728,7 +728,7 @@ class ListBudgetComponent extends Component {
         if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'red');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
           }
         } else {
           for (var i = 0; i < colArr.length; i++) {
