@@ -642,6 +642,7 @@ label.arrow_label:after {
 .jexcel_content {
   overflow-y: auto !important;
   max-height: 540px !important;
+  min-height: 70px !important;
 }
 .jexcel > tbody > tr > td.readonly {
   color: #212721 !important;
@@ -1225,10 +1226,12 @@ h5,
 }
 
 .form-control-sm:hover {
-  padding-right: calc(1.5em + 0.75rem);
+  // padding-right: calc(1.5em + 0.75rem);
+  padding-right: 7px !important;
 }
 .form-control:focus {
-  padding-right: calc(1.5em + 0.75rem);
+  // padding-right: calc(1.5em + 0.75rem);
+  padding-right: 7px!important;
 }
 
 .bottom-logo-img {
@@ -3127,4 +3130,7 @@ border-radius: 2em;
 }
 .WhatifInputFeild {
   width: 212px;
+}
+.ProgramListSearch{
+  margin-top: -4%;
 }
