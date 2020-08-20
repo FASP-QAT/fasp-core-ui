@@ -92,6 +92,7 @@ export default class ConsumptionDetails extends React.Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
+                
                             name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
