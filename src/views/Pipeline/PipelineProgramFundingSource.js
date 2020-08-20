@@ -88,24 +88,9 @@ export default class PipelineProgramFundingSource extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                // this.el.setStyle(col, "background-color", "transparent");
-                // this.el.setComments(col, "");
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    var fundingSourceValue = map.get("1");
-                    // console.log("currentvalues---", currentFundingSource);
-                    // console.log("fundingSourceValue-->", fundingSourceValue);
-                    if (fundingSourceValue == currentFundingSource && y != i) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, "fundingsource aready exist");
-                        i = json.length;
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+               
             }
        }
         return valid;   

@@ -486,11 +486,13 @@ export default class HealthAreaListComponent extends Component {
             const selSource = this.state.healthAreas.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
-            });
+            },
+            () => { this.buildJexcel()})
         } else {
             this.setState({
                 selSource: this.state.healthAreas
-            });
+            },
+            () => { this.buildJexcel()})
         }
     }
 
@@ -615,7 +617,7 @@ export default class HealthAreaListComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -671,13 +673,14 @@ export default class HealthAreaListComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
-            //     this.props.history.push({
-            //         pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
-            //         // state: { currency: currency }
-            //     });
-            // }
+            if( this.state.selSource.length != 0 ){
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                    this.props.history.push({
+                        pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { role }
+                    });
+                }
+            }
         }
     }.bind(this);
     addHealthArea() {

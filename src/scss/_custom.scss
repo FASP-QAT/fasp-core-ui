@@ -527,6 +527,7 @@ label.arrow_label:after {
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
+  // z-index: 0 !important;
 }
 
 .jexcel_page {
@@ -852,6 +853,12 @@ label.arrow_label:after {
 // Readonly background transperant made after conversion
 .jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
   background: transparent!important;
+}
+
+
+// Multiselect z-index going behind table 
+.go2139093995 * {
+  z-index: 30;
 }
 
 
