@@ -1916,7 +1916,7 @@ class ForecastMetrics extends Component {
               </a>
             </div>}
           </div>
-          <CardBody className="pb-lg-2 pt-lg-0">
+          <CardBody className="pb-lg-0 pt-lg-0">
 
             <div ref={ref}>
 
@@ -2027,7 +2027,7 @@ class ForecastMetrics extends Component {
                 </Col>
               </Form>
 
-              <Col md="12 pl-0 mt-2">
+              <Col md="12 pl-0">
 
                 <div className="row">
                   <div className="col-md-12">
@@ -2059,7 +2059,7 @@ class ForecastMetrics extends Component {
                       </ToolkitProvider>
                     } */}
 
-                    <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                    <CardBody className=" pt-md-0 pb-md-0 table-responsive">
                       <div id="tableDiv" className="jexcelremoveReadonlybackground">
                       </div>
                     </CardBody>
