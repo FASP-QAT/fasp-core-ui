@@ -60,6 +60,31 @@ class AddprogramPlanningUnit extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
+         this.dropdownFilter = this.dropdownFilter.bind(this);
+    }
+
+    dropdownFilter = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var value = (instance.jexcel.getJson()[r])[c - 1];
+        // AuthenticationService.setupAxiosInterceptors();
+        // PlanningUnitService.getActivePlanningUnitList()
+        //     .then(response => {
+        //         if (response.status == 200) {
+        // console.log("for my list response---", response.data);
+        // this.setState({
+        //     planningUnitList: response.data
+        // });
+
+        var puList = (this.state.planningUnitList).filter(c => c.forecastingUnit.productCategory.id == value);
+
+        for (var k = 0; k < puList.length; k++) {
+            var planningUnitJson = {
+                name: puList[k].label.label_en,
+                id: puList[k].planningUnitId
+            }
+            mylist.push(planningUnitJson);
+        }
+        return mylist;
     }
     hideSecondComponent() {
         setTimeout(function () {
