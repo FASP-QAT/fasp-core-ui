@@ -190,8 +190,7 @@ export default class DatabaseTranslations extends React.Component {
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
-
-                    <Col xs="12" sm="12">
+                      <Col xs="12" sm="12">
                         <Card>
                             {/* <CardHeader>
 

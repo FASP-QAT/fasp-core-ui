@@ -836,11 +836,11 @@ class ListUserComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                       
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
 
-                        </CardBody>
+                       
 
                     </CardBody>
                 </Card>

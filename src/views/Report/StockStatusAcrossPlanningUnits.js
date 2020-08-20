@@ -223,7 +223,7 @@
 
 //         var db1;
 //         getDatabase();
-//         var openRequest = indexedDB.open('fasp', 1);
+//         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //         openRequest.onsuccess = function (e) {
 //             db1 = e.target.result;
 //             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -317,7 +317,7 @@
 
 //         var db1;
 //         getDatabase();
-//         var openRequest = indexedDB.open('fasp', 1);
+//         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //         openRequest.onsuccess = function (e) {
 //             db1 = e.target.result;
 //             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -450,7 +450,7 @@
 
 //                 var db1;
 //                 getDatabase();
-//                 var openRequest = indexedDB.open('fasp', 1);
+//                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //                 openRequest.onsuccess = function (e) {
 //                     db1 = e.target.result;
 
@@ -1338,7 +1338,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -1548,7 +1548,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1642,7 +1642,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1894,7 +1894,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 

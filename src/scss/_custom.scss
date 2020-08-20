@@ -527,6 +527,7 @@ label.arrow_label:after {
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
+  // z-index: 0 !important;
 }
 
 .jexcel_page {
@@ -852,6 +853,12 @@ label.arrow_label:after {
 // Readonly background transperant made after conversion
 .jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
   background: transparent!important;
+}
+
+
+// Multiselect z-index going behind table 
+.go2139093995 * {
+  z-index: 30;
 }
 
 
@@ -2025,6 +2032,11 @@ input::placeholder {
   // background-color: red;
   background-color: #cc4e4e!important;
 }
+
+.background-red-problemList td:not(:last-child){
+    // background-color: red;
+    background-color: #cc4e4e!important;
+  }
 .background-orange td:not(:last-child){
   // background-color: red;
   background-color: #e07847!important;
@@ -2065,7 +2077,7 @@ input::placeholder {
 }
 .supplyplan-larrow-dataentry-adjustment{
   float: left;
-  margin-left: 91px !important;
+  margin-left: 103px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2515,9 +2527,15 @@ input::placeholder {
     border:none!important;
   }
 
+  .regionTdWidthAdjustments{
+    overflow: hidden!important;
+    min-width: 120px!important;
+    word-wrap: break-word!important;
+  }
+
   .supplyplanTdWidthForMonths{
     overflow: hidden!important;
-    min-width: 56px!important;
+    min-width: 70px!important;
   }
   .BorderNoneSupplyPlan{
     border:none!important;
@@ -3052,9 +3070,13 @@ border-radius: 2em;
 .go1084040746 svg{
   visibility: hidden !important;
 }
-.go2139093995 svg{
-  visibility: hidden !important;
+.go626121005 span {
+  display: inline!important;
+  padding-left: 5px;
 }
+// .go2139093995 svg{
+//   visibility: hidden !important;
+// }
 .go355775859 .gray svg{
   visibility: hidden !important;
 }
@@ -3102,4 +3124,7 @@ border-radius: 2em;
 .HomeIcon{
   color: #20a8d8;
   font-size: 20px;
+}
+.WhatifInputFeild {
+  width: 212px;
 }

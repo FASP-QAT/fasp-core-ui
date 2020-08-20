@@ -696,7 +696,10 @@
     "static.report.suggession":"Suggestion",
     "static.dashboard.qatProblemList":"Liste des problèmes QAT",
     "static.dashboard.qatProblem":"Problème QAT",
-    "static.dashboard.add.problem":"Ajouter un problème"
+    "static.dashboard.add.problem":"Ajouter un problème",
+    "static.jexcel.showing": "Montrant",
+    "static.jexcel.of": "de"
+    
 
     
 

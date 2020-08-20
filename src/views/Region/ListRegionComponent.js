@@ -35,12 +35,111 @@ class RegionListComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
     }
+
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+   buildJexcel() {
+         let regionList = this.state.selRegion;
+        // console.log("regionList---->", regionList);
+        let regionListArray = [];
+        let count = 0;
+        for (var j = 0; j < regionList.length; j++) {
+            data = [];
+            data[0] = regionList[j].regionId
+            data[1] = getLabelText(regionList[j].realmCountry.country.label, this.state.lang)
+            data[2] = getLabelText(regionList[j].label, this.state.lang)
+            data[3] = regionList[j].capacityCbm
+            data[4] = regionList[j].gln
+            data[5] = regionList[j].active;
+            regionListArray[count] = data;
+            count++;
+        }
+        if (regionList.length == 0) {
+            data = [];
+            regionListArray[0] = data;
+        }
+        // console.log("regionListArray---->", regionListArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = regionListArray;
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100,150, 150, 100,100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'regionListId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.region.country'),
+                    type: 'text',
+                    readOnly: true
+                }
+                ,
+                {
+                    title: i18n.t('static.region.region'),
+                    type: 'text',
+                    readOnly: true
+                }
+                ,
+                {
+                    title: i18n.t('static.region.capacitycbm'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.region.gln'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false,
+           
+        };
+        var regionEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = regionEl;
+        this.setState({
+            regionEl: regionEl, loading: false
+        })
     }
 
     filterData() {
@@ -49,11 +148,13 @@ class RegionListComponent extends Component {
             const selRegion = this.state.regionList.filter(c => c.realmCountry.realmCountryId == countryId)
             this.setState({
                 selRegion: selRegion
-            });
+            },
+            () => { this.buildJexcel()})
         } else {
             this.setState({
                 selRegion: this.state.regionList
-            });
+            },
+            () => { this.buildJexcel()})
         }
     }
     editRegion(region) {
@@ -107,107 +208,7 @@ class RegionListComponent extends Component {
                         selRegion: response.data,
                         loading: false
                     },
-                        () => {
-
-                            let regionList = this.state.regionList;
-                            // console.log("regionList---->", regionList);
-                            let regionListArray = [];
-                            let count = 0;
-                            for (var j = 0; j < regionList.length; j++) {
-                                data = [];
-                                data[0] = regionList[j].regionId
-                                data[1] = getLabelText(regionList[j].realmCountry.country.label, this.state.lang)
-                                data[2] = getLabelText(regionList[j].label, this.state.lang)
-                                data[3] = regionList[j].capacityCbm
-                                data[4] = regionList[j].gln
-                                data[5] = regionList[j].active;
-                                regionListArray[count] = data;
-                                count++;
-                            }
-                            if (regionList.length == 0) {
-                                data = [];
-                                regionListArray[0] = data;
-                            }
-                            // console.log("regionListArray---->", regionListArray);
-                            this.el = jexcel(document.getElementById("tableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = regionListArray;
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                // colWidths: [150, 150, 100,150, 150, 100,100],
-                                colHeaderClasses: ["Reqasterisk"],
-                                columns: [
-                                    {
-                                        title: 'regionListId',
-                                        type: 'hidden',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: i18n.t('static.region.country'),
-                                        type: 'text',
-                                        readOnly: true
-                                    }
-                                    ,
-                                    {
-                                        title: i18n.t('static.region.region'),
-                                        type: 'text',
-                                        readOnly: true
-                                    }
-                                    ,
-                                    {
-                                        title: i18n.t('static.region.capacitycbm'),
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: i18n.t('static.region.gln'),
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        type: 'dropdown',
-                                        title: i18n.t('static.common.status'),
-                                        readOnly: true,
-                                        source: [
-                                            { id: true, name: i18n.t('static.common.active') },
-                                            { id: false, name: i18n.t('static.common.disabled') }
-                                        ]
-                                    },
-                                ],
-                                text: {
-                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                    show: '',
-                                    entries: '',
-                                },
-                                onload: this.loaded,
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onselection: this.selected,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                allowExport: false,
-                                paginationOptions: [10, 25, 50],
-                                position: 'top',
-                                contextMenu: false,
-                               
-                            };
-                            var regionEl = jexcel(document.getElementById("tableDiv"), options);
-                            this.el = regionEl;
-                            this.setState({
-                                regionEl: regionEl, loading: false
-                            })
-
-
-
-                        })
+                    () => { this.buildJexcel()})
                 } else {
                     this.setState({ message: response.data.messageCode },
                         () => {

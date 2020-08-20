@@ -610,7 +610,8 @@
 // }
 
 //JEXCEL-------------------------
-import { DATE_FORMAT_CAP } from '../../Constants';
+
+import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants';
 import React from "react";
 import ReactDOM from 'react-dom';
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
@@ -640,6 +641,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
+import QatProblemActions from '../../CommonComponent/QatProblemActions'
 const entityname = i18n.t('static.report.problem');
 
 
@@ -661,7 +663,8 @@ export default class ConsumptionDetails extends React.Component {
             data: [],
             message: '',
             planningUnitId: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
 
         this.fetchData = this.fetchData.bind(this);
@@ -672,17 +675,22 @@ export default class ConsumptionDetails extends React.Component {
         this.addMapping = this.addMapping.bind(this);
         this.getNote = this.getNote.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.updateState=this.updateState.bind(this);
 
     }
 
+    updateState(ekValue){
+        this.setState({loading:ekValue});
+    }
+
     componentDidMount = function () {
-        qatProblemActions();
+        // qatProblemActions();
         let problemStatusId = document.getElementById('problemStatusId').value;
         console.log("problemStatusId ---------> ", problemStatusId);
         const lan = 'en';
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -749,7 +757,7 @@ export default class ConsumptionDetails extends React.Component {
         // console.log('in rowClassNameFormat')
         // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
         if (row.realmProblem.criticality.id == 3) {
-            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
+            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red-problemList' : '';
         } else if (row.realmProblem.criticality.id == 2) {
             return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
         } else {
@@ -1011,7 +1019,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var db1;
             getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             var procurementAgentList = [];
             var fundingSourceList = [];
             var budgetList = [];
@@ -1313,12 +1321,13 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated">
+                <QatProblemActions updateState={this.updateState}></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -1326,7 +1335,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pb-lg-2 pt-lg-0">
+                    <CardBody  className="pb-lg-0">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>
@@ -1389,7 +1398,17 @@ export default class ConsumptionDetails extends React.Component {
                     </CardBody>
 
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
 
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div >
         );

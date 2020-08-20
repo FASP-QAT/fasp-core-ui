@@ -590,7 +590,7 @@
 //             const lan = 'en';
 //             var db1;
 //             getDatabase();
-//             var openRequest = indexedDB.open('fasp', 1);
+//             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //             openRequest.onsuccess = function (e) {
 //                 db1 = e.target.result;
 //                 var transaction = db1.transaction(['CountryData'], 'readwrite');
@@ -668,7 +668,7 @@
 //             var db1;
 //             var storeOS;
 //             getDatabase();
-//             var openRequest = indexedDB.open('fasp', 1);
+//             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 //             openRequest.onsuccess = function (e) {
 //                 db1 = e.target.result;
 //                 var planningunitTransaction = db1.transaction(['CountryPlanningUnit'], 'readwrite');
