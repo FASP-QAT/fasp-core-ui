@@ -6,8 +6,6 @@ import {
     Input, InputGroup, Label, FormGroup, Form, Row, Nav, NavItem, NavLink, Collapse, TabPane, TabContent, FormFeedback
 } from 'reactstrap';
 import * as Yup from 'yup';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import DatePicker from 'react-datepicker';
@@ -28,12 +26,12 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import csvicon from '../../assets/img/csv.png'
-import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan.js";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan.js";
+import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 
 const entityname = i18n.t('static.dashboard.whatIf')
 
@@ -220,18 +218,16 @@ export default class WhatIfReportComponent extends React.Component {
             showShipments: 0,
             paColors: [],
             programSelect: "",
-            showInventory: 0
+            showInventory: 0,
+            showConsumption: 0
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
-        this.saveConsumption = this.saveConsumption.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
-        this.consumptionChanged = this.consumptionChanged.bind(this);
 
         this.adjustmentsDetailsClicked = this.adjustmentsDetailsClicked.bind(this);
-        this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
 
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -2544,7 +2540,8 @@ export default class WhatIfReportComponent extends React.Component {
             shipmentQtyChangedFlag: 0,
             qtyCalculatorValidationError: "",
             showShipments: 0,
-            showInventory: 0
+            showInventory: 0,
+            showConsumption: 0
 
         })
         if (supplyPlanType == 'Consumption') {
@@ -2704,1104 +2701,56 @@ export default class WhatIfReportComponent extends React.Component {
 
     // Show consumption details
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
-        if (this.state.consumptionChangedFlag == 0) {
-            var elInstance = this.state.consumptionBatchInfoTableEl;
-            if (elInstance != undefined && elInstance != "") {
-                elInstance.destroy();
-            }
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var programId = document.getElementById("programId").value;
-            var dataSourceListAll = this.state.dataSourceListAll.filter(c => c.dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || c.dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE);
-            var dataSourceList = [];
-            for (var k = 0; k < dataSourceListAll.length; k++) {
-                var dataSourceJson = {
-                    name: getLabelText(dataSourceListAll[k].label, this.state.lang),
-                    id: dataSourceListAll[k].dataSourceId
-                }
-                dataSourceList.push(dataSourceJson);
-            }
-            var myVar = '';
-
-            var consumptionTotalData = [];
-            var filteredArray = [];
-
-            var db1;
-            var storeOS;
-            getDatabase();
-            var regionList = [];
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
-                var programRequest = programDataOs.get(document.getElementById("programId").value);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    this.setState({
-                        programJsonAfterConsumptionClicked: programJson
-                    })
-                    var batchList = []
-                    var batchInfoList = programJson.batchInfoList;
-                    // batchInfoList.push({
-                    //     batch:{
-                    //         batchId:0,
-                    //         batchNo:i18n.t('static.supplyPlan.fefo'),
-                    //         expiryDate:
-                    //     }
-                    // })
-                    batchList.push({
-                        name: i18n.t('static.supplyPlan.fefo'),
-                        id: -1
-                    })
-                    for (var k = 0; k < batchInfoList.length; k++) {
-                        if (batchInfoList[k].expiryDate >= startDate && batchInfoList[k].createdDate <= startDate && batchInfoList[k].planningUnitId == document.getElementById("planningUnitId").value && (batchInfoList[k].autoGenerated).toString() == "false") {
-                            var batchJson = {
-                                name: batchInfoList[k].batchNo,
-                                id: batchInfoList[k].batchId
-                            }
-                            batchList.push(batchJson);
-                        }
-                    }
-                    this.setState({
-                        batchInfoList: batchList,
-                        batchInfoListAllForConsumption: batchInfoList
-                    })
-                    var consumptionListUnFiltered = (programJson.consumptionList);
-                    this.setState({
-                        consumptionListUnFiltered: consumptionListUnFiltered,
-                        inventoryListUnFiltered: programJson.inventoryList
-                    })
-                    var consumptionList = consumptionListUnFiltered.filter(con =>
-                        con.planningUnit.id == planningUnitId
-                        && con.region.id == region
-                        && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
-                    this.el = jexcel(document.getElementById("consumptionDetailsTable"), '');
-                    this.el.destroy();
-                    var data = [];
-                    var consumptionDataArr = []
-                    for (var j = 0; j < consumptionList.length; j++) {
-                        data = [];
-                        data[0] = month;
-                        data[1] = consumptionList[j].region.id;
-                        data[2] = consumptionList[j].dataSource.id;
-                        data[3] = consumptionList[j].consumptionQty;
-                        data[4] = consumptionList[j].dayOfStockOut;
-                        if (consumptionList[j].notes === null || ((consumptionList[j].notes).trim() == "NULL")) {
-                            data[5] = "";
-                        } else {
-                            data[5] = consumptionList[j].notes;
-                        }
-                        data[6] = consumptionListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == region && c.consumptionDate == consumptionList[j].consumptionDate && c.actualFlag.toString() == consumptionList[j].actualFlag.toString());
-                        data[7] = startDate;
-                        data[8] = consumptionList[j].actualFlag;
-                        data[9] = consumptionList[j].active;
-                        data[10] = consumptionList[j].batchInfoList;
-                        consumptionDataArr[j] = data;
-                    }
-                    if (consumptionList.length == 0) {
-                        data = [];
-                        data[0] = month;
-                        data[1] = region;
-                        data[2] = "";
-                        data[3] = "";
-                        data[4] = "";
-                        data[5] = "";
-                        data[6] = -1;
-                        data[7] = startDate;
-                        data[8] = "";
-                        data[9] = true;
-                        data[10] = [];
-                        consumptionDataArr[0] = data;
-                    }
-                    var options = {
-                        data: consumptionDataArr,
-                        colWidths: [80, 150, 200, 90, 80, 350, 20, 20, 100],
-                        columns: [
-                            { type: 'text', readOnly: true, title: i18n.t('static.report.month') },
-                            { type: 'dropdown', readOnly: true, source: this.state.regionList, title: i18n.t('static.region.region') },
-                            { type: 'dropdown', source: dataSourceList, title: i18n.t('static.inventory.dataSource') },
-                            { type: 'numeric', title: i18n.t('static.consumption.consumptionqty'), mask: '#,##' },
-                            { type: 'numeric', title: i18n.t('static.consumption.daysofstockout'), mask: '#,##' },
-                            { type: 'text', title: i18n.t('static.program.notes') },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index') },
-                            { type: 'hidden', title: i18n.t('static.report.consumptionDate') },
-                            { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }] },
-                            { type: 'checkbox', title: i18n.t('static.common.active') },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo') }
-                        ],
-                        pagination: false,
-                        search: false,
-                        columnSorting: true,
-                        tableOverflow: true,
-                        wordWrap: true,
-                        allowInsertColumn: false,
-                        allowManualInsertColumn: false,
-                        allowDeleteRow: false,
-                        allowManualInsertRow: false,
-                        onchange: this.consumptionChanged,
-                        allowExport: false,
-                        text: {
-                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                            show: '',
-                            entries: '',
-                        },
-                        onload: this.loadedConsumption,
-                        updateTable: function (el, cell, x, y, source, value, id) {
-                            var elInstance = el.jexcel;
-                            var rowData = elInstance.getRowData(y);
-                            var batchInfo = rowData[10];
-                            if (rowData[8].toString() == "true") {
-                                if (batchInfo != "") {
-                                    var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
-                                    cell.classList.add('readonly');
-                                } else {
-                                    var cell = elInstance.getCell(`D${parseInt(y) + 1}`)
-                                    cell.classList.remove('readonly');
-                                }
-                            }
-                        }.bind(this),
-                        contextMenu: function (obj, x, y, e) {
-                            var items = [];
-                            //Add consumption batch info
-                            var rowData = obj.getRowData(y)
-                            if (rowData[8].toString() == "true") {
-                                items.push({
-                                    title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
-                                    onclick: function () {
-                                        document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'block';
-                                        this.el = jexcel(document.getElementById("consumptionBatchInfoTable"), '');
-                                        this.el.destroy();
-                                        var json = [];
-                                        // var elInstance=this.state.plannedPsmShipmentsEl;
-                                        var rowData = obj.getRowData(y)
-                                        var batchInfo = rowData[10];
-                                        var consumptionQty = (rowData[3]).toString().replaceAll("\,", "");
-                                        var consumptionBatchInfoQty = 0;
-                                        for (var sb = 0; sb < batchInfo.length; sb++) {
-                                            var data = [];
-                                            data[0] = batchInfo[sb].batch.batchId;
-                                            data[1] = batchInfo[sb].batch.expiryDate;
-                                            data[2] = batchInfo[sb].consumptionQty;
-                                            data[3] = batchInfo[sb].consumptionTransBatchInfoId;
-                                            data[4] = y;
-                                            consumptionBatchInfoQty += parseInt(batchInfo[sb].consumptionQty);
-                                            json.push(data);
-                                        }
-                                        if (parseInt(consumptionQty) > consumptionBatchInfoQty && batchInfo.length > 0) {
-                                            var data = [];
-                                            data[0] = -1;
-                                            data[1] = "";
-                                            data[2] = parseInt(consumptionQty) - parseInt(consumptionBatchInfoQty);
-                                            data[3] = 0;
-                                            data[4] = y;
-                                            json.push(data);
-                                        }
-                                        if (batchInfo.length == 0) {
-                                            var data = [];
-                                            data[0] = "";
-                                            data[1] = ""
-                                            data[2] = "";
-                                            data[3] = 0;
-                                            data[4] = y;
-                                            json.push(data)
-                                        }
-                                        var options = {
-                                            data: json,
-                                            columnDrag: true,
-                                            colWidths: [100, 150, 100],
-                                            columns: [
-                                                {
-                                                    title: i18n.t('static.supplyPlan.batchId'),
-                                                    type: 'dropdown',
-                                                    source: this.state.batchInfoList,
-                                                    filter: this.filterBatchInfoForExistingData
-                                                },
-                                                {
-                                                    title: i18n.t('static.supplyPlan.expiryDate'),
-                                                    type: 'calendar',
-                                                    options: {
-                                                        format: 'MM-DD-YYYY',
-                                                        validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
-                                                    },
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: i18n.t('static.report.consupmtionqty'),
-                                                    type: 'numeric',
-                                                    mask: '#,##'
-                                                },
-                                                {
-                                                    title: i18n.t('static.supplyPlan.consumptionTransBatchInfoId'),
-                                                    type: 'hidden',
-                                                },
-                                                {
-                                                    title: i18n.t('static.supplyPlan.rowNumber'),
-                                                    type: 'hidden',
-                                                }
-                                            ],
-                                            pagination: false,
-                                            search: false,
-                                            columnSorting: true,
-                                            tableOverflow: true,
-                                            wordWrap: true,
-                                            allowInsertColumn: false,
-                                            allowManualInsertColumn: false,
-                                            allowDeleteRow: false,
-                                            oneditionend: this.onedit,
-                                            copyCompatibility: true,
-                                            allowInsertRow: true,
-                                            allowManualInsertRow: false,
-                                            allowExport: false,
-                                            onchange: this.batchInfoChangedConsumption,
-                                            text: {
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                show: '',
-                                                entries: '',
-                                            },
-                                            onload: this.loadedBatchInfoConsumption,
-                                            contextMenu: function (obj, x, y, e) {
-                                                var items = [];
-                                                if (y == null) {
-                                                    // Insert a new column
-                                                    if (obj.options.allowInsertColumn == true) {
-                                                        items.push({
-                                                            title: obj.options.text.insertANewColumnBefore,
-                                                            onclick: function () {
-                                                                obj.insertColumn(1, parseInt(x), 1);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    if (obj.options.allowInsertColumn == true) {
-                                                        items.push({
-                                                            title: obj.options.text.insertANewColumnAfter,
-                                                            onclick: function () {
-                                                                obj.insertColumn(1, parseInt(x), 0);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    // Delete a column
-                                                    if (obj.options.allowDeleteColumn == true) {
-                                                        items.push({
-                                                            title: obj.options.text.deleteSelectedColumns,
-                                                            onclick: function () {
-                                                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                            }
-                                                        });
-                                                    }
-
-                                                    // Rename column
-                                                    if (obj.options.allowRenameColumn == true) {
-                                                        items.push({
-                                                            title: obj.options.text.renameThisColumn,
-                                                            onclick: function () {
-                                                                obj.setHeader(x);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    // Sorting
-                                                    if (obj.options.columnSorting == true) {
-                                                        // Line
-                                                        items.push({ type: 'line' });
-
-                                                        items.push({
-                                                            title: obj.options.text.orderAscending,
-                                                            onclick: function () {
-                                                                obj.orderBy(x, 0);
-                                                            }
-                                                        });
-                                                        items.push({
-                                                            title: obj.options.text.orderDescending,
-                                                            onclick: function () {
-                                                                obj.orderBy(x, 1);
-                                                            }
-                                                        });
-                                                    }
-                                                } else {
-                                                    // Insert new row
-                                                    if (obj.options.allowInsertRow == true) {
-                                                        items.push({
-                                                            title: i18n.t('static.supplyPlan.addNewBatchInfo'),
-                                                            onclick: function () {
-                                                                var data = [];
-                                                                data[0] = "";
-                                                                data[1] = "";
-                                                                data[2] = "";
-                                                                data[3] = 0;
-                                                                data[4] = y;
-                                                                obj.insertRow(data);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    if (obj.options.allowDeleteRow == true) {
-                                                        items.push({
-                                                            title: obj.options.text.deleteSelectedRows,
-                                                            onclick: function () {
-                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                                            }
-                                                        });
-                                                    }
-
-                                                    if (x) {
-                                                        if (obj.options.allowComments == true) {
-                                                            items.push({ type: 'line' });
-
-                                                            var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                            items.push({
-                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                onclick: function () {
-                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                }
-                                                            });
-
-                                                            if (title) {
-                                                                items.push({
-                                                                    title: obj.options.text.clearComments,
-                                                                    onclick: function () {
-                                                                        obj.setComments([x, y], '');
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                // Line
-                                                items.push({ type: 'line' });
-
-                                                // Save
-                                                if (obj.options.allowExport) {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                        shortcut: 'Ctrl + S',
-                                                        onclick: function () {
-                                                            obj.download(true);
-                                                        }
-                                                    });
-                                                }
-
-                                                return items;
-                                            }.bind(this)
-
-                                        };
-                                        var elVar = jexcel(document.getElementById("consumptionBatchInfoTable"), options);
-                                        this.el = elVar;
-                                        this.setState({ consumptionBatchInfoTableEl: elVar });
-                                    }.bind(this)
-                                    // this.setState({ shipmentBudgetTableEl: elVar });
-                                });
-                            }
-                            // -------------------------------------
-
-                            if (y == null) {
-                                // Insert a new column
-                                if (obj.options.allowInsertColumn == true) {
-                                    items.push({
-                                        title: obj.options.text.insertANewColumnBefore,
-                                        onclick: function () {
-                                            obj.insertColumn(1, parseInt(x), 1);
-                                        }
-                                    });
-                                }
-
-                                if (obj.options.allowInsertColumn == true) {
-                                    items.push({
-                                        title: obj.options.text.insertANewColumnAfter,
-                                        onclick: function () {
-                                            obj.insertColumn(1, parseInt(x), 0);
-                                        }
-                                    });
-                                }
-
-                                // Delete a column
-                                if (obj.options.allowDeleteColumn == true) {
-                                    items.push({
-                                        title: obj.options.text.deleteSelectedColumns,
-                                        onclick: function () {
-                                            obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                        }
-                                    });
-                                }
-
-                                // Rename column
-                                if (obj.options.allowRenameColumn == true) {
-                                    items.push({
-                                        title: obj.options.text.renameThisColumn,
-                                        onclick: function () {
-                                            obj.setHeader(x);
-                                        }
-                                    });
-                                }
-
-                                // Sorting
-                                if (obj.options.columnSorting == true) {
-                                    // Line
-                                    items.push({ type: 'line' });
-
-                                    items.push({
-                                        title: obj.options.text.orderAscending,
-                                        onclick: function () {
-                                            obj.orderBy(x, 0);
-                                        }
-                                    });
-                                    items.push({
-                                        title: obj.options.text.orderDescending,
-                                        onclick: function () {
-                                            obj.orderBy(x, 1);
-                                        }
-                                    });
-                                }
-                            } else {
-                                // Insert new row
-                                if (obj.options.allowInsertRow == true) {
-                                    var json = obj.getJson();
-                                    if (json.length < 2) {
-                                        items.push({
-                                            title: i18n.t('static.supplyPlan.addNewConsumption'),
-                                            onclick: function () {
-                                                var json = obj.getJson();
-                                                var map = new Map(Object.entries(json[0]));
-                                                var data = [];
-                                                data[0] = map.get("0");
-                                                data[1] = map.get("1");
-                                                data[2] = "";
-                                                data[3] = "";
-                                                data[4] = "";
-                                                data[5] = "";
-                                                data[6] = -1;
-                                                data[7] = startDate;
-                                                data[8] = "";
-                                                data[9] = true;
-                                                data[10] = [];
-                                                consumptionDataArr[0] = data;
-                                                obj.insertRow(data);
-                                            }.bind(this)
-                                        });
-                                    }
-                                }
-
-                                if (obj.options.allowDeleteRow == true) {
-                                    items.push({
-                                        title: obj.options.text.deleteSelectedRows,
-                                        onclick: function () {
-                                            obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                        }
-                                    });
-                                }
-
-                                if (x) {
-                                    if (obj.options.allowComments == true) {
-                                        items.push({ type: 'line' });
-
-                                        var title = obj.records[y][x].getAttribute('title') || '';
-
-                                        items.push({
-                                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                            onclick: function () {
-                                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                            }
-                                        });
-
-                                        if (title) {
-                                            items.push({
-                                                title: obj.options.text.clearComments,
-                                                onclick: function () {
-                                                    obj.setComments([x, y], '');
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Line
-                            items.push({ type: 'line' });
-
-                            // Save
-                            if (obj.options.allowExport) {
-                                items.push({
-                                    title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                    shortcut: 'Ctrl + S',
-                                    onclick: function () {
-                                        obj.download(true);
-                                    }
-                                });
-                            }
-
-                            return items;
-                        }.bind(this)
-                    };
-                    myVar = jexcel(document.getElementById("consumptionDetailsTable"), options);
-                    this.el = myVar;
-                    this.setState({
-                        consumptionEl: myVar
-                    })
-                }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                consumptionError: i18n.t('static.supplyPlan.saveDataFirst')
-            })
-        }
-    }
-
-    loadedConsumption = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
-    }
-
-    loadedBatchInfoConsumption = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
-    }
-
-    batchInfoChangedConsumption = function (instance, cell, x, y, value) {
-        this.setState({
-            consumptionBatchError: ''
-        })
-        var elInstance = instance.jexcel;
-        if (x == 0) {
-            var col = ("A").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.setState({
-                    consumptionBatchInfoDuplicateError: '',
-                    consumptionBatchInfoNoStockError: ''
-                })
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                if (value != -1) {
-                    var expiryDate = this.state.batchInfoListAllForConsumption.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
-                    elInstance.setValueFromCoords(1, y, expiryDate, true);
-                } else {
-                    elInstance.setValueFromCoords(1, y, "", true);
-                }
-                var col1 = ("C").concat(parseInt(y) + 1);
-                var rowData = elInstance.getRowData(y);
-                var qty = rowData[2].replaceAll("\,", "");
-                console.log("Qty----------->", qty);
-                if (parseInt(qty) > 0) {
-                    console.log("In if");
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-            }
-        }
-        if (x == 2) {
-            var reg = /^[0-9\b]+$/;
-            var col = ("C").concat(parseInt(y) + 1);
-            value = (elInstance.getRowData(y))[2];
-            value = value.toString().replaceAll("\,", "");
-            if (value == "" || value == 0) {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.setState({
-                        consumptionBatchInfoNoStockError: ''
-                    })
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-        this.setState({
-            consumptionBatchInfoChangedFlag: 1
-        })
-    }.bind(this)
-
-
-    checkValidationConsumptionBatchInfo() {
-        var valid = true;
         var elInstance = this.state.consumptionBatchInfoTableEl;
-        var json = elInstance.getJson();
-        var mapArray = [];
-        for (var y = 0; y < json.length; y++) {
-
-
-            var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-
-            var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("0") == map.get("0")
-            )
-            if (checkDuplicateInMap.length > 1) {
-                var colArr = ['A'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateBatchNumber'));
-                }
-                valid = false;
-                this.setState({
-                    consumptionBatchInfoDuplicateError: i18n.t('static.supplyPlan.duplicateBatchNumber')
-                })
-            }
-            else {
-                var programJson = this.state.programJsonAfterConsumptionClicked;
-                var shipmentList = programJson.shipmentList;
-                var shipmentBatchArray = [];
-                for (var ship = 0; ship < shipmentList.length; ship++) {
-                    var batchInfoList = shipmentList[ship].batchInfoList;
-                    for (var bi = 0; bi < batchInfoList.length; bi++) {
-                        shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
-                    }
-                }
-                if (map.get("0") != -1) {
-                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0];
-                    var totalStockForBatchNumber = stockForBatchNumber.qty;
-                    var consumptionList = programJson.consumptionList;
-                    var consumptionBatchArray = [];
-
-                    for (var con = 0; con < consumptionList.length; con++) {
-                        var consumptionIndex = (this.state.consumptionEl).getRowData(parseInt(map.get("4")))[6];
-                        if (con != consumptionIndex) {
-                            var batchInfoList = consumptionList[con].batchInfoList;
-                            for (var bi = 0; bi < batchInfoList.length; bi++) {
-                                consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
-                            }
-                        }
-                    }
-                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
-                    if (consumptionForBatchNumber == undefined) {
-                        consumptionForBatchNumber = [];
-                    }
-                    var consumptionQty = 0;
-                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
-                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
-                    }
-                    consumptionQty += parseInt(map.get("2").toString().replaceAll("\,", ""));
-                    var inventoryList = programJson.inventoryList;
-                    var inventoryBatchArray = [];
-                    for (var inv = 0; inv < inventoryList.length; inv++) {
-                        var batchInfoList = inventoryList[inv].batchInfoList;
-                        for (var bi = 0; bi < batchInfoList.length; bi++) {
-                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
-                        }
-                    }
-                    var inventoryForBatchNumber = [];
-                    if (inventoryBatchArray.length > 0) {
-                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText);
-                    }
-                    if (inventoryForBatchNumber == undefined) {
-                        inventoryForBatchNumber = [];
-                    }
-                    var adjustmentQty = 0;
-                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
-                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
-                    }
-
-                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-                    if (remainingBatchQty < 0) {
-                        var col = ("C").concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
-
-                        valid = false;
-                        this.setState({
-                            consumptionBatchInfoNoStockError: i18n.t('static.supplyPlan.noStockAvailable')
-                        })
-                    }
-                } else {
-                    var colArr = ['A'];
-                    for (var c = 0; c < colArr.length; c++) {
-                        var col = (colArr[c]).concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                    var col = ("A").concat(parseInt(y) + 1);
-                    var rowData = elInstance.getRowData(y);
-                    var value = rowData[0];
-                    if (value == "") {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                    var col = ("C").concat(parseInt(y) + 1);
-                    var value = (elInstance.getRowData(y))[2];
-                    value = value.toString().replaceAll("\,", "");
-                    var reg = /^[0-9\b]+$/;
-                    if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value)) || value == 0) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        valid = false;
-                        if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                        } else {
-                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        }
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                }
-            }
-        }
-        return valid;
-    }
-
-    saveConsumptionBatchInfo() {
-        var validation = this.checkValidationConsumptionBatchInfo();
-        if (validation == true) {
-            var elInstance = this.state.consumptionBatchInfoTableEl;
-            var json = elInstance.getJson();
-            var batchInfoArray = [];
-            var rowNumber = 0;
-            var totalConsumption = 0;
-            for (var i = 0; i < json.length; i++) {
-                var map = new Map(Object.entries(json[i]));
-                if (i == 0) {
-                    rowNumber = map.get("4");
-                }
-                var batchInfoJson;
-                if (map.get("0") != -1) {
-                    var batchNo = elInstance.getCell(`A${parseInt(i) + 1}`).innerText;
-                    var filteredBatch = this.state.batchInfoListAllForConsumption.filter(c => c.batchNo == batchNo);
-                    var expiryDate = filteredBatch[0].expiryDate;
-                    batchInfoJson = {
-                        consumptionTransBatchInfoId: map.get("3"),
-                        batch: {
-                            batchId: map.get("0"),
-                            batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
-                            expiryDate: expiryDate
-                        },
-                        consumptionQty: map.get("2").toString().replaceAll("\,", "")
-                    }
-                    batchInfoArray.push(batchInfoJson);
-                }
-                totalConsumption += parseInt(map.get("2").toString().replaceAll("\,", ""));
-            }
-            var consumptionInstance = this.state.consumptionEl;
-            consumptionInstance.setValueFromCoords(3, parseInt(rowNumber), totalConsumption, true);
-            consumptionInstance.setValueFromCoords(10, parseInt(rowNumber), batchInfoArray, true);
-            // rowData[10] = batchInfoArray;
-            // consumptionInstance.setRowData(rowNumber, rowData);
-            this.setState({
-                consumptionChangedFlag: 1,
-                consumptionBatchInfoChangedFlag: 0,
-                consumptionBatchInfoTableEl: ''
-            })
-            document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
+        if (elInstance != undefined && elInstance != "") {
             elInstance.destroy();
-        } else {
+        }
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        var programId = document.getElementById("programId").value;
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
             this.setState({
-                consumptionBatchError: i18n.t('static.supplyPlan.validationFailed')
+                supplyPlanError: i18n.t('static.program.errortext')
             })
-        }
-    }
-
-    // Consumption changed
-    consumptionChanged = function (instance, cell, x, y, value) {
-        this.setState({
-            consumptionError: "",
-            consumptionDuplicateError: ""
-        })
-        var elInstance = this.state.consumptionEl;
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 8) {
-            var col = ("I").concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-        if (x == 3) {
-            var reg = /^[0-9\b]+$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            value = (elInstance.getRowData(y))[3];
-            value = value.toString().replaceAll("\,", "");
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.setState({
-                        consumptionNoStockError: ''
-                    })
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
-            value = (elInstance.getRowData(y))[4];
-            value = value.toString().replaceAll("\,", "");
-            if (value != "") {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        this.setState({
-            consumptionChangedFlag: 1
-        })
-    }
-
-    // consumption final validations
-    checkValidationConsumption() {
-        var valid = true;
-        var elInstance = this.state.consumptionEl;
-        var json = elInstance.getJson();
-        var mapArray = [];
-        for (var y = 0; y < json.length; y++) {
-            var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-
-            var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("8").toString() == map.get("8").toString()
-            )
-            if (checkDuplicateInMap.length > 1) {
-                var colArr = ['I'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateConsumption'));
-                }
-                valid = false;
-                this.setState({
-                    consumptionDuplicateError: i18n.t('static.supplyPlan.duplicateConsumption')
-                })
-            } else {
-                var colArr = ['I'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                var col = ("C").concat(parseInt(y) + 1);
-                var rowData = elInstance.getRowData(y);
-                var value = rowData[2];
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("D").concat(parseInt(y) + 1);
-                var value = (elInstance.getRowData(y))[3];
-                value = value.toString().replaceAll("\,", "");
-                var reg = /^[0-9\b]+$/;
-                if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    valid = false;
-                    if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var reg = /^[0-9\b]+$/;
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = (elInstance.getRowData(y))[4];
-                value = value.toString().replaceAll("\,", "");
-                if (value != "") {
-                    if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        valid = false;
-                        if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                        } else {
-                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        }
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-        }
-        return valid;
-    }
-
-    // Save consumption
-    saveConsumption() {
-        this.setState({
-            consumptionError: '',
-            consumptionDuplicateError: ''
-        })
-        var validation = this.checkValidationConsumption();
-        if (validation == true) {
-            var inputs = document.getElementsByClassName("submitBtn");
-            for (var i = 0; i < inputs.length; i++) {
-                inputs[i].disabled = true;
-            }
-            var elInstance = this.state.consumptionEl;
-            var json = elInstance.getJson();
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var productCategoryId = (this.state.planningUnitListForConsumption).filter(c => c.planningUnitId == planningUnitId);
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+            var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
+            var programRequest = programDataOs.get(programId);
+            programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
                 })
             }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-                var programTransaction = transaction.objectStore('whatIfProgramData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var consumptionDataList = (programJson.consumptionList);
-                    for (var i = 0; i < json.length; i++) {
-                        var map = new Map(Object.entries(json[i]));
-                        var actualFlag = false;
-                        if (map.get("8").toString() == "true") {
-                            actualFlag = true;
-                        }
-                        if (map.get("6") != -1) {
-                            consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
-                            consumptionDataList[parseInt(map.get("6"))].consumptionQty = (map.get("3")).toString().replaceAll("\,", "");
-                            consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = (map.get("4")).toString().replaceAll("\,", "");
-                            consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
-                            consumptionDataList[parseInt(map.get("6"))].actualFlag = actualFlag;
-                            consumptionDataList[parseInt(map.get("6"))].active = map.get("9");
-                            consumptionDataList[parseInt(map.get("6"))].batchInfoList = map.get("10")
-                        } else {
-                            var consumptionJson = {
-                                consumptionId: 0,
-                                consumptionDate: moment(map.get("7")).startOf('month').format("YYYY-MM-DD"),
-                                region: {
-                                    id: map.get("1")
-                                },
-                                consumptionQty: (map.get("3")).toString().replaceAll("\,", ""),
-                                dayOfStockOut: (map.get("4")).toString().replaceAll("\,", ""),
-                                dataSource: {
-                                    id: map.get("2")
-                                },
-                                notes: map.get("5"),
-                                actualFlag: actualFlag,
-                                active: map.get("9"),
-
-                                // planningUnit: {
-                                //     id: plannigUnitId
-                                // }
-                                planningUnit: {
-                                    id: planningUnitId,
-                                    forecastingUnit: {
-                                        productCategory: {
-                                            id: productCategoryId[0].forecastingUnit.productCategory.id
-                                        }
-                                    }
-                                },
-                                batchInfoList: map.get("10")
-                            }
-                            consumptionDataList.push(consumptionJson);
-                        }
-                    }
-                    programJson.consumptionList = consumptionDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('Consumption');
-                        this.setState({
-                            message: i18n.t('static.message.consumptionSaved'),
-                            color: 'green',
-                            consumptionChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.planningUnit, this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
+            programRequest.onsuccess = function (e) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                var batchInfoList = programJson.batchInfoList;
+                var consumptionListUnFiltered = (programJson.consumptionList);
+                var consumptionList = consumptionListUnFiltered.filter(con =>
+                    con.planningUnit.id == planningUnitId
+                    && con.region.id == region
+                    && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
+                this.setState({
+                    programJsonAfterConsumptionClicked: programJson,
+                    consumptionListUnFiltered: consumptionListUnFiltered,
+                    batchInfoList: batchInfoList,
+                    programJson: programJson,
+                    consumptionList: consumptionList,
+                    showConsumption: 1,
+                    consumptionMonth: month,
+                    consumptionStartDate: startDate,
+                    consumptionRegion: region
+                })
+                this.refs.consumptionChild.showConsumptionData();
             }.bind(this)
-        } else {
-            this.setState({
-                consumptionError: i18n.t('static.supplyPlan.validationFailed')
-            })
-        }
+        }.bind(this)
     }
-
-
     // Consumption Functionality
 
     // Adjustments Functionality
@@ -4151,26 +3100,26 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
                                                         <div className="controls WhatifInputFeild">
                                                             {/* <InputGroup> */}
-                                                                <Input
-                                                                    type="select"
-                                                                    name="scenarioId"
-                                                                    id="scenarioId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.scenarioId}
-                                                                    invalid={touched.scenarioId && !!errors.scenarioId}
-                                                                    onBlur={handleBlur}
-                                                                    value={this.state.scenarioId}
-                                                                    onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
-                                                                    <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
-                                                                    <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
-                                                                    <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
-                                                                    <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
-                                                                    <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
+                                                            <Input
+                                                                type="select"
+                                                                name="scenarioId"
+                                                                id="scenarioId"
+                                                                bsSize="sm"
+                                                                valid={!errors.scenarioId}
+                                                                invalid={touched.scenarioId && !!errors.scenarioId}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.scenarioId}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
+                                                                <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
+                                                                <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
+                                                                <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
+                                                                <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
+                                                                <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
 
-                                                                </Input>
+                                                            </Input>
                                                             {/* </InputGroup> */}
                                                         </div>
                                                         <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
@@ -4180,18 +3129,18 @@ export default class WhatIfReportComponent extends React.Component {
                                                             <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
                                                             <div className="controls WhatifInputFeild">
                                                                 {/* <InputGroup> */}
-                                                                    <Input
-                                                                        type="number"
-                                                                        name="percentage"
-                                                                        id="percentage"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.percentage}
-                                                                        invalid={touched.percentage && !!errors.percentage}
-                                                                        onBlur={handleBlur}
-                                                                        value={this.state.percentage}
-                                                                        onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                                    >
-                                                                    </Input>
+                                                                <Input
+                                                                    type="number"
+                                                                    name="percentage"
+                                                                    id="percentage"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.percentage}
+                                                                    invalid={touched.percentage && !!errors.percentage}
+                                                                    onBlur={handleBlur}
+                                                                    value={this.state.percentage}
+                                                                    onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                                >
+                                                                </Input>
                                                                 {/* </InputGroup> */}
                                                             </div>
                                                             <FormFeedback className="red">{errors.percentage}</FormFeedback>
@@ -4200,19 +3149,19 @@ export default class WhatIfReportComponent extends React.Component {
                                                             <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
                                                             <div className="controls WhatifInputFeild">
                                                                 {/* <InputGroup> */}
-                                                                    <DatePicker
-                                                                        id="startDate"
-                                                                        name="startDate"
-                                                                        bsSize="sm"
-                                                                        selected={this.state.startDate}
-                                                                        onChange={(date) => { this.dataChangeDate(date) }}
-                                                                        placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                                        // placeholderText="mm-dd-yyy"
-                                                                        className="form-control-sm form-control date-color"
-                                                                        disabledKeyboardNavigation
-                                                                        autoComplete={"off"}
-                                                                        dateFormat={DATE_FORMAT_SM}
-                                                                    />
+                                                                <DatePicker
+                                                                    id="startDate"
+                                                                    name="startDate"
+                                                                    bsSize="sm"
+                                                                    selected={this.state.startDate}
+                                                                    onChange={(date) => { this.dataChangeDate(date) }}
+                                                                    placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                                    // placeholderText="mm-dd-yyy"
+                                                                    className="form-control-sm form-control date-color"
+                                                                    disabledKeyboardNavigation
+                                                                    autoComplete={"off"}
+                                                                    dateFormat={DATE_FORMAT_SM}
+                                                                />
                                                                 {/* </InputGroup> */}
                                                             </div>
                                                         </FormGroup>
@@ -4220,19 +3169,19 @@ export default class WhatIfReportComponent extends React.Component {
                                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                             <div className="controls WhatifInputFeild">
                                                                 {/* <InputGroup> */}
-                                                                    <DatePicker
-                                                                        id="stopDate"
-                                                                        name="stopDate"
-                                                                        bsSize="sm"
-                                                                        selected={this.state.stopDate}
-                                                                        onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                                        minDate={this.state.startDate}
-                                                                        placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                                        className="form-control-sm form-control date-color"
-                                                                        disabledKeyboardNavigation
-                                                                        autoComplete={"off"}
-                                                                        dateFormat={DATE_FORMAT_SM}
-                                                                    />
+                                                                <DatePicker
+                                                                    id="stopDate"
+                                                                    name="stopDate"
+                                                                    bsSize="sm"
+                                                                    selected={this.state.stopDate}
+                                                                    onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                                    minDate={this.state.startDate}
+                                                                    placeholderText={DATE_PLACEHOLDER_TEXT}
+                                                                    className="form-control-sm form-control date-color"
+                                                                    disabledKeyboardNavigation
+                                                                    autoComplete={"off"}
+                                                                    dateFormat={DATE_FORMAT_SM}
+                                                                />
                                                                 {/* </InputGroup> */}
                                                             </div>
                                                         </FormGroup>
@@ -4577,7 +3526,7 @@ export default class WhatIfReportComponent extends React.Component {
                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                 <thead>
                                     <tr>
-                                        <th></th>
+                                        <th className="regionTdWidthConsumption"></th>
                                         {
                                             this.state.monthsArray.map(item => (
                                                 <th>{item.monthName.concat(" ").concat(item.monthYear)}</th>
@@ -4619,8 +3568,9 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tr>
                                 </tfoot>
                             </Table>
-                            <div className="table-responsive">
-                                <div id="consumptionDetailsTable" />
+                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} consumptionPage="whatIf" />}
+                            <div className="table-responsive mt-3">
+                                <div id="consumptionTable" />
                             </div>
                             <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                             <div className="table-responsive">
@@ -4628,11 +3578,12 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
 
                             <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                            {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </ModalFooter>
                     </Modal>
@@ -4954,28 +3905,6 @@ export default class WhatIfReportComponent extends React.Component {
 
     render() {
         const { programList } = this.state;
-        let programs = programList.length > 0
-            && programList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { planningUnitList } = this.state;
-        let planningUnits = planningUnitList.length > 0
-            && planningUnitList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { regionList } = this.state;
-        let regions = regionList.length > 0
-            && regionList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
 
         return (
             <div className="animated fadeIn">
@@ -5191,6 +4120,18 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryBatchInfoDuplicateError: "",
             inventoryBatchInfoNoStockError: "",
             inventoryBatchError: ""
+        })
+    }
+
+    actionCanceledConsumption() {
+        document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
+        (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
+        this.setState({
+            consumptionBatchInfoChangedFlag: 0,
+            consumptionBatchInfoDuplicateError: "",
+            consumptionBatchInfoNoStockError: "",
+            consumptionBatchError: ""
         })
     }
 

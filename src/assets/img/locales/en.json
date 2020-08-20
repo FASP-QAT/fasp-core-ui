@@ -644,7 +644,7 @@
     "static.inventory.manualAdjustment": "Manual Adjustment",
     "static.inventory.actualStock": "Actual Stock",
     "static.inventory.batchNumber": "Batch Number",
-    "static.inventory.expireDate": "Expire Date",
+    "static.inventory.expireDate": "Expiry Date",
     "static.inventory.active": "Active",
     "static.dashboard.inventorydetails": "Inventory Details",
     "static.message.consumptionSaved": "Consumption Data Saved",

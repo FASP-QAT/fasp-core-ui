@@ -22,7 +22,6 @@ export default class AddInventory extends Component {
             programList: [],
             programId: '',
             changedFlag: 0,
-            countrySKUList: [],
             message: '',
             lang: localStorage.getItem('lang'),
             timeout: 0,
@@ -106,7 +105,7 @@ export default class AddInventory extends Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            label: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
+                            label: programJson1.programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
                         proList.push(programJson)
