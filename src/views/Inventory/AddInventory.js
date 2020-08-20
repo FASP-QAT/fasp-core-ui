@@ -74,7 +74,7 @@ export default class AddInventory extends Component {
     componentDidMount() {
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -115,7 +115,17 @@ export default class AddInventory extends Component {
                 this.setState({
                     programList: proList
                 })
-
+                
+                var programIdd = this.props.match.params.programId;
+                console.log("programIdd", programIdd);
+                if (programIdd != '' && programIdd != undefined) {
+                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
+                    this.setState({
+                        programSelect: programSelect,
+                        programId: programIdd
+                    })
+                    this.getPlanningUnitList(programSelect);
+                }
             }.bind(this);
         }.bind(this)
 
@@ -130,7 +140,7 @@ export default class AddInventory extends Component {
         var storeOS;
         var regionList = [];
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
@@ -193,6 +203,17 @@ export default class AddInventory extends Component {
                         planningUnitListAll: myResult,
                         regionList: regionList
                     })
+
+                    var planningUnitIdProp = this.props.match.params.planningUnitId;
+                    console.log("planningUnitIdProp===>", planningUnitIdProp);
+                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                        this.setState({
+                            planningUnit: planningUnit,
+                            planningUnitId: planningUnitIdProp
+                        })
+                        this.formSubmit(planningUnit);
+                    }
                 }.bind(this);
             }.bind(this)
         }.bind(this)
@@ -205,7 +226,7 @@ export default class AddInventory extends Component {
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
