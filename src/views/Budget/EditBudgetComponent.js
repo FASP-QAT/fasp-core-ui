@@ -122,7 +122,6 @@ class EditBudgetComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
-        // console.log(this.state);
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -627,14 +626,10 @@ class EditBudgetComponent extends Component {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.data.startDate != null && response.data.startDate != "") {
-                    // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
-                } else {
-                    response.data.startDate = "";
+                    response.data.startDate = new Date(response.data.startDate);
                 }
                 if (response.data.stopDate != null && response.data.stopDate != "") {
-                    // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
-                } else {
-                    response.data.stopDate = "";
+                    response.data.stopDate = new Date(response.data.stopDate);
                 }
                 var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 response.data.budgetAmt = getBudgetAmount;
