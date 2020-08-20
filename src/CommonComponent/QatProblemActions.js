@@ -597,7 +597,7 @@ export default class QatProblemActions extends Component {
                                                                             label_pr: null
                                                                         }
                                                                     },
-                                                                    notes: 'Resolved',
+                                                                    notes: 'Resolved one',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -643,7 +643,7 @@ export default class QatProblemActions extends Component {
                                                                         label_pr: null
                                                                     }
                                                                 },
-                                                                notes: 'Resolved',
+                                                                notes: 'Resolved two',
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -926,7 +926,7 @@ export default class QatProblemActions extends Component {
 
                                                     }
                                                     for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                        if (problemActionList[kb].realmProblem.problem.problemId == 3 && problemActionList[kb].problemStatus.id == 1) {
+                                                        if (problemActionList[kb].realmProblem.problem.problemId == 4 && problemActionList[kb].problemStatus.id == 1) {
                                                             var kbShipmentId = problemActionList[kb].shipmentId;
                                                             if (kbShipmentId == 0) {
                                                                 kbShipmentId = problemActionList[kb].index;
@@ -1135,7 +1135,7 @@ export default class QatProblemActions extends Component {
 
                                                     }
                                                     for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                        if (problemActionList[kb].realmProblem.problem.problemId == 3 && problemActionList[kb].problemStatus.id == 1) {
+                                                        if (problemActionList[kb].realmProblem.problem.problemId == 5 && problemActionList[kb].problemStatus.id == 1) {
                                                             var kbShipmentId = problemActionList[kb].shipmentId;
                                                             if (kbShipmentId == 0) {
                                                                 kbShipmentId = problemActionList[kb].index;
@@ -1345,7 +1345,7 @@ export default class QatProblemActions extends Component {
 
                                                     }
                                                     for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                        if (problemActionList[kb].realmProblem.problem.problemId == 3 && problemActionList[kb].problemStatus.id == 1) {
+                                                        if (problemActionList[kb].realmProblem.problem.problemId == 6 && problemActionList[kb].problemStatus.id == 1) {
                                                             var kbShipmentId = problemActionList[kb].shipmentId;
                                                             if (kbShipmentId == 0) {
                                                                 kbShipmentId = problemActionList[kb].index;
@@ -1555,7 +1555,7 @@ export default class QatProblemActions extends Component {
 
                                                     }
                                                     for (var kb = 0; kb < problemActionList.length; kb++) {
-                                                        if (problemActionList[kb].realmProblem.problem.problemId == 3 && problemActionList[kb].problemStatus.id == 1) {
+                                                        if (problemActionList[kb].realmProblem.problem.problemId == 7 && problemActionList[kb].problemStatus.id == 1) {
                                                             var kbShipmentId = problemActionList[kb].shipmentId;
                                                             if (kbShipmentId == 0) {
                                                                 kbShipmentId = problemActionList[kb].index;
