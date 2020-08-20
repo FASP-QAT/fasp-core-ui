@@ -1320,7 +1320,7 @@ export default class ConsumptionDetails extends React.Component {
 
         return (
 
-            <div className="animated">
+            <div className="animated"> 
                 <QatProblemActions updateState={this.updateState}></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
@@ -1335,12 +1335,12 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody  className="pb-lg-0">
+                    <CardBody  className="pb-lg-2">
                         <Col md="9 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
+                            <div className="row">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1356,9 +1356,9 @@ export default class ConsumptionDetails extends React.Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1372,9 +1372,9 @@ export default class ConsumptionDetails extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
