@@ -126,8 +126,9 @@ class AddprogramPlanningUnit extends Component {
                                             var data = [];
                                             if (myReasponse.length != 0) {
                                                 for (var j = 0; j < myReasponse.length; j++) {
+                                                    console.log("myReasponse[j]---",myReasponse[j]);
                                                     data = [];
-                                                    data[0] = 0;
+                                                    data[0] = myReasponse[j].productCategory.id;
                                                     data[1] = myReasponse[j].planningUnit.id;
                                                     data[2] = myReasponse[j].reorderFrequencyInMonths;
                                                     data[3] = myReasponse[j].minMonthsOfStock;
