@@ -135,7 +135,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.selBudget.map(ele => A.push([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.budget.code, (getLabelText(ele.program.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.program.code, (getLabelText(ele.fundingSource.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]));
+        this.state.selBudget.map(ele => A.push([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.budget.code,  (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -217,7 +217,7 @@ class Budgets extends Component {
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
     
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, getLabelText(ele.program.label), ele.program.code, getLabelText(ele.fundingSource.label), getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
 
         let content = {
             margin: { top: 80,bottom:50 },
@@ -742,7 +742,7 @@ class Budgets extends Component {
                 style: { align: 'center', width: '100px' },
                 headerAlign: 'center',
             },
-            {
+            /*{
                 dataField: 'program.label',
                 text: i18n.t('static.budget.program'),
                 sort: true,
@@ -758,15 +758,15 @@ class Budgets extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-            },
+            },*/
             {
-                dataField: 'fundingSource.label',
+                dataField: 'fundingSource.code',
                 text: i18n.t('static.budget.fundingsource'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
-                formatter: this.formatLabel
+                style: { align: 'center', width: '100px' }
+               // formatter: this.formatLabel
 
             },
             {

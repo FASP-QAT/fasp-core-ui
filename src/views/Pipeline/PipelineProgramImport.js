@@ -103,7 +103,7 @@ export default class PipelineProgramImport extends Component {
 
                                 <FormGroup id="fileImportDiv">
                                     <Col md="3">
-                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinputjson')}</Label>
                                     </Col>
                                     <Col xs="12" md="4">
                                         <Input
