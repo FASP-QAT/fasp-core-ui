@@ -1419,8 +1419,19 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 console.log("ProList", proList);
                 this.setState({
-                    programList: proList
+                    programList: proList,
                 })
+                var programIdd = this.props.match.params.programId;
+                console.log("programIdd", programIdd);
+                if (programIdd != '' && programIdd != undefined) {
+                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
+                    this.setState({
+                        programSelect: programSelect,
+                        programId: programIdd
+                    })
+                    this.getPlanningUnitList(programSelect);
+                }
+               
             }.bind(this);
         }.bind(this);
         console.log("After component did mount");
@@ -1537,6 +1548,17 @@ export default class SupplyPlanComponent extends React.Component {
                                 dataSourceListAll: dataSourceListAll,
                                 planningUnitListForConsumption: planningUnitListForConsumption
                             })
+                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            console.log("planningUnitIdProp===>",planningUnitIdProp);
+                            if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                this.setState({
+                                    planningUnit: planningUnit,
+                                    planningUnitId: planningUnitIdProp
+                                })
+                                this.formSubmit(planningUnit, this.state.monthCount);
+                            }
+
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);

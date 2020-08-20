@@ -1070,7 +1070,7 @@ export default class PipelineProgramShipment extends Component {
 
     }
     SubmitProgram() {
-
+        this.SubmitShipment()
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
             .then(response => {
                 var planningUnitListFinalInventory = response.data;

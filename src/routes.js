@@ -390,7 +390,7 @@ const routes = [
   // { path: '/masterDataSync', name: i18n.t('static.dashboard.masterdatasync'), component: MasterDataSync },
   // { path: '/masterDataSync/:message',  component: MasterDataSync },
 
-  { path: '/consumptionDetails', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
+  { path: '/consumptionDetails',exact:true, name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
 
   { path: '/language/addLanguage', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.languageheader') }), component: AddLanguage },
   { path: '/language/listLanguage', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
@@ -432,7 +432,8 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
+  { path: '/supplyPlan',exact:true, name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
+  { path: '/supplyPlan/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.supplyPlan'), component: SupplyPlan },
   { path: '/report/whatIf', name: i18n.t('static.dashboard.whatIf'), component: WhatIfReport },
   { path: '/shipment/manualTagging', name: i18n.t('static.dashboard.manualTagging'), component: ManualTagging },
   { path: '/shipment/delinking', name: i18n.t('static.dashboard.delinking'), component: ShipmentDelinking },

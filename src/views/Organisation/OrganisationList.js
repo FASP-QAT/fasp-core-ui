@@ -386,11 +386,13 @@ export default class OrganisationListComponent extends Component {
             const selSource = this.state.organisations.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
-            });
+            },
+            () => { this.buildJexcel()})
         } else {
             this.setState({
                 selSource: this.state.organisations
-            });
+            },
+            () => { this.buildJexcel()})
         }
     }
     buildJexcel() {
