@@ -29,6 +29,8 @@
 // import ReportService from '../../api/ReportService';
 // import ProcurementAgentService from "../../api/ProcurementAgentService";
 // import { Online, Offline } from "react-detect-offline";
+// import FundingSourceService from '../../api/FundingSourceService';
+// import MultiSelect from 'react-multi-select-component';
 
 // const pickerLang = {
 //     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -46,6 +48,8 @@
 //             selRegion: [],
 //             realmCountryList: [],
 //             procurementAgents: [],
+//             fundingSources: [],
+//             viewby: '',
 //             programs: [],
 //             versions: [],
 //             planningUnits: [],
@@ -297,6 +301,7 @@
 //                 versions: []
 //             })
 //         }
+//         this.fetchData();
 //     }
 //     consolidatedVersionList = (programId) => {
 //         const lan = 'en';
@@ -332,8 +337,6 @@
 //                         verList.push(version)
 
 //                     }
-
-
 //                 }
 
 //                 console.log(verList)
@@ -344,19 +347,16 @@
 //                 })
 
 //             }.bind(this);
-
-
-
 //         }.bind(this)
-
-
 //     }
 
 //     getPlanningUnit = () => {
 //         let programId = document.getElementById("programId").value;
 //         let versionId = document.getElementById("versionId").value;
 //         this.setState({
-//             planningUnits: []
+//             planningUnits: [],
+//             planningUnitLabels:[],
+//             planningUnitValues:[]
 //         }, () => {
 //             if (versionId.includes('Local')) {
 //                 const lan = 'en';
@@ -436,8 +436,11 @@
 //     }
 
 //     handlePlanningUnitChange = (planningUnitIds) => {
+//         planningUnitIds = planningUnitIds.sort(function (a, b) {
+//             return parseInt(a.value) - parseInt(b.value);
+//           })
 //         this.setState({
-//             planningUnitValues: planningUnitIds.map(ele => ele.value),
+//             planningUnitValues: planningUnitIds.map(ele => ele),
 //             planningUnitLabels: planningUnitIds.map(ele => ele.label)
 //         }, () => {
 
@@ -474,14 +477,21 @@
 
 //     exportCSV(columns) {
 
+//         let viewby = document.getElementById("viewById").value;
+
 //         var csvRow = [];
 //         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-//         csvRow.push(i18n.t('static.procurementagent.procurementagent') + ' , ' + (document.getElementById("procurementAgentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+//         if (viewby == 1) {
+//             csvRow.push(i18n.t('static.procurementagent.procurementagent') + ' , ' + (document.getElementById("procurementAgentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+//         } else if (viewby == 2) {
+//             csvRow.push(i18n.t('static.budget.fundingsource') + ' , ' + (document.getElementById("fundingSourceId").selectedOptions[0].text).replaceAll(' ', '%20'))
+//         }
+
 //         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
 //         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
 //         this.state.planningUnitLabels.map(ele =>
 //             csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-//         csvRow.push(i18n.t('static.program.isincludeplannedshipment') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+//         csvRow.push(i18n.t('static.program.isincludeplannedshipment').replaceAll(' ', '%20') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
 //         csvRow.push('')
 //         csvRow.push('')
 //         csvRow.push('')
@@ -489,12 +499,26 @@
 //         csvRow.push('')
 
 //         const headers = [];
-//         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+//         if (viewby == 3) {
+//             columns.splice(0, 2);
+//             columns.map((item, idx) => { headers[idx] = ((item.text)) });
+//         } else {
+//             columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+//         }
+
+
 
 
 //         var A = [headers]
 //         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
-//         this.state.data.map(ele => A.push([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),(ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20') , (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]));
+//         if (viewby == 1) {
+//             this.state.data.map(ele => A.push([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]));
+//         } else if (viewby == 2) {
+//             this.state.data.map(ele => A.push([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]));
+//         } else {
+//             this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost]));
+//         }
+
 //         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
 //         for (var i = 0; i < A.length; i++) {
 //             console.log(A[i])
@@ -507,7 +531,7 @@
 //         var a = document.createElement("a")
 //         a.href = 'data:attachment/csv,' + csvString
 //         a.target = "_Blank"
-//         a.download = i18n.t('static.report.procurementAgent') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+//         a.download = i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
 //         document.body.appendChild(a)
 //         a.click()
 //     }
@@ -536,6 +560,7 @@
 //         const addHeaders = doc => {
 
 //             const pageCount = doc.internal.getNumberOfPages()
+//             var viewby = document.getElementById("viewById").value;
 
 //             for (var i = 1; i <= pageCount; i++) {
 //                 doc.setFontSize(12)
@@ -543,7 +568,7 @@
 //                 doc.setPage(i)
 //                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
 //                 doc.setTextColor("#002f6c");
-//                 doc.text(i18n.t('static.report.procurementAgent'), doc.internal.pageSize.width / 2, 60, {
+//                 doc.text(i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 2, 60, {
 //                     align: 'center'
 //                 })
 //                 if (i == 1) {
@@ -552,9 +577,17 @@
 //                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
 //                         align: 'left'
 //                     })
-//                     doc.text(i18n.t('static.procurementagent.procurementagent') + ' : ' + document.getElementById("procurementAgentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-//                         align: 'left'
-//                     })
+
+//                     if (viewby == 1) {
+//                         doc.text(i18n.t('static.procurementagent.procurementagent') + ' : ' + document.getElementById("procurementAgentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+//                             align: 'left'
+//                         })
+//                     } else if (viewby == 2) {
+//                         doc.text(i18n.t('static.budget.fundingsource') + ' : ' + document.getElementById("fundingSourceId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+//                             align: 'left'
+//                         })
+//                     }
+
 //                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
 //                         align: 'left'
 //                     })
@@ -562,13 +595,13 @@
 //                     doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
 //                         align: 'left'
 //                     })
-
-//                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-//                     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
-
-//                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 200, {
+//                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
 //                         align: 'left'
 //                     })
+
+//                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+//                     doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+
 
 //                 }
 
@@ -584,14 +617,27 @@
 
 //         doc.setFontSize(8);
 
+//         var viewby = document.getElementById("viewById").value;
 
 
 //         const headers = [];
-//         columns.map((item, idx) => { headers[idx] = (item.text) });
-//         let data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
+
+//         let data = [];
+//         if (viewby == 1) {
+//             columns.map((item, idx) => { headers[idx] = (item.text) });
+//             data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+//         } else if (viewby == 2) {
+//             columns.map((item, idx) => { headers[idx] = (item.text) });
+//             data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+//         } else {
+//             columns.splice(0, 2);
+//             columns.map((item, idx) => { headers[idx] = (item.text) });
+//             data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+//         }
+//        let startY=190+(this.state.planningUnitValues.length*3)
 //         let content = {
-//             margin: { top: 40 },
-//             startY: 220,
+//             margin: { top: 80 ,bottom:70},
+//             startY: startY,
 //             head: [headers],
 //             body: data,
 //             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -605,7 +651,7 @@
 //         doc.autoTable(content);
 //         addHeaders(doc)
 //         addFooters(doc)
-//         doc.save(i18n.t('static.report.procurementAgent') + ".pdf")
+//         doc.save(i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text + ".pdf")
 //     }
 
 
@@ -614,320 +660,701 @@
 //         console.log("-------------------IN FETCHDATA-----------------------------");
 //         let versionId = document.getElementById("versionId").value;
 //         let programId = document.getElementById("programId").value;
+//         let viewby = document.getElementById("viewById").value;
 //         let procurementAgentId = document.getElementById("procurementAgentId").value;
+//         let fundingSourceId = document.getElementById("fundingSourceId").value;
 //         let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
 
-//         let planningUnitIds = this.state.planningUnitValues;
+//         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
 //         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
 //         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-//         if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && procurementAgentId > 0 && isPlannedShipmentId > 0) {
-//             if (versionId.includes('Local')) {
-//                 var db1;
-//                 var storeOS;
-//                 getDatabase();
-//                 var regionList = [];
-//                 var openRequest = indexedDB.open('fasp', 1);
-//                 openRequest.onerror = function (event) {
-//                     this.setState({
-//                         message: i18n.t('static.program.errortext')
-//                     })
-//                 }.bind(this);
-//                 openRequest.onsuccess = function (e) {
-//                     var version = (versionId.split('(')[0]).trim()
-
-//                     //for user id
-//                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-//                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-//                     //for program id
-//                     var program = `${programId}_v${version}_uId_${userId}`
-
-//                     db1 = e.target.result;
-//                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-//                     var programDataOs = programDataTransaction.objectStore('programData');
-//                     // console.log(program)
-//                     var programRequest = programDataOs.get(program);
-//                     programRequest.onerror = function (event) {
+//         if (viewby == 1) {
+//             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && procurementAgentId > 0) {
+//                 if (versionId.includes('Local')) {
+//                     planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
+//                     var db1;
+//                     var storeOS;
+//                     getDatabase();
+//                     var regionList = [];
+//                     var openRequest = indexedDB.open('fasp', 1);
+//                     openRequest.onerror = function (event) {
 //                         this.setState({
 //                             message: i18n.t('static.program.errortext')
 //                         })
 //                     }.bind(this);
-//                     programRequest.onsuccess = function (e) {
-//                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-//                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-//                         var programJson = JSON.parse(programData);
+//                     openRequest.onsuccess = function (e) {
+//                         var version = (versionId.split('(')[0]).trim()
+
+//                         //for user id
+//                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+//                         //for program id
+//                         var program = `${programId}_v${version}_uId_${userId}`
+
+//                         db1 = e.target.result;
+//                         var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+//                         var programDataOs = programDataTransaction.objectStore('programData');
+//                         // console.log(program)
+//                         var programRequest = programDataOs.get(program);
+//                         programRequest.onerror = function (event) {
+//                             this.setState({
+//                                 message: i18n.t('static.program.errortext')
+//                             })
+//                         }.bind(this);
+//                         programRequest.onsuccess = function (e) {
+//                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+//                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+//                             var programJson = JSON.parse(programData);
 
 
-//                         var programTransaction = db1.transaction(['program'], 'readwrite');
-//                         var programOs = programTransaction.objectStore('program');
-//                         var program1Request = programOs.getAll();
-//                         program1Request.onsuccess = function (event) {
-//                             var programResult = [];
-//                             programResult = program1Request.result;
-//                             let airFreight = 0;
-//                             let seaFreight = 0;
-//                             for (var k = 0; k < programResult.length; k++) {
-//                                 if (programId == programResult[k].programId) {
-//                                     airFreight = programResult[k].airFreightPerc;
-//                                     seaFreight = programResult[k].seaFreightPerc;
-//                                 }
-//                             }
-
-//                             // var shipmentList = []
-//                             // planningUnitIds.map(planningUnitId =>
-//                             //     shipmentList = [...shipmentList, ...((programJson.shipmentList).filter(c => c.active == true && c.procurementAgent.id == procurementAgentId && c.planningUnit.id == planningUnitId && moment(c.shippedDate).isBetween(startDate, endDate, null, '[)')))]);
-
-//                             // var dates = new Set(shipmentList.map(ele => ele.shippedDate))
-
-//                             // var data = []
-//                             // planningUnitIds.map(planningUnitId => {
-//                             //     dates.map(dt => {
-
-//                             //         var list = shipmentList.filter(c => c.shippedDate === dt && c.planningUnit.id == planningUnitId && c.procurementAgent.id == procurementAgentId)
-//                             //         // console.log(list)
-//                             //         if (list.length > 0) {
-//                             //             var adjustment = 0;
-//                             //             list.map(ele => adjustment = adjustment + ele.adjustmentQty);
-
-//                             //             var json = {
-//                             //                 program: programJson,
-//                             //                 inventoryDate: new moment(dt).format('MMM YYYY'),
-//                             //                 planningUnit: list[0].planningUnit,
-//                             //                 stockAdjustemntQty: adjustment,
-//                             //                 lastModifiedBy: programJson.currentVersion.lastModifiedBy,
-//                             //                 lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-//                             //                 notes: list[0].notes
-//                             //             }
-//                             //             data.push(json)
-//                             //         } else {
-
-//                             //         }
-//                             //     })
-//                             // })
-
-//                             var shipmentList = (programJson.shipmentList);
-//                             // console.log("regionList---->>>", (programJson.regionList));
-
-//                             const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
-//                             // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-
-//                             let isPlannedShipment = [];
-//                             if (isPlannedShipmentId == 1) {//yes
-//                                 isPlannedShipment = activeFilter;
-//                             } else {//no
-//                                 isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
-//                             }
-
-//                             const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
-
-//                             const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-
-//                             // console.log("DB LIST---", dateFilter);
-//                             // console.log("SELECTED LIST---", planningUnitIds);
-
-//                             let data = [];
-//                             let planningUnitFilter = [];
-//                             for (let i = 0; i < planningUnitIds.length; i++) {
-//                                 for (let j = 0; j < dateFilter.length; j++) {
-//                                     if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
-//                                         planningUnitFilter.push(dateFilter[j]);
+//                             var programTransaction = db1.transaction(['program'], 'readwrite');
+//                             var programOs = programTransaction.objectStore('program');
+//                             var program1Request = programOs.getAll();
+//                             program1Request.onsuccess = function (event) {
+//                                 var programResult = [];
+//                                 programResult = program1Request.result;
+//                                 let airFreight = 0;
+//                                 let seaFreight = 0;
+//                                 for (var k = 0; k < programResult.length; k++) {
+//                                     if (programId == programResult[k].programId) {
+//                                         airFreight = programResult[k].airFreightPerc;
+//                                         seaFreight = programResult[k].seaFreightPerc;
 //                                     }
 //                                 }
-//                             }
 
-//                             console.log("offline data----", planningUnitFilter);
-//                             for (let j = 0; j < planningUnitFilter.length; j++) {
-//                                 let freight = 0;
-//                                 if (planningUnitFilter[j].shipmentMode === "Air") {
-//                                     freight = airFreight;
-//                                 } else {
-//                                     freight = seaFreight;
+//                                 var shipmentList = (programJson.shipmentList);
+//                                 console.log("shipmentList----*********----", shipmentList);
+
+//                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+
+//                                 let isPlannedShipment = [];
+//                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
+//                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
+//                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
+//                                     isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
 //                                 }
-//                                 let json = {
-//                                     "active": true,
-//                                     "shipmentId": planningUnitFilter[j].shipmentId,
-//                                     "procurementAgent": planningUnitFilter[j].procurementAgent,
-//                                     "planningUnit": planningUnitFilter[j].planningUnit,
-//                                     "qty": planningUnitFilter[j].shipmentQty,
-//                                     "productCost": planningUnitFilter[j].productCost,
-//                                     "freightPerc": parseFloat(freight),
-//                                     "freightCost": planningUnitFilter[j].freightCost,
-//                                     "totalCost": planningUnitFilter[j].productCost + planningUnitFilter[j].freightCost,
+
+//                                 const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
+
+//                                 const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+//                                 let data = [];
+//                                 let planningUnitFilter = [];
+//                                 for (let i = 0; i < planningUnitIds.length; i++) {
+//                                     for (let j = 0; j < dateFilter.length; j++) {
+//                                         if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+//                                             planningUnitFilter.push(dateFilter[j]);
+//                                         }
+//                                     }
 //                                 }
-//                                 data.push(json);
-//                             }
 
+//                                 console.log("offline data----", planningUnitFilter);
+//                                 for (let j = 0; j < planningUnitFilter.length; j++) {
+//                                     let freight = 0;
+//                                     if (planningUnitFilter[j].shipmentMode === "Air") {
+//                                         freight = airFreight;
+//                                     } else {
+//                                         freight = seaFreight;
+//                                     }
+//                                     let json = {
+//                                         "active": true,
+//                                         "shipmentId": planningUnitFilter[j].shipmentId,
+//                                         "procurementAgent": planningUnitFilter[j].procurementAgent,
+//                                         "fundingSource": planningUnitFilter[j].fundingSource,
+//                                         "planningUnit": planningUnitFilter[j].planningUnit,
+//                                         "qty": planningUnitFilter[j].shipmentQty,
+//                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+//                                         "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+//                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+//                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+//                                     }
+//                                     data.push(json);
+//                                 }
 
-
-
-//                             // let duplicateIds = planningUnitFilter
-//                             //     .map(e => e['planningUnit.id'])
-//                             //     .map((e, i, final) => final.indexOf(e) !== i && i)
-//                             //     .filter(obj => planningUnitFilter[obj])
-//                             //     .map(e => planningUnitFilter[e]["planningUnit.id"])
-
-//                             // let duplicateArray = planningUnitFilter.filter(obj => duplicateIds.includes(obj.planningUnit.id));
-
-//                             // if (duplicateIds.length == 0) {
-//                             //     for (let j = 0; j < planningUnitFilter.length; j++) {
-//                             //         let freight = 0;
-//                             //         if (planningUnitFilter[j].shipmentMode === "Air") {
-//                             //             freight = airFreight;
-//                             //         } else {
-//                             //             freight = seaFreight;
-//                             //         }
-//                             //         let json = {
-//                             //             "active": true,
-//                             //             "shipmentId": planningUnitFilter[j].shipmentId,
-//                             //             "procurementAgent": planningUnitFilter[j].procurementAgent.label.label_en,
-//                             //             "planningUnit": planningUnitFilter[j].planningUnit.label.label_en,
-//                             //             "qty": planningUnitFilter[j].shipmentQty,
-//                             //             "totalProductCost": planningUnitFilter[j].productCost,
-//                             //             "freightPer": freight,
-//                             //             "freightCost": planningUnitFilter[j].freightCost,
-//                             //             "totalCost": planningUnitFilter[j].productCost + planningUnitFilter[j].freightCost,
-//                             //         }
-//                             //         data.push(json);
-//                             //     }
-//                             // } else {
-//                             //     for (let j = 0; j < planningUnitFilter.length; j++) {
-//                             //         for (let i = 0; i < duplicateIds.length; i++) {
-
-//                             //             if (duplicateIds[i] != planningUnitFilter[j].planningUnit.id) {
-//                             //                 let freight = 0;
-//                             //                 if (planningUnitFilter[j].shipmentMode === "Air") {
-//                             //                     freight = airFreight;
-//                             //                 } else {
-//                             //                     freight = seaFreight;
-//                             //                 }
-//                             //                 let json = {
-//                             //                     "active": true,
-//                             //                     "shipmentId": planningUnitFilter[j].shipmentId,
-//                             //                     "procurementAgent": planningUnitFilter[j].procurementAgent.label.label_en,
-//                             //                     "planningUnit": planningUnitFilter[j].planningUnit.label.label_en,
-//                             //                     "qty": planningUnitFilter[j].shipmentQty,
-//                             //                     "totalProductCost": planningUnitFilter[j].productCost,
-//                             //                     "freightPer": freight,
-//                             //                     "freightCost": planningUnitFilter[j].freightCost,
-//                             //                     "totalCost": planningUnitFilter[j].productCost + planningUnitFilter[j].freightCost,
-//                             //                 }
-//                             //                 data.push(json);
-//                             //             }
-
-//                             //         }
-//                             //     }
-
-//                             //     //push duplicates 
-//                             //     for (let j = 0; j < duplicateArray.length; j++) {
-//                             //         let freight = 0;
-//                             //         if (duplicateArray[j].shipmentMode === "Air") {
-//                             //             freight = airFreight;
-//                             //         } else {
-//                             //             freight = seaFreight;
-//                             //         }
-//                             //         let json = {
-//                             //             "active": true,
-//                             //             "shipmentId": duplicateArray[j].shipmentId,
-//                             //             "procurementAgent": duplicateArray[j].procurementAgent.label.label_en,
-//                             //             "planningUnit": duplicateArray[j].planningUnit.label.label_en,
-//                             //             "qty": duplicateArray[j].shipmentQty,
-//                             //             "totalProductCost": duplicateArray[j].productCost,
-//                             //             "freightPer": freight,
-//                             //             "freightCost": duplicateArray[j].freightCost,
-//                             //             "totalCost": duplicateArray[j].productCost + duplicateArray[j].freightCost,
-//                             //         }
-//                             //         data.push(json);
-//                             //     }
-//                             // }
-//                             // console.log("end offline data----", data);
-//                             this.setState({
-//                                 data: data
-//                                 , message: ''
-//                             })
+//                                 this.setState({
+//                                     data: data
+//                                     , message: ''
+//                                 })
+//                             }.bind(this)
 //                         }.bind(this)
 //                     }.bind(this)
-//                 }.bind(this)
-//             } else {
-//                 this.setState({
-//                     message: ''
-//                 })
-//                 let includePlannedShipments = true;
-//                 if(isPlannedShipmentId == 1){
-//                     includePlannedShipments = true;
-//                 }else{
-//                     includePlannedShipments = false;
-//                 }
-//                 var inputjson = {
-//                     procurementAgentId: procurementAgentId,
-//                     programId: programId,
-//                     versionId: versionId,
-//                     startDate: new moment(startDate),
-//                     stopDate: new moment(endDate),
-//                     planningUnitIds: planningUnitIds,
-//                     includePlannedShipments: includePlannedShipments,
-//                 }
-//                 AuthenticationService.setupAxiosInterceptors();
-//                 ReportService.procurementAgentExporttList(inputjson)
-//                     .then(response => {
-//                         console.log("Online Data------",response.data);
-//                         this.setState({
-//                             data: response.data
-//                         }, () => {
-//                             this.consolidatedProgramList();
-//                             this.consolidatedProcurementAgentList();
-//                         })
-//                     }).catch(
-//                         error => {
+//                 } else {
+//                     this.setState({
+//                         message: ''
+//                     })
+//                     let includePlannedShipments = true;
+//                     if (isPlannedShipmentId == 1) {
+//                         includePlannedShipments = true;
+//                     } else {
+//                         includePlannedShipments = false;
+//                     }
+//                     var inputjson = {
+//                         procurementAgentId: procurementAgentId,
+//                         programId: programId,
+//                         versionId: versionId,
+//                         startDate: new moment(startDate),
+//                         stopDate: new moment(endDate),
+//                         planningUnitIds: planningUnitIds,
+//                         includePlannedShipments: includePlannedShipments,
+//                     }
+//                     console.log("inputjson-------", inputjson);
+//                     AuthenticationService.setupAxiosInterceptors();
+//                     ReportService.procurementAgentExporttList(inputjson)
+//                         .then(response => {
+//                             console.log("Online Data------", response.data);
 //                             this.setState({
-//                                 data: []
+//                                 data: response.data
 //                             }, () => {
 //                                 this.consolidatedProgramList();
 //                                 this.consolidatedProcurementAgentList();
 //                             })
-//                             if (error.message === "Network Error") {
-//                                 this.setState({ message: error.message });
-//                             } else {
-//                                 switch (error.response ? error.response.status : "") {
-//                                     case 500:
-//                                     case 401:
-//                                     case 404:
-//                                     case 406:
-//                                     case 412:
-//                                         this.setState({ message: i18n.t(error.response.data.messageCode) });
-//                                         break;
-//                                     default:
-//                                         this.setState({ message: 'static.unkownError' });
-//                                         break;
+//                         }).catch(
+//                             error => {
+//                                 this.setState({
+//                                     data: []
+//                                 }, () => {
+//                                     this.consolidatedProgramList();
+//                                     this.consolidatedProcurementAgentList();
+//                                 })
+//                                 if (error.message === "Network Error") {
+//                                     this.setState({ message: error.message });
+//                                 } else {
+//                                     switch (error.response ? error.response.status : "") {
+//                                         case 500:
+//                                         case 401:
+//                                         case 404:
+//                                         case 406:
+//                                         case 412:
+//                                             this.setState({ message: i18n.t(error.response.data.messageCode) });
+//                                             break;
+//                                         default:
+//                                             this.setState({ message: 'static.unkownError' });
+//                                             break;
+//                                     }
 //                                 }
 //                             }
-//                         }
-//                     );
+//                         );
 
+
+//                 }
+//             } else if (programId == 0) {
+//                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+//             } else if (versionId == -1) {
+//                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+//             } else if (this.state.planningUnitValues.length == 0) {
+//                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+//             } else if (procurementAgentId == 0) {
+//                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
+//             }
+//         } else if (viewby == 2) {
+//             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && fundingSourceId > 0) {
+//                 if (versionId.includes('Local')) {
+//                     planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
+//                     var db1;
+//                     var storeOS;
+//                     getDatabase();
+//                     var regionList = [];
+//                     var openRequest = indexedDB.open('fasp', 1);
+//                     openRequest.onerror = function (event) {
+//                         this.setState({
+//                             message: i18n.t('static.program.errortext')
+//                         })
+//                     }.bind(this);
+//                     openRequest.onsuccess = function (e) {
+//                         var version = (versionId.split('(')[0]).trim()
+
+//                         //for user id
+//                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+//                         //for program id
+//                         var program = `${programId}_v${version}_uId_${userId}`
+
+//                         db1 = e.target.result;
+//                         var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+//                         var programDataOs = programDataTransaction.objectStore('programData');
+//                         // console.log(program)
+//                         var programRequest = programDataOs.get(program);
+//                         programRequest.onerror = function (event) {
+//                             this.setState({
+//                                 message: i18n.t('static.program.errortext')
+//                             })
+//                         }.bind(this);
+//                         programRequest.onsuccess = function (e) {
+//                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+//                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+//                             var programJson = JSON.parse(programData);
+
+
+//                             var programTransaction = db1.transaction(['program'], 'readwrite');
+//                             var programOs = programTransaction.objectStore('program');
+//                             var program1Request = programOs.getAll();
+//                             program1Request.onsuccess = function (event) {
+//                                 var programResult = [];
+//                                 programResult = program1Request.result;
+//                                 let airFreight = 0;
+//                                 let seaFreight = 0;
+//                                 for (var k = 0; k < programResult.length; k++) {
+//                                     if (programId == programResult[k].programId) {
+//                                         airFreight = programResult[k].airFreightPerc;
+//                                         seaFreight = programResult[k].seaFreightPerc;
+//                                     }
+//                                 }
+
+//                                 var shipmentList = (programJson.shipmentList);
+
+//                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+//                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+
+//                                 let isPlannedShipment = [];
+//                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
+//                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
+//                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
+//                                     isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+//                                 }
+
+//                                 const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
+
+//                                 const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+//                                 console.log("DB LIST---", dateFilter);
+//                                 console.log("SELECTED LIST---", planningUnitIds);
+
+//                                 let data = [];
+//                                 let planningUnitFilter = [];
+//                                 for (let i = 0; i < planningUnitIds.length; i++) {
+//                                     for (let j = 0; j < dateFilter.length; j++) {
+//                                         if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+//                                             planningUnitFilter.push(dateFilter[j]);
+//                                         }
+//                                     }
+//                                 }
+
+//                                 console.log("offline data----", planningUnitFilter);
+//                                 for (let j = 0; j < planningUnitFilter.length; j++) {
+//                                     let freight = 0;
+//                                     if (planningUnitFilter[j].shipmentMode === "Air") {
+//                                         freight = airFreight;
+//                                     } else {
+//                                         freight = seaFreight;
+//                                     }
+//                                     let json = {
+//                                         "active": true,
+//                                         "shipmentId": planningUnitFilter[j].shipmentId,
+//                                         "fundingSource": planningUnitFilter[j].fundingSource,
+//                                         "planningUnit": planningUnitFilter[j].planningUnit,
+//                                         "qty": planningUnitFilter[j].shipmentQty,
+//                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+//                                         "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+//                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+//                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+//                                     }
+//                                     data.push(json);
+//                                 }
+//                                 console.log("end offline data----", data);
+//                                 this.setState({
+//                                     data: data
+//                                     , message: ''
+//                                 })
+//                             }.bind(this)
+//                         }.bind(this)
+//                     }.bind(this)
+//                 } else {
+//                     this.setState({
+//                         message: ''
+//                     })
+//                     let includePlannedShipments = true;
+//                     if (isPlannedShipmentId == 1) {
+//                         includePlannedShipments = true;
+//                     } else {
+//                         includePlannedShipments = false;
+//                     }
+//                     var inputjson = {
+//                         fundingSourceId: fundingSourceId,
+//                         programId: programId,
+//                         versionId: versionId,
+//                         startDate: new moment(startDate),
+//                         stopDate: new moment(endDate),
+//                         planningUnitIds: planningUnitIds,
+//                         includePlannedShipments: includePlannedShipments,
+//                     }
+//                     AuthenticationService.setupAxiosInterceptors();
+//                     ReportService.fundingSourceExportList(inputjson)
+//                         .then(response => {
+//                             // console.log(JSON.stringify(response.data))
+//                             this.setState({
+//                                 data: response.data
+//                             }, () => {
+//                                 this.consolidatedProgramList();
+//                                 this.consolidatedFundingSourceList();
+//                             })
+//                         }).catch(
+//                             error => {
+//                                 this.setState({
+//                                     data: []
+//                                 }, () => {
+//                                     this.consolidatedProgramList();
+//                                     this.consolidatedFundingSourceList();
+//                                 })
+//                                 if (error.message === "Network Error") {
+//                                     this.setState({ message: error.message });
+//                                 } else {
+//                                     switch (error.response ? error.response.status : "") {
+//                                         case 500:
+//                                         case 401:
+//                                         case 404:
+//                                         case 406:
+//                                         case 412:
+//                                             this.setState({ message: i18n.t(error.response.data.messageCode) });
+//                                             break;
+//                                         default:
+//                                             this.setState({ message: 'static.unkownError' });
+//                                             break;
+//                                     }
+//                                 }
+//                             }
+//                         );
+
+
+//                 }
+//             } else if (programId == 0) {
+//                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+//             } else if (versionId == -1) {
+//                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+//             } else if (this.state.planningUnitValues.length == 0) {
+//                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+
+//             } else if (fundingSourceId == 0) {
+//                 this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
+//             }
+//         } else {
+//             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
+//                 if (versionId.includes('Local')) {
+//                     planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
+
+//                     var db1;
+//                     var storeOS;
+//                     getDatabase();
+//                     var regionList = [];
+//                     var openRequest = indexedDB.open('fasp', 1);
+//                     openRequest.onerror = function (event) {
+//                         this.setState({
+//                             message: i18n.t('static.program.errortext')
+//                         })
+//                     }.bind(this);
+//                     openRequest.onsuccess = function (e) {
+//                         var version = (versionId.split('(')[0]).trim()
+
+//                         //for user id
+//                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+//                         //for program id
+//                         var program = `${programId}_v${version}_uId_${userId}`
+
+//                         db1 = e.target.result;
+//                         var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+//                         var programDataOs = programDataTransaction.objectStore('programData');
+//                         // console.log(program)
+//                         var programRequest = programDataOs.get(program);
+//                         programRequest.onerror = function (event) {
+//                             this.setState({
+//                                 message: i18n.t('static.program.errortext')
+//                             })
+//                         }.bind(this);
+//                         programRequest.onsuccess = function (e) {
+//                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+//                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+//                             var programJson = JSON.parse(programData);
+
+
+//                             var programTransaction = db1.transaction(['program'], 'readwrite');
+//                             var programOs = programTransaction.objectStore('program');
+//                             var program1Request = programOs.getAll();
+//                             program1Request.onsuccess = function (event) {
+//                                 var programResult = [];
+//                                 programResult = program1Request.result;
+//                                 let airFreight = 0;
+//                                 let seaFreight = 0;
+//                                 for (var k = 0; k < programResult.length; k++) {
+//                                     if (programId == programResult[k].programId) {
+//                                         airFreight = programResult[k].airFreightPerc;
+//                                         seaFreight = programResult[k].seaFreightPerc;
+//                                     }
+//                                 }
+
+//                                 var shipmentList = (programJson.shipmentList);
+
+//                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+
+//                                 let isPlannedShipment = [];
+//                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
+//                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
+//                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
+//                                     isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+//                                 }
+
+//                                 const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+//                                 let data = [];
+//                                 let planningUnitFilter = [];
+//                                 for (let i = 0; i < planningUnitIds.length; i++) {
+//                                     for (let j = 0; j < dateFilter.length; j++) {
+//                                         if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+//                                             planningUnitFilter.push(dateFilter[j]);
+//                                         }
+//                                     }
+//                                 }
+
+//                                 console.log("offline data----", planningUnitFilter);
+//                                 for (let j = 0; j < planningUnitFilter.length; j++) {
+//                                     let freight = 0;
+//                                     if (planningUnitFilter[j].shipmentMode === "Air") {
+//                                         freight = airFreight;
+//                                     } else {
+//                                         freight = seaFreight;
+//                                     }
+//                                     let json = {
+//                                         "active": true,
+//                                         "shipmentId": planningUnitFilter[j].shipmentId,
+//                                         "planningUnit": planningUnitFilter[j].planningUnit,
+//                                         "qty": planningUnitFilter[j].shipmentQty,
+//                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+//                                         "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+//                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+//                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+//                                     }
+//                                     data.push(json);
+//                                 }
+
+//                                 this.setState({
+//                                     data: data
+//                                     , message: ''
+//                                 })
+//                             }.bind(this)
+//                         }.bind(this)
+//                     }.bind(this)
+//                 } else {
+//                     this.setState({
+//                         message: ''
+//                     })
+//                     let includePlannedShipments = true;
+//                     if (isPlannedShipmentId == 1) {
+//                         includePlannedShipments = true;
+//                     } else {
+//                         includePlannedShipments = false;
+//                     }
+//                     var inputjson = {
+//                         programId: programId,
+//                         versionId: versionId,
+//                         startDate: new moment(startDate),
+//                         stopDate: new moment(endDate),
+//                         planningUnitIds: planningUnitIds,
+//                         includePlannedShipments: includePlannedShipments,
+//                     }
+//                     AuthenticationService.setupAxiosInterceptors();
+//                     ReportService.AggregateShipmentByProduct(inputjson)
+//                         .then(response => {
+//                             console.log("Online Data------", response.data);
+//                             this.setState({
+//                                 data: response.data
+//                             }, () => {
+//                                 this.consolidatedProgramList();
+//                             })
+//                         }).catch(
+//                             error => {
+//                                 this.setState({
+//                                     data: []
+//                                 }, () => {
+//                                     this.consolidatedProgramList();
+//                                     this.consolidatedProcurementAgentList();
+//                                 })
+//                                 if (error.message === "Network Error") {
+//                                     this.setState({ message: error.message });
+//                                 } else {
+//                                     switch (error.response ? error.response.status : "") {
+//                                         case 500:
+//                                         case 401:
+//                                         case 404:
+//                                         case 406:
+//                                         case 412:
+//                                             this.setState({ message: i18n.t(error.response.data.messageCode) });
+//                                             break;
+//                                         default:
+//                                             this.setState({ message: 'static.unkownError' });
+//                                             break;
+//                                     }
+//                                 }
+//                             }
+//                         );
+
+
+//                 }
+//             } else if (programId == 0) {
+//                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+
+//             } else if (versionId == -1) {
+//                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+
+//             } else if (this.state.planningUnitValues.length == 0) {
+//                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
 //             }
-//         } else if (procurementAgentId == 0) {
-//             this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
+//         }
 
-//         } else if (programId == 0) {
-//             this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+//     }
 
-//         } else if (versionId == -1) {
-//             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+//     toggleView = () => {
+//         let viewby = document.getElementById("viewById").value;
+//         this.setState({
+//             viewby: viewby
+//         });
+//         if (viewby == 1) {
+//             document.getElementById("fundingSourceDiv").style.display = "none";
+//             document.getElementById("procurementAgentDiv").style.display = "block";
+//             this.setState({
+//                 data: []
+//             }, () => {
+//                 this.fetchData();
+//                 // this.consolidatedProgramList();
+//                 // this.consolidatedProcurementAgentList();
+//             })
 
-//         } else if (planningUnitIds.length == 0) {
-//             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
 
-//         } else if (isPlannedShipmentId == 0) {
-//             this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
+//         } else if (viewby == 2) {
+//             document.getElementById("procurementAgentDiv").style.display = "none";
+//             document.getElementById("fundingSourceDiv").style.display = "block";
+//             this.setState({
+//                 data: []
+//             }, () => {
+//                 this.fetchData();
+//                 // this.consolidatedProgramList();
+//                 // this.consolidatedProcurementAgentList();
+//             })
+
+
+//         } else {
+//             document.getElementById("procurementAgentDiv").style.display = "none";
+//             document.getElementById("fundingSourceDiv").style.display = "none";
+//             this.setState({
+//                 data: []
+//             }, () => {
+//                 // this.consolidatedProgramList();
+//                 // this.consolidatedProcurementAgentList();
+//                 this.fetchData();
+//             })
+
+
+
 //         }
 //     }
 
 //     componentDidMount() {
 //         this.getProcurementAgent();
+//         this.getFundingSource();
 //         this.getPrograms();
+//         document.getElementById("fundingSourceDiv").style.display = "none";
+//         let viewby = document.getElementById("viewById").value;
+//         this.setState({
+//             viewby: viewby
+//         });
 
 //     }
+
+//     getFundingSource = () => {
+//         if (navigator.onLine) {
+//             AuthenticationService.setupAxiosInterceptors();
+//             FundingSourceService.getFundingSourceListAll()
+//                 .then(response => {
+//                     // console.log(JSON.stringify(response.data))
+//                     this.setState({
+//                         fundingSources: response.data
+//                     }, () => { this.consolidatedFundingSourceList() })
+//                 }).catch(
+//                     error => {
+//                         this.setState({
+//                             fundingSources: []
+//                         }, () => { this.consolidatedFundingSourceList() })
+//                         if (error.message === "Network Error") {
+//                             this.setState({ message: error.message });
+//                         } else {
+//                             switch (error.response ? error.response.status : "") {
+//                                 case 500:
+//                                 case 401:
+//                                 case 404:
+//                                 case 406:
+//                                 case 412:
+//                                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+//                                     break;
+//                                 default:
+//                                     this.setState({ message: 'static.unkownError' });
+//                                     break;
+//                             }
+//                         }
+//                     }
+//                 );
+
+//         } else {
+//             console.log('offline')
+//             this.consolidatedFundingSourceList()
+//         }
+
+//     }
+
+//     consolidatedFundingSourceList = () => {
+//         const lan = 'en';
+//         const { fundingSources } = this.state
+//         var proList = fundingSources;
+
+//         var db1;
+//         getDatabase();
+//         var openRequest = indexedDB.open('fasp', 1);
+//         openRequest.onsuccess = function (e) {
+//             db1 = e.target.result;
+//             var transaction = db1.transaction(['fundingSource'], 'readwrite');
+//             var fundingSource = transaction.objectStore('fundingSource');
+//             var getRequest = fundingSource.getAll();
+
+//             getRequest.onerror = function (event) {
+//                 // Handle errors!
+//             };
+//             getRequest.onsuccess = function (event) {
+//                 var myResult = [];
+//                 myResult = getRequest.result;
+//                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+//                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+//                 for (var i = 0; i < myResult.length; i++) {
+
+//                     var f = 0
+//                     for (var k = 0; k < this.state.fundingSources.length; k++) {
+//                         if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+//                             f = 1;
+//                             console.log('already exist')
+//                         }
+//                     }
+//                     var programData = myResult[i];
+//                     if (f == 0) {
+//                         proList.push(programData)
+//                     }
+
+//                 }
+
+//                 this.setState({
+//                     fundingSources: proList
+//                 })
+
+//             }.bind(this);
+
+//         }.bind(this);
+//     }
+
 
 //     formatLabel(cell, row) {
 //         return getLabelText(cell, this.state.lang);
@@ -942,11 +1369,11 @@
 //         var x2 = x.length > 1 ? '.' + x[1] : '';
 //         var rgx = /(\d+)(\d{3})/;
 //         while (rgx.test(x1)) {
-//           x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//             x1 = x1.replace(rgx, '$1' + ',' + '$2');
 //         }
 //         // return "(" + currencyCode + ")" + "  " + x1 + x2;
 //         return x1 + x2;
-//       }
+//     }
 
 //     render() {
 
@@ -958,6 +1385,8 @@
 //         );
 
 //         const { procurementAgents } = this.state;
+
+//         const { fundingSources } = this.state;
 
 //         const { programs } = this.state;
 
@@ -981,10 +1410,36 @@
 //         const { rangeValue } = this.state
 
 
-//         const columns = [
-//             {
+//         let viewby = this.state.viewby;
+//         // console.log("RENDER VIEWBY-------", viewby);
+//         let obj1 = {}
+//         let obj2 = {}
+//         if (viewby == 1) {
+//             obj1 = {
 //                 dataField: 'procurementAgent.label',
-//                 text: i18n.t('static.procurementagent.procurementagent'),
+//                 text: 'Procurement Agent',
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 formatter: (cell, row) => {
+//                     return getLabelText(cell, this.state.lang);
+//                 },
+//                 style: { width: '70px' },
+//             }
+
+//             obj2 = {
+//                 dataField: 'procurementAgent.code',
+//                 text: 'Procurement Agent Code',
+//                 sort: true,
+//                 align: 'center',
+//                 headerAlign: 'center',
+//                 style: { width: '70px' },
+//             }
+
+//         } else if (viewby == 2) {
+//             obj1 = {
+//                 dataField: 'fundingSource.label',
+//                 text: i18n.t('static.budget.fundingsource'),
 //                 sort: true,
 //                 align: 'center',
 //                 headerAlign: 'center',
@@ -992,25 +1447,41 @@
 //                     return getLabelText(cell, this.state.lang);
 //                 },
 //                 style: { width: '100px' },
-//             },
-//             {
-//                 dataField: 'procurementAgent.code',
-//                 text: i18n.t('static.report.procurementagentcode'),
+//             }
+
+//             obj2 = {
+//                 dataField: 'fundingSource.code',
+//                 text: i18n.t('static.fundingsource.fundingsourceCode'),
 //                 sort: true,
 //                 align: 'center',
 //                 headerAlign: 'center',
 //                 style: { width: '100px' },
-//             },
+//             }
+//         } else {
+//             obj1 = {
+//                 hidden: true
+//             }
+
+//             obj2 = {
+//                 hidden: true
+
+//             }
+//         }
+
+
+//         const columns = [
+//             obj1,
+//             obj2,
 //             {
 //                 dataField: 'planningUnit.label',
-//                 text: i18n.t('static.planningunit.planningunit'),
+//                 text: i18n.t('static.report.planningUnit'),
 //                 sort: true,
 //                 align: 'center',
 //                 headerAlign: 'center',
 //                 formatter: (cell, row) => {
 //                     return getLabelText(cell, this.state.lang);
 //                 },
-//                 style: { width: '200px' },
+//                 style: { width: '400px' },
 //             },
 //             {
 //                 dataField: 'qty',
@@ -1093,10 +1564,10 @@
 //                     this.setState({ message: message })
 //                 }} />
 //                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-//                 <h5>{i18n.t(this.state.message)}</h5>
-//                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-//                     <CardHeader className="pb-1">
-//                         <i className="icon-menu"></i><strong>{i18n.t('static.report.procurementAgent')}</strong>
+//                 <h5 className="red">{i18n.t(this.state.message)}</h5>
+//                 <Card >
+//                     <div className="Card-header-reporticon">
+
 //                         {/* <div className="card-header-actions">
 //                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
 //                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
@@ -1123,8 +1594,8 @@
 //                                 </div>
 //                             }
 //                         </Offline>
-//                     </CardHeader>
-//                     <CardBody >
+//                     </div>
+//                     <CardBody className="pt-lg-0">
 
 //                         <Col md="12 pl-0">
 //                             <div className="row ">
@@ -1132,46 +1603,19 @@
 //                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
 //                                     <div className="controls  Regioncalender">
 
-//                                             <Picker
-//                                                 ref="pickRange"
-//                                                 years={{ min: 2013 }}
-//                                                 value={rangeValue}
-//                                                 lang={pickerLang}
-//                                                 //theme="light"
-//                                                 onChange={this.handleRangeChange}
-//                                                 onDismiss={this.handleRangeDissmis}
-//                                             >
-//                                                 <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-//                                             </Picker>
+//                                         <Picker
+//                                             ref="pickRange"
+//                                             years={{ min: 2013 }}
+//                                             value={rangeValue}
+//                                             lang={pickerLang}
+//                                             //theme="light"
+//                                             onChange={this.handleRangeChange}
+//                                             onDismiss={this.handleRangeDissmis}
+//                                         >
+//                                             <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+//                                         </Picker>
 
 
-//                                     </div>
-//                                 </FormGroup>
-
-//                                 <FormGroup className="col-md-3">
-//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
-//                                     <div className="controls ">
-//                                         <InputGroup>
-//                                             <Input
-//                                                 type="select"
-//                                                 name="procurementAgentId"
-//                                                 id="procurementAgentId"
-//                                                 bsSize="sm"
-//                                                 onChange={this.fetchData}
-//                                             >
-//                                                 <option value="0">{i18n.t('static.common.select')}</option>
-//                                                 {procurementAgents.length > 0
-//                                                     && procurementAgents.map((item, i) => {
-//                                                         return (
-//                                                             <option key={i} value={item.procurementAgentId}>
-//                                                                 {getLabelText(item.label, this.state.lang)}
-//                                                             </option>
-//                                                         )
-//                                                     }, this)}
-
-//                                             </Input>
-
-//                                         </InputGroup>
 //                                     </div>
 //                                 </FormGroup>
 
@@ -1222,19 +1666,18 @@
 //                                 </FormGroup>
 
 //                                 <FormGroup className="col-md-3">
-//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
 //                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 //                                     <div className="controls">
-//                                         <InputGroup className="box">
-//                                             <ReactMultiSelectCheckboxes
+//                                             <MultiSelect
 //                                                 name="planningUnitId"
 //                                                 id="planningUnitId"
 //                                                 bsSize="md"
+//                                                 value={this.state.planningUnitValues}
 //                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
 //                                                 options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
 //                                             />
 
-//                                         </InputGroup>
 //                                     </div>
 //                                 </FormGroup>
 
@@ -1249,7 +1692,6 @@
 //                                                 bsSize="sm"
 //                                                 onChange={this.fetchData}
 //                                             >
-//                                                 <option value="-1">{i18n.t('static.common.select')}</option>
 //                                                 <option value="1">{i18n.t('static.program.yes')}</option>
 //                                                 <option value="2">{i18n.t('static.program.no')}</option>
 //                                             </Input>
@@ -1257,6 +1699,84 @@
 //                                         </InputGroup>
 //                                     </div>
 //                                 </FormGroup>
+
+//                                 <FormGroup className="col-md-3">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+//                                     <div className="controls ">
+//                                         <InputGroup>
+//                                             <Input
+//                                                 type="select"
+//                                                 name="viewById"
+//                                                 id="viewById"
+//                                                 bsSize="sm"
+//                                                 onChange={this.toggleView}
+//                                             >
+//                                                 {/* <option value="-1">{i18n.t('static.common.select')}</option> */}
+//                                                 <option value="1">{i18n.t('static.procurementagent.procurementagent')}</option>
+//                                                 <option value="2">{i18n.t('static.dashboard.fundingsource')}</option>
+//                                                 <option value="3">{i18n.t('static.planningunit.planningunit')}</option>
+//                                             </Input>
+
+//                                         </InputGroup>
+//                                     </div>
+//                                 </FormGroup>
+
+//                                 <FormGroup className="col-md-3" id="procurementAgentDiv">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
+//                                     <div className="controls ">
+//                                         <InputGroup>
+//                                             <Input
+//                                                 type="select"
+//                                                 name="procurementAgentId"
+//                                                 id="procurementAgentId"
+//                                                 bsSize="sm"
+//                                                 onChange={this.fetchData}
+//                                             >
+//                                                 <option value="0">{i18n.t('static.common.select')}</option>
+//                                                 {procurementAgents.length > 0
+//                                                     && procurementAgents.map((item, i) => {
+//                                                         return (
+//                                                             <option key={i} value={item.procurementAgentId}>
+//                                                                 {getLabelText(item.label, this.state.lang)}
+//                                                             </option>
+//                                                         )
+//                                                     }, this)}
+
+//                                             </Input>
+
+//                                         </InputGroup>
+//                                     </div>
+//                                 </FormGroup>
+
+//                                 <FormGroup className="col-md-3" id="fundingSourceDiv">
+//                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+//                                     <div className="controls ">
+//                                         <InputGroup>
+//                                             <Input
+//                                                 type="select"
+//                                                 name="fundingSourceId"
+//                                                 id="fundingSourceId"
+//                                                 bsSize="sm"
+//                                                 onChange={this.fetchData}
+//                                             >
+//                                                 <option value="0">{i18n.t('static.common.select')}</option>
+//                                                 {fundingSources.length > 0
+//                                                     && fundingSources.map((item, i) => {
+//                                                         return (
+//                                                             <option key={i} value={item.fundingSourceId}>
+//                                                                 {getLabelText(item.label, this.state.lang)}
+//                                                             </option>
+//                                                         )
+//                                                     }, this)}
+
+//                                             </Input>
+
+//                                         </InputGroup>
+//                                     </div>
+//                                 </FormGroup>
+
+
+
 //                             </div>
 //                         </Col>
 
@@ -1291,24 +1811,15 @@
 //                         </ToolkitProvider>
 //                     </CardBody>
 //                 </Card>
-//                 <div style={{ display: this.state.loading ? "block" : "none" }}>
-//                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-//                         <div className="align-items-center">
-//                             <div ><h4> <strong>Loading...</strong></h4></div>
-
-//                             <div className="spinner-border blue ml-4" role="status">
-
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
 //             </div>
 //         );
 //     }
 // }
 // export default ProcurementAgentExport;
-//----------------------------------------------------------------------------------------------
 
+
+
+//----------------------------JEXCEL
 import React, { Component } from 'react';
 import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
@@ -1342,6 +1853,9 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
 import MultiSelect from 'react-multi-select-component';
+import jexcel from 'jexcel';
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1375,6 +1889,7 @@ class ProcurementAgentExport extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
 
     makeText = m => {
@@ -1666,8 +2181,8 @@ class ProcurementAgentExport extends Component {
         let versionId = document.getElementById("versionId").value;
         this.setState({
             planningUnits: [],
-            planningUnitLabels:[],
-            planningUnitValues:[]
+            planningUnitLabels: [],
+            planningUnitValues: []
         }, () => {
             if (versionId.includes('Local')) {
                 const lan = 'en';
@@ -1749,7 +2264,7 @@ class ProcurementAgentExport extends Component {
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
-          })
+        })
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -1913,7 +2428,7 @@ class ProcurementAgentExport extends Component {
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 190, planningText)
 
-                  
+
                 }
 
             }
@@ -1945,9 +2460,9 @@ class ProcurementAgentExport extends Component {
             columns.map((item, idx) => { headers[idx] = (item.text) });
             data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         }
-       let startY=190+(this.state.planningUnitValues.length*3)
+        let startY = 190 + (this.state.planningUnitValues.length * 3)
         let content = {
-            margin: { top: 80 ,bottom:70},
+            margin: { top: 80, bottom: 70 },
             startY: startY,
             head: [headers],
             body: data,
@@ -1965,6 +2480,188 @@ class ProcurementAgentExport extends Component {
         doc.save(i18n.t('static.report.procurementAgent') + ' by ' + document.getElementById("viewById").selectedOptions[0].text + ".pdf")
     }
 
+    buildJExcel() {
+        let shipmentCosttList = this.state.data;
+        // console.log("shipmentCosttList---->", shipmentCosttList);
+        let shipmentCostArray = [];
+        let count = 0;
+
+        let viewby = this.state.viewby;
+
+        for (var j = 0; j < shipmentCosttList.length; j++) {
+            data = [];
+            data[0] = (viewby == 1) ? (getLabelText(shipmentCosttList[j].procurementAgent.label, this.state.lang)) : ((viewby == 2) ? (getLabelText(shipmentCosttList[j].fundingSource.label, this.state.lang)) : ({}))
+            data[1] = (viewby == 1) ? (shipmentCosttList[j].procurementAgent.code, this.state.lang) : ((viewby == 2) ? (shipmentCosttList[j].fundingSource.code, this.state.lang) : ({}))
+            data[2] = getLabelText(shipmentCosttList[j].planningUnit.label, this.state.lang)
+            data[3] = this.addCommas(shipmentCosttList[j].qty)
+            data[4] = this.addCommas(shipmentCosttList[j].productCost)
+            data[5] = shipmentCosttList[j].freightPerc.toFixed(2)
+            data[6] = this.addCommas(shipmentCosttList[j].freightCost)
+            data[7] = this.addCommas(shipmentCosttList[j].totalCost)
+
+            shipmentCostArray[count] = data;
+            count++;
+        }
+        if (shipmentCosttList.length == 0) {
+            data = [];
+            shipmentCostArray[0] = data;
+        }
+        // console.log("shipmentCostArray---->", shipmentCostArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = shipmentCostArray;
+
+
+
+        // console.log("RENDER VIEWBY-------", viewby);
+        let obj1 = {}
+        let obj2 = {}
+        if (viewby == 1) {
+            obj1 = {
+                // dataField: 'procurementAgent.label',
+                // text: 'Procurement Agent',
+                // sort: true,
+                // align: 'center',
+                // headerAlign: 'center',
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // },
+                // style: { width: '70px' },
+
+                title: i18n.t('static.procurementagent.procurementagent'),
+                type: 'text',
+                readOnly: true
+            }
+
+            obj2 = {
+                // dataField: 'procurementAgent.code',
+                // text: 'Procurement Agent Code',
+                // sort: true,
+                // align: 'center',
+                // headerAlign: 'center',
+                // style: { width: '70px' },
+
+                title: i18n.t('static.report.procurementagentcode'),
+                type: 'text',
+                readOnly: true
+            }
+
+        } else if (viewby == 2) {
+            obj1 = {
+                // dataField: 'fundingSource.label',
+                // text: i18n.t('static.budget.fundingsource'),
+                // sort: true,
+                // align: 'center',
+                // headerAlign: 'center',
+                // formatter: (cell, row) => {
+                //     return getLabelText(cell, this.state.lang);
+                // },
+                // style: { width: '100px' },
+
+                title: i18n.t('static.budget.fundingsource'),
+                type: 'text',
+                readOnly: true
+            }
+
+            obj2 = {
+                // dataField: 'fundingSource.code',
+                // text: i18n.t('static.fundingsource.fundingsourceCode'),
+                // sort: true,
+                // align: 'center',
+                // headerAlign: 'center',
+                // style: { width: '100px' },
+
+                title: i18n.t('static.fundingsource.fundingsourceCode'),
+                type: 'text',
+                readOnly: true
+            }
+        } else {
+            obj1 = {
+                // hidden: true,
+                type: 'hidden',
+            }
+
+            obj2 = {
+                // hidden: true
+                type: 'hidden',
+
+            }
+        }
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                obj1,
+                obj2,
+                {
+                    title: i18n.t('static.report.planningUnit'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.qty'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.productCost'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.freightPer'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.freightCost'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.totalCost'),
+                    type: 'text',
+                    readOnly: true
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+
+
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false,
+        };
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
+        this.setState({
+            languageEl: languageEl
+        })
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
 
 
     fetchData = () => {
@@ -1983,7 +2680,7 @@ class ProcurementAgentExport extends Component {
         if (viewby == 1) {
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && procurementAgentId > 0) {
                 if (versionId.includes('Local')) {
-                    planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
+                    planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value))
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2087,6 +2784,8 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: data
                                     , message: ''
+                                }, () => {
+                                    this.buildJExcel();
                                 })
                             }.bind(this)
                         }.bind(this)
@@ -2120,6 +2819,7 @@ class ProcurementAgentExport extends Component {
                             }, () => {
                                 this.consolidatedProgramList();
                                 this.consolidatedProcurementAgentList();
+                                this.buildJExcel();
                             })
                         }).catch(
                             error => {
@@ -2128,6 +2828,8 @@ class ProcurementAgentExport extends Component {
                                 }, () => {
                                     this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
+                                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                                    this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({ message: error.message });
@@ -2151,21 +2853,33 @@ class ProcurementAgentExport extends Component {
 
                 }
             } else if (programId == 0) {
-                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (versionId == -1) {
-                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (this.state.planningUnitValues.length == 0) {
-                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (procurementAgentId == 0) {
-                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] });
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
             }
         } else if (viewby == 2) {
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && fundingSourceId > 0) {
                 if (versionId.includes('Local')) {
-                    planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
+                    planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value))
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2271,6 +2985,8 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: data
                                     , message: ''
+                                }, () => {
+                                    this.buildJExcel();
                                 })
                             }.bind(this)
                         }.bind(this)
@@ -2303,6 +3019,7 @@ class ProcurementAgentExport extends Component {
                             }, () => {
                                 this.consolidatedProgramList();
                                 this.consolidatedFundingSourceList();
+                                this.buildJExcel();
                             })
                         }).catch(
                             error => {
@@ -2311,6 +3028,9 @@ class ProcurementAgentExport extends Component {
                                 }, () => {
                                     this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
+                                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                                    this.el.destroy();
+
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({ message: error.message });
@@ -2334,22 +3054,34 @@ class ProcurementAgentExport extends Component {
 
                 }
             } else if (programId == 0) {
-                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (versionId == -1) {
-                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (this.state.planningUnitValues.length == 0) {
-                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (fundingSourceId == 0) {
-                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
+                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
             }
         } else {
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
                 if (versionId.includes('Local')) {
-                    planningUnitIds=this.state.planningUnitValues.map(ele => (ele.value))
-                    
+                    planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value))
+
                     var db1;
                     var storeOS;
                     getDatabase();
@@ -2448,6 +3180,9 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: data
                                     , message: ''
+                                }, () => {
+                                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                                    this.el.destroy();
                                 })
                             }.bind(this)
                         }.bind(this)
@@ -2478,6 +3213,7 @@ class ProcurementAgentExport extends Component {
                                 data: response.data
                             }, () => {
                                 this.consolidatedProgramList();
+                                this.buildJExcel();
                             })
                         }).catch(
                             error => {
@@ -2486,6 +3222,8 @@ class ProcurementAgentExport extends Component {
                                 }, () => {
                                     this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
+                                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                                    this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({ message: error.message });
@@ -2509,13 +3247,22 @@ class ProcurementAgentExport extends Component {
 
                 }
             } else if (programId == 0) {
-                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
+                this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (versionId == -1) {
-                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+                this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             } else if (this.state.planningUnitValues.length == 0) {
-                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                })
 
             }
         }
@@ -2534,6 +3281,8 @@ class ProcurementAgentExport extends Component {
                 data: []
             }, () => {
                 this.fetchData();
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
             })
@@ -2546,6 +3295,8 @@ class ProcurementAgentExport extends Component {
                 data: []
             }, () => {
                 this.fetchData();
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
             })
@@ -2560,6 +3311,8 @@ class ProcurementAgentExport extends Component {
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
                 this.fetchData();
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
             })
 
 
@@ -2980,14 +3733,14 @@ class ProcurementAgentExport extends Component {
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
-                                            <MultiSelect
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="md"
-                                                value={this.state.planningUnitValues}
-                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                            />
+                                        <MultiSelect
+                                            name="planningUnitId"
+                                            id="planningUnitId"
+                                            bsSize="md"
+                                            value={this.state.planningUnitValues}
+                                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                        />
 
                                     </div>
                                 </FormGroup>
@@ -3091,35 +3844,8 @@ class ProcurementAgentExport extends Component {
                             </div>
                         </Col>
 
-                        <ToolkitProvider
-                            keyField="shipmentId"
-                            data={this.state.data}
-                            columns={columns}
-                            search={{ searchFormatted: true }}
-                            hover
-                            filter={filterFactory()}
-                        >
-                            {
-                                props => (
-
-                                    <div className="TableCust">
-                                        <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left table-accesscnl-mt">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
-                                        </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(options)}
-                                            /* rowEvents={{
-                                                 onClick: (e, row, rowIndex) => {
-                                                     this.editRegion(row);
-                                                 }
-                                             }}*/
-                                            {...props.baseProps}
-                                        />
-                                    </div>
-                                )
-                            }
-                        </ToolkitProvider>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                     </CardBody>
                 </Card>
             </div>
@@ -3127,5 +3853,6 @@ class ProcurementAgentExport extends Component {
     }
 }
 export default ProcurementAgentExport;
+
 
 
