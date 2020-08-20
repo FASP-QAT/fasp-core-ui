@@ -711,6 +711,7 @@ export default class ConsumptionDetails extends React.Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
+                
                             name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
@@ -1111,17 +1112,17 @@ export default class ConsumptionDetails extends React.Component {
         var programId = document.getElementById('programId').value;
         var versionId = row.versionId
         event.stopPropagation();
-        if (row.realmProblem.problem.problemId != 2) {
+        // if (row.realmProblem.problem.problemId != 2) {
             this.props.history.push({
                 // pathname: `/programProduct/addProgramProduct/${cell}`,
                 // pathname: `/report/addProblem`,
                 pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
             });
-        } else {
-            this.props.history.push({
-                pathname: `${cell}`,
-            });
-        }
+        // } else {
+        //     this.props.history.push({
+        //         pathname: `${cell}`,
+        //     });
+        // }
 
 
     }
@@ -1336,10 +1337,10 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody  className="pb-lg-2">
-                        <Col md="9 pl-0">
+                    <CardBody  className=" pt-lg-0">
+                        <Col md="9 pl-1 pb-3">
                             <div className="row">
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls">
                                         <InputGroup>
@@ -1357,7 +1358,7 @@ export default class ConsumptionDetails extends React.Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
                                     <div className="controls">
                                         <InputGroup>
@@ -1373,7 +1374,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
                                     <div className="controls">
                                         <InputGroup>
@@ -1393,8 +1394,9 @@ export default class ConsumptionDetails extends React.Component {
                                 </FormGroup>
                             </div>
                         </Col>
-
+                        <div className="ProgramListSearch">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
                     </CardBody>
 

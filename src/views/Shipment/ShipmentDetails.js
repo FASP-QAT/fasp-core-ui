@@ -101,64 +101,18 @@ export default class ShipmentDetails extends React.Component {
                     programList: proList
                 })
 
+                var programIdd = this.props.match.params.programId;
+                console.log("programIdd", programIdd);
+                if (programIdd != '' && programIdd != undefined) {
+                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
+                    this.setState({
+                        programSelect: programSelect,
+                        programId: programIdd
+                    })
+                    this.getPlanningUnitList(programSelect);
+                }
             }.bind(this);
         }.bind(this)
-
-
-        var programIdd = this.props.match.params.programId;
-        var versionId = this.props.match.params.versionId;
-        var planningUnitId = this.props.match.params.planningUnitId;
-
-        if (programIdd != '') {
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: 'red'
-                    })
-                }.bind(this);
-                planningunitRequest.onsuccess = function (e) {
-                    var myResult = [];
-                    myResult = planningunitRequest.result;
-                    console.log("myResult", myResult);
-                    var programId = programIdd.split("_")[0];
-                    console.log('programId----->>>', programId)
-                    console.log(myResult);
-                    var proList = []
-                    for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].program.id == programId && myResult[i].active == true) {
-                            var productJson = {
-                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                id: myResult[i].planningUnit.id
-                            }
-                            proList.push(productJson)
-                        }
-                    }
-                    console.log("proList---" + proList);
-                    this.setState({
-                        planningUnitList: proList,
-                        planningUnitListAll: myResult
-                    })
-                    this.setState({ programId: programIdd, planningUnitId: planningUnitId });
-                    this.formSubmit(this.state.planningUnit);
-                }.bind(this)
-            }.bind(this)
-        }
     };
 
     getPlanningUnitList(value) {
@@ -210,6 +164,16 @@ export default class ShipmentDetails extends React.Component {
                     planningUnitList: proList,
                     planningUnitListAll: myResult
                 })
+                var planningUnitIdProp = this.props.match.params.planningUnitId;
+                console.log("planningUnitIdProp===>", planningUnitIdProp);
+                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                    var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                    this.setState({
+                        planningUnit: planningUnit,
+                        planningUnitId: planningUnitIdProp
+                    })
+                    this.formSubmit(planningUnit);
+                }
             }.bind(this);
         }.bind(this)
     }
