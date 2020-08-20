@@ -616,6 +616,10 @@ class ListBudgetComponent extends Component {
       data[7] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
       data[8] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
       data[9] = budgetList[j].active;
+      data[10] = budgetList[j].budgetAmt;
+      data[11] = budgetList[j].usedUsdAmt;
+      data[12] = budgetList[j].stopDate;
+
 
 
       budgetArray[count] = data;
@@ -644,54 +648,67 @@ class ListBudgetComponent extends Component {
         {
           title: i18n.t('static.budget.program'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.budget.budget'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.budget.budgetCode'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.budget.fundingsource'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.budget.budgetamount'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.budget.availableAmt'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.common.startdate'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.common.stopdate'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           type: 'dropdown',
           title: i18n.t('static.common.status'),
-          readOnly: true,
+          // readOnly: true,
           source: [
             { id: true, name: i18n.t('static.common.active') },
             { id: false, name: i18n.t('static.common.disabled') }
           ]
         },
+        {
+          title: i18n.t('static.budget.budgetamount'),
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.budget.availableAmt'),
+          type: 'hidden',
+        },
+        {
+          title: 'Date',
+          type: 'hidden',
+        },
 
       ],
+      editable: false,
       text: {
         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
         show: '',
@@ -701,25 +718,24 @@ class ListBudgetComponent extends Component {
       updateTable: function (el, cell, x, y, source, value, id) {
         console.log("INSIDE UPDATE TABLE");
         var elInstance = el.jexcel;
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         var rowData = elInstance.getRowData(y);
         // console.log("elInstance---->", elInstance);
-        var stopDate = rowData[8];
-        var budgetAmt = rowData[5];
-        var usedUsdAmt = rowData[6];
-        // console.log("ABC----->", new Date(stopDate) < new Date() || (budgetAmt - usedUsdAmt) <= 0);
-        if (new Date(stopDate) < new Date() || (budgetAmt - usedUsdAmt) <= 0) {
+        var stopDate = rowData[12];
+        var budgetAmt = rowData[10];
+        var usedUsdAmt = rowData[11];
 
+        if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
           for (var i = 0; i < colArr.length; i++) {
-            var col = ("B").concat(parseInt(y) + 1);
-            // elInstance.setStyle(`B2`, 'background-color', 'transparent');
-            // elInstance.setStyle(`B2`, 'background-color', 'red');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'red');
           }
         } else {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
           }
         }
+
       }.bind(this),
 
       onload: this.loaded,
@@ -807,9 +823,9 @@ class ListBudgetComponent extends Component {
   }
 
   rowClassNameFormat(row, rowIdx) {
-
     return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedUsdAmt) <= 0 ? 'background-red' : '';
   }
+
   formatLabel(cell, row) {
     // console.log("celll----", cell);
     if (cell != null && cell != "") {
@@ -1030,6 +1046,7 @@ class ListBudgetComponent extends Component {
             <CardBody className=" pt-md-1 pb-md-1 table-responsive">
               {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
               </div>
+              <h5>*Rows in red indicate that Budget has either lapsed or has no money in it</h5>
 
             </CardBody>
           </CardBody>
