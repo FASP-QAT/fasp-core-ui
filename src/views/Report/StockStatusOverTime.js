@@ -342,8 +342,8 @@ class StockStatusOverTime extends Component {
             console.log(program)
             if (program.length == 1) {
                 this.setState({
-                    monthsInPastForAmc: program[0].monthsInPastForAmc,
-                    monthsInFutureForAmc: program[0].monthsInFutureForAmc
+                    monthsInPastForAmc: 0,
+                    monthsInFutureForAmc: 0
                 },()=>{this.fetchData()})
 
             }
@@ -570,7 +570,7 @@ class StockStatusOverTime extends Component {
         let monthsInFutureForAmc = this.state.monthsInFutureForAmc
         let monthsInPastForAmc = this.state.monthsInPastForAmc
         console.log(monthsInFutureForAmc,monthsInPastForAmc)
-        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc!=undefined && monthsInPastForAmc!=undefined) {
+        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc!=undefined && monthsInPastForAmc!=undefined &&monthsInFutureForAmc!=0 && monthsInPastForAmc!=0) {
             if (versionId.includes('Local')) {
 
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
