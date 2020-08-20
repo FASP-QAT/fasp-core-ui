@@ -692,7 +692,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 copyCompatibility: true,
                                                 allowInsertRow: false,
                                                 text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
                                                 },
@@ -828,7 +829,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance);
     }
 
     render() {

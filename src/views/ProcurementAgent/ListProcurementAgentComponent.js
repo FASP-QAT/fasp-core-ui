@@ -762,7 +762,8 @@ class ListProcurementAgentComponent extends Component {
 
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },
@@ -1078,7 +1079,7 @@ class ListProcurementAgentComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv ">
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -1099,11 +1100,10 @@ class ListProcurementAgentComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                       
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
 
-                        </CardBody>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
