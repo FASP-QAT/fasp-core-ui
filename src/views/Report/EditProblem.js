@@ -241,11 +241,17 @@ export default class EditLanguageComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProblemStatusById = this.getProblemStatusById.bind(this);
         this.getProblemStatus = this.getProblemStatus.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
     }
-
+    Capitalize(str) {
+        // let { notes } = this.state
+        // console.log("in capti;ized====>");
+        var notes = str.charAt(0).toUpperCase() + str.slice(1)
+        this.setState({notes:notes});
+    }
     dataChange(event) {
 
         if (event.target.name === "problemStatusInputId") {
@@ -964,7 +970,7 @@ export default class EditLanguageComponent extends Component {
                                                                     valid={!errors.notes && this.state.notes != ''}
                                                                     invalid={(touched.notes && !!errors.notes)}
                                                                     onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                                     onBlur={handleBlur}
                                                                     required
                                                                     value={this.state.notes}
