@@ -114,7 +114,7 @@ export default class AddInventory extends Component {
                 this.setState({
                     programList: proList
                 })
-                
+
                 var programIdd = this.props.match.params.programId;
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
@@ -131,6 +131,8 @@ export default class AddInventory extends Component {
     }
 
     getPlanningUnitList(value) {
+        document.getElementById("planningUnitId").value = 0;
+        document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
             programId: value.value

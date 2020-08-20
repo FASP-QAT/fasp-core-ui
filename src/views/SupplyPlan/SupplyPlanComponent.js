@@ -1428,7 +1428,7 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     this.getPlanningUnitList(programSelect);
                 }
-               
+
             }.bind(this);
         }.bind(this);
         console.log("After component did mount");
@@ -1437,11 +1437,14 @@ export default class SupplyPlanComponent extends React.Component {
     getPlanningUnitList(value) {
         console.log("Vlue", value);
         document.getElementById("planningUnitId").value = 0;
+        document.getElementById("planningUnit").value = "";
         this.setState({
             display: 'none',
             planningUnitChange: false,
             programSelect: value,
-            programId: value.value
+            programId: value.value,
+            planningUnit:"",
+            planningUnitId:""
         })
         var db1;
         var storeOS;
@@ -1546,7 +1549,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 planningUnitListForConsumption: planningUnitListForConsumption
                             })
                             var planningUnitIdProp = this.props.match.params.planningUnitId;
-                            console.log("planningUnitIdProp===>",planningUnitIdProp);
+                            console.log("planningUnitIdProp===>", planningUnitIdProp);
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                 this.setState({
@@ -1709,19 +1712,11 @@ export default class SupplyPlanComponent extends React.Component {
 
                 for (var i = 0; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
                     var consumptionQty = 0;
-                    var consumptionUnaccountedQty = 0;
                     for (var reg = 0; reg < regionListFiltered.length; reg++) {
                         var c = consumptionList.filter(c => (c.consumptionDate >= m[i].startDate && c.consumptionDate <= m[i].endDate) && c.region.id == regionListFiltered[reg].id);
                         var filteredJson = { consumptionQty: '', region: { id: regionListFiltered[reg].id }, month: m[i] };
                         for (var j = 0; j < c.length; j++) {
-                            var count = 0;
-                            for (var k = 0; k < c.length; k++) {
-                                if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
-                                    count++;
-                                } else {
-
-                                }
-                            }
+                            var count = (c.filter(c.actualFlag.toString()=='true')).length;
                             if (count == 0) {
                                 consumptionQty = consumptionQty + parseInt((c[j].consumptionQty));
                                 filteredJson = { month: m[i], region: c[j].region, consumptionQty: c[j].consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, consumptionDate: c[j].consumptionDate };
@@ -1733,7 +1728,6 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                         }
                         // Consumption details
-
                         filteredArray.push(filteredJson);
                     }
                     var consumptionWithoutRegion = consumptionList.filter(c => (c.consumptionDate >= m[i].startDate && c.consumptionDate <= m[i].endDate));

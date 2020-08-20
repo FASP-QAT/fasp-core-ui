@@ -116,9 +116,13 @@ export default class ShipmentDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
+        document.getElementById("planningUnitId").value = 0;
+        document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value.value
+            programId: value.value,
+            planningUnit:"",
+            planningUnitId:""
         })
         var db1;
         var storeOS;

@@ -128,6 +128,8 @@ export default class ConsumptionDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
+        document.getElementById("planningUnitId").value = 0;
+        document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
             programId: value.value

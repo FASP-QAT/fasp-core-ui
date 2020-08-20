@@ -1064,6 +1064,7 @@ export default class WhatIfReportComponent extends React.Component {
 
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
+        document.getElementById("planningUnit").value = "";
         this.setState({
             display: 'none',
             planningUnitChange: false,
