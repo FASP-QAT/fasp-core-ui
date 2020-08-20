@@ -122,7 +122,7 @@ const SubFundingSourceList = React.lazy(() => import('./views/SubFundingSource/L
 const AddProduct = React.lazy(() => import('./views/Product/AddProduct'));
 const ListProdct = React.lazy(() => import('./views/Product/ProductList'));
 const EditProdct = React.lazy(() => import('./views/Product/EditProduct'));
-const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
+const ProgramTree = React.lazy(() => import('./views/Program/ProgramTree'));
 const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
 // const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
@@ -192,10 +192,8 @@ const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'))
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 const StockStatusReport = React.lazy(() => import('./views/Report/StockStatus'));
 const GlobalConsumptionReport = React.lazy(() => import('./views/Report/GlobalConsumption'));
-const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentDetails'));
-const EditShipment = React.lazy(() => import('./views/Shipment/EditShipment'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
@@ -236,7 +234,7 @@ const Budgets = React.lazy(() => import('./views/Report/Budgets'));
 const routes = [
 
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
-  { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'Shipment Details', component: ShipmentList },
+  { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },
   { path: '/report/problemList/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.qatProblem') }), component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
@@ -250,7 +248,8 @@ const routes = [
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
-  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
+  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory,exact:true },
+  { path: '/inventory/addInventory/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/productCategory/productCategoryTree/:color/:message', name: 'Product Category', component: ProductCategoryTree },
 
@@ -560,7 +559,7 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/shipment/shipmentDetails', name: 'Shipment Details', component: ShipmentList },
+  { path: '/shipment/shipmentDetails', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList,exact:true },
   { path: '/report/warehouseCapacity', name: i18n.t('static.report.warehouseCapacity'), component: WarehouseCapacity },
   { path: '/report/stockStatusAccrossPlanningUnitGlobalView', name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'), component: StockStatusAccrossPlanningUnitGlobalView },
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
