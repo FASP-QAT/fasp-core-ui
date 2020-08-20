@@ -642,6 +642,7 @@ label.arrow_label:after {
 .jexcel_content {
   overflow-y: auto !important;
   max-height: 540px !important;
+  min-height: 70px !important;
 }
 .jexcel > tbody > tr > td.readonly {
   color: #212721 !important;
