@@ -1061,7 +1061,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tfoot>
                             </Table>
-                            <div className="table-responsive">
+                            <div className="table-responsive mt-3">
                                 <div id="consumptionDetailsTable" />
                             </div>
                             <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
