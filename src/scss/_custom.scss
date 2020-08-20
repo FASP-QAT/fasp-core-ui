@@ -527,7 +527,7 @@ label.arrow_label:after {
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
-  // z-index: 0 !important;
+  z-index: 0 !important;
 }
 
 .jexcel_page {
@@ -1226,10 +1226,12 @@ h5,
 }
 
 .form-control-sm:hover {
-  padding-right: calc(1.5em + 0.75rem);
+  // padding-right: calc(1.5em + 0.75rem);
+  padding-right: 7px !important;
 }
 .form-control:focus {
-  padding-right: calc(1.5em + 0.75rem);
+  // padding-right: calc(1.5em + 0.75rem);
+  padding-right: 7px!important;
 }
 
 .bottom-logo-img {
@@ -3081,6 +3083,9 @@ border-radius: 2em;
   display: inline!important;
   padding-left: 5px;
 }
+.go2139093995 * {
+  z-index: unset;
+}
 // .go2139093995 svg{
 //   visibility: hidden !important;
 // }
@@ -3134,4 +3139,7 @@ border-radius: 2em;
 }
 .WhatifInputFeild {
   width: 212px;
+}
+.ProgramListSearch{
+  margin-top: -4%;
 }

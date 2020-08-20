@@ -496,7 +496,7 @@ class PlanningUnitCountry extends Component {
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicatePlanningUnit();
         var validation = this.checkValidation();
-        if (validation == true && duplicateValidation == true) {
+        if (validation == true) {
             var tableJson = this.el.getJson();
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
