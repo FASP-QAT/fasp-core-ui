@@ -780,7 +780,7 @@ export default class ConsumptionDetails extends React.Component {
             data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[7] = moment(problemList[j].createdDate).format(`${DATE_FORMAT_CAP}`)
+            data[7] = moment(problemList[j].createdDate).format('MMM-YY')
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             data[10] = getLabelText(problemList[j].problemStatus.label, this.state.lang)
@@ -1226,10 +1226,11 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '100px' },
+                style: { width: '100px' }, 
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        var modifiedDate = moment(cell).format('MMM-YY');
+                        console.log("date===>",modifiedDate);
                         return modifiedDate;
                     }
                 }
