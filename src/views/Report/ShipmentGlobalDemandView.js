@@ -1753,48 +1753,7 @@ class ShipmentGlobalDemandView extends Component {
 
             // var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 200, statusText)
-            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-            let y = 130
-            console.log(doc.internal.pageSize.height)
-            var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
-            for (var i = 0; i < fundingSourceText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                };
-                doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
-                y = y + 10
-                console.log(y)
-            }
-            var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
-            // 
-            y = y + 10;
-            for (var i = 0; i < statusText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
-                y = y + 10;
-                console.log(y)
-            }
-            y = y + 10;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
-                y = y + 10;
-                console.log(y)
-            }
-
+           
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                 align: 'left'
@@ -1806,7 +1765,7 @@ class ShipmentGlobalDemandView extends Component {
 
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
             //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-            let y = 150
+           /* let y = 150
             console.log(doc.internal.pageSize.height)
             var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
@@ -1845,8 +1804,54 @@ class ShipmentGlobalDemandView extends Component {
                 y = y + 10;
                 console.log(y)
             }
-
+*/
         }
+        doc.setFontSize(8);
+        doc.setTextColor("#002f6c");
+      
+        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+        let y =navigator.onLine? 130:150
+        console.log(doc.internal.pageSize.height)
+        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
+        for (var i = 0; i < fundingSourceText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            } ;
+            doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+            y = y + 10
+            console.log(y)
+        }
+        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
+        // 
+        y = y + 10;
+        for (var i = 0; i < statusText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+
         doc.setTextColor("#fff");
         const title = "Shipment Global Demand";
         var canvas = document.getElementById("cool-canvas1");
@@ -1856,13 +1861,17 @@ class ShipmentGlobalDemandView extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         var aspectwidth1 = (width - h1);
-        let startY = 150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
+        let startY = y//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
         console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
+        if(startYtable>height - 500){
+            doc.addPage()
+            startYtable=80
+        }
         console.log(startYtable)
         doc.addImage(canvasImg, 'png', 50, startYtable, 300, 200, 'a', 'CANVAS');
 
