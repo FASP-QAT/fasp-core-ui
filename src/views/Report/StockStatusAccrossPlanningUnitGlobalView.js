@@ -676,7 +676,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             bsSize="sm"
                             onChange={(e) => { this.dataChange(e) }}
                             type="select" name="realmId" id="realmId"
-                            onChange={(e) => { this.getCountrys(); this.getTracerCategoryList() }}
+                            onChange={(e) => { this.getCountrys(); this.getTracerCategoryList();this.filterData();  }}
                           >
                             <option value="">{i18n.t('static.common.select')}</option>
                             {realms}
