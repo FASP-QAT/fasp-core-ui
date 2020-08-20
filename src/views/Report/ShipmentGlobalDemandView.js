@@ -1764,7 +1764,7 @@ class ShipmentGlobalDemandView extends Component {
                     doc.addPage();
                     y = 80;
 
-                } ;
+                };
                 doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
                 y = y + 10
                 console.log(y)
@@ -1978,6 +1978,15 @@ class ShipmentGlobalDemandView extends Component {
             } else if (realmId <= 0) {
                 this.setState({
                     message: i18n.t('static.common.realmtext'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: []
+                });
+            } else if (productCategoryId == -1) {
+                this.setState({
+                    message: i18n.t('static.product.productcategorytext'),
                     data: [],
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
