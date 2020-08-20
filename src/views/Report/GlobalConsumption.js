@@ -302,22 +302,13 @@ class GlobalConsumption extends Component {
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
 
-          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-
-          // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
-          //   align: 'left'
-          // })
-
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
         }
 
       }
     }
+
+
     const unit = "pt";
     const size = "A4"; // Use A1, A2, A3 or A4
     const orientation = "landscape"; // portrait or landscape
@@ -325,7 +316,57 @@ class GlobalConsumption extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
 
-    doc.setFontSize(10);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor("#002f6c");
+
+
+    var y = 110;
+    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+    planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
+    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
+
+
+
+
+
 
     const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
@@ -336,15 +377,23 @@ class GlobalConsumption extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 50;
     var aspectwidth1 = (width - h1);
-
-    doc.addImage(canvasImg, 'png', 50, 150+(this.state.planningUnitLabels.length*2.5), 750, 260, 'CANVAS');
+    let startY = y
+    console.log('startY', startY)
+    let pages = Math.ceil(startY / height)
+    for (var j = 1; j < pages; j++) {
+      doc.addPage()
+    }
+    let startYtable = startY - ((height - h1) * (pages - 1))
+    doc.setTextColor("#fff");
+    doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
 
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
-
+    doc.addPage()
+    startYtable = 80
     let content = {
       margin: { top: 80, bottom: 50 },
-      startY: height,
+      startY: startYtable,
       head: headers,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
