@@ -1112,17 +1112,17 @@ export default class ConsumptionDetails extends React.Component {
         var programId = document.getElementById('programId').value;
         var versionId = row.versionId
         event.stopPropagation();
-        if (row.realmProblem.problem.problemId != 2) {
+        // if (row.realmProblem.problem.problemId != 2) {
             this.props.history.push({
                 // pathname: `/programProduct/addProgramProduct/${cell}`,
                 // pathname: `/report/addProblem`,
                 pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
             });
-        } else {
-            this.props.history.push({
-                pathname: `${cell}`,
-            });
-        }
+        // } else {
+        //     this.props.history.push({
+        //         pathname: `${cell}`,
+        //     });
+        // }
 
 
     }
