@@ -2570,10 +2570,9 @@ class SupplierLeadTimes extends Component {
                     </div>
                     <CardBody className="pt-lg-0">
                         {/* <div ref={ref}> */}
-                        <br />
-                        <Form >
+                      {/* <Form> */}
                             <Col md="12 pl-0">
-                                <div className="d-md-flex Selectdiv2">
+                                <div className="row">
                                     {/* <Online>
                                         <FormGroup className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">Country</Label>
@@ -2594,9 +2593,9 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                    <FormGroup className="">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -2619,11 +2618,11 @@ class SupplierLeadTimes extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
 
-                                        <div className="controls SelectGo">
+                                        <div className="controls">
                                             <MultiSelect
                                                 name="planningUnitId"
                                                 id="planningUnitId"
@@ -2635,11 +2634,11 @@ class SupplierLeadTimes extends Component {
 
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
 
-                                        <div className="controls SelectGo">
+                                        <div className="controls">
                                             <MultiSelect
                                                 name="procurementAgentId"
                                                 id="procurementAgentId"
@@ -2652,7 +2651,7 @@ class SupplierLeadTimes extends Component {
                                     </FormGroup>
                                 </div>
                             </Col>
-                        </Form>
+                        {/* </Form> */}
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
 
