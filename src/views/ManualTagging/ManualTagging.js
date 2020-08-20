@@ -259,22 +259,22 @@ export default class ManualTagging extends Component {
                 formatter: this.formatDate
             },
             {
-                dataField: 'shipmentStatusDesc',
+                dataField: 'shipmentStatus.label.label_en',
                 text: 'Shipment Status',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
             }, {
-                dataField: 'procurementAgentName',
-                text: 'Planning Unit',
+                dataField: 'procurementAgent.code',
+                text: 'Procurement Agent',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
             },
             {
-                dataField: 'budgetDesc',
+                dataField: 'budget.label.label_en',
                 text: 'Budget',
                 sort: true,
                 align: 'center',

@@ -711,6 +711,7 @@ export default class ConsumptionDetails extends React.Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
+                
                             name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
@@ -780,7 +781,7 @@ export default class ConsumptionDetails extends React.Component {
             data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[7] = moment(problemList[j].createdDate).format(`${DATE_FORMAT_CAP}`)
+            data[7] = moment(problemList[j].createdDate).format('MMM-YY')
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             data[10] = getLabelText(problemList[j].problemStatus.label, this.state.lang)
@@ -1226,10 +1227,11 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '100px' },
+                style: { width: '100px' }, 
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
+                        var modifiedDate = moment(cell).format('MMM-YY');
+                        console.log("date===>",modifiedDate);
                         return modifiedDate;
                     }
                 }
@@ -1320,7 +1322,7 @@ export default class ConsumptionDetails extends React.Component {
 
         return (
 
-            <div className="animated">
+            <div className="animated"> 
                 <QatProblemActions updateState={this.updateState}></QatProblemActions>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
@@ -1335,12 +1337,12 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody  className="pb-lg-0">
-                        <Col md="9 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
+                    <CardBody  className=" pt-lg-0">
+                        <Col md="9 pl-1 pb-3">
+                            <div className="row">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1356,9 +1358,9 @@ export default class ConsumptionDetails extends React.Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1372,9 +1374,9 @@ export default class ConsumptionDetails extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1392,8 +1394,9 @@ export default class ConsumptionDetails extends React.Component {
                                 </FormGroup>
                             </div>
                         </Col>
-
+                        <div className="ProgramListSearch">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
                     </CardBody>
 

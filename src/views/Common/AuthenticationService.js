@@ -217,7 +217,7 @@ class AuthenticationService {
         } else {
             var db;
             var customerObjectStore;
-            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 
             openRequest.onupgradeneeded = function (e) {
                 var db = e.target.result;
@@ -351,7 +351,7 @@ class AuthenticationService {
             var db;
             var customerObjectStore;
             var userObj = 0;
-            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 
             openRequest.onupgradeneeded = function (e) {
                 db = e.target.result;
@@ -831,6 +831,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/inventory/addInventory":
+                case "/inventory/addInventory/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                         return true;
                     }
@@ -839,7 +840,7 @@ class AuthenticationService {
                 case "/shipment/manualTagging":
                 case "/shipment/delinking":
                 case "/shipment/shipmentDetails/:message":
-                case "/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex":
+                case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                         return true;
                     }
@@ -1103,8 +1104,6 @@ class AuthenticationService {
                 case "/report/problemList/:color/:message": return true
                     break;
                 case "/report/addProblem/:color/:message": return true
-                    break;
-                case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId": return true
                     break;
                 default:
                     console.log("Inside default-");
