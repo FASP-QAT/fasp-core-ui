@@ -1718,9 +1718,9 @@ export default class syncPage extends Component {
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
-              <CardHeader>
+              {/* <CardHeader>
                 <strong>{i18n.t('static.dashboard.commitVersion')}</strong>
-              </CardHeader>
+              </CardHeader> */}
               <CardBody>
 
                 <Form name='simpleForm'>
