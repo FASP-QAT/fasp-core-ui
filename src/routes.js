@@ -248,8 +248,10 @@ const routes = [
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
-  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory,exact:true },
+ 
   { path: '/inventory/addInventory/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
+  { path: '/inventory/addInventory',name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory,exact:true },
+ 
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/productCategory/productCategoryTree/:color/:message', name: 'Product Category', component: ProductCategoryTree },
 
