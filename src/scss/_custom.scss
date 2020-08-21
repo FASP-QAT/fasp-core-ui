@@ -855,6 +855,10 @@ label.arrow_label:after {
 .jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
   background: transparent!important;
 }
+// supplyplan consumption add new batch tr row height  in table for add batch
+.AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
+  height: 30px;
+}
 
 
 // Multiselect z-index going behind table 
