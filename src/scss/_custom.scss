@@ -2066,7 +2066,7 @@ input::placeholder {
 
 .supplyplan-larrow-dataentry {
   float: left;
-  margin-left: 77px !important;
+  margin-left: 85px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2533,6 +2533,12 @@ input::placeholder {
   .regionTdWidthAdjustments{
     overflow: hidden!important;
     min-width: 120px!important;
+    word-wrap: break-word!important;
+  }
+
+  .regionTdWidthConsumption{
+    overflow: hidden!important;
+    min-width: 100px!important;
     word-wrap: break-word!important;
   }
 
