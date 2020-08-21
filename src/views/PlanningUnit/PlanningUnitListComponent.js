@@ -827,10 +827,10 @@ export default class PlanningUnitListComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-0">
                         <Col md="9 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
+                            <div className="row Selectdiv2 mt-md-2 mb-md-0">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -849,9 +849,9 @@ export default class PlanningUnitListComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 &nbsp;
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -871,11 +871,11 @@ export default class PlanningUnitListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                      
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
 
-                        </CardBody>
+                      
 
                     </CardBody>
                 </Card>
