@@ -157,6 +157,26 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             return true;
             // }
         }
+    } else if (type == "numberNotRequired") {
+        var col = (colName).concat(parseInt(rowNo) + 1);
+        value = value.toString().replaceAll("\,", "");
+        console.log("Value", value);
+        if (value != "") {
+            if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                return false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                return true;
+            }
+        } else {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
+            return true;
+        }
     }
 }
 

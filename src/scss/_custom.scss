@@ -527,7 +527,7 @@ label.arrow_label:after {
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
-  // z-index: 0 !important;
+  z-index: 0 !important;
 }
 
 .jexcel_page {
@@ -2066,7 +2066,7 @@ input::placeholder {
 
 .supplyplan-larrow-dataentry {
   float: left;
-  margin-left: 77px !important;
+  margin-left: 85px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2533,6 +2533,12 @@ input::placeholder {
   .regionTdWidthAdjustments{
     overflow: hidden!important;
     min-width: 120px!important;
+    word-wrap: break-word!important;
+  }
+
+  .regionTdWidthConsumption{
+    overflow: hidden!important;
+    min-width: 100px!important;
     word-wrap: break-word!important;
   }
 
@@ -3076,6 +3082,9 @@ border-radius: 2em;
 .go626121005 span {
   display: inline!important;
   padding-left: 5px;
+}
+.go2139093995 * {
+  z-index: unset;
 }
 // .go2139093995 svg{
 //   visibility: hidden !important;

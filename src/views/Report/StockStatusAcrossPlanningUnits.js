@@ -17,8 +17,8 @@
 // import Picker from 'react-month-picker';
 // import MonthBox from '../../CommonComponent/MonthBox.js';
 // import ProgramService from '../../api/ProgramService';
-// import CryptoJS from 'crypto-js'
-// import { SECRET_KEY,DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE } from '../../Constants.js'
+// import CryptoJS from 'crypto-js';
+// import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js';
 // import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 // import ProductService from '../../api/ProductService';
 // import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -78,7 +78,7 @@
 //         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
 //         var A = [headers]
-//         this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc),(new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20')]));
+//         this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc), (new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20')]));
 
 //         for (var i = 0; i < A.length; i++) {
 //             csvRow.push(A[i].join(","))
@@ -160,14 +160,14 @@
 //         const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc), new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)]);
 
 //         let content = {
-//             margin: { top: 80 ,bottom:50},
+//             margin: { top: 80, bottom: 50 },
 //             startY: 170,
 //             head: [headers],
 //             body: data,
 //             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
 //             columnStyles: {
 //                 0: { cellWidth: 236.89 },
-//               }
+//             }
 //         };
 //         doc.autoTable(content);
 //         addHeaders(doc)
@@ -441,9 +441,9 @@
 //     fetchData = () => {
 //         let programId = document.getElementById("programId").value;
 //         let versionId = document.getElementById("versionId").value;
-//         let startDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month -1, 1));
+//         let startDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, 1));
 //         let endDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0).getDate()));
-// let includePlanningShipments= document.getElementById("includePlanningShipments").value
+//         let includePlanningShipments = document.getElementById("includePlanningShipments").value
 //         if (programId != 0 && versionId != 0) {
 //             if (versionId.includes('Local')) {
 
@@ -488,60 +488,58 @@
 //                                 }
 //                             }
 //                             proList.map(planningUnit => {
-//                                      var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnit.planningUnit.id);
-//             var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
-//             for (var ma = 0; ma < myArray.length; ma++) {
-//               var shipmentList = programJson.shipmentList;
-//               var shipmentBatchArray = [];
-//               for (var ship = 0; ship < shipmentList.length; ship++) {
-//                 var batchInfoList = shipmentList[ship].batchInfoList;
-//                 for (var bi = 0; bi < batchInfoList.length; bi++) {
-//                   shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
-//                 }
-//               }
-//               var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
-//               var totalStockForBatchNumber = stockForBatchNumber.qty;
-//               var consumptionList = programJson.consumptionList;
-//               var consumptionBatchArray = [];
+//                                 var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnit.planningUnit.id);
+//                                 var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
+//                                 for (var ma = 0; ma < myArray.length; ma++) {
+//                                     var shipmentList = programJson.shipmentList;
+//                                     var shipmentBatchArray = [];
+//                                     for (var ship = 0; ship < shipmentList.length; ship++) {
+//                                         var batchInfoList = shipmentList[ship].batchInfoList;
+//                                         for (var bi = 0; bi < batchInfoList.length; bi++) {
+//                                             shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
+//                                         }
+//                                     }
+//                                     var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
+//                                     var totalStockForBatchNumber = stockForBatchNumber.qty;
+//                                     var consumptionList = programJson.consumptionList;
+//                                     var consumptionBatchArray = [];
 
-//               for (var con = 0; con < consumptionList.length; con++) {
-//                 var batchInfoList = consumptionList[con].batchInfoList;
-//                 for (var bi = 0; bi < batchInfoList.length; bi++) {
-//                   consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
-//                 }
-//               }
-//               var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
-//               if (consumptionForBatchNumber == undefined) {
-//                 consumptionForBatchNumber = [];
-//               }
-//               var consumptionQty = 0;
-//               for (var b = 0; b < consumptionForBatchNumber.length; b++) {
-//                 consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
-//               }
-//               var inventoryList = programJson.inventoryList;
-//               var inventoryBatchArray = [];
-//               for (var inv = 0; inv < inventoryList.length; inv++) {
-//                 var batchInfoList = inventoryList[inv].batchInfoList;
-//                 for (var bi = 0; bi < batchInfoList.length; bi++) {
-//                   inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
-//                 }
-//               }
-//               var inventoryForBatchNumber = [];
-//               if (inventoryBatchArray.length > 0) {
-//                 inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
-//               }
-//               if (inventoryForBatchNumber == undefined) {
-//                 inventoryForBatchNumber = [];
-//               }
-//               var adjustmentQty = 0;
-//               for (var b = 0; b < inventoryForBatchNumber.length; b++) {
-//                 adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
-//               }
-//               var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-//               myArray[ma].remainingQty = remainingBatchQty;
-//             }
-
-
+//                                     for (var con = 0; con < consumptionList.length; con++) {
+//                                         var batchInfoList = consumptionList[con].batchInfoList;
+//                                         for (var bi = 0; bi < batchInfoList.length; bi++) {
+//                                             consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
+//                                         }
+//                                     }
+//                                     var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+//                                     if (consumptionForBatchNumber == undefined) {
+//                                         consumptionForBatchNumber = [];
+//                                     }
+//                                     var consumptionQty = 0;
+//                                     for (var b = 0; b < consumptionForBatchNumber.length; b++) {
+//                                         consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
+//                                     }
+//                                     var inventoryList = programJson.inventoryList;
+//                                     var inventoryBatchArray = [];
+//                                     for (var inv = 0; inv < inventoryList.length; inv++) {
+//                                         var batchInfoList = inventoryList[inv].batchInfoList;
+//                                         for (var bi = 0; bi < batchInfoList.length; bi++) {
+//                                             inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
+//                                         }
+//                                     }
+//                                     var inventoryForBatchNumber = [];
+//                                     if (inventoryBatchArray.length > 0) {
+//                                         inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
+//                                     }
+//                                     if (inventoryForBatchNumber == undefined) {
+//                                         inventoryForBatchNumber = [];
+//                                     }
+//                                     var adjustmentQty = 0;
+//                                     for (var b = 0; b < inventoryForBatchNumber.length; b++) {
+//                                         adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
+//                                     }
+//                                     var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
+//                                     myArray[ma].remainingQty = remainingBatchQty;
+//                                 }
 
 
 
@@ -562,28 +560,30 @@
 
 
 
-//             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true);
-//             var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
-//             var shipmentList = []
-//             // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
-//             shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
-//             // } else {
-//             //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
 
-//             // }
-//             // calculate openingBalance
 
-//             // let invmin=moment.min(inventoryList.map(d => moment(d.inventoryDate)))
-//             // let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
-//             // let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
-//             // var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
-//             var minDate = moment(FIRST_DATA_ENTRY_DATE);
-//             let moments = (inventoryList.filter(c=>moment(c.inventoryDate).isBefore(endDate)||moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
-//              var maxDate = moments.length>0?moment.max(moments):''
-//             var openingBalance = 0;
-//             console.log('minDate', minDate, 'startDate', startDate,' maxDate',maxDate)
+//                                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true);
+//                                 var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
+//                                 var shipmentList = []
+//                                 // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
+//                                 shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
+//                                 // } else {
+//                                 //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
 
-//                 var endingBalance = 0
+//                                 // }
+//                                 // calculate openingBalance
+
+//                                 // let invmin=moment.min(inventoryList.map(d => moment(d.inventoryDate)))
+//                                 // let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
+//                                 // let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
+//                                 // var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
+//                                 var minDate = moment(FIRST_DATA_ENTRY_DATE);
+//                                 let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
+//                                 var maxDate = moments.length > 0 ? moment.max(moments) : ''
+//                                 var openingBalance = 0;
+//                                 console.log('minDate', minDate, 'startDate', startDate, ' maxDate', maxDate)
+
+//                                 var endingBalance = 0
 //                                 for (i = 1; ; i++) {
 //                                     var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
 //                                     var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
@@ -597,27 +597,27 @@
 //                                     var actualFlag = false
 //                                     for (var i = 0; i < programJson.regionList.length; i++) {
 
-//                                       var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-//                                       console.log(list)
-//                                       if (list.length > 1) {
-//                                         for (var l = 0; l < list.length; l++) {
-//                                           if (list[l].actualFlag.toString() == 'true') {
-//                                             actualFlag = true;
-//                                             consumptionQty = consumptionQty + list[l].consumptionQty
-//                                             var qty = 0;
-//                                             if (list[l].batchInfoList.length > 0) {
-//                                                 for (var a = 0; a < list[l].batchInfoList.length; a++) {
-//                                                     qty += parseInt((list[l].batchInfoList)[a].consumptionQty);
+//                                         var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+//                                         console.log(list)
+//                                         if (list.length > 1) {
+//                                             for (var l = 0; l < list.length; l++) {
+//                                                 if (list[l].actualFlag.toString() == 'true') {
+//                                                     actualFlag = true;
+//                                                     consumptionQty = consumptionQty + list[l].consumptionQty
+//                                                     var qty = 0;
+//                                                     if (list[l].batchInfoList.length > 0) {
+//                                                         for (var a = 0; a < list[l].batchInfoList.length; a++) {
+//                                                             qty += parseInt((list[l].batchInfoList)[a].consumptionQty);
+//                                                         }
+//                                                     }
+//                                                     var remainingQty = parseInt((list[l].consumptionQty)) - parseInt(qty);
+//                                                     unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
 //                                                 }
 //                                             }
-//                                             var remainingQty = parseInt((list[l].consumptionQty)) - parseInt(qty);
-//                                             unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
-//                                           }
+//                                         } else {
+//                                             consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
+//                                             unallocatedConsumptionQty = list.length == 0 ? unallocatedConsumptionQty : unallocatedConsumptionQty = unallocatedConsumptionQty + parseInt(list[0].consumptionQty);
 //                                         }
-//                                       } else {
-//                                         consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
-//                                         unallocatedConsumptionQty =list.length == 0 ?  unallocatedConsumptionQty:unallocatedConsumptionQty=unallocatedConsumptionQty +  parseInt(list[0].consumptionQty);
-//                                       }
 //                                     }
 //                                     var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(dtstr).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
 //                                     console.log("--------------------------------------------------------------");
@@ -644,7 +644,7 @@
 
 //                                     for (var i = 0; i < programJson.regionList.length; i++) {
 
-//                                       var list = invlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+//                                         var list = invlist.filter(c => c.region.id == programJson.regionList[i].regionId)
 
 //                                         for (var l = 0; l < list.length; l++) {
 
@@ -679,39 +679,39 @@
 //                                                     unallocatedAdjustmentQty = 0;
 
 
+//                                                 }
+
+//                                             }
+//                                         }
+//                                         var list1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
+//                                         for (var j = 0; j < list1.length; j++) {
+//                                             adjustmentQty += parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
+//                                             unallocatedAdjustmentQty = parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
+//                                             if (unallocatedAdjustmentQty < 0) {
+//                                                 for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
+//                                                     console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
+//                                                     console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+//                                                     var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
+//                                                     if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
+//                                                         myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
+//                                                         unallocatedAdjustmentQty = 0
+//                                                     } else {
+//                                                         var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
+//                                                         myArray[index].remainingQty = 0;
+//                                                         unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
+//                                                     }
+//                                                 }
+//                                             } else {
+//                                                 if (batchDetailsForParticularPeriod.length > 0) {
+//                                                     console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
+//                                                     console.log("Unallocated adjustments", unallocatedAdjustmentQty);
+//                                                     batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
+//                                                     unallocatedAdjustmentQty = 0;
+//                                                 }
+//                                             }
 //                                         }
 
 //                                     }
-//                                   }
-//                                   var list1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
-//                                   for (var j = 0; j < list1.length; j++) {
-//                                       adjustmentQty += parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-//                                       unallocatedAdjustmentQty = parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-//                                       if (unallocatedAdjustmentQty < 0) {
-//                                           for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-//                                               console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-//                                               console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-//                                               var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-//                                               if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-//                                                   myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-//                                                   unallocatedAdjustmentQty = 0
-//                                               } else {
-//                                                   var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-//                                                   myArray[index].remainingQty = 0;
-//                                                   unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-//                                               }
-//                                           }
-//                                       } else {
-//                                           if (batchDetailsForParticularPeriod.length > 0) {
-//                                               console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-//                                               console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-//                                               batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-//                                               unallocatedAdjustmentQty = 0;
-//                                           }
-//                                       }
-//                                   }
-
-//                               }
 
 
 
@@ -725,7 +725,7 @@
 
 
 
-//                               var expiredStockArr = myArray;
+//                                     var expiredStockArr = myArray;
 //                                     console.log(openingBalance)
 //                                     console.log(inventoryList)
 //                                     var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
@@ -744,18 +744,18 @@
 //                                     var actualFlag = false
 //                                     for (var i = 0; i < programJson.regionList.length; i++) {
 
-//                                       var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-//                                       console.log(list)
-//                                       if (list.length > 1) {
-//                                         for (var l = 0; l < list.length; l++) {
-//                                           if (list[l].actualFlag.toString() == 'true') {
-//                                             actualFlag = true;
-//                                             consumption = consumption + list[l].consumptionQty
-//                                           }
+//                                         var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
+//                                         console.log(list)
+//                                         if (list.length > 1) {
+//                                             for (var l = 0; l < list.length; l++) {
+//                                                 if (list[l].actualFlag.toString() == 'true') {
+//                                                     actualFlag = true;
+//                                                     consumption = consumption + list[l].consumptionQty
+//                                                 }
+//                                             }
+//                                         } else {
+//                                             consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
 //                                         }
-//                                       } else {
-//                                         consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-//                                       }
 //                                     }
 
 
@@ -788,17 +788,17 @@
 
 
 //                                     console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-//                                     var endingBalance = openingBalance + adjustment + shipment - consumption-expiredStockQty
+//                                     var endingBalance = openingBalance + adjustment + shipment - consumption - expiredStockQty
 //                                     console.log('endingBalance', endingBalance)
 
 
 //                                     endingBalance = endingBalance < 0 ? 0 : endingBalance
 //                                     openingBalance = endingBalance
-//                                     minDate=minDate.add(1,'month')
+//                                     minDate = minDate.add(1, 'month')
 
-//                                    if(minDate.startOf('month').isAfter(startDate)){
-//                                        break;
-//                                    }
+//                                     if (minDate.startOf('month').isAfter(startDate)) {
+//                                         break;
+//                                     }
 //                                 }
 //                                 var amcBeforeArray = [];
 //                                 var amcAfterArray = [];
@@ -860,16 +860,16 @@
 //                                         }
 //                                         amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
 //                                         amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-//                                        /* if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
-//                                             c = 12;
-//                                         }*/
+//                                         /* if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
+//                                              c = 12;
+//                                          }*/
 //                                     }
 
 //                                 }
 
 //                                 var amcArray = amcBeforeArray.concat(amcAfterArray);
 //                                 var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
-//                                 console.log('amcArrayFilteredForMonth'+JSON.stringify(amcArrayFilteredForMonth))
+//                                 console.log('amcArrayFilteredForMonth' + JSON.stringify(amcArrayFilteredForMonth))
 //                                 var countAMC = amcArrayFilteredForMonth.length;
 //                                 var sumOfConsumptions = 0;
 //                                 for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
@@ -877,13 +877,13 @@
 //                                 }
 
 
-//                                 var amcCalcualted =0;
-//                                 var mos =0;
-//                                 if(countAMC>0){
-//                                 amcCalcualted= Math.ceil((sumOfConsumptions) / countAMC);
-//                                 console.log('amcCalcualted', amcCalcualted)
-//                               mos= endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
-//                                   }
+//                                 var amcCalcualted = 0;
+//                                 var mos = 0;
+//                                 if (countAMC > 0) {
+//                                     amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
+//                                     console.log('amcCalcualted', amcCalcualted)
+//                                     mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+//                                 }
 //                                 var maxForMonths = 0;
 //                                 if (DEFAULT_MIN_MONTHS_OF_STOCK > planningUnit.minMonthsOfStock) {
 //                                     maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
@@ -901,7 +901,7 @@
 
 //                                 var json = {
 //                                     planningUnit: planningUnit.planningUnit,
-//                                     lastStockCount: maxDate==''?'':maxDate.format('MMM-DD-YYYY'),
+//                                     lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
 //                                     mos: this.roundN(mos),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
 //                                     minMos: minMOS,
 //                                     maxMos: maxMOS,
@@ -916,7 +916,7 @@
 //                             this.setState({
 //                                 data: data,
 //                                 message: ''
-//                             },()=>{console.log(this.state.data)})
+//                             }, () => { console.log(this.state.data) })
 //                         }.bind(this)
 
 //                     }.bind(this)
@@ -941,59 +941,59 @@
 //                     "programId": programId,
 //                     "versionId": versionId,
 //                     "dt": startDate.startOf('month').format('YYYY-MM-DD'),
-//                     "includePlannedShipments":includePlanningShipments?1:0
+//                     "includePlannedShipments": includePlanningShipments ? 1 : 0
 
 //                 }
-//               /*  this.setState({
-//                     data: [{
-//                         planningUnit: {
-//                             id: 157, label: {
-//                                 active: false,
-//                                 labelId: 9117,
-//                                 label_en: "Abacavir 60 mg Tablet, 60 Tablets",
-//                                 label_sp: null,
-//                                 label_fr: null,
-//                                 label_pr: null
-//                             }
-//                         },
-//                         transDate: moment(new Date()).format('MMM-DD-YYYY'),
-//                         mos: this.roundN(2),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-//                         min: 3,
-//                         max: 5,
-//                         stock: 44103,
-//                         amc: 23957
-//                     }]
-//                 })*/
-//                   AuthenticationService.setupAxiosInterceptors();
-//                   ReportService.stockStatusForProgram(inputjson)
+//                 /*  this.setState({
+//                       data: [{
+//                           planningUnit: {
+//                               id: 157, label: {
+//                                   active: false,
+//                                   labelId: 9117,
+//                                   label_en: "Abacavir 60 mg Tablet, 60 Tablets",
+//                                   label_sp: null,
+//                                   label_fr: null,
+//                                   label_pr: null
+//                               }
+//                           },
+//                           transDate: moment(new Date()).format('MMM-DD-YYYY'),
+//                           mos: this.roundN(2),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
+//                           min: 3,
+//                           max: 5,
+//                           stock: 44103,
+//                           amc: 23957
+//                       }]
+//                   })*/
+//                 AuthenticationService.setupAxiosInterceptors();
+//                 ReportService.stockStatusForProgram(inputjson)
 //                     .then(response => {
-//                       console.log(JSON.stringify(response.data));
-//                       this.setState({
-//                         data: response.data,message:''
-//                       })
-//                     }).catch(
-//                       error => {
+//                         console.log(JSON.stringify(response.data));
 //                         this.setState({
-//                             data: []
+//                             data: response.data, message: ''
 //                         })
+//                     }).catch(
+//                         error => {
+//                             this.setState({
+//                                 data: []
+//                             })
 
-//                         if (error.message === "Network Error") {
-//                           this.setState({ message: error.message });
-//                         } else {
-//                           switch (error.response ? error.response.status : "") {
-//                             case 500:
-//                             case 401:
-//                             case 404:
-//                             case 406:
-//                             case 412:
-//                               this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-//                               break;
-//                             default:
-//                               this.setState({ message: 'static.unkownError' });
-//                               break;
-//                           }
+//                             if (error.message === "Network Error") {
+//                                 this.setState({ message: error.message });
+//                             } else {
+//                                 switch (error.response ? error.response.status : "") {
+//                                     case 500:
+//                                     case 401:
+//                                     case 404:
+//                                     case 406:
+//                                     case 412:
+//                                         this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+//                                         break;
+//                                     default:
+//                                         this.setState({ message: 'static.unkownError' });
+//                                         break;
+//                                 }
+//                             }
 //                         }
-//                       }
 //                     );
 //             }
 //         } else if (programId == 0) {
@@ -1184,8 +1184,8 @@
 
 //                             <a className="card-header-action">
 //                                 {this.state.data.length > 0 && <div className="card-header-actions">
-//                                     <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-//                                     <img style={{ height: '25px', width: '25px' ,cursor:'pointer'}} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+//                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+//                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
 //                                 </div>}
 //                             </a>
 //                         </div>
@@ -1261,7 +1261,7 @@
 //                                                             name="includePlanningShipments"
 //                                                             id="includePlanningShipments"
 //                                                             bsSize="sm"
-//                                                             onChange={(e) => {  this.fetchData() }}
+//                                                             onChange={(e) => { this.fetchData() }}
 //                                                         >
 //                                                             <option value="true">{i18n.t('static.program.yes')}</option>
 //                                                             <option value="false">{i18n.t('static.program.no')}</option>
@@ -1807,49 +1807,112 @@ class StockStatusAcrossPlanningUnits extends Component {
                 {
                     title: i18n.t('static.dashboard.planningunit'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.withinstock'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.mos'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.minStockMos'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.maxStockMos'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.stock'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.amc'),
                     type: 'text',
-                    readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
                     type: 'text',
-                    readOnly: true
                 },
             ],
+            editable: false,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },
+
+            updateTable: function (el, cell, x, y, source, value, id) {
+
+                var elInstance = el.jexcel;
+                var colArrB = ['B'];
+                var colArrC = ['C'];
+                var colArrD = ['D'];
+                var colArrE = ['E'];
+                var rowData = elInstance.getRowData(y);
+
+                var mos = rowData[2];
+                var minMos = rowData[3];
+                var maxMos = rowData[4];
+
+                //------------B--------------
+                if (mos < minMos) {
+                    for (var i = 0; i < colArrB.length; i++) {
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                    }
+                } else if (mos > maxMos) {
+                    for (var i = 0; i < colArrB.length; i++) {
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
+                    }
+                } else {
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
+                }
+
+                //-------------C----------------
+                if (mos < minMos) {
+                    for (var i = 0; i < colArrC.length; i++) {
+                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                    }
+                } else if (mos > maxMos) {
+                    for (var i = 0; i < colArrC.length; i++) {
+                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
+                    }
+                } else {
+                    elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
+                }
+
+                // //-------------D----------------
+                // if (mos < minMos) {
+                //     for (var i = 0; i < colArrD.length; i++) {
+                //         elInstance.setStyle(`${colArrD[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrD[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                //     }
+                // } else {
+                //     elInstance.setStyle(`${colArrD[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                // }
+
+                // //-------------E----------------
+                // if (mos < minMos) {
+                //     for (var i = 0; i < colArrE.length; i++) {
+                //         elInstance.setStyle(`${colArrE[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrE[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                //     }
+                // } else {
+                //     elInstance.setStyle(`${colArrE[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                // }
+
+
+
+            }.bind(this),
+
             onload: this.loaded,
             pagination: 10,
             search: true,
