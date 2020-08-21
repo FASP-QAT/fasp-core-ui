@@ -289,6 +289,7 @@ export default class EditProcurementUnit extends Component {
         )
         this.validateForm(errors)
     }
+    
     validateForm(errors) {
         this.findFirstError('procurementUnitForm', (fieldName) => {
             return Boolean(errors[fieldName])
