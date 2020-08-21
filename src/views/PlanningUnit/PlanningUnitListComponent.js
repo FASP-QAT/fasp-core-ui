@@ -825,7 +825,7 @@ export default class PlanningUnitListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-5">
                         <Col md="9 pl-0">
                             <div className="row Selectdiv2 mt-md-2 mb-md-0">
                                 <FormGroup className="col-md-3">

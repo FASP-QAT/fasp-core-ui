@@ -320,7 +320,7 @@ export default class ImportProgram extends Component {
                                         {/* <CardHeader>
                                             <strong>{i18n.t('static.program.import')}</strong>
                                         </CardHeader> */}
-                                        <CardBody>
+                                        <CardBody className="pb-lg-2 pt-lg-2">
                                             <FormGroup id="fileImportDiv">
                                                 <Col md="3">
                                                     <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>

@@ -274,7 +274,7 @@ class Program extends Component {
                             {/* <CardHeader>
                                 <strong>{i18n.t('static.program.download')}</strong>
                             </CardHeader> */}
-                            <CardBody>
+                            <CardBody className="pb-lg-2 pt-lg-2">
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
