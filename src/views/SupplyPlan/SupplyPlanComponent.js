@@ -1062,7 +1062,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
                             <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                             <div className="table-responsive">
-                                <div id="consumptionBatchInfoTable"></div>
+                                <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
 
                             <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
