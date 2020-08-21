@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import {LABEL_REGEX,ALPHABETS_REGEX} from '../../Constants.js';
+import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
 
 
 let initialValues = {
@@ -23,8 +23,8 @@ const validationSchema = function (values) {
             .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
-        .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
-        .required(i18n.t('static.language.languagecodetext'))
+            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            .required(i18n.t('static.language.languagecodetext'))
         // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
@@ -223,9 +223,9 @@ export default class EditLanguageComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
-                                                            required 
+                                                            required
                                                             maxLength={2}
-                                                            />
+                                                        />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -267,7 +267,7 @@ export default class EditLanguageComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -285,6 +285,7 @@ export default class EditLanguageComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+
 
     resetClicked() {
         // console.log("iiii-------->>>>>", this.props.match.params.languageId)
