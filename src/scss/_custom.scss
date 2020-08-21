@@ -2664,10 +2664,14 @@ input::placeholder {
 /////card header css
 .Card-header-addicon
 {
-  padding:10px 20px 10px 20px;
+  padding:0px 20px 10px 20px;
+  // padding:10px 20px 10px 20px;
+}
+.card-header-action{
+  margin-top: 0.25rem !important;
 }
 .Card-header-reporticon{
-  padding: 8px 20px 0px 20px;
+  padding: 5px 20px 0px 20px;
 }
 .CardBodyMargin{
   margin-top: -1%;
@@ -3146,4 +3150,13 @@ border-radius: 2em;
 }
 .ProgramListSearch{
   margin-top: -4%;
+}
+.SearchMarginTop{
+  margin-top: -1%;;
+}
+.SearchMarginTopLarge{
+  margin-top: -5%;;
+}
+.SelectField {
+  width: 210px;
 }

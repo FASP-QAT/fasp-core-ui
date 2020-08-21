@@ -1721,7 +1721,7 @@ export default class syncPage extends Component {
               {/* <CardHeader>
                 <strong>{i18n.t('static.dashboard.commitVersion')}</strong>
               </CardHeader> */}
-              <CardBody>
+              <CardBody className="pb-lg-2 pt-lg-2">
 
                 <Form name='simpleForm'>
                   <Col md="12 pl-0">

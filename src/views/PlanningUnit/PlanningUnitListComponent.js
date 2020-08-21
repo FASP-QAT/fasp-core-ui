@@ -825,10 +825,10 @@ export default class PlanningUnitListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-5">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
+                                <FormGroup className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -849,7 +849,7 @@ export default class PlanningUnitListComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 &nbsp;
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -871,11 +871,11 @@ export default class PlanningUnitListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                        <div className=" table-responsive">
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
 
-                        </CardBody>
+                        </div>
 
                     </CardBody>
                 </Card>
