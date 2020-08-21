@@ -3496,5 +3496,4 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionBatchError: ""
         })
     }
-
 }
