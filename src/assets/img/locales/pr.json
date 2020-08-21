@@ -687,5 +687,7 @@
     "static.dashboard.forecastmetrics": "Métricas de previsão",
     "static.report.historicalConsumptionDiff": "Diferença de consumo histórico",
     "static.report.error": "Erro de previsão",
-    "static.report.selectMonth": "Selecione o mês"
+    "static.report.selectMonth": "Selecione o mês",
+    "static.jexcel.showing": "Mostrando",
+    "static.jexcel.of": "Do"
 }

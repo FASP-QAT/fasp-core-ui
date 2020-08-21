@@ -855,6 +855,10 @@ label.arrow_label:after {
 .jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
   background: transparent!important;
 }
+// supplyplan consumption add new batch tr row height  in table for add batch
+.AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
+  height: 30px;
+}
 
 
 // Multiselect z-index going behind table 
@@ -2066,7 +2070,7 @@ input::placeholder {
 
 .supplyplan-larrow-dataentry {
   float: left;
-  margin-left: 77px !important;
+  margin-left: 85px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2533,6 +2537,12 @@ input::placeholder {
   .regionTdWidthAdjustments{
     overflow: hidden!important;
     min-width: 120px!important;
+    word-wrap: break-word!important;
+  }
+
+  .regionTdWidthConsumption{
+    overflow: hidden!important;
+    min-width: 100px!important;
     word-wrap: break-word!important;
   }
 

@@ -45,7 +45,7 @@
 // import MonthBox from '../../CommonComponent/MonthBox.js'
 // import RealmCountryService from '../../api/RealmCountryService';
 // import CryptoJS from 'crypto-js'
-// import { SECRET_KEY } from '../../Constants.js'
+// import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 // import moment from "moment";
 // import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 // import pdfIcon from '../../assets/img/pdf.png';
@@ -181,10 +181,10 @@
 //   }
 
 //   formatValue(cell, row) {
-//      console.log("cell----", cell);
+//     console.log("cell----", cell);
 //     if (cell != null && cell != "") {
 //       return this.roundN(cell) + '%';
-//     } else if ((cell == "0" && row.months == 0)||cell==null) {
+//     } else if ((cell == "0" && row.months == 0) || cell == null) {
 //       return "No data points containing both actual and forecast consumption ";
 //     } else {
 //       return "0%"
@@ -198,7 +198,7 @@
 //       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
 //     this.state.programLabels.map(ele =>
 //       csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-//    // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+//     // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
 //     this.state.planningUnitLabels.map(ele =>
 //       csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
 //     csvRow.push('')
@@ -215,9 +215,9 @@
 
 //     for (var item = 0; item < re.length; item++) {
 //       console.log(re[item].planningUnit)
-//       A.push([[ (getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id==0?'':(getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+//       A.push([[(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
 //       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-//       re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError ) + '%', re[item].monthCount]])
+//       re[item].monthCount == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount]])
 //     }
 //     for (var i = 0; i < A.length; i++) {
 //       csvRow.push(A[i].join(","))
@@ -226,7 +226,7 @@
 //     var a = document.createElement("a")
 //     a.href = 'data:attachment/csv,' + csvString
 //     a.target = "_Blank"
-//     a.download = i18n.t('static.dashboard.forecastmetrics')+ ".csv"
+//     a.download = i18n.t('static.dashboard.forecastmetrics') + ".csv"
 //     document.body.appendChild(a)
 //     a.click()
 //   }
@@ -277,7 +277,7 @@
 //           doc.setFont('helvetica', 'normal')
 //           doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
 //             align: 'left'
-//         })
+//           })
 //           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
 //           doc.text(doc.internal.pageSize.width / 8, 110, planningText)
 
@@ -302,24 +302,25 @@
 
 
 //     var height = doc.internal.pageSize.height;
-//     const headers = [[ i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
+//     const headers = [[i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
 //     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
 //     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
-//     const data = this.state.consumptions.map(elt => [ getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
+//     const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
 //     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-//     elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError ) + '%', elt.monthCount]);
-//     let startY = 170+(this.state.planningUnitLabels.length*3) 
+//     elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError) + '%', elt.monthCount]);
+//     let startY = 170 + (this.state.planningUnitLabels.length * 3)
 //     let content = {
-//       margin: { top: 80 ,bottom:50},
+//       margin: { top: 80, bottom: 50 },
 //       startY: startY,
 //       head: headers,
 //       body: data,
 //       styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
 //       columnStyles: {
 //         0: { cellWidth: 219.0 },
-//         1: { cellWidth:  218.89 },
+//         1: { cellWidth: 218.89 },
 //         2: { cellWidth: 162 },
-//         3: { cellWidth: 162 }}
+//         3: { cellWidth: 162 }
+//       }
 
 //     };
 
@@ -328,7 +329,7 @@
 //     doc.autoTable(content);
 //     addHeaders(doc)
 //     addFooters(doc)
-//     doc.save(i18n.t('static.dashboard.forecastmetrics')+".pdf")
+//     doc.save(i18n.t('static.dashboard.forecastmetrics') + ".pdf")
 //     //creates PDF from img
 //     /*  var doc = new jsPDF('landscape');
 //       doc.setFontSize(20);
@@ -339,7 +340,7 @@
 
 
 //   rowClassNameFormat(row, rowIdx) {
-//     return (row.forecastError  > 50 )? 'background-red' : '';
+//     return (row.forecastError > 50) ? 'background-red' : '';
 //   }
 
 
@@ -392,12 +393,12 @@
 //     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
 //     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
 //     let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
-//      let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
-//     let monthInCalc=document.getElementById("viewById").value;
-//                 if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
+//     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
+//     let monthInCalc = document.getElementById("viewById").value;
+//     if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
 
 //       var inputjson = {
-//         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate,"previousMonths":monthInCalc
+//         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc
 //       }
 //       AuthenticationService.setupAxiosInterceptors();
 
@@ -438,7 +439,7 @@
 //     } else if (this.state.programValues.length == 0) {
 //       this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
 
-//     } else if(this.state.planningUnitValues.length == 0){
+//     } else if (this.state.planningUnitValues.length == 0) {
 //       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
 
 //     }
@@ -708,7 +709,7 @@
 //         sort: true,
 //         align: 'center',
 //         headerAlign: 'center',
-//         style: { align: 'center' ,width: '420px' },
+//         style: { align: 'center', width: '420px' },
 //         formatter: this.formatLabel
 //       }, {
 //         dataField: 'planningUnit.label',
@@ -716,7 +717,7 @@
 //         sort: true,
 //         align: 'center',
 //         headerAlign: 'center',
-//         style: { align: 'center' ,width: '420px' },
+//         style: { align: 'center', width: '420px' },
 //         formatter: this.formatLabel
 //       }/*, {
 //             dataField: 'historicalConsumptionDiff',
@@ -738,7 +739,7 @@
 //         sort: true,
 //         align: 'center',
 //         headerAlign: 'center',
-//         style: { align: 'center' ,width: '250px' },
+//         style: { align: 'center', width: '250px' },
 //         formatter: this.formatValue
 
 //       }, {
@@ -746,7 +747,7 @@
 //         text: i18n.t('static.report.noofmonth'),
 //         sort: true,
 //         align: 'center',
-//         style: { align: 'center' ,width: '250px' },
+//         style: { align: 'center', width: '250px' },
 //         headerAlign: 'center',
 
 //       }];
@@ -818,7 +819,7 @@
 //                 <Col md="12 pl-0">
 //                   <div className="row">
 
-//                   <FormGroup className="col-md-3">
+//                     <FormGroup className="col-md-3">
 //                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
 //                       <div className="controls edit">
 //                         <Picker
@@ -836,26 +837,26 @@
 
 //                     </FormGroup>
 //                     <FormGroup className="col-md-3">
-//                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.timeWindow')}</Label>
-//                         <div className="controls">
-//                           <InputGroup>
-//                             <Input
-//                               type="select"
-//                               name="viewById"
-//                               id="viewById"
-//                               bsSize="sm"
-//                               onChange={this.filterData}
-//                             >
-//                               <option value="5">6 {i18n.t('static.dashboard.months')}</option>
-//                               <option value="2">3 {i18n.t('static.dashboard.months')}</option>
-//                               <option value="8">9 {i18n.t('static.dashboard.months')}</option>
-//                               <option value="11">12 {i18n.t('static.dashboard.months')}</option>
-//                             </Input>
-//                           </InputGroup>
-//                         </div>
-//                       </FormGroup>
+//                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.timeWindow')}</Label>
+//                       <div className="controls">
+//                         <InputGroup>
+//                           <Input
+//                             type="select"
+//                             name="viewById"
+//                             id="viewById"
+//                             bsSize="sm"
+//                             onChange={this.filterData}
+//                           >
+//                             <option value="5">6 {i18n.t('static.dashboard.months')}</option>
+//                             <option value="2">3 {i18n.t('static.dashboard.months')}</option>
+//                             <option value="8">9 {i18n.t('static.dashboard.months')}</option>
+//                             <option value="11">12 {i18n.t('static.dashboard.months')}</option>
+//                           </Input>
+//                         </InputGroup>
+//                       </div>
+//                     </FormGroup>
 
-//                       <FormGroup className="col-md-3">
+//                     <FormGroup className="col-md-3">
 //                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
 //                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
@@ -1375,8 +1376,9 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = consumptions[j].forecastError;
+      data[2] = this.formatValue(consumptions[j].forecastError, consumptions[j]);
       data[3] = consumptions[j].monthCount;
+      data[4] = consumptions[j].forecastError;
 
       consumptionArray[count] = data;
       count++;
@@ -1400,29 +1402,52 @@ class ForecastMetrics extends Component {
         {
           title: i18n.t('static.program.program'),
           type: 'text',
-          readOnly: true
         },
         {
           title: i18n.t('static.dashboard.planningunit'),
           type: 'text',
-          readOnly: true
         },
         {
           title: i18n.t('static.report.error'),
           type: 'text',
-          readOnly: true
         },
         {
           title: i18n.t('static.report.noofmonth'),
           type: 'text',
-          readOnly: true
+        },
+        {
+          title: i18n.t('static.report.error'),
+          type: 'hidden',
         },
       ],
+      editable: false,
       text: {
         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
         show: '',
         entries: '',
       },
+
+      updateTable: function (el, cell, x, y, source, value, id) {
+
+        var elInstance = el.jexcel;
+        var colArr = ['A', 'B', 'C', 'D', 'E']
+        var rowData = elInstance.getRowData(y);
+
+        var forecastError = rowData[4];
+
+        if (forecastError > 50) {
+          for (var i = 0; i < colArr.length; i++) {
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+          }
+        } else {
+          for (var i = 0; i < colArr.length; i++) {
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+          }
+        }
+
+      }.bind(this),
+
       onload: this.loaded,
       pagination: 10,
       search: true,
@@ -1805,14 +1830,14 @@ class ForecastMetrics extends Component {
             sort: true,
             align: 'center',
             headerAlign: 'center',
-         
+
         }, {
           dataField: 'historicalConsumptionActual',
           text: i18n.t('static.report.historicalConsumptionActual'),
           sort: true,
           align: 'center',
           headerAlign: 'center',
-       
+
       }*/, {
         dataField: 'forecastError',
         text: i18n.t('static.report.error'),
