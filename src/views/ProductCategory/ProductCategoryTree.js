@@ -510,7 +510,7 @@ export default class ProductCategoryTree extends Component {
                             {/* <CardHeader className="pb-lg-1">
                                 <strong>Product Category</strong>
                             </CardHeader> */}
-                            <CardBody className="pb-lg-0">
+                            <CardBody className="pb-lg-0 pt-lg-1">
                                 <Col md="3 pl-0" >
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>

@@ -2935,16 +2935,16 @@ class ProductCatalog extends Component {
 
                         </div>}
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
                      
                             <Col md="12 pl-0">
                            
-                                <div className="row ">
-                                    <FormGroup className="col-md-3">
+                                <div className="d-md-flex  Selectdiv2 ">
+                                    <FormGroup className="mt-md-2 mb-md-0 ">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls">
+                                        <div className="controls SelectField">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -2967,9 +2967,9 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
-                                        <div className="controls">
+                                        <div className="controls SelectField">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -2993,9 +2993,9 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls">
+                                        <div className="controls SelectField">
                                             <InputGroup>
                                                 <Input
                                                     type="select"

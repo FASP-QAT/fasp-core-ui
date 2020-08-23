@@ -585,7 +585,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground SearchMarginTop">
                         </div>
 
                     </CardBody>
