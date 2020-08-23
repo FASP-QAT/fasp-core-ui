@@ -405,7 +405,7 @@ class GlobalConsumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("GlobalConsumption.pdf")
+    doc.save("Consumption (Realm View).pdf")
     //creates PDF from img
     /*  var doc = new jsPDF('landscape');
       doc.setFontSize(20);
