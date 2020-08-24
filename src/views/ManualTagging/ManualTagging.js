@@ -34,7 +34,8 @@ export default class ManualTagging extends Component {
             planningUnits: [],
             outputListAfterSearch: [],
             artmisList: [],
-            shipmentId: ''
+            shipmentId: '',
+            reason: "1"
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -59,14 +60,19 @@ export default class ManualTagging extends Component {
             })
     }
     getOrderDetails() {
+        var programId = document.getElementById("programId").value;
+        var planningUnitId = document.getElementById("planningUnitId").value;
         var orderNo = document.getElementById("orderNo").value;
         var primeLineNo = document.getElementById("primeLineNo").value;
-        ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(orderNo, primeLineNo)
+        ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(programId, planningUnitId, orderNo, primeLineNo)
             .then(response => {
-                console.log("artmis response===", response);
+                console.log("artmis response===", response.data);
                 var artmisList = [];
                 artmisList.push(response.data);
+                console.log("--------->>", response.data);
+                // console.log("--------->",response.data[0].reason);
                 this.setState({
+                    reason: response.data.reason,
                     artmisList
                 })
             })
@@ -189,6 +195,7 @@ export default class ManualTagging extends Component {
     toggleLarge() {
         this.setState({
             artmisList: [],
+            reason : "1",
             manualTag: !this.state.manualTag,
         })
     }
@@ -244,7 +251,10 @@ export default class ManualTagging extends Component {
         const columns = [
             {
                 dataField: 'shipmentId',
-                hidden: true,
+                text: 'Shipment Id',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
             },
             {
                 dataField: 'shipmentTransId',
@@ -290,12 +300,11 @@ export default class ManualTagging extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'productCost',
-                text: 'Total Amount',
+                dataField: 'fundingSource.label.label_en',
+                text: 'Funding Source',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
+                headerAlign: 'center'
             }
         ];
 
@@ -593,9 +602,12 @@ export default class ManualTagging extends Component {
                                         }
                                     </ToolkitProvider>
                                 </div>
+                                {this.state.reason != "" && this.state.reason != 1 &&  <div style={{color:'red'}}>Note : {this.state.reason}</div>}
                             </ModalBody>
                             <ModalFooter>
-                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i> Link</Button>{' '}
+                                {this.state.reason == "" &&
+                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i> Link</Button>
+                                }
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </ModalFooter>
                         </Modal>
