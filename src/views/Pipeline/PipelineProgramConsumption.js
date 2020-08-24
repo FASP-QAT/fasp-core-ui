@@ -47,6 +47,25 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
 
         }
         return valid;
@@ -85,6 +104,24 @@ export default class PipelineProgramConsumption extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+            }
+        }
+        if (x == 6) {
+            var reg = /^[0-9\b]+$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
 
@@ -247,7 +284,7 @@ export default class PipelineProgramConsumption extends Component {
                                             data[2] = consumptionList[j].regionId;
                                         };
                                         // data[2] = consumptionList[j].regionId;
-                                        data[6] = consumptionList[j].consumptionQty/consumptionList[j].consNumMonth;
+                                        data[6] =(cm==0 || cm!=consumptionList[j].consNumMonth-1)? Math.ceil(consumptionList[j].consumptionQty/consumptionList[j].consNumMonth):Math.ceil(consumptionList[j].consumptionQty/consumptionList[j].consNumMonth)+(consumptionList[j].consumptionQty-((Math.ceil(consumptionList[j].consumptionQty/consumptionList[j].consNumMonth))*consumptionList[j].consNumMonth));
                                         data[7] = consumptionList[j].dayOfStockOut;
                                         data[1] = consumptionList[j].dataSourceId;
                                         data[3] = consumptionList[j].realmCountryPlanningUnitId;
@@ -293,14 +330,14 @@ console.log('consumptionDataArr',consumptionDataArr)
                                             type: 'dropdown',
                                             source: regionList
                                         }, {
-                                            title: "Realm Country Planning Unit",
+                                            title: i18n.t('static.planningunit.countrysku'),
                                             type: 'dropdown',
                                             source: realmCountryPlanningUnitList,
                                             filter: this.dropdownFilter
 
                                         },
                                         {
-                                            title: "Multiplier",
+                                            title: i18n.t('static.unit.multiplier'),
                                             type: 'text',
                                             readonly: true
                                         },
