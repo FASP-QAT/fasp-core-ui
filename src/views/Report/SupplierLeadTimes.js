@@ -1371,10 +1371,10 @@ class SupplierLeadTimes extends Component {
             outPutArray[count] = data;
             count++;
         }
-        if (outPutList.length == 0) {
-            data = [];
-            outPutArray[0] = data;
-        }
+        // if (outPutList.length == 0) {
+        //     data = [];
+        //     outPutArray[0] = data;
+        // }
         // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1498,7 +1498,7 @@ class SupplierLeadTimes extends Component {
         // csvRow.push("");
         // csvRow.push(i18n.t('static.report.procurementAgentName') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
         // csvRow.push("");
-        
+
         // console.log("this.state.planningUnitLabels===>",this.state.planningUnitLabels);
         // console.log("this.state.procurementAgentLabels===>",this.state.procurementAgentLabels);
 
@@ -1523,13 +1523,13 @@ class SupplierLeadTimes extends Component {
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [headers];
 
-        console.log("output list--->",this.state.outPutList);
+        console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push([
                 (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.procurementAgent.label, this.state.lang) ==null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (getLabelText(ele.procurementAgent.label, this.state.lang) == null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
@@ -1602,7 +1602,7 @@ class SupplierLeadTimes extends Component {
                     })
                     var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-                   
+
                     planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 130, planningText)
                 }
@@ -1645,10 +1645,10 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-        let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
-      
+        let startY = 150 + (this.state.planningUnitLabels.length * 3) + (this.state.procurementAgentLabels.length * 3)
+
         let content = {
-            margin: { top: 110 ,bottom:75},
+            margin: { top: 110, bottom: 75 },
             startY: startY,
             head: [headers],
             body: data,
@@ -2268,7 +2268,7 @@ class SupplierLeadTimes extends Component {
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
                                                 arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
                                                 submittedToApprovedLeadTime: submittedToApprovedLeadTime,
-                                               
+
                                                 totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
                                                 totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
                                             }
@@ -2385,7 +2385,7 @@ class SupplierLeadTimes extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '150px' }, 
+                style: { width: '150px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -2454,7 +2454,7 @@ class SupplierLeadTimes extends Component {
 
             {
                 dataField: 'approvedToShippedLeadTime',
-                text:i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
+                text: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2490,7 +2490,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'totalSeaLeadTime',
-                text:i18n.t('static.report.totalSeaLeadTime'),
+                text: i18n.t('static.report.totalSeaLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2570,10 +2570,10 @@ class SupplierLeadTimes extends Component {
                     </div>
                     <CardBody className="pt-lg-0">
                         {/* <div ref={ref}> */}
-                      {/* <Form> */}
-                            <Col md="12 pl-0">
-                                <div className="row">
-                                    {/* <Online>
+                        {/* <Form> */}
+                        <Col md="12 pl-0">
+                            <div className="row">
+                                {/* <Online>
                                         <FormGroup className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">Country</Label>
                                             <div className="controls SelectGo">
@@ -2593,64 +2593,64 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    // onChange={this.filterVersion}
-                                                    onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {programs.length > 0
-                                                        && programs.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.programId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                                // onChange={this.filterVersion}
+                                                onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programs.length > 0
+                                                    && programs.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.programId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
 
-                                        <div className="controls">
-                                            <MultiSelect
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="md"
-                                                value={this.state.planningUnitValues}
-                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                            />
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="planningUnitId"
+                                            id="planningUnitId"
+                                            bsSize="md"
+                                            value={this.state.planningUnitValues}
+                                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                        />
 
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
 
-                                        <div className="controls">
-                                            <MultiSelect
-                                                name="procurementAgentId"
-                                                id="procurementAgentId"
-                                                bsSize="md"
-                                                value={this.state.procurementAgenttValues}
-                                                onChange={(e) => { this.handleProcurementAgentChange(e) }}
-                                                options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
-                                            />
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                            </Col>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="procurementAgentId"
+                                            id="procurementAgentId"
+                                            bsSize="md"
+                                            value={this.state.procurementAgenttValues}
+                                            onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                            options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                        />
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </Col>
                         {/* </Form> */}
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
