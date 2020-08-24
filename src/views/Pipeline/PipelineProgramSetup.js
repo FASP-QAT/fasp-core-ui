@@ -161,7 +161,7 @@ export default class PipelineProgramSetup extends Component {
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
-                this.setState({ pipelineProgramSetupPer: 25 ,planningUnitStatus: true,consumptionStatus: false , inventoryStatus: false,
+                this.setState({ pipelineProgramSetupPer:14 ,planningUnitStatus: true,consumptionStatus: false , inventoryStatus: false,
                     shipmentStatus: false});
                 document.getElementById('stepOne').style.display = 'none';
                 document.getElementById('stepTwo').style.display = 'block';

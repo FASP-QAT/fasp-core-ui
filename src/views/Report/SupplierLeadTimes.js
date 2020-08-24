@@ -81,7 +81,7 @@
 //         this.fetchData = this.fetchData.bind(this);
 //     }
 
-//     exportCSV(columns) {
+//     exportCSV(columns) { 
 //         var csvRow = [];
 //         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
 //         csvRow.push("");
@@ -1347,7 +1347,7 @@ class SupplierLeadTimes extends Component {
     buildJexcel() {
 
         let outPutList = this.state.outPutList;
-        // console.log("outPutList---->", outPutList);
+        console.log("outPutList---->", outPutList);
         let outPutArray = [];
         let count = 0;
 
@@ -1357,17 +1357,17 @@ class SupplierLeadTimes extends Component {
             data[1] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[2] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[3] = getLabelText(outPutList[j].procurementAgent.label, this.state.lang)
-            data[4] = outPutList[j].plannedToDraftLeadTime
-            data[5] = outPutList[j].draftToSubmittedLeadTime
-            data[6] = outPutList[j].submittedToApprovedLeadTime
-            data[7] = outPutList[j].approvedToShippedLeadTime
+            data[4] = outPutList[j].plannedSubmittedLeadTime
+            data[5] = outPutList[j].submittedToApprovedLeadTime
+            data[6] = outPutList[j].approvedToShippedLeadTime
+            data[7] = outPutList[j].shippedToArrivedBySeaLeadTime
 
-            data[8] = outPutList[j].shippedToArrivedBySeaLeadTime
-            data[9] = outPutList[j].shippedToArrivedByAirLeadTime
-            data[10] = outPutList[j].arrivedToDeliveredLeadTime
-            data[11] = outPutList[j].totalSeaLeadTime
-            data[12] = outPutList[j].totalAirLeadTime
-            data[13] = outPutList[j].localProcurementAgentLeadTime
+            data[8] = outPutList[j].shippedToArrivedByAirLeadTime
+            data[9] = outPutList[j].arrivedToDeliveredLeadTime
+            data[10] = outPutList[j].totalSeaLeadTime
+            data[11] = outPutList[j].totalAirLeadTime
+            data[12] = outPutList[j].localProcurementAgentLeadTime
+            // data[13] = outPutList[j].
             outPutArray[count] = data;
             count++;
         }
@@ -1393,68 +1393,68 @@ class SupplierLeadTimes extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Program',
+                    title: i18n.t('static.program.program'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Planning Unit',
+                    title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
                     readOnly: true
                 },
 
                 {
-                    title: 'Procurement Agent',
+                    title: i18n.t('static.report.procurementAgentName'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Planned To Draft Lead Time',
+                    title: i18n.t('static.report.plannedToSubmitLeadTime'),
+                    type: 'text',
+                    readOnly: true
+                },
+                // {
+                //     title: 'Draft To Submitted Lead Time',
+                //     type: 'text',
+                //     readOnly: true
+                // },
+                {
+                    title: i18n.t('static.program.submittoapproveleadtime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Draft To Submitted Lead Time',
+                    title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Submitted To Approved Lead Time',
+                    title: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Approved To Shipped Lead Time',
+                    title: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Shipped To Arrived By Sea LeadTime',
+                    title: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Shipped To Arrived By Air LeadTime',
+                    title: i18n.t('static.report.totalSeaLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Arrived To Delivered LeadTime',
+                    title: i18n.t('static.report.totalAirLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Total Sea Lead Time',
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: 'Total Air LeadTime',
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: 'Local Procurement LeadTime',
+                    title: i18n.t('static.report.localProcurementAgentLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
@@ -1553,7 +1553,7 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Procurement Agent Lead Times Report.csv"
+        a.download = 'Procurement Agent Lead Times.csv'
         document.body.appendChild(a)
         a.click()
     }
@@ -1586,7 +1586,7 @@ class SupplierLeadTimes extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text("Procurement Agent Lead Times Report", doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.procurmentAgentLeadTimeReport'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1609,13 +1609,19 @@ class SupplierLeadTimes extends Component {
 
             }
         }
+
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "landscape"; // portrait or landscape
+
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
+
         doc.setFontSize(8);
-        const title = "Procurement Agent Lead Times Report";
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+        const title = i18n.t('static.report.procurmentAgentLeadTimeReport');
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1645,7 +1651,7 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-        let startY = 150 + (this.state.planningUnitLabels.length * 3) + (this.state.procurementAgentLabels.length * 3)
+        let startY = 150;
 
         let content = {
             margin: { top: 110, bottom: 75 },
