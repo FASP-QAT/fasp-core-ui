@@ -475,10 +475,10 @@ export default class UnitListComponent extends Component {
             unitListArray[count] = data;
             count++;
         }
-        if (unitList.length == 0) {
-            data = [];
-            unitListArray[0] = data;
-        }
+        // if (unitList.length == 0) {
+        //     data = [];
+        //     unitListArray[0] = data;
+        // }
         // console.log("unitListArray---->", unitListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
