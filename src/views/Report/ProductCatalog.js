@@ -1686,7 +1686,7 @@ class ProductCatalog extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Product Catalog Report";
+        const title = i18n.t('static.report.productCatalogReport');
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1735,7 +1735,7 @@ class ProductCatalog extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Product Catalog Report.pdf")
+        doc.save("Product Catalog.pdf")
     }
     handleChangeProgram(programIds) {
 
@@ -2514,7 +2514,8 @@ class ProductCatalog extends Component {
                         var outPutList = response.data;
                         // var responseData = response.data;
                         this.setState({
-                            outPutList: outPutList
+                            outPutList: outPutList,
+                            message: ''
                         },
                             () => { this.buildJexcel() })
                     }).catch(
@@ -2670,7 +2671,7 @@ class ProductCatalog extends Component {
                                         outPutList = outPutList;
                                     }
                                     console.log("outPutList------>", outPutList);
-                                    this.setState({ outPutList: outPutList },
+                                    this.setState({ outPutList: outPutList, message: '' },
                                         () => { this.buildJexcel() });
 
                                 }.bind(this)
@@ -2935,99 +2936,99 @@ class ProductCatalog extends Component {
 
                         </div>}
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
-                     
-                            <Col md="12 pl-0">
-                           
-                                <div className="row ">
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    // onChange={this.filterVersion}
-                                                    onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {programs.length > 0
-                                                        && programs.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.programId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="productCategoryId"
-                                                    id="productCategoryId"
-                                                    bsSize="sm"
-                                                    onChange={this.fetchData}
-                                                // onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
-                                                    {productCategories.length > 0
-                                                        && productCategories.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                </option>
-                                                            )
-                                                        }, this)}
 
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                    onChange={this.fetchData}
-                                                // onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
-                                                    {tracerCategories.length > 0
-                                                        && tracerCategories.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.tracerCategoryId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
+                        <Col md="12 pl-0">
 
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                             
-                            </Col>
-                        
-                        
+                            <div className="d-md-flex  Selectdiv2 ">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                                // onChange={this.filterVersion}
+                                                onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programs.length > 0
+                                                    && programs.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.programId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {productCategories.length > 0
+                                                    && productCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {tracerCategories.length > 0
+                                                    && tracerCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.tracerCategoryId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+
+                        </Col>
+
+
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
-                       
-                       
+
+
                     </CardBody>
                 </Card>
 

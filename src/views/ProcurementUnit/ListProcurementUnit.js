@@ -691,7 +691,8 @@ export default class ListProcurementUnit extends Component {
           </div>
           <CardBody className="pb-lg-0">
             <Col md="3 pl-0" >
-              <FormGroup className="Selectdiv">
+            <div className="d-md-flex Selectdiv2">
+              <FormGroup className="mt-md-2 mb-md-0 ">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
 
                 <div className="controls SelectGo">
@@ -712,12 +713,13 @@ export default class ListProcurementUnit extends Component {
                   </InputGroup>
                 </div>
               </FormGroup>
+              </div>
             </Col>
-            <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+            <div className="table-responsive">
               {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
               </div>
 
-            </CardBody>
+            </div>
           </CardBody>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>

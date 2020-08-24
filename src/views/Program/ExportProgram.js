@@ -218,7 +218,7 @@ export default class ExportProgram extends Component {
                                         {/* <CardHeader>
                                             <strong>{i18n.t('static.program.export')}</strong>
                                         </CardHeader> */}
-                                        <CardBody>
+                                        <CardBody className="pb-lg-2 pt-lg-2">
                                             <FormGroup className="col-md-4" >
                                                 <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                 <Select

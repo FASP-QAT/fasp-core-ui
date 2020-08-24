@@ -885,7 +885,7 @@ class Budgets extends Component {
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
 
-                        <Col md="10 pl-0">
+                        <Col md="12 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Program</Label>

@@ -1336,12 +1336,12 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pt-lg-0">
-                        <Col md="9 pl-1 pb-3">
-                            <div className="row">
-                                <FormGroup className="col-md-4">
+                    <CardBody className="pb-lg-5 ">
+                        <Col md="9 pl-1">
+                            <div className="d-md-flex Selectdiv2">
+                                <FormGroup  className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1357,9 +1357,9 @@ export default class ConsumptionDetails extends React.Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-4">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                    <div className="controls">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1373,9 +1373,9 @@ export default class ConsumptionDetails extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-4">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
-                                    <div className="controls">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1393,10 +1393,10 @@ export default class ConsumptionDetails extends React.Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div className="ProgramListSearch">
+                        {/* <div className="ProgramListSearch"> */}
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
-                        </div>
+                        {/* </div> */}
                     </CardBody>
 
                 </Card>
