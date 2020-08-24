@@ -523,10 +523,10 @@ class ListRealmCountryComponent extends Component {
             realmCountryArray[count] = data;
             count++;
         }
-        if (realmCountryList.length == 0) {
-            data = [];
-            realmCountryArray[0] = data;
-        }
+        // if (realmCountryList.length == 0) {
+        //     data = [];
+        //     realmCountryArray[0] = data;
+        // }
         // console.log("realmCountryArray---->", realmCountryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

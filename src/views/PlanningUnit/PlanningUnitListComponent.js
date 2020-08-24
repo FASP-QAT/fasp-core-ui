@@ -504,10 +504,10 @@ export default class PlanningUnitListComponent extends Component {
             planningUnitArray[count] = data;
             count++;
         }
-        if (planningUnitList.length == 0) {
-            data = [];
-            planningUnitArray[0] = data;
-        }
+        // if (planningUnitList.length == 0) {
+        //     data = [];
+        //     planningUnitArray[0] = data;
+        // }
         // console.log("planningUnitArray---->", planningUnitArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -871,11 +871,11 @@ export default class PlanningUnitListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                      
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
 
-                      
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
+
+
 
                     </CardBody>
                 </Card>

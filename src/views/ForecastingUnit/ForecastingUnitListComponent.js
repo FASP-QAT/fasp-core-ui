@@ -576,10 +576,10 @@ export default class ForecastingUnitListComponent extends Component {
             forecastingUnitListArray[count] = data;
             count++;
         }
-        if (forecastingUnitList.length == 0) {
-            data = [];
-            forecastingUnitListArray[0] = data;
-        }
+        // if (forecastingUnitList.length == 0) {
+        //     data = [];
+        //     forecastingUnitListArray[0] = data;
+        // }
         // console.log("forecastingUnitListArray---->", forecastingUnitListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

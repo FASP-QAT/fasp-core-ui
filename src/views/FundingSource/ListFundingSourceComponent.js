@@ -413,10 +413,10 @@ class FundingSourceListComponent extends Component {
             fundingSourceArray[count] = data;
             count++;
         }
-        if (fundingSourceList.length == 0) {
-            data = [];
-            fundingSourceArray[0] = data;
-        }
+        // if (fundingSourceList.length == 0) {
+        //     data = [];
+        //     fundingSourceArray[0] = data;
+        // }
         // console.log("fundingSourceArray---->", fundingSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

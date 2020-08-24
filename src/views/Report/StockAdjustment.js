@@ -1488,10 +1488,10 @@ class StockAdjustmentComponent extends Component {
             stockAdjustmentArray[count] = data;
             count++;
         }
-        if (stockAdjustmentList.length == 0) {
-            data = [];
-            stockAdjustmentArray[0] = data;
-        }
+        // if (stockAdjustmentList.length == 0) {
+        //     data = [];
+        //     stockAdjustmentArray[0] = data;
+        // }
         // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

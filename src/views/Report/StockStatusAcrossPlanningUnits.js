@@ -1788,10 +1788,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             dataArray[count] = data;
             count++;
         }
-        if (dataStockStatus.length == 0) {
-            data = [];
-            dataArray[0] = data;
-        }
+        // if (dataStockStatus.length == 0) {
+        //     data = [];
+        //     dataArray[0] = data;
+        // }
         // console.log("dataArray---->", dataArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

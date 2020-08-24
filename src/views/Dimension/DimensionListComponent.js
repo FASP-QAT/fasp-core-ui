@@ -320,10 +320,10 @@ export default class DimensionListComponent extends Component {
                             dimensionArray[count] = data;
                             count++;
                         }
-                        if (dimensionList.length == 0) {
-                            data = [];
-                            dimensionArray[0] = data;
-                        }
+                        // if (dimensionList.length == 0) {
+                        //     data = [];
+                        //     dimensionArray[0] = data;
+                        // }
                         // console.log("dimensionArray---->", dimensionArray);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         this.el.destroy();

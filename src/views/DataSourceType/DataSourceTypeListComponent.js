@@ -416,10 +416,10 @@ export default class DataSourceTypeListComponent extends Component {
             dataSourceTypeArray[count] = data;
             count++;
         }
-        if (dataSourceTypeList.length == 0) {
-            data = [];
-            dataSourceTypeArray[0] = data;
-        }
+        // if (dataSourceTypeList.length == 0) {
+        //     data = [];
+        //     dataSourceTypeArray[0] = data;
+        // }
         // console.log("dataSourceTypeArray---->", dataSourceTypeArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

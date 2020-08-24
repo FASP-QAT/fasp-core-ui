@@ -390,10 +390,10 @@ export default class CurrencyListComponent extends Component {
                             currencyArray[count] = data;
                             count++;
                         }
-                        if (currencyList.length == 0) {
-                            data = [];
-                            currencyArray[0] = data;
-                        }
+                        // if (currencyList.length == 0) {
+                        //     data = [];
+                        //     currencyArray[0] = data;
+                        // }
                         // console.log("currencyArray---->", currencyArray);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         this.el.destroy();

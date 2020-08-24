@@ -1383,10 +1383,10 @@ class ForecastMetrics extends Component {
       consumptionArray[count] = data;
       count++;
     }
-    if (consumptions.length == 0) {
-      data = [];
-      consumptionArray[0] = data;
-    }
+    // if (consumptions.length == 0) {
+    //   data = [];
+    //   consumptionArray[0] = data;
+    // }
     // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
