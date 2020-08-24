@@ -137,10 +137,10 @@ class ListTracerCategoryComponent extends Component {
                             tracerCategory[count] = data;
                             count++;
                         }
-                        if (tracerCategoryList.length == 0) {
-                            data = [];
-                            tracerCategory[0] = data;
-                        }
+                        // if (tracerCategoryList.length == 0) {
+                        //     data = [];
+                        //     tracerCategory[0] = data;
+                        // }
                         // console.log("tracerCategory---->", tracerCategory);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         this.el.destroy();

@@ -382,10 +382,10 @@ class RegionListComponent extends Component {
             regionListArray[count] = data;
             count++;
         }
-        if (regionList.length == 0) {
-            data = [];
-            regionListArray[0] = data;
-        }
+        // if (regionList.length == 0) {
+        //     data = [];
+        //     regionListArray[0] = data;
+        // }
         // console.log("regionListArray---->", regionListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

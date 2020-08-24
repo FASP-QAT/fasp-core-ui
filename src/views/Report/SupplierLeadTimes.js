@@ -1371,10 +1371,10 @@ class SupplierLeadTimes extends Component {
             outPutArray[count] = data;
             count++;
         }
-        if (outPutList.length == 0) {
-            data = [];
-            outPutArray[0] = data;
-        }
+        // if (outPutList.length == 0) {
+        //     data = [];
+        //     outPutArray[0] = data;
+        // }
         // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

@@ -416,10 +416,10 @@ class SupplierListComponent extends Component {
             supplierArray[count] = data;
             count++;
         }
-        if (supplierList.length == 0) {
-            data = [];
-            supplierArray[0] = data;
-        }
+        // if (supplierList.length == 0) {
+        //     data = [];
+        //     supplierArray[0] = data;
+        // }
         // console.log("supplierArray---->", supplierArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

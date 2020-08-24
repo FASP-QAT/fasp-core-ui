@@ -504,10 +504,10 @@ export default class PlanningUnitListComponent extends Component {
             planningUnitArray[count] = data;
             count++;
         }
-        if (planningUnitList.length == 0) {
-            data = [];
-            planningUnitArray[0] = data;
-        }
+        // if (planningUnitList.length == 0) {
+        //     data = [];
+        //     planningUnitArray[0] = data;
+        // }
         // console.log("planningUnitArray---->", planningUnitArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -827,10 +827,10 @@ export default class PlanningUnitListComponent extends Component {
                     </div>
                     <CardBody className="pb-lg-5">
                         <Col md="9 pl-0">
-                            <div className="row Selectdiv2 mt-md-2 mb-md-0">
-                                <FormGroup className="col-md-3">
+                            <div className="d-md-flex  Selectdiv2 ">
+                                <FormGroup className="mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls ">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -849,9 +849,9 @@ export default class PlanningUnitListComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 &nbsp;
-                            <FormGroup className="col-md-3">
+                            <FormGroup className=" tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                    <div className="controls ">
+                                    <div className="controls SelectField">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -871,11 +871,11 @@ export default class PlanningUnitListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                      
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
 
-                      
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
+
+
 
                     </CardBody>
                 </Card>

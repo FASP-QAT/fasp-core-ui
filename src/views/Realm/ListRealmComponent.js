@@ -358,10 +358,10 @@ export default class ReactListComponent extends Component {
                             realmArray[count] = data;
                             count++;
                         }
-                        if (realmList.length == 0) {
-                            data = [];
-                            realmArray[0] = data;
-                        }
+                        // if (realmList.length == 0) {
+                        //     data = [];
+                        //     realmArray[0] = data;
+                        // }
                         // console.log("realmArray---->", realmArray);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         this.el.destroy();

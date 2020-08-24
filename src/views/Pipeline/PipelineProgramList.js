@@ -299,10 +299,10 @@ export default class PipelineProgramList extends Component {
             pipelineProgramArray[count] = data;
             count++;
         }
-        if (pipelineProgramList.length == 0) {
-            data = [];
-            pipelineProgramArray[0] = data;
-        }
+        // if (pipelineProgramList.length == 0) {
+        //     data = [];
+        //     pipelineProgramArray[0] = data;
+        // }
         // console.log("pipelineProgramArray---->", pipelineProgramArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

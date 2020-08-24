@@ -2502,10 +2502,10 @@ class ProcurementAgentExport extends Component {
             shipmentCostArray[count] = data;
             count++;
         }
-        if (shipmentCosttList.length == 0) {
-            data = [];
-            shipmentCostArray[0] = data;
-        }
+        // if (shipmentCosttList.length == 0) {
+        //     data = [];
+        //     shipmentCostArray[0] = data;
+        // }
         // console.log("shipmentCostArray---->", shipmentCostArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

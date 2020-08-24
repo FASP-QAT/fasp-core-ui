@@ -625,6 +625,7 @@ export default class ProductCategoryTree extends Component {
                                             handleReset
                                         }) => (
                                                 <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm'>
+                                                   
                                                     <FormGroup>
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                             <Row>
@@ -645,7 +646,7 @@ export default class ProductCategoryTree extends Component {
                                                                     <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
                                                                 </Col>
                                                             </Row>}
-                                                    </FormGroup>
+                                                    </FormGroup> 
                                                     {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                         // <CardFooter>
                                                         <FormGroup className="mr-4">
@@ -656,6 +657,17 @@ export default class ProductCategoryTree extends Component {
                                                     } */}
                                                 </Form>
                                             )} />
+                                         <div className="col-md-12 ">
+                                             <Col md="3 float-right" >
+                                                <InputGroup>
+                                                    <input type="search" bsSize="sm" placeholder="Search" onChange={this.handleSearchOnChange} className="form-control form-control-sm" />
+                                                     <InputGroupAddon addonType="append">
+                                                         <button type="button"  className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount}  onClick={selectPrevMatch}> <i class="fa fa-angle-left btn-Icon-productTreeNextPre"></i></button>
+                                                         <button  type="submit"  className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount}  onClick={selectNextMatch}><i class="fa fa-angle-right btn-Icon-productTreeNextPre" ></i></button>
+                                                     </InputGroupAddon>
+                                                </InputGroup>
+                                             </Col>
+                                             </div>
                                 <FormGroup>
                                     <Label for="product category">{i18n.t('static.productCategory.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
@@ -721,14 +733,14 @@ export default class ProductCategoryTree extends Component {
                                     </div>
                                 </FormGroup>
                                 {/* <input type='text' onInput={(e) => { this.defaultSearchMethod(e.target.value)}} /> */}
-                                <input type="search" onChange={this.handleSearchOnChange} className="form-control" />
+                                {/* <input type="search" onChange={this.handleSearchOnChange} className="form-control" />
                                 <button
                                     type="button"
                                     disabled={!this.state.searchFoundCount}
                                     onClick={selectPrevMatch}
                                 >
                                     &lt;
-          </button>
+                                </button>
 
                                 <button
                                     type="submit"
@@ -736,7 +748,7 @@ export default class ProductCategoryTree extends Component {
                                     onClick={selectNextMatch}
                                 >
                                     &gt;
-          </button>
+                                 </button> */}
 
                             </CardBody>
                             <CardFooter>

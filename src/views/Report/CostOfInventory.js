@@ -1055,7 +1055,7 @@ export default class CostOfInventory extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1157,7 +1157,7 @@ export default class CostOfInventory extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1414,10 +1414,10 @@ export default class CostOfInventory extends Component {
             costOfInventoryArray[count] = data;
             count++;
         }
-        if (costOfInventory.length == 0) {
-            data = [];
-            costOfInventoryArray[0] = data;
-        }
+        // if (costOfInventory.length == 0) {
+        //     data = [];
+        //     costOfInventoryArray[0] = data;
+        // }
         // console.log("costOfInventoryArray---->", costOfInventoryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1430,7 +1430,7 @@ export default class CostOfInventory extends Component {
             colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                
+
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
@@ -1501,7 +1501,7 @@ export default class CostOfInventory extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
