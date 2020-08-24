@@ -54,6 +54,28 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].pipelineProductName).concat(" Does not exist."));
             }
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[10]).toString();
+
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+            var col = ("M").concat(parseInt(y) + 1);
+            var value = (this.el.getRowData(y)[12]).toString();
+
+            if (value != "" && value > 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
         }
 
     }
@@ -199,12 +221,13 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 10) {
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("K").concat(parseInt(y) + 1);
+            console.log('value=>',value)
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value)|| value<0)) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -243,7 +266,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value)|| value<0)) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -491,9 +514,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 monthsInFutureForAmc: map.get("7"),
                 monthsInPastForAmc: map.get("8"),
                 programPlanningUnitId: map.get("9"),
-                localProcurmentLeadTime: map.get("10"),
+                localProcurmentLeadTime: map.get("10")==''?null: map.get("10"),
                 shelfLife: map.get("11"),
-                catalogPrice: map.get("12")
+                catalogPrice: map.get("12")==''?null:map.get("12")
 
 
             }
@@ -547,7 +570,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                             this.setState({ activePlanningUnitList: response.data });
                             for (var k = 0; k < (response.data).length; k++) {
                                 var planningUnitJson = {
-                                    name: response.data[k].label.label_en,
+                                    name: response.data[k].label.label_en+' ~ '+response.data[k].planningUnitId,
                                     id: response.data[k].planningUnitId
                                 }
                                 planningUnitListQat.push(planningUnitJson);
@@ -591,13 +614,13 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                                                     data[9] = planningUnitList[j].programPlanningUnitId
 
-                                                    data[10] = planningUnitList[j].localProcurmentLeadTime
+                                                    data[10] = planningUnitList[j].localProcurmentLeadTime==-1?'':planningUnitList[j].localProcurmentLeadTime
                                                     if (planningUnitList[j].shelfLife == 0) {
                                                         data[11] = this.props.items.program.shelfLife;
                                                     } else {
                                                         data[11] = planningUnitList[j].shelfLife
                                                     }
-                                                    data[12] = planningUnitList[j].catalogPrice
+                                                    data[12] = planningUnitList[j].catalogPrice==-1?'':planningUnitList[j].catalogPrice
 
                                                     productDataArr.push(data);
 
@@ -692,7 +715,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 copyCompatibility: true,
                                                 allowInsertRow: false,
                                                 text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
                                                 },
@@ -828,7 +852,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance);
     }
 
     render() {

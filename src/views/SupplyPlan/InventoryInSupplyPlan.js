@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, INTEGER_NO_REGEX, INVENTORY_DATA_SOURCE_TYPE, NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from "../../Constants";
+import { SECRET_KEY, INTEGER_NO_REGEX, INVENTORY_DATA_SOURCE_TYPE, NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 
@@ -92,10 +92,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             }
                         }
                     }
-                    if (this.state.inventoryEl != "") {
+                    if (this.state.inventoryEl != "" && this.state.inventoryEl != undefined) {
                         this.state.inventoryEl.destroy();
                     }
-                    if (this.state.inventoryBatchInfoTableEl != "") {
+                    if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
                         this.state.inventoryBatchInfoTableEl.destroy();
                     }
                     var data = [];
@@ -283,7 +283,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             batchInfoList: batchList
                                         })
                                         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
-                                        if (this.state.inventoryBatchInfoTableEl != "") {
+                                        if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
                                             this.state.inventoryBatchInfoTableEl.destroy();
                                         }
                                         var json = [];
@@ -308,7 +308,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
                                             var data = [];
                                             data[0] = batchInfo[sb].batch.batchId; //A
-                                            data[1] = batchInfo[sb].batch.expiryDate;
+                                            data[1] = moment(batchInfo[sb].batch.expiryDate).format(DATE_FORMAT_CAP);
                                             data[2] = adjustmentType; //B
                                             data[3] = batchInfo[sb].adjustmentQty; //C
                                             data[4] = batchInfo[sb].actualQty; //D
@@ -354,7 +354,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             columnDrag: true,
                                             columns: [
                                                 { title: i18n.t('static.supplyPlan.batchId'), type: 'dropdown', source: batchList, filter: this.filterBatchInfoForExistingDataForInventory, width: 100 },
-                                                { title: i18n.t('static.supplyPlan.expiryDate'), type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), null] }, readOnly: true, width: 150 },
+                                                { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
                                                 { title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true },
                                                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80 },
                                                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', width: 80 },
@@ -458,9 +458,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 data[13] = "";
                                                 data[14] = -1;
                                                 obj.insertRow(data);
-                                                var cell = obj.getCell(`D${parseInt(json.length) + 1}`)
-                                                cell.classList.remove('readonly');
-
                                             }.bind(this)
                                         });
                                     }
@@ -552,8 +549,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 console.log("elInstance.getCell(`A${parseInt(y) + 1}`).innerText", elInstance.getCell(`A${parseInt(y) + 1}`).innerText)
                 if (value != -1) {
-                    var expiryDate = this.props.items.batchInfoList.filter(c => c.name == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
-                    elInstance.setValueFromCoords(1, y, expiryDate, true);
+                    var expiryDate = this.props.items.batchInfoList.filter(c => c.batchNo == elInstance.getCell(`A${parseInt(y) + 1}`).innerText)[0].expiryDate;
+                    elInstance.setValueFromCoords(1, y, moment(expiryDate).format(DATE_FORMAT_CAP), true);
                 } else {
                     elInstance.setValueFromCoords(1, y, "", true);
                 }
@@ -561,13 +558,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 3) {
             if (rowData[2] == 2) {
-                checkValidtion("number", "D", y, rowData[3], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 1);
+                checkValidtion("number", "D", y, rowData[3], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
             }
         }
 
         if (x == 4) {
             if (rowData[2] == 1) {
-                checkValidtion("number", "E", y, rowData[4], elInstance, INTEGER_NO_REGEX, 1, 1);
+                checkValidtion("number", "E", y, rowData[4], elInstance, INTEGER_NO_REGEX, 1, 0);
             }
         }
 
@@ -684,12 +681,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 // } else {
                 var colArr = ['A'];
                 for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
                     positiveValidation(colArr[c], y, elInstance);
                 }
-                var col = ("A").concat(parseInt(y) + 1);
                 var rowData = elInstance.getRowData(y);
 
                 var validation = checkValidtion("text", "A", y, rowData[0], elInstance);

@@ -1721,15 +1721,15 @@ export default class syncPage extends Component {
               {/* <CardHeader>
                 <strong>{i18n.t('static.dashboard.commitVersion')}</strong>
               </CardHeader> */}
-              <CardBody>
+              <CardBody className="pb-lg-2 pt-lg-2">
 
                 <Form name='simpleForm'>
                   <Col md="12 pl-0">
 
-                    <div className="d-md-flex">
-                      <FormGroup className="col-md-2 comparebtntext">
+                    <div className="row">
+                      <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                        <div className="controls SelectGo ">
+                        <div className="controls  ">
                           <InputGroup>
                             <Input type="select"
                               bsSize="sm"
@@ -1744,7 +1744,7 @@ export default class syncPage extends Component {
                         </div>
 
                       </FormGroup>
-                      <div className="col-md-10">
+                      <div className="col-md-8 mt-2 ml-5">
                         <ul className="legendcommitversion">
                           <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">Conflicts</span></li>
                           <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">Changed in current version </span></li>
@@ -1757,7 +1757,7 @@ export default class syncPage extends Component {
                 <div id="detailsDiv">
                   <div className="animated fadeIn">
                     <Col md="12 pl-0">
-                      <div className="d-md-flex">
+                      <div className="row">
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                           <div className="controls ">

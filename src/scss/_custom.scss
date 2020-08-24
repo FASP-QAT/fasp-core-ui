@@ -527,7 +527,7 @@ label.arrow_label:after {
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
-  // z-index: 0 !important;
+  z-index: 0 !important;
 }
 
 .jexcel_page {
@@ -854,6 +854,10 @@ label.arrow_label:after {
 // Readonly background transperant made after conversion
 .jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
   background: transparent!important;
+}
+// supplyplan consumption add new batch tr row height  in table for add batch
+.AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
+  height: 30px;
 }
 
 
@@ -1806,28 +1810,28 @@ input::placeholder {
 }
 .progressetuptext3 {
   // left: 33.46%;
-  left: 30%;
-  transform: translateX(-45%) scale(1);
+  left: 28.5714%;
+  transform: translateX(-35%) scale(1);
 }
 .progressetuptext4 {
   // left: 44.46%;
-  left: 45%;
-  transform: translateX(-70%) scale(1);
+  left: 42.8571%;
+  transform: translateX(-50%) scale(1);
 }
 .progressetuptext5 {
   // left: 94.95%;
-  left: 60%;
-  transform: translateX(-97%) scale(1);
+  left:57.1429%;
+  transform: translateX(-50%) scale(1);
 }
 .progressetuptext6 {
   // left: 94.95%;
-  left: 75%;
-  transform: translateX(-97%) scale(1);
+  left: 71.4286%;
+  transform: translateX(-62%) scale(1);
 }
 .progressetuptext7 {
   // left: 94.95%;
-  left: 90%;
-  transform: translateX(-97%) scale(1);
+  left:85.7143%;
+  transform: translateX(-81%) scale(1);
 }
 .progressetuptext8 {
   // left: 94.95%;
@@ -2066,7 +2070,7 @@ input::placeholder {
 
 .supplyplan-larrow-dataentry {
   float: left;
-  margin-left: 77px !important;
+  margin-left: 85px !important;
   color: #20a8d8;
   font-size: 13px;
   cursor: pointer;
@@ -2536,6 +2540,12 @@ input::placeholder {
     word-wrap: break-word!important;
   }
 
+  .regionTdWidthConsumption{
+    overflow: hidden!important;
+    min-width: 100px!important;
+    word-wrap: break-word!important;
+  }
+
   .supplyplanTdWidthForMonths{
     overflow: hidden!important;
     min-width: 70px!important;
@@ -2654,10 +2664,14 @@ input::placeholder {
 /////card header css
 .Card-header-addicon
 {
-  padding:10px 20px 10px 20px;
+  padding:0px 20px 10px 20px;
+  // padding:10px 20px 10px 20px;
+}
+.card-header-action{
+  margin-top: 0.25rem !important;
 }
 .Card-header-reporticon{
-  padding: 8px 20px 0px 20px;
+  padding: 5px 20px 0px 20px;
 }
 .CardBodyMargin{
   margin-top: -1%;
@@ -3077,6 +3091,9 @@ border-radius: 2em;
   display: inline!important;
   padding-left: 5px;
 }
+.go2139093995 * {
+  z-index: unset;
+}
 // .go2139093995 svg{
 //   visibility: hidden !important;
 // }
@@ -3133,4 +3150,13 @@ border-radius: 2em;
 }
 .ProgramListSearch{
   margin-top: -4%;
+}
+.SearchMarginTop{
+  margin-top: -1%;;
+}
+.SearchMarginTopLarge{
+  margin-top: -5%;;
+}
+.SelectField {
+  width: 210px;
 }

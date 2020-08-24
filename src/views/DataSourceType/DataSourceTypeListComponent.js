@@ -458,7 +458,8 @@ export default class DataSourceTypeListComponent extends Component {
                 },
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },
@@ -630,11 +631,11 @@ export default class DataSourceTypeListComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className=" table-responsive SearchMarginTop">
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
 
-                        </CardBody>
+                        </div>
 
                     </CardBody>
                 </Card>

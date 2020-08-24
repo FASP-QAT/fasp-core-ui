@@ -30,22 +30,22 @@ const validationSchema = function (values) {
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.realm.minMosMinGaurdrail')),
-        // .min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.realm.minMosMinGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         minMosMaxGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.realm.minMosMaxGaurdrail')),
-        // .min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.realm.minMosMaxGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         maxMosMaxGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-            .required(i18n.t('static.realm.maxMosMaxGaurdrail')),
-        // .min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.realm.maxMosMaxGaurdrail'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         /*   monthInPastForAmc: Yup.number()
                .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
            monthInFutureForAmc: Yup.number()
@@ -299,12 +299,12 @@ export default class UpdateDataSourceComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}</Label>
                                                         <Input type="number"
-                                                            // min="0"
+                                                            min="0"
                                                             name="minMosMinGaurdrail"
                                                             id="minMosMinGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.minMosMinGaurdrail && this.state.realm.minMosMinGaurdrail != ''}
-                                                            invalid={touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail || this.state.realm.minMosMinGaurdrail == ''}
+                                                            valid={!errors.minMosMinGaurdrail && ( this.state.realm.minMosMinGaurdrail >= 0)}
+                                                            invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMinGaurdrail}
@@ -314,12 +314,12 @@ export default class UpdateDataSourceComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}</Label>
                                                         <Input type="number"
-                                                            // min="0"
+                                                            min="0"
                                                             name="minMosMaxGaurdrail"
                                                             id="minMosMaxGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
-                                                            invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail || this.state.realm.minMosMaxGaurdrail == ''}
+                                                            valid={!errors.minMosMaxGaurdrail && ( this.state.realm.minMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMaxGaurdrail}
@@ -329,12 +329,12 @@ export default class UpdateDataSourceComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}</Label>
                                                         <Input type="number"
-                                                            // min="0"
+                                                            min="0"
                                                             name="maxMosMaxGaurdrail"
                                                             id="maxMosMaxGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
-                                                            invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail || this.state.realm.maxMosMaxGaurdrail == ''}
+                                                            valid={!errors.maxMosMaxGaurdrail && ( this.state.realm.maxMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.maxMosMaxGaurdrail}

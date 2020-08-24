@@ -801,7 +801,7 @@ class ListRealmCountryComponent extends Component {
                     </CardHeader> */}
                     <CardBody className="pb-lg-0 mt-3">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                            <FormGroup className="Selectdiv mt-md-1 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -822,11 +822,11 @@ class ListRealmCountryComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                      
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
 
-                        </CardBody>
+                      
 
                     </CardBody>
                 </Card>

@@ -728,7 +728,7 @@ class ListBudgetComponent extends Component {
         if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'red');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
           }
         } else {
           for (var i = 0; i < colArr.length; i++) {
@@ -1022,7 +1022,7 @@ class ListBudgetComponent extends Component {
           </div>
           <CardBody className="pb-lg-0 ">
             <Col md="3 pl-0" >
-              <FormGroup className="Selectdiv">
+              <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                 <div className="controls SelectGo">
                   <InputGroup>
@@ -1043,12 +1043,12 @@ class ListBudgetComponent extends Component {
                 </div>
               </FormGroup>
             </Col>
-            <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+          
               {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
               </div>
               <h5>*Rows in red indicate that Budget has either lapsed or has no money in it</h5>
 
-            </CardBody>
+            
           </CardBody>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>

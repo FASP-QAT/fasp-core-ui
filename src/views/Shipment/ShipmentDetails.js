@@ -91,7 +91,7 @@ export default class ShipmentDetails extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            label: getLabelText(JSON.parse(programNameLabel), this.state.lang) + " - " + programJson1.programCode + "~v" + myResult[i].version,
+                            label: programJson1.programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -116,9 +116,13 @@ export default class ShipmentDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
+        document.getElementById("planningUnitId").value = 0;
+        document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value.value
+            programId: value.value,
+            planningUnit:"",
+            planningUnitId:""
         })
         var db1;
         var storeOS;
@@ -267,7 +271,7 @@ export default class ShipmentDetails extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardBody >
+                    <CardBody className="pb-lg-2 pt-lg-2">
                         <Formik
                             render={
                                 ({

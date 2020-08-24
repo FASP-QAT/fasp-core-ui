@@ -963,13 +963,13 @@ export default class ForecastingUnitListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-0">
-                        <Form >
+                    <CardBody className="pb-lg-5">
+                       
                             <Col md="9 pl-0">
-                                <div className="d-md-flex Selectdiv2 mt-md-2 mb-md-0">
-                                    <FormGroup>
+                                <div className="d-md-flex  Selectdiv2">
+                                    <FormGroup className="mt-md-2 mb-md-0 "> 
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls SelectField">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -988,10 +988,10 @@ export default class ForecastingUnitListComponent extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    &nbsp;
-                                    <FormGroup className="tab-ml-1">
+                                    
+                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls SelectField">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -1006,9 +1006,9 @@ export default class ForecastingUnitListComponent extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls SelectField ">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -1026,9 +1026,11 @@ export default class ForecastingUnitListComponent extends Component {
                                         </div>
                                     </FormGroup>
                                 </div>
+                               
                             </Col>
-                        </Form>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                            {/* <div className="SearchMarginTopLarge"> */}
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                        {/* </div> */}
 
                     </CardBody>
                 </Card>

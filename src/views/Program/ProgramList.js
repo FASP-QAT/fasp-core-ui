@@ -450,10 +450,10 @@ export default class ProgramList extends Component {
       programArray[count] = data;
       count++;
     }
-    if (programList.length == 0) {
-      data = [];
-      programArray[0] = data;
-    }
+    // if (programList.length == 0) {
+    //   data = [];
+    //   programArray[0] = data;
+    // }
     // console.log("programArray---->", programArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -498,7 +498,7 @@ export default class ProgramList extends Component {
 
       ],
       text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
         show: '',
         entries: '',
       },
@@ -662,7 +662,7 @@ export default class ProgramList extends Component {
           </div>
           <CardBody className="pb-lg-0">
             <Col md="3 pl-0" >
-              <FormGroup className="Selectdiv">
+              <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
 
                 <div className="controls SelectGo">
@@ -684,11 +684,10 @@ export default class ProgramList extends Component {
                 </div>
               </FormGroup>
             </Col>
-            <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-              {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-              </div>
 
-            </CardBody>
+            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+            </div>
+
           </CardBody>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>

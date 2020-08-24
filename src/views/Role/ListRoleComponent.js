@@ -302,10 +302,10 @@ class ListRoleComponent extends Component {
                                 roleArray[count] = data;
                                 count++;
                             }
-                            if (roleList.length == 0) {
-                                data = [];
-                                roleArray[0] = data;
-                            }
+                            // if (roleList.length == 0) {
+                            //     data = [];
+                            //     roleArray[0] = data;
+                            // }
                             // console.log("roleArray---->", roleArray);
                             this.el = jexcel(document.getElementById("tableDiv"), '');
                             this.el.destroy();

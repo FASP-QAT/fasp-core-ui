@@ -435,10 +435,10 @@ export default class CountryListComponent extends Component {
             countryArray[count] = data;
             count++;
         }
-        if (countryList.length == 0) {
-            data = [];
-            countryArray[0] = data;
-        }
+        // if (countryList.length == 0) {
+        //     data = [];
+        //     countryArray[0] = data;
+        // }
         // console.log("countryArray---->", countryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -482,7 +482,8 @@ export default class CountryListComponent extends Component {
                 },
             ],
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },

@@ -16,6 +16,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import UnitService from '../../api/UnitService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { DECIMAL_NO_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
@@ -26,7 +27,7 @@ let initialValues = {
     unitId: '',
     supplierId: '',
     heightUnitId: '',
-    heightQty: 0,
+    heightQty: "",
     lengthUnitId: '',
     lengthQty: 0,
     widthUnitId: '',
@@ -54,25 +55,40 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validSupplierIdText')),
         heightQty: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            // .matches(DECIMAL_NO_REGEX, i18n.t('static.realm.decimalNotAllow'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         lengthQty: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         widthQty: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         weightQty: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         unitsPerCase: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         unitsPerPallet: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         unitsPerContainer: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .min(0, i18n.t('static.procurementUnit.validValueText')),
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .decimal(i18n.t('static.realm.decimalNotAllow'))
+            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 
@@ -99,7 +115,6 @@ const getErrorsFromValidationError = (validationError) => {
 }
 export default class EditProcurementUnit extends Component {
     constructor(props) {
-        console.log("in constructor");
         super(props);
         this.state = {
             procurementUnit: {
@@ -134,7 +149,7 @@ export default class EditProcurementUnit extends Component {
                 heightUnit: {
                     id: '',
                 },
-                heightQty: 0,
+                heightQty: "",
                 lengthUnit: {
                     id: '',
                 },
@@ -182,32 +197,11 @@ export default class EditProcurementUnit extends Component {
         procurementUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         console.log("this.props.match.params.procurementUnitId", this.props.match.params.procurementUnitId)
         ProcurementUnitService.getProcurementUnitById(this.props.match.params.procurementUnitId).then(response => {
             this.setState({
                 procurementUnit: response.data
             })
-            initialValues = {
-                procurementUnitName: getLabelText(this.state.procurementUnit.label, lang),
-                planningUnitId: this.state.procurementUnit.planningUnit.planningUnitId,
-                multiplier: this.state.procurementUnit.multiplier,
-                unitId: this.state.procurementUnit.unit.id,
-                supplierId: this.state.procurementUnit.supplier.id,
-                heightUnitId: this.state.procurementUnit.heightUnit.id,
-                heightQty: this.state.procurementUnit.heightQty,
-                lengthUnitId: this.state.procurementUnit.lengthUnit.id,
-                lengthQty: this.state.procurementUnit.lengthQty,
-                widthUnitId: this.state.procurementUnit.widthUnit.id,
-                widthQty: this.state.procurementUnit.widthQty,
-                weightUnitId: this.state.procurementUnit.weightUnit.id,
-                weightQty: this.state.procurementUnit.weightQty,
-                labeling: this.state.procurementUnit.labeling,
-                unitsPerCase: this.state.procurementUnit.unitsPerCase,
-                unitsPerPallet: this.state.procurementUnit.unitsPerPallet,
-                unitsPerContainer: this.state.procurementUnit.unitsPerContainer
-            }
-            AuthenticationService.setupAxiosInterceptors();
             UnitService.getUnitListAll()
                 .then(response => {
                     if (response.status == 200) {
@@ -283,6 +277,10 @@ export default class EditProcurementUnit extends Component {
         } else if (event.target.name === "active") {
             procurementUnit.active = event.target.id === "active2" ? false : true
         }
+        this.setState({
+            procurementUnit
+        },
+            () => { console.log("state-------------------", this.state.procurementUnit) });
     }
     touchAll(setTouched, errors) {
         setTouched({
@@ -307,6 +305,7 @@ export default class EditProcurementUnit extends Component {
         )
         this.validateForm(errors)
     }
+
     validateForm(errors) {
         this.findFirstError('procurementUnitForm', (fieldName) => {
             return Boolean(errors[fieldName])
@@ -343,7 +342,25 @@ export default class EditProcurementUnit extends Component {
                         <Card>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    procurementUnitName: getLabelText(this.state.procurementUnit.label, lang),
+                                    planningUnitId: this.state.procurementUnit.planningUnit.planningUnitId,
+                                    multiplier: this.state.procurementUnit.multiplier,
+                                    unitId: this.state.procurementUnit.unit.id,
+                                    supplierId: this.state.procurementUnit.supplier.id,
+                                    heightUnitId: this.state.procurementUnit.heightUnit.id,
+                                    heightQty: this.state.procurementUnit.heightQty,
+                                    lengthUnitId: this.state.procurementUnit.lengthUnit.id,
+                                    lengthQty: this.state.procurementUnit.lengthQty,
+                                    widthUnitId: this.state.procurementUnit.widthUnit.id,
+                                    widthQty: this.state.procurementUnit.widthQty,
+                                    weightUnitId: this.state.procurementUnit.weightUnit.id,
+                                    weightQty: this.state.procurementUnit.weightQty,
+                                    labeling: this.state.procurementUnit.labeling,
+                                    unitsPerCase: this.state.procurementUnit.unitsPerCase,
+                                    unitsPerPallet: this.state.procurementUnit.unitsPerPallet,
+                                    unitsPerContainer: this.state.procurementUnit.unitsPerContainer
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -383,9 +400,10 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            type="text" name="procurementUnitName" valid={!errors.procurementUnitName}
+                                                            type="text" name="procurementUnitName"
+                                                            valid={!errors.procurementUnitName}
                                                             bsSize="sm"
-                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName}
+                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.label.label_en}
@@ -412,7 +430,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             type="number" name="multiplier" valid={!errors.multiplier}
                                                             bsSize="sm"
-                                                            invalid={touched.multiplier && !!errors.multiplier}
+                                                            invalid={touched.multiplier && !!errors.multiplier || this.state.procurementUnit.multiplier == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.multiplier}
@@ -424,7 +442,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.unitId}
-                                                            invalid={touched.unitId && !!errors.unitId}
+                                                            invalid={touched.unitId && !!errors.unitId || this.state.procurementUnit.unit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unit.id}
@@ -454,7 +472,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.heightUnitId}
-                                                            invalid={touched.heightUnitId && !!errors.heightUnitId}
+                                                            // invalid={touched.heightUnitId && !!errors.heightUnitId  || this.state.procurementUnit.heightUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.heightUnit.id}
@@ -467,9 +485,10 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="heightQty">{i18n.t('static.procurementUnit.heightQty')}</Label>
                                                         <Input
-                                                            type="number" name="heightQty" valid={!errors.heightQty}
+                                                            type="number" name="heightQty"
                                                             bsSize="sm"
-                                                            invalid={touched.heightQty && !!errors.heightQty}
+                                                            valid={!errors.heightQty && this.state.procurementUnit.heightQty >= 0}
+                                                            invalid={(touched.heightQty && !!errors.heightQty) || (this.state.procurementUnit.heightQty < 0 || (this.state.procurementUnit.heightQty).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.heightQty}
@@ -481,7 +500,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.lengthUnitId}
-                                                            invalid={touched.lengthUnitId && !!errors.lengthUnitId}
+                                                            // invalid={touched.lengthUnitId && !!errors.lengthUnitId || this.state.procurementUnit.lengthUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.lengthUnit.id}
@@ -494,9 +513,10 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="lengthQty">{i18n.t('static.procurementUnit.lengthQty')}</Label>
                                                         <Input
-                                                            type="number" name="lengthQty" valid={!errors.lengthQty}
+                                                            type="number" name="lengthQty"
                                                             bsSize="sm"
-                                                            invalid={touched.lengthQty && !!errors.lengthQty}
+                                                            valid={!errors.lengthQty && this.state.procurementUnit.lengthQty >= 0}
+                                                            invalid={(touched.lengthQty && !!errors.lengthQty) || (this.state.procurementUnit.lengthQty < 0 || (this.state.procurementUnit.lengthQty).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.lengthQty}
@@ -508,7 +528,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.widthUnitId}
-                                                            invalid={touched.widthUnitId && !!errors.widthUnitId}
+                                                            // invalid={touched.widthUnitId && !!errors.widthUnitId || this.state.procurementUnit.widthUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.widthUnit.id}
@@ -521,9 +541,10 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="widthQty">{i18n.t('static.procurementUnit.widthQty')}</Label>
                                                         <Input
-                                                            type="number" name="widthQty" valid={!errors.widthQty}
+                                                            type="number" name="widthQty"
                                                             bsSize="sm"
-                                                            invalid={touched.widthQty && !!errors.widthQty}
+                                                            valid={!errors.widthQty && this.state.procurementUnit.widthQty >= 0}
+                                                            invalid={(touched.widthQty && !!errors.widthQty) || (this.state.procurementUnit.widthQty < 0 || (this.state.procurementUnit.widthQty).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.widthQty}
@@ -535,7 +556,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.weightUnitId}
-                                                            invalid={touched.weightUnitId && !!errors.weightUnitId}
+                                                            // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.weightUnit.id}
@@ -548,9 +569,10 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="weightQty">{i18n.t('static.procurementUnit.weightQty')}</Label>
                                                         <Input
-                                                            type="number" name="weightQty" valid={!errors.weightQty}
+                                                            type="number" name="weightQty"
                                                             bsSize="sm"
-                                                            invalid={touched.weightQty && !!errors.weightQty}
+                                                            valid={!errors.weightQty && this.state.procurementUnit.weightQty >= 0}
+                                                            invalid={(touched.weightQty && !!errors.weightQty) || (this.state.procurementUnit.weightQty < 0 || (this.state.procurementUnit.weightQty).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.weightQty}
@@ -562,7 +584,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             type="text" name="labeling" valid={!errors.labeling}
                                                             bsSize="sm"
-                                                            invalid={touched.labeling && !!errors.labeling}
+                                                            invalid={touched.labeling && !!errors.labeling || this.state.procurementUnit.labeling == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.labeling}
@@ -574,7 +596,8 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             type="number" name="unitsPerCase" valid={!errors.unitsPerCase}
                                                             bsSize="sm"
-                                                            invalid={touched.unitsPerCase && !!errors.unitsPerCase}
+                                                            valid={!errors.unitsPerCase && this.state.procurementUnit.unitsPerCase >= 0}
+                                                            invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || (this.state.procurementUnit.unitsPerCase < 0 || (this.state.procurementUnit.unitsPerCase).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerCase}
@@ -586,7 +609,8 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             type="number" name="unitsPerPallet" valid={!errors.unitsPerPallet}
                                                             bsSize="sm"
-                                                            invalid={touched.unitsPerPallet && !!errors.unitsPerPallet}
+                                                            valid={!errors.unitsPerPallet && this.state.procurementUnit.unitsPerPallet >= 0}
+                                                            invalid={(touched.unitsPerPallet && !!errors.unitsPerPallet) || (this.state.procurementUnit.unitsPerPallet < 0 || (this.state.procurementUnit.unitsPerPallet).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerPallet}
@@ -598,7 +622,8 @@ export default class EditProcurementUnit extends Component {
                                                         <Input
                                                             type="number" name="unitsPerContainer" valid={!errors.unitsPerContainer}
                                                             bsSize="sm"
-                                                            invalid={touched.unitsPerContainer && !!errors.unitsPerContainer}
+                                                            valid={!errors.unitsPerContainer && this.state.procurementUnit.unitsPerContainer >= 0}
+                                                            invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || (this.state.procurementUnit.unitsPerContainer < 0 || (this.state.procurementUnit.unitsPerContainer).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerContainer}
@@ -665,44 +690,10 @@ export default class EditProcurementUnit extends Component {
         this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     resetClicked() {
-        AuthenticationService.setupAxiosInterceptors();
-        console.log("this.props.match.params.procurementUnitId", this.props.match.params.procurementUnitId)
         ProcurementUnitService.getProcurementUnitById(this.props.match.params.procurementUnitId).then(response => {
             this.setState({
                 procurementUnit: response.data
             })
-            initialValues = {
-                procurementUnitName: getLabelText(this.state.procurementUnit.label, lang),
-                planningUnitId: this.state.procurementUnit.planningUnit.planningUnitId,
-                multiplier: this.state.procurementUnit.multiplier,
-                unitId: this.state.procurementUnit.unit.id,
-                supplierId: this.state.procurementUnit.supplier.id,
-                heightUnitId: this.state.procurementUnit.heightUnit.id,
-                heightQty: this.state.procurementUnit.heightQty,
-                lengthUnitId: this.state.procurementUnit.lengthUnit.id,
-                lengthQty: this.state.procurementUnit.lengthQty,
-                widthUnitId: this.state.procurementUnit.widthUnit.id,
-                widthQty: this.state.procurementUnit.widthQty,
-                weightUnitId: this.state.procurementUnit.weightUnit.id,
-                weightQty: this.state.procurementUnit.weightQty,
-                labeling: this.state.procurementUnit.labeling,
-                unitsPerCase: this.state.procurementUnit.unitsPerCase,
-                unitsPerPallet: this.state.procurementUnit.unitsPerPallet,
-                unitsPerContainer: this.state.procurementUnit.unitsPerContainer
-            }
-            AuthenticationService.setupAxiosInterceptors();
-            UnitService.getUnitListAll()
-                .then(response => {
-                    if (response.status == 200) {
-                        this.setState({
-                            unitList: response.data
-                        })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode
-                        })
-                    }
-                })
 
         })
 
