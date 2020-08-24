@@ -1553,7 +1553,7 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.procurmentAgentLeadTimeReport')
+        a.download = 'Procurement Agent Lead Times.csv'
         document.body.appendChild(a)
         a.click()
     }
