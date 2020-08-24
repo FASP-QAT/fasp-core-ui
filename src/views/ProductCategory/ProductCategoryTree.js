@@ -12,7 +12,7 @@ import ProductCategoryService from '../../api/PoroductCategoryService';
 import SortableTree, {
     getFlatDataFromTree,
     getTreeFromFlatData,
-    getNodeAtPath, addNodeUnderParent, removeNodeAtPath, changeNodeAtPath
+    getNodeAtPath, addNodeUnderParent, removeNodeAtPath, changeNodeAtPath, defaultSearchMethod
 } from "react-sortable-tree";
 import 'react-sortable-tree/style.css';
 import { node } from 'prop-types';
@@ -68,7 +68,11 @@ export default class ProductCategoryTree extends Component {
             nodename: '',
             maxId: 0,
             message: '',
-            duplicate: 0
+            duplicate: 0,
+            searchQuery: null,
+            searchFocusIndex: 0,
+            searchFoundCount: null
+            // searchFocusIndex: 0
 
 
         }
@@ -82,6 +86,9 @@ export default class ProductCategoryTree extends Component {
         this.reSetTree = this.reSetTree.bind(this);
         this.setTreeData = this.setTreeData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.handleSearchOnChange = this.handleSearchOnChange.bind(this);
+        // this.selectPrevMatch = this.selectPrevMatch.bind(this);
+        // this.selectNextMatch = this.selectNextMatch.bind(this);
     }
 
     setTreeData(treeData) {
@@ -490,7 +497,57 @@ export default class ProductCategoryTree extends Component {
             }
         }
     }
+    handleSearchOnChange = e => {
+        this.setState({
+            searchQuery: e.target.value,
+        });
+    };
+
+    // selectPrevMatch = () => {
+    //     // const { searchFocusIndex, searchFoundCount } = this.state;
+
+    //     this.setState({
+    //         searchFocusIndex:
+    //            this.state.searchFocusIndex !== null
+    //                 ? (this.state.searchFoundCount + this.state.searchFocusIndex - 1) % this.state.searchFoundCount
+    //                 : this.state.searchFoundCount - 1
+    //     });
+    // };
+
+    // selectNextMatch = () => {
+    //     // const { searchFocusIndex, searchFoundCount } = this.state;
+
+    //     this.setState({
+    //         searchFocusIndex:
+    //         this.state.searchFocusIndex !== null
+    //                 ? (this.state.searchFocusIndex + 1) % this.state.searchFoundCount
+    //                 : 0
+    //     });
+    // };
+
     render() {
+        const { searchString, searchFocusIndex, searchFoundCount } = this.state;
+
+        const customSearchMethod = ({ node, searchQuery }) =>
+            searchQuery &&
+            node.title.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;
+
+        const selectPrevMatch = () =>
+            this.setState({
+                searchFocusIndex:
+                    searchFocusIndex !== null
+                        ? (searchFoundCount + searchFocusIndex - 1) % searchFoundCount
+                        : searchFoundCount - 1,
+            });
+
+        const selectNextMatch = () =>
+            this.setState({
+                searchFocusIndex:
+                    searchFocusIndex !== null
+                        ? (searchFocusIndex + 1) % searchFoundCount
+                        : 0,
+            });
+
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -589,14 +646,14 @@ export default class ProductCategoryTree extends Component {
                                                                 </Col>
                                                             </Row>}
                                                     </FormGroup>
-                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                    {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                         // <CardFooter>
                                                         <FormGroup className="mr-4">
                                                             <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                             <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         </ FormGroup>
                                                         // </CardFooter>
-                                                    }
+                                                    } */}
                                                 </Form>
                                             )} />
                                 <FormGroup>
@@ -605,6 +662,16 @@ export default class ProductCategoryTree extends Component {
                                         <SortableTree
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
+                                            searchQuery={this.state.searchQuery}
+                                            searchMethod={customSearchMethod}
+                                            searchFocusOffset={this.state.searchFocusIndex}
+                                            searchFinishCallback={matches =>
+                                                this.setState({
+                                                    searchFoundCount: matches.length,
+                                                    searchFocusIndex:
+                                                        matches.length > 0 ? this.state.searchFocusIndex % matches.length : 0
+                                                })
+                                            }
                                             generateNodeProps={rowInfo => {
                                                 // console.log(rowInfo);
                                                 // if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
@@ -653,14 +720,33 @@ export default class ProductCategoryTree extends Component {
 
                                     </div>
                                 </FormGroup>
+                                {/* <input type='text' onInput={(e) => { this.defaultSearchMethod(e.target.value)}} /> */}
+                                <input type="search" onChange={this.handleSearchOnChange} className="form-control" />
+                                <button
+                                    type="button"
+                                    disabled={!this.state.searchFoundCount}
+                                    onClick={selectPrevMatch}
+                                >
+                                    &lt;
+          </button>
+
+                                <button
+                                    type="submit"
+                                    disabled={!this.state.searchFoundCount}
+                                    onClick={selectNextMatch}
+                                >
+                                    &gt;
+          </button>
+
                             </CardBody>
-                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
-                                <CardFooter>
-                                    <FormGroup>
+                            <CardFooter>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                    <FormGroup className="mr-4">
                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ FormGroup>
-                                </CardFooter>} */}
+                                }
+                            </CardFooter>
                         </Card>
                     </Col>
                 </Row>
