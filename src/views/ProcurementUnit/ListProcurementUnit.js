@@ -715,7 +715,7 @@ export default class ListProcurementUnit extends Component {
               </FormGroup>
               </div>
             </Col>
-            <div className="table-responsive">
+            <div >
               {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
               </div>
 

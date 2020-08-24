@@ -631,7 +631,7 @@ export default class DataSourceTypeListComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <div className=" table-responsive SearchMarginTop">
+                        <div className="SearchMarginTop">
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
 
