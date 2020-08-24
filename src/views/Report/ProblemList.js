@@ -639,6 +639,7 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
@@ -903,16 +904,22 @@ export default class ConsumptionDetails extends React.Component {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (criticalityId == 2 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'orange');
+                        let textColor = contrast('orange');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (criticalityId == 1 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'yellow');
+                        let textColor = contrast('yellow');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 }
 
