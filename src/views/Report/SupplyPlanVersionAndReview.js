@@ -1219,7 +1219,7 @@ class SupplyPlanVersionAndReview extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         if (programId != 0 && countryId != 0) {
             AuthenticationService.setupAxiosInterceptors();
-            ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
+            ReportService.getProgramVersionList(programId, countryId, versionStatusId,versionTypeId, startDate, endDate)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
