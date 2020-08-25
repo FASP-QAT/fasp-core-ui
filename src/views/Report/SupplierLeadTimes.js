@@ -1553,7 +1553,8 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = 'Procurement Agent Lead Times.csv'
+        a.download = i18n.t('static.report.procurmentAgentLeadTimeReport').concat('.csv')
+        // 'Procurement Agent Lead Times.csv'
         document.body.appendChild(a)
         a.click()
     }
@@ -1600,27 +1601,47 @@ class SupplierLeadTimes extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-
-                    planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+                   
                 }
 
             }
         }
-
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "landscape"; // portrait or landscape
-
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
-        doc.setTextColor("#002f6c");
-
+         doc.setTextColor("#002f6c");
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+        //doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+              doc.addPage();
+              y = 80;
+      
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+          }
+        planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+        //doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+          if (y > doc.internal.pageSize.height - 100) {
+            doc.addPage();
+            y = 80;
+    
+          }
+          doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+          y = y + 10;
+          console.log(y)
+        }
+     
+        doc.setFontSize(8);
         const title = i18n.t('static.report.procurmentAgentLeadTimeReport');
         // var canvas = document.getElementById("cool-canvas");
         //creates image
@@ -1632,6 +1653,15 @@ class SupplierLeadTimes extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
         // const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
         // const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
+        let startY = y
+        console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+          doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        doc.setTextColor("#fff");
+       
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
@@ -1651,25 +1681,27 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-        let startY = 150;
-
+       // let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
+      
         let content = {
-            margin: { top: 110, bottom: 75 },
-            startY: startY,
+            margin: { top: 110 ,bottom:95},
+            startY: startYtable,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
-            // columnStyles: {
-            //     0: { cellWidth: 170 },
-            //     1: { cellWidth: 171.89 },
-            //     6: { cellWidth: 100 }
-            // }
+            columnStyles: {
+                // 0: { cellWidth: 170 },
+                // 1: { cellWidth: 171.89 },
+                3: { cellWidth: 110 }
+            }
         };
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Procurement Agent Lead Times Report.pdf")
+        doc.save(i18n.t('static.report.procurmentAgentLeadTimeReport').concat('.pdf'));
     }
+
+
     handleChangeProgram(programIds) {
 
         this.setState({
