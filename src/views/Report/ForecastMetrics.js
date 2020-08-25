@@ -1919,12 +1919,12 @@ class ForecastMetrics extends Component {
               </a>
             </div>}
           </div>
-          <CardBody className="pb-lg-0 pt-lg-0">
-
+          <CardBody className="pb-lg-5 pt-lg-0 ">
+            
             <div ref={ref}>
 
               <Form >
-                <Col md="12 pl-0">
+                <div className="pl-0" >
                   <div className="row">
 
                     <FormGroup className="col-md-3">
@@ -2027,13 +2027,13 @@ class ForecastMetrics extends Component {
                     </FormGroup>
 
                   </div>
-                </Col>
+                </div>
               </Form>
-
-              <Col md="12 pl-0">
+              </div>
+              {/* <Col md="12 pl-0">
 
                 <div className="row">
-                  <div className="col-md-12">
+                  <div className="col-md-12"> */}
                     {/* {this.state.consumptions.length > 0 &&
                        <ToolkitProvider
                         keyField="procurementUnitId"
@@ -2062,16 +2062,18 @@ class ForecastMetrics extends Component {
                       </ToolkitProvider>
                     } */}
 
-                    <CardBody className=" pt-md-0 pb-md-0 table-responsive">
-                      <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                      </div>
-                    </CardBody>
-                  </div>
+                    {/* <CardBody className=" pt-md-0 pb-md-0 table-responsive"> */}
+                      {/* <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                      </div> */}
+                    {/* </CardBody> */}
+                  {/* </div>
                 </div>
-              </Col>
+              </Col> */}
 
-            </div>
-
+            <div className="ReportSearchMarginTop">
+            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                      </div>
+                      </div>
           </CardBody>
         </Card>
 
