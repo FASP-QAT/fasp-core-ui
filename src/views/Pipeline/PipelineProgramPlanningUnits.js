@@ -503,7 +503,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 // pipelineId: {
                 //     id: this.props.pipelineId
                 // },
-                // active: true,
+                 active: map.get("13"),
                 program: {
                     id: 0
                 },
@@ -621,7 +621,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         data[11] = planningUnitList[j].shelfLife
                                                     }
                                                     data[12] = planningUnitList[j].catalogPrice==-1?'':planningUnitList[j].catalogPrice
-
+                                                    data[13] = planningUnitList[j].active
                                                     productDataArr.push(data);
 
                                                 }
@@ -637,7 +637,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var options = {
                                                 data: data,
                                                 columnDrag: true,
-                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 80, 80, 80],
+                                                colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 80, 80, 80,80],
                                                 columns: [
 
                                                     {
@@ -698,6 +698,11 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                         type: 'number'
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.common.status'),
+                                                        type: 'dropdown',
+                                                        source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
                                                     }
                                                 ],
                                                 pagination: 10,
