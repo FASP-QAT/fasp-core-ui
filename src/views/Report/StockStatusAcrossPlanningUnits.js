@@ -1349,6 +1349,7 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const ref = React.createRef();
@@ -1788,10 +1789,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             dataArray[count] = data;
             count++;
         }
-        if (dataStockStatus.length == 0) {
-            data = [];
-            dataArray[0] = data;
-        }
+        // if (dataStockStatus.length == 0) {
+        //     data = [];
+        //     dataArray[0] = data;
+        // }
         // console.log("dataArray---->", dataArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1862,15 +1863,21 @@ class StockStatusAcrossPlanningUnits extends Component {
                     for (var i = 0; i < colArrB.length; i++) {
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (mos > maxMos) {
                     for (var i = 0; i < colArrB.length; i++) {
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
+                        let textColor = contrast('#f3d679');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else {
                     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
+                    let textColor = contrast('#00c596');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                 }
 
                 //-------------C----------------
@@ -1878,15 +1885,21 @@ class StockStatusAcrossPlanningUnits extends Component {
                     for (var i = 0; i < colArrC.length; i++) {
                         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (mos > maxMos) {
                     for (var i = 0; i < colArrC.length; i++) {
                         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
+                        let textColor = contrast('#f3d679');
+                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else {
                     elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
+                    let textColor = contrast('#00c596');
+                    elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
                 }
 
                 // //-------------D----------------

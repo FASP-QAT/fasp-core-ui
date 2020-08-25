@@ -971,7 +971,7 @@ label.arrow_label:after {
   width: 100%;
 }
 .upper-logo {
-  max-width: 325px;
+  max-width: 300px;
   margin-top: 1% !important;
   margin-left: 0%;
 }
@@ -1810,28 +1810,28 @@ input::placeholder {
 }
 .progressetuptext3 {
   // left: 33.46%;
-  left: 30%;
-  transform: translateX(-45%) scale(1);
+  left: 28.5714%;
+  transform: translateX(-35%) scale(1);
 }
 .progressetuptext4 {
   // left: 44.46%;
-  left: 45%;
-  transform: translateX(-70%) scale(1);
+  left: 42.8571%;
+  transform: translateX(-50%) scale(1);
 }
 .progressetuptext5 {
   // left: 94.95%;
-  left: 60%;
-  transform: translateX(-97%) scale(1);
+  left:57.1429%;
+  transform: translateX(-50%) scale(1);
 }
 .progressetuptext6 {
   // left: 94.95%;
-  left: 75%;
-  transform: translateX(-97%) scale(1);
+  left: 71.4286%;
+  transform: translateX(-62%) scale(1);
 }
 .progressetuptext7 {
   // left: 94.95%;
-  left: 90%;
-  transform: translateX(-97%) scale(1);
+  left:85.7143%;
+  transform: translateX(-81%) scale(1);
 }
 .progressetuptext8 {
   // left: 94.95%;
@@ -2664,10 +2664,14 @@ input::placeholder {
 /////card header css
 .Card-header-addicon
 {
-  padding:10px 20px 10px 20px;
+  padding:0px 20px 10px 20px;
+  // padding:10px 20px 10px 20px;
+}
+.card-header-action{
+  margin-top: 0.25rem !important;
 }
 .Card-header-reporticon{
-  padding: 8px 20px 0px 20px;
+  padding: 5px 20px 0px 20px;
 }
 .CardBodyMargin{
   margin-top: -1%;
@@ -3146,4 +3150,20 @@ border-radius: 2em;
 }
 .ProgramListSearch{
   margin-top: -4%;
+}
+.SearchMarginTop{
+  margin-top: -1%;;
+}
+.SearchMarginTopLarge{
+  margin-top: -5%;;
+}
+.SelectField {
+  width: 210px;
+}
+.btn-Icon-productTreeNextPre {
+ font-size: 15px;
+ font-weight: bold;
+}
+.ReportSearchMarginTop{
+  margin-top: -51px;
 }

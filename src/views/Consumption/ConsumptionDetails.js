@@ -291,7 +291,7 @@ export default class ConsumptionDetails extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardBody >
+                    <CardBody className="pb-lg-1 pt-lg-2">
                         <Formik
                             render={
                                 ({

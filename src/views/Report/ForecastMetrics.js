@@ -1032,6 +1032,7 @@ import ProgramService from '../../api/ProgramService';
 import MultiSelect from "react-multi-select-component";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 // const { getToggledOptions } = utils;
@@ -1383,10 +1384,10 @@ class ForecastMetrics extends Component {
       consumptionArray[count] = data;
       count++;
     }
-    if (consumptions.length == 0) {
-      data = [];
-      consumptionArray[0] = data;
-    }
+    // if (consumptions.length == 0) {
+    //   data = [];
+    //   consumptionArray[0] = data;
+    // }
     // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -1439,6 +1440,8 @@ class ForecastMetrics extends Component {
           for (var i = 0; i < colArr.length; i++) {
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            let textColor = contrast('#f48282');
+            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
           }
         } else {
           for (var i = 0; i < colArr.length; i++) {
@@ -1916,12 +1919,12 @@ class ForecastMetrics extends Component {
               </a>
             </div>}
           </div>
-          <CardBody className="pb-lg-0 pt-lg-0">
-
+          <CardBody className="pb-lg-5 pt-lg-0 ">
+            
             <div ref={ref}>
 
               <Form >
-                <Col md="12 pl-0">
+                <div className="pl-0" >
                   <div className="row">
 
                     <FormGroup className="col-md-3">
@@ -2024,13 +2027,13 @@ class ForecastMetrics extends Component {
                     </FormGroup>
 
                   </div>
-                </Col>
+                </div>
               </Form>
-
-              <Col md="12 pl-0">
+              </div>
+              {/* <Col md="12 pl-0">
 
                 <div className="row">
-                  <div className="col-md-12">
+                  <div className="col-md-12"> */}
                     {/* {this.state.consumptions.length > 0 &&
                        <ToolkitProvider
                         keyField="procurementUnitId"
@@ -2059,16 +2062,18 @@ class ForecastMetrics extends Component {
                       </ToolkitProvider>
                     } */}
 
-                    <CardBody className=" pt-md-0 pb-md-0 table-responsive">
-                      <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                      </div>
-                    </CardBody>
-                  </div>
+                    {/* <CardBody className=" pt-md-0 pb-md-0 table-responsive"> */}
+                      {/* <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                      </div> */}
+                    {/* </CardBody> */}
+                  {/* </div>
                 </div>
-              </Col>
+              </Col> */}
 
-            </div>
-
+            <div className="ReportSearchMarginTop">
+            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                      </div>
+                      </div>
           </CardBody>
         </Card>
 

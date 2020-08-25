@@ -695,10 +695,10 @@ class ListProcurementAgentComponent extends Component {
             procurementAgentArray[count] = data;
             count++;
         }
-        if (procurementAgentList.length == 0) {
-            data = [];
-            procurementAgentArray[0] = data;
-        }
+        // if (procurementAgentList.length == 0) {
+        //     data = [];
+        //     procurementAgentArray[0] = data;
+        // }
         // console.log("procurementAgentArray---->", procurementAgentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

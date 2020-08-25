@@ -542,10 +542,10 @@ class ListUserComponent extends Component {
             userArray[count] = data;
             count++;
         }
-        if (userList.length == 0) {
-            data = [];
-            userArray[0] = data;
-        }
+        // if (userList.length == 0) {
+        //     data = [];
+        //     userArray[0] = data;
+        // }
         // console.log("userArray---->", userArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -836,11 +836,11 @@ class ListUserComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                       
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
 
-                       
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
+
+
 
                     </CardBody>
                 </Card>

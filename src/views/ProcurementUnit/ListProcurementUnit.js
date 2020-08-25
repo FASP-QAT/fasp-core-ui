@@ -412,10 +412,10 @@ export default class ListProcurementUnit extends Component {
       procurementUnitArray[count] = data;
       count++;
     }
-    if (procurementUnitList.length == 0) {
-      data = [];
-      procurementUnitArray[0] = data;
-    }
+    // if (procurementUnitList.length == 0) {
+    //   data = [];
+    //   procurementUnitArray[0] = data;
+    // }
     // console.log("procurementUnitArray---->", procurementUnitArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -691,33 +691,35 @@ export default class ListProcurementUnit extends Component {
           </div>
           <CardBody className="pb-lg-0">
             <Col md="3 pl-0" >
-              <FormGroup className="Selectdiv">
-                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+              <div className="d-md-flex Selectdiv2">
+                <FormGroup className="mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
 
-                <div className="controls SelectGo">
-                  <InputGroup >
-                    <Input
-                      type="select"
-                      name="planningUnitId"
-                      id="planningUnitId"
-                      bsSize="sm"
-                      onChange={this.filterData}
-                    >
-                      <option value="0">{i18n.t('static.common.all')}</option>
-                      {planningUnits}
-                    </Input>
-                    {/* <InputGroupAddon addonType="append">
+                  <div className="controls SelectGo">
+                    <InputGroup >
+                      <Input
+                        type="select"
+                        name="planningUnitId"
+                        id="planningUnitId"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="0">{i18n.t('static.common.all')}</option>
+                        {planningUnits}
+                      </Input>
+                      {/* <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                     </InputGroupAddon> */}
-                  </InputGroup>
-                </div>
-              </FormGroup>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+              </div>
             </Col>
-            <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+            <div >
               {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
               </div>
 
-            </CardBody>
+            </div>
           </CardBody>
         </Card>
         <div style={{ display: this.state.loading ? "block" : "none" }}>

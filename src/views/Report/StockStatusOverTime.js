@@ -1393,7 +1393,7 @@ class StockStatusOverTime extends Component {
         } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
 
-        } else if (monthsInPastForAmc == undefined) {
+        } else if (monthsInPastForAmc == undefined ||monthsInPastForAmc == 0) {
             this.setState({ message: i18n.t('static.realm.monthInPastForAmcText'), matricsList: [] });
 
         } else {

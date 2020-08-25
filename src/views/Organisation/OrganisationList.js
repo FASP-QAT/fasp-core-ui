@@ -387,12 +387,12 @@ export default class OrganisationListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         } else {
             this.setState({
                 selSource: this.state.organisations
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         }
     }
     buildJexcel() {
@@ -412,10 +412,10 @@ export default class OrganisationListComponent extends Component {
             organisationsArray[count] = data;
             count++;
         }
-        if (organisations.length == 0) {
-            data = [];
-            organisationsArray[0] = data;
-        }
+        // if (organisations.length == 0) {
+        //     data = [];
+        //     organisationsArray[0] = data;
+        // }
         // console.log("organisationsArray---->", organisationsArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

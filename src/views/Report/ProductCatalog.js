@@ -1686,7 +1686,7 @@ class ProductCatalog extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Product Catalog Report";
+        const title = i18n.t('static.report.productCatalogReport');
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1735,7 +1735,7 @@ class ProductCatalog extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Product Catalog Report.pdf")
+        doc.save("Product Catalog.pdf")
     }
     handleChangeProgram(programIds) {
 
@@ -1932,71 +1932,7 @@ class ProductCatalog extends Component {
         }
     }
 
-    getProductCategories() {
-        if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProductService.getProductCategoryList(realmId)
-                .then(response => {
-                    console.log(response.data)
-                    this.setState({
-                        productCategories: response.data
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            productCategories: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            const lan = 'en';
-            const { productCategories } = this.state
-            var proList = productCategories;
-
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['productCategory'], 'readwrite');
-                var program = transaction.objectStore('productCategory');
-                var getRequest = program.getAll();
-
-                getRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                getRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
-                    // for (var i = 0; i < myResult.length; i++) {
-                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
-                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    //     proList.push(programData)
-                    // }
-                    this.setState({
-                        productCategories: myResult
-                    })
-                }.bind(this)
-            }.bind(this)
-        }
-    }
+   
 
     getPrograms() {
         if (navigator.onLine) {
@@ -2081,11 +2017,90 @@ class ProductCatalog extends Component {
                 }
                 this.setState({
                     programs: proList
-                })
+                }, () => {
+                    this.getProductCategories()
+                }
+                    )
 
             }.bind(this);
 
         }.bind(this);
+    }
+
+    getProductCategories() {
+
+        // alert(navigator.onLine);
+        
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors();
+            let realmId = AuthenticationService.getRealmId();
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    console.log(response.data);
+                    var list=response.data.slice(1);
+                    console.log("my list=======",list);
+                    
+                    this.setState({
+                        productCategories: list
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            productCategories: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            // alert("in else");
+            const lan = 'en';
+            const { productCategories } = this.state
+            var proList = productCategories;
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['productCategory'], 'readwrite');
+                var program = transaction.objectStore('productCategory');
+                var getRequest = program.getAll();
+
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result.slice(1);
+                    // alert("hi---");
+                    console.log("offline result==>",myResult);
+                    
+                    // for (var i = 0; i < myResult.length; i++) {
+                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
+                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    //     proList.push(programData)
+                    // }
+                    this.setState({
+                        productCategories: myResult
+                    })
+                }.bind(this)
+            }.bind(this)
+        }
     }
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
@@ -2368,10 +2383,10 @@ class ProductCatalog extends Component {
             outPutArray[count] = data;
             count++;
         }
-        if (outPutList.length == 0) {
-            data = [];
-            outPutArray[0] = data;
-        }
+        // if (outPutList.length == 0) {
+        //     data = [];
+        //     outPutArray[0] = data;
+        // }
         // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -2514,7 +2529,8 @@ class ProductCatalog extends Component {
                         var outPutList = response.data;
                         // var responseData = response.data;
                         this.setState({
-                            outPutList: outPutList
+                            outPutList: outPutList,
+                            message: ''
                         },
                             () => { this.buildJexcel() })
                     }).catch(
@@ -2670,7 +2686,7 @@ class ProductCatalog extends Component {
                                         outPutList = outPutList;
                                     }
                                     console.log("outPutList------>", outPutList);
-                                    this.setState({ outPutList: outPutList },
+                                    this.setState({ outPutList: outPutList, message: '' },
                                         () => { this.buildJexcel() });
 
                                 }.bind(this)
@@ -2693,10 +2709,11 @@ class ProductCatalog extends Component {
         // }
     }
     componentDidMount() {
+        // alert("in component did mount");
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
         // this.getProcurementAgent();
-        this.getProductCategories();
+        // this.getProductCategories();
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -2935,99 +2952,99 @@ class ProductCatalog extends Component {
 
                         </div>}
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         {/* <div ref={ref}> */}
                         <br />
-                     
-                            <Col md="12 pl-0">
-                           
-                                <div className="row ">
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    // onChange={this.filterVersion}
-                                                    onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {programs.length > 0
-                                                        && programs.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.programId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="productCategoryId"
-                                                    id="productCategoryId"
-                                                    bsSize="sm"
-                                                    onChange={this.fetchData}
-                                                // onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
-                                                    {productCategories.length > 0
-                                                        && productCategories.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                </option>
-                                                            )
-                                                        }, this)}
 
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="tracerCategoryId"
-                                                    id="tracerCategoryId"
-                                                    bsSize="sm"
-                                                    onChange={this.fetchData}
-                                                // onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.all')}</option>
-                                                    {tracerCategories.length > 0
-                                                        && tracerCategories.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.tracerCategoryId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
+                        <Col md="12 pl-0">
 
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                             
-                            </Col>
-                        
-                        
+                            <div className="d-md-flex  Selectdiv2 ">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                                // onChange={this.filterVersion}
+                                                onChange={(e) => { this.fetchData(); this.getTracerCategoryList(); }}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programs.length > 0
+                                                    && programs.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.programId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {productCategories.length > 0
+                                                    && productCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.fetchData}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {tracerCategories.length > 0
+                                                    && tracerCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.tracerCategoryId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+
+                        </Col>
+
+
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
-                       
-                       
+
+
                     </CardBody>
                 </Card>
 

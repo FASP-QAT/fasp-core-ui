@@ -318,8 +318,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             name="minMosMaxGaurdrail"
                                                             id="minMosMaxGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
-                                                            invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail || this.state.realm.minMosMaxGaurdrail == ''}
+                                                            valid={!errors.minMosMaxGaurdrail && ( this.state.realm.minMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.minMosMaxGaurdrail}
@@ -333,8 +333,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             name="maxMosMaxGaurdrail"
                                                             id="maxMosMaxGaurdrail"
                                                             bsSize="sm"
-                                                            valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
-                                                            invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail || this.state.realm.maxMosMaxGaurdrail == ''}
+                                                            valid={!errors.maxMosMaxGaurdrail && ( this.state.realm.maxMosMaxGaurdrail >= 0)}
+                                                            invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.maxMosMaxGaurdrail}

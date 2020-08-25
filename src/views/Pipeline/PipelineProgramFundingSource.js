@@ -215,13 +215,14 @@ export default class PipelineProgramFundingSource extends Component {
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     text: {
+                                                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
                                                 },
-                                                onload: this.loadedJexcelCommonFunction,
-                                                // onload: this.loaded
+                                                // onload: this.loadedJexcelCommonFunction,
+                                                onload: this.loaded
 
                                             };
                                             var elVar = jexcel(document.getElementById("mapFundingSource"), options);

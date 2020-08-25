@@ -71,6 +71,10 @@ const pickerLang = {
   from: 'From', to: 'To',
 }
 let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
+const legendcolor=[{text:"Stock Out" ,color:"#ed5626"},
+{text:"Excess stock" ,color:"#f48521"},
+{text:"Low stock" ,color:"#edb944"},
+{text:"Okay" ,color:"#118b70"}];
 const options = {
   title: {
     display: true,
@@ -287,13 +291,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   cellstyleWithData = (item) => {
     if (item.outputString == 'OUT') {
-      return { backgroundColor: 'red' }
+      return { backgroundColor: legendcolor[0].color }
     } else if (item.outputString == 'excess') {
-      return { backgroundColor: 'yellow' }
+      return { backgroundColor: legendcolor[1].color }
     } else if (item.outputString == 'low') {
-      return { backgroundColor: '#f0910c' }
+      return { backgroundColor: legendcolor[2].color }
     } else {
-      return { backgroundColor: '#00c596' }
+      return { backgroundColor: legendcolor[3].color }
     }
   }
 
@@ -730,6 +734,15 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         </InputGroup>
                       </div>
                     </FormGroup>
+                    <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
+                                                    <ul className="legendcommitversion list-group">
+                                                    {
+                                                            legendcolor.map(item1 => (
+                                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                                            ))
+                                                        }
+                                                    </ul>
+                                                </FormGroup>
                   </div>
                 </Col>
               </Form>

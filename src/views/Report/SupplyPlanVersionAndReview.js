@@ -949,10 +949,10 @@ class SupplyPlanVersionAndReview extends Component {
             matricsArray[count] = data;
             count++;
         }
-        if (matricsList.length == 0) {
-            data = [];
-            matricsArray[0] = data;
-        }
+        // if (matricsList.length == 0) {
+        //     data = [];
+        //     matricsArray[0] = data;
+        // }
         // console.log("matricsArray---->", matricsArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1217,6 +1217,7 @@ class SupplyPlanVersionAndReview extends Component {
         let versionTypeId = document.getElementById("versionTypeId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+        console.log('endDate',endDate)
         if (programId != 0 && countryId != 0) {
             AuthenticationService.setupAxiosInterceptors();
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
@@ -1508,85 +1509,85 @@ class SupplyPlanVersionAndReview extends Component {
         }
 
         const columns = [
-                        {
-                            dataField: 'program.label',
-                            text: i18n.t('static.program.program'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.formatLabel
-            
-                        },
-                        {
-                            dataField: 'versionId',
-                            text: i18n.t('static.report.version'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center'
-                        },
-                        {
-                            dataField: 'versionType.label',
-                            text: i18n.t('static.report.versiontype'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.formatLabel
-                        },
-                        {
-                            dataField: 'createdDate',
-                            text: i18n.t('static.report.veruploaddate'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: (cellContent, row) => {
-                                return (
-                                    (row.createdDate ? moment(row.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
-                                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
-                                );
-                            }
-                        }
-                        , {
-                            dataField: 'createdBy.username',
-                            text: i18n.t('static.report.veruploaduser'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center'
-                        }, {
-                            dataField: 'versionStatus.label',
-                            text: i18n.t('static.report.issupplyplanapprove'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.formatLabel
-                        }
-                        , {
-                            dataField: 'lastModifiedBy.username',
-                            text: i18n.t('static.report.approver'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                            formatter: this.checkValue
-                        }, {
-                            dataField: 'lastModifiedDate',
-                            text: i18n.t('static.report.approveddate'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-                             formatter: (cellContent, row) => {
-                                return (
-                                    (row.versionStatus.id == 2)? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null):null
-                                    // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
-                                );
-                            }
-            
-                        }, {
-                            dataField: 'notes',
-                            text: i18n.t('static.report.comment'),
-                            sort: true,
-                            align: 'center',
-                            headerAlign: 'center',
-            
-                        }];
+            {
+                dataField: 'program.label',
+                text: i18n.t('static.program.program'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+
+            },
+            {
+                dataField: 'versionId',
+                text: i18n.t('static.report.version'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'versionType.label',
+                text: i18n.t('static.report.versiontype'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
+                dataField: 'createdDate',
+                text: i18n.t('static.report.veruploaddate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.createdDate ? moment(row.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
+            }
+            , {
+                dataField: 'createdBy.username',
+                text: i18n.t('static.report.veruploaduser'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'versionStatus.label',
+                text: i18n.t('static.report.issupplyplanapprove'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            }
+            , {
+                dataField: 'lastModifiedBy.username',
+                text: i18n.t('static.report.approver'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.checkValue
+            }, {
+                dataField: 'lastModifiedDate',
+                text: i18n.t('static.report.approveddate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.versionStatus.id == 2) ? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
+
+            }, {
+                dataField: 'notes',
+                text: i18n.t('static.report.comment'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+
+            }];
 
         const options = {
             hidePageListOnlyOnePage: true,

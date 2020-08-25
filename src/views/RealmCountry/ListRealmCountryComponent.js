@@ -523,10 +523,10 @@ class ListRealmCountryComponent extends Component {
             realmCountryArray[count] = data;
             count++;
         }
-        if (realmCountryList.length == 0) {
-            data = [];
-            realmCountryArray[0] = data;
-        }
+        // if (realmCountryList.length == 0) {
+        //     data = [];
+        //     realmCountryArray[0] = data;
+        // }
         // console.log("realmCountryArray---->", realmCountryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -801,7 +801,7 @@ class ListRealmCountryComponent extends Component {
                     </CardHeader> */}
                     <CardBody className="pb-lg-0 mt-3">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
+                            <FormGroup className="Selectdiv mt-md-1 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -823,7 +823,7 @@ class ListRealmCountryComponent extends Component {
                             </FormGroup>
                         </Col>
                       
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
 
                       

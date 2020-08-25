@@ -416,10 +416,10 @@ export default class DataSourceTypeListComponent extends Component {
             dataSourceTypeArray[count] = data;
             count++;
         }
-        if (dataSourceTypeList.length == 0) {
-            data = [];
-            dataSourceTypeArray[0] = data;
-        }
+        // if (dataSourceTypeList.length == 0) {
+        //     data = [];
+        //     dataSourceTypeArray[0] = data;
+        // }
         // console.log("dataSourceTypeArray---->", dataSourceTypeArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -631,11 +631,11 @@ export default class DataSourceTypeListComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className="SearchMarginTop">
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
 
-                        </CardBody>
+                        </div>
 
                     </CardBody>
                 </Card>

@@ -389,10 +389,10 @@ export default class HealthAreaListComponent extends Component {
             healthAreasArray[count] = data;
             count++;
         }
-        if (healthAreas.length == 0) {
-            data = [];
-            healthAreasArray[0] = data;
-        }
+        // if (healthAreas.length == 0) {
+        //     data = [];
+        //     healthAreasArray[0] = data;
+        // }
         // console.log("healthAreasArray---->", healthAreasArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

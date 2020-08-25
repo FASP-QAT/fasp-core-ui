@@ -81,7 +81,7 @@
 //         this.fetchData = this.fetchData.bind(this);
 //     }
 
-//     exportCSV(columns) {
+//     exportCSV(columns) { 
 //         var csvRow = [];
 //         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
 //         csvRow.push("");
@@ -1347,7 +1347,7 @@ class SupplierLeadTimes extends Component {
     buildJexcel() {
 
         let outPutList = this.state.outPutList;
-        // console.log("outPutList---->", outPutList);
+        console.log("outPutList---->", outPutList);
         let outPutArray = [];
         let count = 0;
 
@@ -1357,24 +1357,24 @@ class SupplierLeadTimes extends Component {
             data[1] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[2] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[3] = getLabelText(outPutList[j].procurementAgent.label, this.state.lang)
-            data[4] = outPutList[j].plannedToDraftLeadTime
-            data[5] = outPutList[j].draftToSubmittedLeadTime
-            data[6] = outPutList[j].submittedToApprovedLeadTime
-            data[7] = outPutList[j].approvedToShippedLeadTime
+            data[4] = outPutList[j].plannedSubmittedLeadTime
+            data[5] = outPutList[j].submittedToApprovedLeadTime
+            data[6] = outPutList[j].approvedToShippedLeadTime
+            data[7] = outPutList[j].shippedToArrivedBySeaLeadTime
 
-            data[8] = outPutList[j].shippedToArrivedBySeaLeadTime
-            data[9] = outPutList[j].shippedToArrivedByAirLeadTime
-            data[10] = outPutList[j].arrivedToDeliveredLeadTime
-            data[11] = outPutList[j].totalSeaLeadTime
-            data[12] = outPutList[j].totalAirLeadTime
-            data[13] = outPutList[j].localProcurementAgentLeadTime
+            data[8] = outPutList[j].shippedToArrivedByAirLeadTime
+            data[9] = outPutList[j].arrivedToDeliveredLeadTime
+            data[10] = outPutList[j].totalSeaLeadTime
+            data[11] = outPutList[j].totalAirLeadTime
+            data[12] = outPutList[j].localProcurementAgentLeadTime
+            // data[13] = outPutList[j].
             outPutArray[count] = data;
             count++;
         }
-        if (outPutList.length == 0) {
-            data = [];
-            outPutArray[0] = data;
-        }
+        // if (outPutList.length == 0) {
+        //     data = [];
+        //     outPutArray[0] = data;
+        // }
         // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1393,68 +1393,68 @@ class SupplierLeadTimes extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Program',
+                    title: i18n.t('static.program.program'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Planning Unit',
+                    title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
                     readOnly: true
                 },
 
                 {
-                    title: 'Procurement Agent',
+                    title: i18n.t('static.report.procurementAgentName'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Planned To Draft Lead Time',
+                    title: i18n.t('static.report.plannedToSubmitLeadTime'),
+                    type: 'text',
+                    readOnly: true
+                },
+                // {
+                //     title: 'Draft To Submitted Lead Time',
+                //     type: 'text',
+                //     readOnly: true
+                // },
+                {
+                    title: i18n.t('static.program.submittoapproveleadtime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Draft To Submitted Lead Time',
+                    title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Submitted To Approved Lead Time',
+                    title: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Approved To Shipped Lead Time',
+                    title: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Shipped To Arrived By Sea LeadTime',
+                    title: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Shipped To Arrived By Air LeadTime',
+                    title: i18n.t('static.report.totalSeaLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Arrived To Delivered LeadTime',
+                    title: i18n.t('static.report.totalAirLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Total Sea Lead Time',
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: 'Total Air LeadTime',
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: 'Local Procurement LeadTime',
+                    title: i18n.t('static.report.localProcurementAgentLeadTime'),
                     type: 'text',
                     readOnly: true
                 },
@@ -1498,7 +1498,7 @@ class SupplierLeadTimes extends Component {
         // csvRow.push("");
         // csvRow.push(i18n.t('static.report.procurementAgentName') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
         // csvRow.push("");
-        
+
         // console.log("this.state.planningUnitLabels===>",this.state.planningUnitLabels);
         // console.log("this.state.procurementAgentLabels===>",this.state.procurementAgentLabels);
 
@@ -1523,13 +1523,13 @@ class SupplierLeadTimes extends Component {
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [headers];
 
-        console.log("output list--->",this.state.outPutList);
+        console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push([
                 (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.procurementAgent.label, this.state.lang) ==null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                (getLabelText(ele.procurementAgent.label, this.state.lang) == null ? '' : getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
@@ -1553,7 +1553,8 @@ class SupplierLeadTimes extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = "Procurement Agent Lead Times Report.csv"
+        a.download = i18n.t('static.report.procurmentAgentLeadTimeReport').concat('.csv')
+        // 'Procurement Agent Lead Times.csv'
         document.body.appendChild(a)
         a.click()
     }
@@ -1586,7 +1587,7 @@ class SupplierLeadTimes extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text("Procurement Agent Lead Times Report", doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.procurmentAgentLeadTimeReport'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1600,11 +1601,7 @@ class SupplierLeadTimes extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 110, planningText)
                    
-                    planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130, planningText)
                 }
 
             }
@@ -1615,7 +1612,37 @@ class SupplierLeadTimes extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = "Procurement Agent Lead Times Report";
+        doc.setFont('helvetica', 'normal')
+         doc.setTextColor("#002f6c");
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+        //doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+              doc.addPage();
+              y = 80;
+      
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+          }
+        planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+        //doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+          if (y > doc.internal.pageSize.height - 100) {
+            doc.addPage();
+            y = 80;
+    
+          }
+          doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+          y = y + 10;
+          console.log(y)
+        }
+     
+        doc.setFontSize(8);
+        const title = i18n.t('static.report.procurmentAgentLeadTimeReport');
         // var canvas = document.getElementById("cool-canvas");
         //creates image
         // var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1626,6 +1653,15 @@ class SupplierLeadTimes extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
         // const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
         // const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
+        let startY = y
+        console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+          doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        doc.setTextColor("#fff");
+       
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
@@ -1645,25 +1681,27 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-        let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
+       // let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
       
         let content = {
-            margin: { top: 110 ,bottom:75},
-            startY: startY,
+            margin: { top: 110 ,bottom:95},
+            startY: startYtable,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
-            // columnStyles: {
-            //     0: { cellWidth: 170 },
-            //     1: { cellWidth: 171.89 },
-            //     6: { cellWidth: 100 }
-            // }
+            columnStyles: {
+                // 0: { cellWidth: 170 },
+                // 1: { cellWidth: 171.89 },
+                3: { cellWidth: 110 }
+            }
         };
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Procurement Agent Lead Times Report.pdf")
+        doc.save(i18n.t('static.report.procurmentAgentLeadTimeReport').concat('.pdf'));
     }
+
+
     handleChangeProgram(programIds) {
 
         this.setState({
@@ -2268,7 +2306,7 @@ class SupplierLeadTimes extends Component {
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
                                                 arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
                                                 submittedToApprovedLeadTime: submittedToApprovedLeadTime,
-                                               
+
                                                 totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
                                                 totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
                                             }
@@ -2385,7 +2423,7 @@ class SupplierLeadTimes extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '150px' }, 
+                style: { width: '150px' },
                 formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
@@ -2454,7 +2492,7 @@ class SupplierLeadTimes extends Component {
 
             {
                 dataField: 'approvedToShippedLeadTime',
-                text:i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
+                text: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2490,7 +2528,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'totalSeaLeadTime',
-                text:i18n.t('static.report.totalSeaLeadTime'),
+                text: i18n.t('static.report.totalSeaLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -2568,12 +2606,12 @@ class SupplierLeadTimes extends Component {
                         </div>
                         {/* } */}
                     </div>
-                    <CardBody className="pt-lg-0">
+                    <CardBody className="pt-lg-0 pb-lg-5">
                         {/* <div ref={ref}> */}
-                      {/* <Form> */}
-                            <Col md="12 pl-0">
-                                <div className="row">
-                                    {/* <Online>
+                        {/* <Form> */}
+                        <div className="pl-0">
+                            <div className="row">
+                                {/* <Online>
                                         <FormGroup className="tab-ml-1">
                                             <Label htmlFor="appendedInputButton">Country</Label>
                                             <div className="controls SelectGo">
@@ -2593,66 +2631,68 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    // onChange={this.filterVersion}
-                                                    onChange={(e) => { this.getPlanningUnit(); }}
-                                                >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                    {programs.length > 0
-                                                        && programs.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.programId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                                // onChange={this.filterVersion}
+                                                onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {programs.length > 0
+                                                    && programs.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.programId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
 
-                                        <div className="controls">
-                                            <MultiSelect
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="md"
-                                                value={this.state.planningUnitValues}
-                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                            />
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="planningUnitId"
+                                            id="planningUnitId"
+                                            bsSize="md"
+                                            value={this.state.planningUnitValues}
+                                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                        />
 
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
 
-                                        <div className="controls">
-                                            <MultiSelect
-                                                name="procurementAgentId"
-                                                id="procurementAgentId"
-                                                bsSize="md"
-                                                value={this.state.procurementAgenttValues}
-                                                onChange={(e) => { this.handleProcurementAgentChange(e) }}
-                                                options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
-                                            />
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                            </Col>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="procurementAgentId"
+                                            id="procurementAgentId"
+                                            bsSize="md"
+                                            value={this.state.procurementAgenttValues}
+                                            onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                            options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                        />
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </div>
                         {/* </Form> */}
+                        <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
 

@@ -334,10 +334,10 @@ export default class RealmCountryPlanningUnitList extends Component {
             realmCountryArray[count] = data;
             count++;
         }
-        if (realmCountryList.length == 0) {
-            data = [];
-            realmCountryArray[0] = data;
-        }
+        // if (realmCountryList.length == 0) {
+        //     data = [];
+        //     realmCountryArray[0] = data;
+        // }
         // console.log("realmCountryArray---->", realmCountryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -439,7 +439,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 realmCountryPlanningUnitList: response.data,
                 selSource: response.data
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         })
             .catch(
                 error => {
@@ -476,7 +476,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             this.setState({
                 realmCountrys: response.data,
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         })
             .catch(
                 error => {
@@ -585,7 +585,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground SearchMarginTop">
                         </div>
 
                     </CardBody>

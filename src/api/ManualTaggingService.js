@@ -7,8 +7,8 @@ class ManualTaggingSerice {
         return axios.get(`${API_URL}/api/manualTagging/${programId}/${planningUnitId}`, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(orderNo, primeLineNo) {
-        return axios.get(`${API_URL}/api/orderDetails/${orderNo}/${primeLineNo}`, {
+    getOrderDetailsByOrderNoAndPrimeLineNo(programId, planningUnitId, orderNo, primeLineNo) {
+        return axios.get(`${API_URL}/api/orderDetails/${programId}/${planningUnitId}/${orderNo}/${primeLineNo}`, {
         });
     }
     linkShipmentWithARTMIS(orderNo, primeLineNo, shipmentId) {
