@@ -382,7 +382,7 @@ export default class AddInventory extends Component {
                     <ModalBody>
                         <h6 className="red">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                         <div className="table-responsive">
-                            <div id="inventoryBatchInfoTable"></div>
+                            <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                     </ModalBody>
                     <ModalFooter>

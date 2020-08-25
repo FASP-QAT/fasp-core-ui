@@ -349,7 +349,7 @@ export default class ShipmentDetails extends React.Component {
                         </div>
                         <h6 className="red">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                         <div className="table-responsive">
-                            <div id="shipmentBatchInfoTable"></div>
+                            <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
 
                     </ModalBody>
