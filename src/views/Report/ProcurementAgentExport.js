@@ -3659,9 +3659,9 @@ class ProcurementAgentExport extends Component {
                             }
                         </Offline>
                     </div>
-                    <CardBody className="pt-lg-0">
+                    <CardBody className="pt-lg-0 pb-lg-5">
 
-                        <Col md="12 pl-0">
+                        <div className="pl-0">
                             <div className="row ">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
@@ -3842,9 +3842,10 @@ class ProcurementAgentExport extends Component {
 
 
                             </div>
-                        </Col>
-
+                        </div>
+                        <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
                     </CardBody>
                 </Card>
