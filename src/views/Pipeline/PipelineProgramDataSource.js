@@ -272,7 +272,7 @@ export default class PipelineProgramDataSource extends Component {
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50, 100],
+                                                paginationOptions: [10, 25, 50],
                                                 // position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -280,8 +280,10 @@ export default class PipelineProgramDataSource extends Component {
                                                 onchange: this.changed,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                
                                                     text: {
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
                                                 },
