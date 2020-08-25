@@ -384,6 +384,7 @@
     "static.user.validphone": "Please enter Phone Number",
     "static.common.rmlastrow": "Remove last row",
     "static.common.add": "Add",
+    "static.common.dlink": "D-link",
     "static.common.deleterow": "Delete Row",
     "static.common.remove": "Remove",
     "static.healtharea.healtharea": "Technical Area",
@@ -415,6 +416,8 @@
     "static.masterDataSync.masters": "masters",
     "static.common.retry": "Retry",
     "static.masterDataSync.success": "Master data synced successfully.",
+    "static.shipment.delinkingsuccess": "Shipment delinked successfully",
+    "static.shipment.linkingsuccess": "Shipment linked successfully",
     "static.masterDataSync.syncFailed": "Master data synced failed. Please try again.",
     "static.breadcrum.add": "Add {{entityname}}",
     "static.breadcrum.edit": "Update {{entityname}}",
@@ -1099,6 +1102,5 @@
     "static.pipelineProgram.fileName": "File Name",
     "static.pipelineProgram.importDate": "Import Date",
     "static.program.fileinputjson": "File Input(File must be .json format)",
-    "static.report.procurmentAgentLeadTimeReport":"Procurement Agent Lead Times"
-
+    "static.report.procurmentAgentLeadTimeReport": "Procurement Agent Lead Times"
 }
