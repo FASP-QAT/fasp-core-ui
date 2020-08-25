@@ -639,6 +639,7 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
@@ -796,10 +797,10 @@ export default class ConsumptionDetails extends React.Component {
             problemArray[count] = data;
             count++;
         }
-        if (problemList.length == 0) {
-            data = [];
-            problemArray[0] = data;
-        }
+        // if (problemList.length == 0) {
+        //     data = [];
+        //     problemArray[0] = data;
+        // }
         // console.log("problemArray---->", problemArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -903,16 +904,22 @@ export default class ConsumptionDetails extends React.Component {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (criticalityId == 2 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'orange');
+                        let textColor = contrast('orange');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (criticalityId == 1 && problemStatusId == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'yellow');
+                        let textColor = contrast('yellow');
+                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 }
 
@@ -951,9 +958,9 @@ export default class ConsumptionDetails extends React.Component {
                                 var versionId = this.el.getValueFromCoords(3, y)
 
                                 // if (this.el.getValueFromCoords(14, y) != 2) {
-                                    this.props.history.push({
-                                        pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
-                                    });
+                                this.props.history.push({
+                                    pathname: `${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`,
+                                });
                                 // } else {
                                 //     this.props.history.push({
                                 //         pathname: `${this.el.getValueFromCoords(15, y)}`,
@@ -1111,12 +1118,12 @@ export default class ConsumptionDetails extends React.Component {
         var versionId = row.versionId
         event.stopPropagation();
         // if (row.realmProblem.problem.problemId != 2) {
-            alert(`${cell}/${programId}/${versionId}/${planningunitId}`);
-            this.props.history.push({
-                // pathname: `/programProduct/addProgramProduct/${cell}`,
-                // pathname: `/report/addProblem`,
-                pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
-            });
+        alert(`${cell}/${programId}/${versionId}/${planningunitId}`);
+        this.props.history.push({
+            // pathname: `/programProduct/addProgramProduct/${cell}`,
+            // pathname: `/report/addProblem`,
+            pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
+        });
         // } else {
         //     this.props.history.push({
         //         pathname: `${cell}`,
@@ -1339,7 +1346,7 @@ export default class ConsumptionDetails extends React.Component {
                     <CardBody className="pb-lg-5 ">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup  className="mt-md-2 mb-md-0 ">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectField">
                                         <InputGroup>
@@ -1394,8 +1401,8 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </Col>
                         {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         {/* </div> */}
                     </CardBody>
 

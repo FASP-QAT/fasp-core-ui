@@ -365,10 +365,10 @@ export default class LanguageListComponent extends Component {
                                 languageArray[count] = data;
                                 count++;
                             }
-                            if (langaugeList.length == 0) {
-                                data = [];
-                                languageArray[0] = data;
-                            }
+                            // if (langaugeList.length == 0) {
+                            //     data = [];
+                            //     languageArray[0] = data;
+                            // }
                             // console.log("languageArray---->", languageArray);
                             this.el = jexcel(document.getElementById("tableDiv"), '');
                             this.el.destroy();

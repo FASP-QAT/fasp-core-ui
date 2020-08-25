@@ -922,13 +922,13 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.shipment.edd'),
                     type: 'calendar',
-                    options: { format: 'MM-DD-YYYY' }
+                    options: { format: 'DD-MMM-YYYY' }
 
                 },
                 {
                     title: i18n.t('static.shipment.ordereddate'),
                     type: 'hidden',
-                    // options: { format: 'MM-DD-YYYY' }
+                    // options: { format: 'DD-MMM-YYYY' }
 
                 }, {
                     title: i18n.t('static.supplyPlan.plannedDate'),

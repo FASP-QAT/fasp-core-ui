@@ -583,20 +583,20 @@ export default class DataSourceListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (realmId != 0 && dataSourceTypeId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (realmId != 0 && programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.program.id == programId)
 
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0 && programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.program.id == programId && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
@@ -607,29 +607,29 @@ export default class DataSourceListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else if (programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.program.id == programId)
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else {
             this.setState({
                 selSource: this.state.dataSourceList
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         }
 
     }
     buildJexcel() {
-         let dataSourceList = this.state.selSource;
+        let dataSourceList = this.state.selSource;
         // console.log("dataSourceList---->", dataSourceList);
         let dataSourceArray = [];
         let count = 0;
@@ -645,10 +645,10 @@ export default class DataSourceListComponent extends Component {
             dataSourceArray[count] = data;
             count++;
         }
-        if (dataSourceList.length == 0) {
-            data = [];
-            dataSourceArray[0] = data;
-        }
+        // if (dataSourceList.length == 0) {
+        //     data = [];
+        //     dataSourceArray[0] = data;
+        // }
         // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -838,7 +838,7 @@ export default class DataSourceListComponent extends Component {
             // })
             this.setState({
                 dataSourceList: response.data, selSource: response.data
-            },() => { this.buildJexcel()})
+            }, () => { this.buildJexcel() })
         })
 
     }
@@ -855,7 +855,7 @@ export default class DataSourceListComponent extends Component {
         }
     }
     selected = function (instance, cell, x, y, value) {
-         if (x == 0 && value != 0) {
+        if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {

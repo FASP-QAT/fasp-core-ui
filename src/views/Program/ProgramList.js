@@ -450,10 +450,10 @@ export default class ProgramList extends Component {
       programArray[count] = data;
       count++;
     }
-    if (programList.length == 0) {
-      data = [];
-      programArray[0] = data;
-    }
+    // if (programList.length == 0) {
+    //   data = [];
+    //   programArray[0] = data;
+    // }
     // console.log("programArray---->", programArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     this.el.destroy();
@@ -684,9 +684,9 @@ export default class ProgramList extends Component {
                 </div>
               </FormGroup>
             </Col>
-          
-              {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-              </div>
+
+            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+            </div>
 
           </CardBody>
         </Card>
