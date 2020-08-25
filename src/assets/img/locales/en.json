@@ -1099,6 +1099,6 @@
     "static.pipelineProgram.fileName": "File Name",
     "static.pipelineProgram.importDate": "Import Date",
     "static.program.fileinputjson": "File Input(File must be .json format)",
-    "static.report.procurmentAgentLeadTimeReport":"Procurement Agent Lead Times"
-
+    "static.report.procurmentAgentLeadTimeReport": "Procurement Agent Lead Times",
+    "static.dashboard.linkShipment": "Link shipment"
 }
