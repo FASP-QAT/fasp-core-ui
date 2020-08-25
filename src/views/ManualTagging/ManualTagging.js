@@ -1247,7 +1247,7 @@ export default class ManualTagging extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -1320,7 +1320,7 @@ export default class ManualTagging extends Component {
                                 <Col md="12 pl-0">
                                     <div className="d-md-flex">
                                         <FormGroup className="col-md-3 pl-0">
-                                            <Label htmlFor="appendedInputButton">Order No</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.orderNo')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -1334,7 +1334,7 @@ export default class ManualTagging extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Prime Line No</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.primeLineNo')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
