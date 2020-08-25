@@ -2574,10 +2574,10 @@ class SupplierLeadTimes extends Component {
                         </div>
                         {/* } */}
                     </div>
-                    <CardBody className="pt-lg-0">
+                    <CardBody className="pt-lg-0 pb-lg-5">
                         {/* <div ref={ref}> */}
                         {/* <Form> */}
-                        <Col md="12 pl-0">
+                        <div className="pl-0">
                             <div className="row">
                                 {/* <Online>
                                         <FormGroup className="tab-ml-1">
@@ -2656,9 +2656,11 @@ class SupplierLeadTimes extends Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                        </Col>
+                        </div>
                         {/* </Form> */}
+                        <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
 

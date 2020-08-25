@@ -500,7 +500,7 @@
     "static.program.reorderFrequencyInMonths": "Reorder Frequency In Months",
     "static.program.programPlanningUnit.reorderFrequencyText": "Please enter reorder frequency in months",
     "static.dashboard.procurementAgentPlanningUnit": "Procurement Agent Planning Unit",
-    "static.procurementAgentPlanningUnit.catalogPrice": "Catalog price (USD)",
+    "static.procurementAgentPlanningUnit.catalogPrice": "Catalog Price (USD)",
     "static.procurementAgentPlanningUnit.catalogPriceText": "Please enter catalog price (USD)",
     "static.procurementAgentPlanningUnit.moq": "Minimum Order Quantity (MOQ)",
     "static.procurementAgentPlanningUnit.moqText": "Enter MOQ",

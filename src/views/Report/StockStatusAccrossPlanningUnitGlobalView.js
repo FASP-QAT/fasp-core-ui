@@ -734,7 +734,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         </InputGroup>
                       </div>
                     </FormGroup>
-                    <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
+                    <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                                                     <ul className="legendcommitversion list-group">
                                                     {
                                                             legendcolor.map(item1 => (
