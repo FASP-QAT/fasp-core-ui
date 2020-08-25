@@ -1932,71 +1932,7 @@ class ProductCatalog extends Component {
         }
     }
 
-    getProductCategories() {
-        if (navigator.onLine) {
-            AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
-            ProductService.getProductCategoryList(realmId)
-                .then(response => {
-                    console.log(response.data)
-                    this.setState({
-                        productCategories: response.data
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            productCategories: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            const lan = 'en';
-            const { productCategories } = this.state
-            var proList = productCategories;
-
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['productCategory'], 'readwrite');
-                var program = transaction.objectStore('productCategory');
-                var getRequest = program.getAll();
-
-                getRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                getRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
-                    // for (var i = 0; i < myResult.length; i++) {
-                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
-                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    //     proList.push(programData)
-                    // }
-                    this.setState({
-                        productCategories: myResult
-                    })
-                }.bind(this)
-            }.bind(this)
-        }
-    }
+   
 
     getPrograms() {
         if (navigator.onLine) {
@@ -2081,11 +2017,90 @@ class ProductCatalog extends Component {
                 }
                 this.setState({
                     programs: proList
-                })
+                }, () => {
+                    this.getProductCategories()
+                }
+                    )
 
             }.bind(this);
 
         }.bind(this);
+    }
+
+    getProductCategories() {
+
+        // alert(navigator.onLine);
+        
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors();
+            let realmId = AuthenticationService.getRealmId();
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    console.log(response.data);
+                    var list=response.data.slice(1);
+                    console.log("my list=======",list);
+                    
+                    this.setState({
+                        productCategories: list
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            productCategories: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            // alert("in else");
+            const lan = 'en';
+            const { productCategories } = this.state
+            var proList = productCategories;
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['productCategory'], 'readwrite');
+                var program = transaction.objectStore('productCategory');
+                var getRequest = program.getAll();
+
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result.slice(1);
+                    // alert("hi---");
+                    console.log("offline result==>",myResult);
+                    
+                    // for (var i = 0; i < myResult.length; i++) {
+                    //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
+                    //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    //     proList.push(programData)
+                    // }
+                    this.setState({
+                        productCategories: myResult
+                    })
+                }.bind(this)
+            }.bind(this)
+        }
     }
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
@@ -2694,10 +2709,11 @@ class ProductCatalog extends Component {
         // }
     }
     componentDidMount() {
+        // alert("in component did mount");
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
         // this.getProcurementAgent();
-        this.getProductCategories();
+        // this.getProductCategories();
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
