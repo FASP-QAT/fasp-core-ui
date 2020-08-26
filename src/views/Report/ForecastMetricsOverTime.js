@@ -948,17 +948,22 @@ PercentageFormatter=num=>{
           <Col lg="12">
             <Card>
               <div className="Card-header-reporticon">
+              <div className="card-header-actions">
+              <a className="card-header-action">
+                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                            </a>
                 {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong> */}
                 
                   {
                     this.state.matricsList.length > 0 &&
-                    <div className="card-header-actions">
+                   
+                     
                       <a className="card-header-action">
                       <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
                       <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                      </a> </div>
+                      </a> 
                   }
-              
+                  </div>
                 </div>
               <CardBody className="pb-lg-2 pt-lg-0">
                 <div className="TableCust" >

@@ -117,7 +117,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var prevMonthDate = moment(createdDate).subtract(1, 'months').startOf('month').format("YYYY-MM-DD");
                                     var prevMonthSupplyPlan = [];
                                     if (supplyPlanData.length > 0) {
-                                        prevMonthSupplyPlan = supplyPlanData.filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(prevMonthDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
+                                        prevMonthSupplyPlan = supplyPlanData.filter(c => moment(c.startDate).format("YYYY-MM-DD") == moment(prevMonthDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
                                     } else {
                                         prevMonthSupplyPlan = []
                                     }
@@ -211,7 +211,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -221,11 +221,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (manualShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -235,7 +235,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -245,11 +245,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (manualShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -259,7 +259,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -269,11 +269,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (manualShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -283,7 +283,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (manualShipmentArr[j].procurementAgent.id != "" && manualShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -293,11 +293,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (manualShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -353,7 +353,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -363,11 +363,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (erpShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -377,7 +377,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -387,11 +387,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (erpShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -401,7 +401,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -411,11 +411,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (erpShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -425,7 +425,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (erpShipmentArr[j].procurementAgent.id != "" && erpShipmentArr[j].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == erpShipmentArr[j].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == erpShipmentArr[j].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + erpShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                 paColor = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == "#" + paColor);
                                                 if (index == -1) {
@@ -435,11 +435,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 if (erpShipmentArr[j].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == manualShipmentArr[j].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == manualShipmentArr[j].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + manualShipmentArr[j].shipmentQty + " - " + shipmentStatus.label.label_en + "\n";
+                                                    var shipmentDetail = { pa: procurementAgent.procurementAgentCode, qty: manualShipmentArr[j].shipmentQty, status: shipmentStatus.label };
                                                     paColor = "#efefef"
                                                 }
                                             }
@@ -764,7 +764,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var totalMonths = 0;
                                     for (var ap = 1; ap <= programPlanningUnitList[ppL].monthsInPastForAmc; ap++) {
                                         var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
-                                        var amcFilter = supplyPlanData.filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(amcDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
+                                        var amcFilter = supplyPlanData.filter(c => moment(c.startDate).format("YYYY-MM-DD") == moment(amcDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
                                         if (amcFilter.length > 0) {
                                             amcTotal += (amcFilter[0].consumptionJson.consumptionQty != "" ? parseInt(amcFilter[0].consumptionJson.consumptionQty) : 0);
                                             if (amcFilter[0].consumptionJson.consumptionQty != "") {
@@ -944,22 +944,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         programId: programJsonForStoringTheResult.programId,
                                         versionId: programJsonForStoringTheResult.currentVersion.versionId,
                                         planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
-                                        month: month,
+                                        startDate: month.startDate,
                                         consumptionJson: consumptionJson,
                                         shipmentTotalQty: shipmentTotalQty,
                                         manualTotalQty: manualTotalQty,
-                                        deliveredShipmentsDetailsArr: deliveredShipmentsDetailsArr,
-                                        shippedShipmentsDetailsArr: shippedShipmentsDetailsArr,
-                                        orderedShipmentsDetailsArr: orderedShipmentsDetailsArr,
-                                        plannedShipmentsDetailsArr: plannedShipmentsDetailsArr,
                                         deliveredShipmentsTotalData: deliveredShipmentsTotalData,
                                         shippedShipmentsTotalData: shippedShipmentsTotalData,
                                         orderedShipmentsTotalData: orderedShipmentsTotalData,
                                         plannedShipmentsTotalData: plannedShipmentsTotalData,
-                                        deliveredErpShipmentsDetailsArr: deliveredErpShipmentsDetailsArr,
-                                        shippedErpShipmentsDetailsArr: shippedErpShipmentsDetailsArr,
-                                        orderedErpShipmentsDetailsArr: orderedErpShipmentsDetailsArr,
-                                        plannedErpShipmentsDetailsArr: plannedErpShipmentsDetailsArr,
                                         erpTotalQty: erpTotalQty,
                                         deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
                                         shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
@@ -1047,6 +1039,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         }
                                     }
                                 } else if (page == "whatIf") {
+                                    props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                } else if (page == "supplyPlan") {
+                                    props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                } else if (page == "supplyPlanCompare") {
+                                    props.formSubmit(props.state.monthCount);
+                                } else if (page == "whatIfFormSubmit") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                 }
                             }
