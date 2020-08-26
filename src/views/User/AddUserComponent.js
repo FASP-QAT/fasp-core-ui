@@ -11,7 +11,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import {LABEL_REGEX} from '../../Constants.js';
+import { LABEL_REGEX } from '../../Constants.js';
 
 const initialValues = {
     username: "",
@@ -372,29 +372,6 @@ class AddUserComponent extends Component {
                                             }
 
                                         })
-                                        .catch(
-                                            error => {
-                                                this.setState({ loading: false });
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
-
-
                                 }}
                                 render={
                                     ({
@@ -544,7 +521,7 @@ class AddUserComponent extends Component {
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
- &nbsp;
+                                                        &nbsp;
  </FormGroup>
                                                 </CardFooter>
                                             </Form>

@@ -442,7 +442,7 @@ export default class LanguageListComponent extends Component {
                         })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
                     },
                         () => {
                             this.hideSecondComponent();
@@ -483,6 +483,8 @@ export default class LanguageListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -496,7 +498,7 @@ export default class LanguageListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
                         </div>
 
                     </CardBody>
