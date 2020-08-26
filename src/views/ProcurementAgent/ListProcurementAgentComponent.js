@@ -823,7 +823,7 @@ class ListProcurementAgentComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -889,7 +889,8 @@ class ListProcurementAgentComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         procurementAgentList: response.data,
-                        selProcurementAgent: response.data
+                        selProcurementAgent: response.data,
+                        loading: false
                     },
                         () => {
                             this.buildJExcel();
@@ -1065,6 +1066,8 @@ class ListProcurementAgentComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -1100,9 +1103,9 @@ class ListProcurementAgentComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                       
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
+
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
 
                     </CardBody>
                 </Card>
