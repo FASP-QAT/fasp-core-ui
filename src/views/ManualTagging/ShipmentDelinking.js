@@ -48,6 +48,9 @@ export default class ShipmentDelinking extends Component {
         ManualTaggingService.delinkShipment(row.shipmentId)
             .then(response => {
                 console.log("link response===", response);
+                this.setState({
+                    message : i18n.t('static.shipment.delinkingsuccess')
+                })
                 this.filterData();
             })
     }
@@ -185,7 +188,10 @@ export default class ShipmentDelinking extends Component {
         const columns = [
             {
                 dataField: 'shipmentId',
-                hidden: true,
+                text: 'Shipment Id',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             },
             {
                 dataField: 'shipmentTransId',
@@ -200,14 +206,14 @@ export default class ShipmentDelinking extends Component {
                 formatter: this.formatDate
             },
             {
-                dataField: 'shipmentStatusDesc',
+                dataField: 'shipmentStatus.label',
                 text: 'Shipment Status',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                // formatter: this.formatLabel
+                formatter: this.formatLabel
             }, {
-                dataField: 'procurementAgentName',
+                dataField: 'procurementAgent.code',
                 text: 'Planning Unit',
                 sort: true,
                 align: 'center',
@@ -215,12 +221,12 @@ export default class ShipmentDelinking extends Component {
                 // formatter: this.formatLabel
             },
             {
-                dataField: 'budgetDesc',
+                dataField: 'budget.label',
                 text: 'Budget',
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                // formatter: this.formatLabel
+                formatter: this.formatLabel
             },
             {
                 dataField: 'shipmentQty',
@@ -231,20 +237,19 @@ export default class ShipmentDelinking extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'productCost',
-                text: 'Total Amount',
+                dataField: 'fundingSource.code',
+                text: 'Funding Source',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
+                headerAlign: 'center'
             },
             {
-                dataField: 'shipmentId',
+                // dataField: 'shipmentId',
                 text: "De-link",
                 align: 'center',
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
-                    return (<Button type="button" size="sm" color="success" title="De-link Shipment" onClick={(event) => this.delinkShipment(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                    return (<Button type="button" size="sm" color="success" title="De-link Shipment" onClick={(event) => this.delinkShipment(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.dlink')}</Button>
                     )
                 }
             }

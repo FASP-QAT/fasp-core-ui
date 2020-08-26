@@ -1423,7 +1423,8 @@ class AccessControlComponent extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                 show: '',
                 entries: '',
             },
@@ -1972,9 +1973,9 @@ class AccessControlComponent extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <div className="table-responsive">
+                          
                                 <div id="paputableDiv" >
-                                </div>
+                              
                             </div>
                         </Col>
                     </CardBody>

@@ -467,7 +467,7 @@ class Program extends Component {
                             console.log("Version", version)
                             var db1;
                             getDatabase();
-                            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onsuccess = function (e) {
                                 db1 = e.target.result;
                                 var transaction = db1.transaction(['programData'], 'readwrite');
@@ -599,7 +599,6 @@ class Program extends Component {
                                                         // }
                                                         transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
                                                             // this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
-
                                                             this.setState({
                                                                 message: 'static.program.downloadsuccess',
                                                                 color: 'green'

@@ -9,6 +9,7 @@ import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_P
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
+import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 
 
 export default class ShipmentsInSupplyPlanComponent extends React.Component {
@@ -2885,24 +2886,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        if (this.props.shipmentPage != "shipmentDataEntry") {
-                            this.props.toggleLarge('shipments');
+                        var programId = (document.getElementById("programId").value)
+                        var planningUnitId = (document.getElementById("planningUnitId").value)
+                        var objectStore = "";
+                        if (this.props.consumptionPage == "whatIf") {
+                            objectStore = 'whatIfProgramData';
+                        } else {
+                            objectStore = 'programData';
                         }
-                        this.props.updateState("message", i18n.t('static.message.shipmentsSaved'));
-                        this.props.updateState("color", 'green');
-                        this.props.updateState("shipmentChangedFlag", 0);
-                        this.props.updateState("budgetChangedFlag", 0);
-                        this.props.updateState("shipmentsEl", "");
-                        this.setState({
-                            shipmentsEl: ""
-                        })
-                        if (this.props.shipmentPage != "shipmentDataEntry") {
-                            if (this.props.shipmentPage != "supplyPlanCompare") {
-                                this.props.formSubmit(this.props.items.planningUnit, this.props.items.monthCount);
-                            } else {
-                                this.props.formSubmit(this.props.items.monthCount);
-                            }
-                        }
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "shipment", this.props);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

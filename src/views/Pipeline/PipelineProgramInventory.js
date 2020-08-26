@@ -344,7 +344,7 @@ export default class PipelineProgramInventory extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance);
     }
 
     render() {

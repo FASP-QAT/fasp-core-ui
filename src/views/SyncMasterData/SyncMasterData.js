@@ -187,7 +187,6 @@ export default class SyncMasterData extends Component {
                                     })
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
-                                    console.log("in succes");
                                 }
                             }
                         } else {

@@ -359,11 +359,13 @@ export default class ConsumptionDetails extends React.Component {
                     <ModalBody>
                         <h6 className="red">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                         <div className="table-responsive">
-                            <div id="consumptionBatchInfoTable"></div>
+                            <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                        </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>

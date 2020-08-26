@@ -692,6 +692,9 @@ export default class ManualTagging extends Component {
         ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
             .then(response => {
                 console.log("link response===", response);
+                this.setState({
+                    message : i18n.t('static.shipment.linkingsuccess')
+                })
                 this.toggleLarge();
                 this.filterData();
             })
@@ -821,7 +824,7 @@ export default class ManualTagging extends Component {
             data[5] = getLabelText(manualTaggingList[j].budget.label, this.state.lang)
             data[6] = this.addCommas(manualTaggingList[j].shipmentQty);
             // data[7] = getLabelText(manualTaggingList[j].fundingSource.label, this.state.lang)
-            data[7] = ''
+            data[7] = manualTaggingList[j].fundingSource.code
 
             manualTaggingArray[count] = data;
             count++;
@@ -898,7 +901,31 @@ export default class ManualTagging extends Component {
             allowExport: false,
             paginationOptions: [10, 25, 50],
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y != null) {
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.dashboard.linkShipment'),
+                            onclick: function () {
+                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                                var outputListAfterSearch = [];
+                                let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
+                                outputListAfterSearch.push(row);
+
+                                this.setState({
+                                    shipmentId: this.el.getValueFromCoords(0, y),
+                                    outputListAfterSearch
+                                })
+                                this.toggleLarge();
+
+                            }.bind(this)
+                        });
+                    }
+                }
+
+                return items;
+            }.bind(this)
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
