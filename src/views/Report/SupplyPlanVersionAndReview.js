@@ -1220,7 +1220,7 @@ class SupplyPlanVersionAndReview extends Component {
         console.log('endDate',endDate)
         if (programId != 0 && countryId != 0) {
             AuthenticationService.setupAxiosInterceptors();
-            ReportService.getProgramVersionList(programId, countryId, versionStatusId, startDate, endDate)
+            ReportService.getProgramVersionList(programId, countryId, versionStatusId,versionTypeId, startDate, endDate)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({

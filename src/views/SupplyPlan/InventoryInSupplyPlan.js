@@ -8,6 +8,7 @@ import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValid
 import { SECRET_KEY, INTEGER_NO_REGEX, INVENTORY_DATA_SOURCE_TYPE, NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
+import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 
 
 export default class InventoryInSupplyPlanComponent extends React.Component {
@@ -941,65 +942,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             console.log("inventioryJson", inventoryJson);
                             inventoryDataList.push(inventoryJson);
                         }
-                        if (this.props.inventoryPage != "inventoryDataEntry") {
-                            console.log("Inventory data list");
-                            var invList = inventoryDataList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") && c.region != null && c.planningUnit.id == document.getElementById("planningUnitId").value);
-                            var actualQty = 0;
-                            var regionWiseInventory = [];
-                            for (var k = 0; k < invList.length; k++) {
-                                if (invList[k].actualQty != "" && invList[k].actualQty != null) {
-                                    var regionIndex = regionWiseInventory.findIndex(c => c == invList[k].region.id);
-                                    if (regionIndex == -1) {
-                                        regionWiseInventory.push(invList[k].region.id);
-                                    }
-                                    actualQty += parseFloat(invList[k].actualQty) * parseFloat(invList[k].multiplier);
-                                }
-                                if (invList[k].adjustmentQty != "" && invList[k].adjustmentQty != null) {
-                                }
-                            }
-                            console.log("Actual Qty", actualQty);
-                            console.log("regionWiseInventoryCount", regionWiseInventory);
-
-                            if (actualQty > 0 && regionWiseInventory.length == this.props.items.regionList.length) {
-                                console.log("In if");
-                                var endDate = map.get("0");
-                                var index = this.props.items.monthsArray.findIndex(c => moment(c.endDate).format("YYYY-MM-DD") == moment(endDate).format("YYYY-MM-DD"));
-                                var closingBalance = parseInt(this.props.items.openingBalanceArray[index]) + parseInt(this.props.items.shipmentsTotalData[index]) - parseInt(this.props.items.consumptionTotalData[index]);
-                                var nationalAdjustment = parseFloat(actualQty) - parseInt(closingBalance);
-                                nationalAdjustment = (nationalAdjustment);
-                                if (nationalAdjustment != 0) {
-                                    var nationAdjustmentIndex = inventoryDataList.findIndex(c => c.region == null && moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM"));
-                                    var realmCountryPlanningUnitId = this.state.realmCountryPlanningUnitList.filter(c => c.multiplier == 1)[0].id;
-                                    console.log("Realmcountry planningUnit Id", realmCountryPlanningUnitId);
-                                    if (nationAdjustmentIndex == -1) {
-                                        var inventoryJson = {
-                                            inventoryId: 0,
-                                            dataSource: {
-                                                id: QAT_DATA_SOURCE_ID
-                                            },
-                                            region: null,
-                                            inventoryDate: moment(map.get("0")).endOf('month').format("YYYY-MM-DD"),
-                                            adjustmentQty: nationalAdjustment,
-                                            actualQty: "",
-                                            active: true,
-                                            realmCountryPlanningUnit: {
-                                                id: realmCountryPlanningUnitId,
-                                            },
-                                            multiplier: 1,
-                                            planningUnit: {
-                                                id: planningUnitId
-                                            },
-                                            notes: NOTES_FOR_QAT_ADJUSTMENTS,
-                                            batchInfoList: []
-                                        }
-                                        inventoryDataList.push(inventoryJson);
-                                    } else {
-                                        inventoryDataList[parseInt(nationAdjustmentIndex)].adjustmentQty = nationalAdjustment;
-                                    }
-                                }
-                            }
-
-                        }
                     }
                     programJson.inventoryList = inventoryDataList;
                     this.setState({
@@ -1013,22 +955,15 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        console.log("After save")
-                        // this.showInventoryData();
-                        this.props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
-                        this.props.updateState("color", 'green');
-                        this.props.updateState("inventoryChangedFlag", 0);
-                        console.log("after update state")
-                        if (this.props.inventoryPage != "inventoryDataEntry") {
-                            this.props.toggleLarge('Adjustments');
+                        var programId = (document.getElementById("programId").value)
+                        var planningUnitId = (document.getElementById("planningUnitId").value)
+                        var objectStore = "";
+                        if (this.props.consumptionPage == "whatIf") {
+                            objectStore = 'whatIfProgramData';
+                        } else {
+                            objectStore = 'programData';
                         }
-                        if (this.props.inventoryPage != "inventoryDataEntry") {
-                            if (this.props.inventoryPage != "supplyPlanCompare") {
-                                this.props.formSubmit(this.props.items.planningUnit, this.props.items.monthCount);
-                            } else {
-                                this.props.formSubmit(this.props.items.monthCount);
-                            }
-                        }
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "inventory", this.props);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
