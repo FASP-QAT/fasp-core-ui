@@ -603,7 +603,8 @@ export default class PlanningUnitListComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl,
+            loading: false
         })
     }
 
@@ -635,7 +636,8 @@ export default class PlanningUnitListComponent extends Component {
             // console.log(response.data)
             if (response.status == 200) {
                 this.setState({
-                    forecastingUnits: response.data, loading: false
+                    forecastingUnits: response.data,
+                    // loading: false
 
                 })
             }
@@ -657,7 +659,7 @@ export default class PlanningUnitListComponent extends Component {
                     this.setState({
                         realms: response.data,
                         realmId: response.data[0].realmId,
-                        loading: false
+                        // loading: false
                     })
 
                     PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
