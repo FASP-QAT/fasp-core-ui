@@ -350,7 +350,8 @@ console.log('consumptionDataArr',consumptionDataArr)
                                         },
                                         {
                                             title: i18n.t('static.consumption.consumptionqty'),
-                                            type: 'numeric'
+                                            type: 'numeric',
+                                            mask:'###,###,###.##'
                                         },
                                         {
                                             title: i18n.t('static.consumption.daysofstockout'),
