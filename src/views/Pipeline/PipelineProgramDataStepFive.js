@@ -73,11 +73,11 @@ export default class PipelineProgramDataStepFive extends Component {
     render() {
         return (
             <>
-                <FormGroup>
+                <FormGroup className="col-md-4 pl-0">
                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                     <Select
                         onChange={(e) => { this.props.updateFieldData(e) }}
-                        className="col-md-4 ml-field"
+                        // className="col-md-4 ml-field"
                         bsSize="sm"
                         name="regionId"
                         id="regionId"
@@ -87,7 +87,7 @@ export default class PipelineProgramDataStepFive extends Component {
                     />
                 </FormGroup>
                 <br></br>
-                <FormGroup>
+                <FormGroup >
                     <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                     &nbsp;
                     <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.endProgramInfoStepFour}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>

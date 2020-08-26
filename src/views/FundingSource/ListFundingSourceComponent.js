@@ -388,12 +388,12 @@ class FundingSourceListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         } else {
             this.setState({
                 selSource: this.state.fundingSourceList
             },
-            () => { this.buildJexcel()});
+                () => { this.buildJexcel() });
         }
     }
     buildJexcel() {
@@ -507,7 +507,7 @@ class FundingSourceListComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
                 this.props.history.push({
                     pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }
@@ -571,9 +571,10 @@ class FundingSourceListComponent extends Component {
                     // })
                     this.setState({
                         fundingSourceList: response.data,
-                        selSource: response.data
+                        selSource: response.data,
+                        loading: false
                     },
-                    () => { this.buildJexcel()})
+                        () => { this.buildJexcel() })
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -631,6 +632,8 @@ class FundingSourceListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
