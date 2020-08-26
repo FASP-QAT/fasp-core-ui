@@ -245,11 +245,11 @@ export default class ShipmentDelinking extends Component {
             },
             {
                 // dataField: 'shipmentId',
-                text: "De-link",
+                text: "Delink",
                 align: 'center',
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
-                    return (<Button type="button" size="sm" color="success" title="De-link Shipment" onClick={(event) => this.delinkShipment(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.dlink')}</Button>
+                    return (<Button type="button" size="sm" color="success" title="Delink Shipment" onClick={(event) => this.delinkShipment(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.dlink')}</Button>
                     )
                 }
             }

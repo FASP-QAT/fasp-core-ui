@@ -803,6 +803,9 @@ export default class AddProgram extends Component {
         program.healthArea.id = ''
         program.programManager.userId = ''
         program.programNotes = ''
+        program.arrivedToDeliveredLeadTime = ''
+        program.shippedToArrivedBySeaLeadTime = ''
+        program.shippedToArrivedByAirLeadTime = ''
 
         this.setState({ program }, () => { })
 

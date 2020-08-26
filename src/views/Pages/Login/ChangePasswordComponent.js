@@ -107,7 +107,9 @@ class ChangePasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled'))
+        // this.props.history.push(`/dashboard/` + 'red/' + i18n.t('static.message.cancelled'))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -163,10 +165,14 @@ class ChangePasswordComponent extends Component {
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
                                                 localStorage.setItem('password', CryptoJS.AES.encrypt((response.data.hashPass).toString(), `${SECRET_KEY}`));
-                                                this.props.history.push(`/ApplicationDashboard/green/static.message.user.passwordSuccess`)
+                                                // this.props.history.push(`/ApplicationDashboard/green/` + i18n.t('static.message.user.passwordSuccess'))/
+                                                // this.props.history.push(`/ApplicationDashboard/` + '/green/' + i18n.t('static.message.user.passwordSuccess'))
+                                                let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.user.passwordSuccess'))
                                             })
                                             .catch(
                                                 error => {
+                                                    console.log("error---",error);
                                                     if (error.message === "Network Error") {
                                                         this.setState({ message: error.message }, () => {
                                                             console.log("inside412");
