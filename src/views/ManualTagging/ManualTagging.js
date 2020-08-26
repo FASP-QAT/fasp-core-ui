@@ -692,6 +692,9 @@ export default class ManualTagging extends Component {
         ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
             .then(response => {
                 console.log("link response===", response);
+                this.setState({
+                    message : i18n.t('static.shipment.linkingsuccess')
+                })
                 this.toggleLarge();
                 this.filterData();
             })
@@ -821,7 +824,7 @@ export default class ManualTagging extends Component {
             data[5] = getLabelText(manualTaggingList[j].budget.label, this.state.lang)
             data[6] = this.addCommas(manualTaggingList[j].shipmentQty);
             // data[7] = getLabelText(manualTaggingList[j].fundingSource.label, this.state.lang)
-            data[7] = ''
+            data[7] = manualTaggingList[j].fundingSource.code
 
             manualTaggingArray[count] = data;
             count++;
