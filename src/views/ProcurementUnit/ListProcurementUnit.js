@@ -500,7 +500,8 @@ export default class ListProcurementUnit extends Component {
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
     this.setState({
-      languageEl: languageEl
+      languageEl: languageEl,
+      loading: false
     })
   }
 
@@ -533,7 +534,7 @@ export default class ListProcurementUnit extends Component {
         this.setState({
           procurementUnitList: response.data,
           selProcurementUnit: response.data,
-          loading: false
+          // loading: false
         }, () => {
           this.buildJExcel();
         });

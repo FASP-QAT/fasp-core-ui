@@ -8,6 +8,7 @@ import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValid
 import { SECRET_KEY, INTEGER_NO_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
+import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 
 
 export default class ConsumptionInSupplyPlanComponent extends React.Component {
@@ -150,7 +151,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         if (consumptionList[j].consumptionId != 0) {
                             index = consumptionListUnFiltered.findIndex(c => c.consumptionId == consumptionList[j].consumptionId);
                         } else {
-                            index = consumptionListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == consumptionList[j].region.id && moment(c.consumptionDate).format("MMM YY") == moment(consumptionList[j].consumptionDate).format("MMM YY") && c.realmCountryPlanningUnit.id == consumptionList[j].realmCountryPlanningUnit.id);
+                            index = consumptionListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == consumptionList[j].region.id && moment(c.consumptionDate).format("MMM YY") == moment(consumptionList[j].consumptionDate).format("MMM YY") && c.realmCountryPlanningUnit.id == consumptionList[j].realmCountryPlanningUnit.id && c.actualFlag.toString() == consumptionList[j].actualFlag.toString());
                         }
                         data[12] = index;
                         consumptionDataArr[j] = data;
@@ -859,21 +860,15 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        console.log("After save")
-                        this.props.updateState("message", i18n.t('static.message.consumptionSaved'));
-                        this.props.updateState("color", 'green');
-                        this.props.updateState("consumptionChangedFlag", 0);
-                        console.log("after update state")
-                        if (this.props.consumptionPage != "consumptionDataEntry") {
-                            this.props.toggleLarge('Consumption');
+                        var programId = (document.getElementById("programId").value)
+                        var planningUnitId = (document.getElementById("planningUnitId").value)
+                        var objectStore = "";
+                        if (this.props.consumptionPage == "whatIf") {
+                            objectStore = 'whatIfProgramData';
+                        } else {
+                            objectStore = 'programData';
                         }
-                        if (this.props.consumptionPage != "consumptionDataEntry") {
-                            if (this.props.consumptionPage != "supplyPlanCompare") {
-                                this.props.formSubmit(this.props.items.planningUnit, this.props.items.monthCount);
-                            } else {
-                                this.props.formSubmit(this.props.items.monthCount);
-                            }
-                        }
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "consumption", this.props);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

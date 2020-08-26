@@ -68,9 +68,9 @@ class AddSupplierComponent extends Component {
   }
   hideSecondComponent() {
     setTimeout(function () {
-        document.getElementById('div2').style.display = 'none';
+      document.getElementById('div2').style.display = 'none';
     }, 8000);
-}
+  }
   Capitalize(str) {
     if (str != null && str != "") {
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -160,11 +160,11 @@ class AddSupplierComponent extends Component {
                         this.props.history.push(`/supplier/listSupplier/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
-                            message: response.data.messageCode
+                          message: response.data.messageCode
                         },
-                            () => {
-                                this.hideSecondComponent();
-                            })
+                          () => {
+                            this.hideSecondComponent();
+                          })
                       }
                     })
                 }}
@@ -200,7 +200,7 @@ class AddSupplierComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                            <FormText className="red">{errors.realmId}</FormText>
+                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
@@ -215,7 +215,7 @@ class AddSupplierComponent extends Component {
                               required
                               value={this.Capitalize(this.state.supplier.label.label_en)}
                             />
-                            <FormText className="red">{errors.supplier}</FormText>
+                            <FormFeedback className="red">{errors.supplier}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
@@ -241,7 +241,7 @@ class AddSupplierComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/supplier/listSupplier/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/supplier/listSupplier/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {
