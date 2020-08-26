@@ -19,7 +19,6 @@ import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
-import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 
 export default class SyncMasterData extends Component {
 
@@ -188,8 +187,6 @@ export default class SyncMasterData extends Component {
                                     })
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
-                                    console.log("in succes");
-                                    calculateSupplyPlan(prog.id, 0, "programData");
                                 }
                             }
                         } else {

@@ -26,7 +26,6 @@ import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations.js';
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
@@ -510,14 +509,12 @@ class Program extends Component {
                                         };
                                         console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
-                                        calculateSupplyPlan(json.programId + "_v" + version + "_uId_" + userId, 0, 'programData');
                                         programThenCount++;
                                         putRequest.onerror = function (error) {
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this);
 
                                         var putRequestDownloadedProgramData = downloadedProgramSaveData.put(item);
-                                        calculateSupplyPlan(json.programId + "_v" + version + "_uId_" + userId, 0, 'downloadedProgramData');
                                         // programThenCount++;
                                         putRequestDownloadedProgramData.onerror = function (error) {
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
@@ -580,7 +577,6 @@ class Program extends Component {
                                                         };
                                                         console.log("Item------------------>", item)
                                                         var putRequest = programOverWrite.put(item);
-                                                        calculateSupplyPlan(json.programId + "_v" + version + "_uId_" + userId, 0, 'programData');
                                                         programThenCount++;
                                                         putRequest.onerror = function (error) {
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
@@ -595,7 +591,6 @@ class Program extends Component {
                                                         }.bind(this);
 
                                                         var putRequestDownloadedProgramData = programOverWriteForDownloadedProgramData.put(item);
-                                                        calculateSupplyPlan(json.programId + "_v" + version + "_uId_" + userId, 0, 'downloadedProgramData');
                                                         // programThenCount++;
                                                         putRequestDownloadedProgramData.onerror = function (error) {
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
