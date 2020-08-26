@@ -62,7 +62,8 @@ class EditSupplierComponent extends Component {
                     label_pr: ''
                 }
             },
-            message: ''
+            message: '',
+            loading: true
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -70,9 +71,13 @@ class EditSupplierComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -127,7 +132,7 @@ class EditSupplierComponent extends Component {
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    supplier: response.data
+                    supplier: response.data, loading: false
                 });
             }
             else {
@@ -145,9 +150,9 @@ class EditSupplierComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -158,11 +163,14 @@ class EditSupplierComponent extends Component {
                                 initialValues={{ supplier: this.state.supplier.label.label_en }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     AuthenticationService.setupAxiosInterceptors();
                                     SupplierService.updateSupplier(this.state.supplier)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/supplier/listSupplier/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/supplier/listSupplier/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -265,6 +273,17 @@ class EditSupplierComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -280,7 +299,7 @@ class EditSupplierComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             this.setState({
-                supplier: response.data
+                supplier: response.data,loading:false
             });
 
         })

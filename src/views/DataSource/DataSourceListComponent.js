@@ -776,7 +776,7 @@ export default class DataSourceListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({ message: response.data.messageCode })
@@ -806,7 +806,7 @@ export default class DataSourceListComponent extends Component {
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             console.log(response.data)
             this.setState({
-                dataSourceTypes: response.data,
+                dataSourceTypes: response.data, loading: false
 
             })
         })
@@ -923,6 +923,8 @@ export default class DataSourceListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

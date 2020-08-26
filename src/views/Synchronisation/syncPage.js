@@ -1607,6 +1607,7 @@ export default class syncPage extends Component {
   }
 
   cancelClicked() {
+    console.log("inside cancel")
     this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 }

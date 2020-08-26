@@ -65,7 +65,8 @@ export default class AddDataSourceTypeComponent extends Component {
                     label_en: '',
                     labelId: 0,
                 }
-            }
+            },
+            loading: true
         }
 
         this.dataChange = this.dataChange.bind(this);
@@ -121,7 +122,8 @@ export default class AddDataSourceTypeComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
+                    realms: response.data,
+                    loading: false
                 })
             })
     }
@@ -149,9 +151,11 @@ export default class AddDataSourceTypeComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -161,6 +165,9 @@ export default class AddDataSourceTypeComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: false
+                                    })
                                     DataSourceTypeService.addDataSourceType(this.state.dataSourceType)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -244,6 +251,17 @@ export default class AddDataSourceTypeComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>

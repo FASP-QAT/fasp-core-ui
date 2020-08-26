@@ -220,6 +220,27 @@ Months Of Stock = 3.54</p>
                     </ListGroupItemText>
                   </ListGroupItem>
 
+                  {/* <ListGroupItem action>
+                    <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/WAPE-Formula.png"/><br></br>
+                    <p>* N is number of months</p>
+                   
+                    </ListGroupItemText>
+                  </ListGroupItem>
+
+                   */}
+                </ListGroup>
+                <ListGroup>
+                <ListGroupItem action>
+                    <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/WAPE-Formula.png"/><br></br>
+                    <p>* N is number of months</p>
+                   
+                    </ListGroupItemText>
+                  </ListGroupItem>
+
                   
                 </ListGroup>
               </CardBody>

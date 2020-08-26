@@ -31,6 +31,7 @@ import 'react-select/dist/react-select.min.css';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import InventoryInSupplyPlanComponent from "./InventoryInSupplyPlan";
 import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
+import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -1666,121 +1667,211 @@ export default class SupplyPlanComponent extends React.Component {
                     minMonthsOfStock: programPlanningUnit.minMonthsOfStock
                 })
                 console.log("ProgramJson", programJson);
-                var supplyPlanData = (programJson.supplyPlanData).filter(c => c.planningUnitId == planningUnitId);
-                var lastClosingBalance = 0;
-                for (var n = 0; n < m.length; n++) {
-                    var jsonList = supplyPlanData.filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
-                    if (jsonList.length > 0) {
-                        openingBalanceArray.push(jsonList[0].openingBalance);
-                        consumptionTotalData.push(jsonList[0].consumptionJson);
-                        shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
-                        manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
-                        deliveredShipmentsTotalData.push(jsonList[0].deliveredShipmentsTotalData);
-                        shippedShipmentsTotalData.push(jsonList[0].shippedShipmentsTotalData);
-                        orderedShipmentsTotalData.push(jsonList[0].orderedShipmentsTotalData);
-                        plannedShipmentsTotalData.push(jsonList[0].plannedShipmentsTotalData);
-                        erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
-                        deliveredErpShipmentsTotalData.push(jsonList[0].deliveredErpShipmentsTotalData);
-                        shippedErpShipmentsTotalData.push(jsonList[0].shippedErpShipmentsTotalData);
-                        orderedErpShipmentsTotalData.push(jsonList[0].orderedErpShipmentsTotalData);
-                        plannedErpShipmentsTotalData.push(jsonList[0].plannedErpShipmentsTotalData);
-                        inventoryTotalData.push(jsonList[0].adjustmentQty);
-                        totalExpiredStockArr.push(jsonList[0].expiredStockArr);
-                        suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
-                        monthsOfStockArray.push(jsonList[0].mos);
-                        amcTotalData.push(jsonList[0].amc)
-                        minStockMoS.push(jsonList[0].minStockMoS)
-                        maxStockMoS.push(jsonList[0].maxStockMoS)
-                        unmetDemand.push(jsonList[0].unmetDemand)
-                        closingBalanceArray.push(jsonList[0].closingBalance)
-                        consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
-                        inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
-                        lastClosingBalance = jsonList[0].closingBalance
-                        var json = {
-                            month: m[n].month,
-                            consumption: jsonList[0].consumptionJson.consumptionQty,
-                            stock: jsonList[0].closingBalance,
-                            planned: jsonList[0].plannedShipmentsTotalData.qty + jsonList[0].plannedErpShipmentsTotalData.qty,
-                            delivered: jsonList[0].deliveredShipmentsTotalData.qty + jsonList[0].deliveredErpShipmentsTotalData.qty,
-                            shipped: jsonList[0].shippedShipmentsTotalData.qty + jsonList[0].shippedErpShipmentsTotalData.qty,
-                            ordered: jsonList[0].orderedShipmentsTotalData.qty + jsonList[0].orderedErpShipmentsTotalData.qty,
-                            mos: jsonList[0].mos,
-                            minMos: jsonList[0].minStockMoS,
-                            maxMos: jsonList[0].maxStockMoS
-                        }
-                        jsonArrForGraph.push(json);
-                    } else {
-                        openingBalanceArray.push(lastClosingBalance);
-                        consumptionTotalData.push(0);
-                        shipmentsTotalData.push(0);
-                        suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
-                        manualShipmentsTotalData.push(0);
-                        deliveredShipmentsTotalData.push("");
-                        shippedShipmentsTotalData.push("");
-                        orderedShipmentsTotalData.push("");
-                        plannedShipmentsTotalData.push("");
-                        erpShipmentsTotalData.push(0);
-                        deliveredErpShipmentsTotalData.push("");
-                        shippedErpShipmentsTotalData.push("");
-                        orderedErpShipmentsTotalData.push("");
-                        plannedErpShipmentsTotalData.push("");
-                        inventoryTotalData.push("");
-                        totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
-                        monthsOfStockArray.push("")
-                        amcTotalData.push("");
-                        minStockMoS.push("");
-                        maxStockMoS.push("")
-                        unmetDemand.push("");
-                        closingBalanceArray.push(lastClosingBalance);
-                        consumptionArrayForRegion = consumptionArrayForRegion.concat([])
-                        inventoryArrayForRegion = inventoryArrayForRegion.concat([]);
-                        var json = {
-                            month: m[n].month,
-                            consumption: 0,
-                            stock: lastClosingBalance,
-                            planned: 0,
-                            delivered: 0,
-                            shipped: 0,
-                            ordered: 0,
-                            mos: "",
-                            minMos: "",
-                            maxMos: ""
-                        }
-                        jsonArrForGraph.push(json);
-                    }
+                var supplyPlanData = [];
+                if (programJson.supplyPlanData != undefined) {
+                    supplyPlanData = (programJson.supplyPlanData).filter(c => c.planningUnitId == planningUnitId);
                 }
-                this.setState({
-                    openingBalanceArray: openingBalanceArray,
-                    consumptionTotalData: consumptionTotalData,
-                    expiredStockArr: totalExpiredStockArr,
-                    shipmentsTotalData: shipmentsTotalData,
-                    suggestedShipmentsTotalData: suggestedShipmentsTotalData,
-                    manualShipmentsTotalData: manualShipmentsTotalData,
-                    deliveredShipmentsTotalData: deliveredShipmentsTotalData,
-                    shippedShipmentsTotalData: shippedShipmentsTotalData,
-                    orderedShipmentsTotalData: orderedShipmentsTotalData,
-                    plannedShipmentsTotalData: plannedShipmentsTotalData,
-                    erpShipmentsTotalData: erpShipmentsTotalData,
-                    deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
-                    shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
-                    orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
-                    plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
-                    inventoryTotalData: inventoryTotalData,
-                    monthsOfStockArray: monthsOfStockArray,
-                    amcTotalData: amcTotalData,
-                    minStockMoS: minStockMoS,
-                    maxStockMoS: maxStockMoS,
-                    unmetDemand: unmetDemand,
-                    inventoryFilteredArray: inventoryArrayForRegion,
-                    regionListFiltered: regionListFiltered,
-                    consumptionFilteredArray: consumptionArrayForRegion,
-                    planningUnitName: planningUnitName,
-                    lastActualConsumptionDate: moment(Date.now()).format("YYYY-MM-DD"),
-                    lastActualConsumptionDateArr: supplyPlanData[0].lastActualConsumptionDate,
-                    paColors: supplyPlanData[supplyPlanData.length - 1].paColors,
-                    jsonArrForGraph: jsonArrForGraph,
-                    closingBalanceArray: closingBalanceArray
-                })
+                if (supplyPlanData.length > 0) {
+                    var lastClosingBalance = 0;
+                    for (var n = 0; n < m.length; n++) {
+                        var jsonList = supplyPlanData.filter(c => moment(c.startDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
+                        if (jsonList.length > 0) {
+                            openingBalanceArray.push(jsonList[0].openingBalance);
+                            consumptionTotalData.push(jsonList[0].consumptionJson);
+                            shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
+                            manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
+                            var deliveredShipmentsTotalDataJson = jsonList[0].deliveredShipmentsTotalData;
+                            var shipmentDetails = deliveredShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                deliveredShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            deliveredShipmentsTotalData.push(deliveredShipmentsTotalDataJson);
+
+                            var shippedShipmentsTotalDataJson = jsonList[0].shippedShipmentsTotalData;
+                            var shipmentDetails = shippedShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                shippedShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            shippedShipmentsTotalData.push(shippedShipmentsTotalDataJson);
+
+
+                            var orderedShipmentsTotalDataJson = jsonList[0].orderedShipmentsTotalData;
+                            var shipmentDetails = orderedShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                orderedShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            orderedShipmentsTotalData.push(orderedShipmentsTotalDataJson);
+                            var plannedShipmentsTotalDataJson = jsonList[0].plannedShipmentsTotalData;
+                            var shipmentDetails = plannedShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                plannedShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            plannedShipmentsTotalData.push(plannedShipmentsTotalDataJson);
+                            erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
+                            var deliveredErpShipmentsTotalDataJson = jsonList[0].deliveredErpShipmentsTotalData;
+                            var shipmentDetails = deliveredErpShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                deliveredErpShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            deliveredErpShipmentsTotalData.push(deliveredErpShipmentsTotalDataJson);
+                            var shippedErpShipmentsTotalDataJson = jsonList[0].shippedErpShipmentsTotalData;
+                            var shipmentDetails = shippedErpShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                shippedErpShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            shippedErpShipmentsTotalData.push(shippedErpShipmentsTotalDataJson);
+                            var orderedErpShipmentsTotalDataJson = jsonList[0].orderedErpShipmentsTotalData;
+                            var shipmentDetails = orderedErpShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                orderedErpShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            orderedErpShipmentsTotalData.push(orderedErpShipmentsTotalDataJson);
+                            var plannedErpShipmentsTotalDataJson = jsonList[0].plannedErpShipmentsTotalData;
+                            var shipmentDetails = plannedErpShipmentsTotalDataJson.shipmentDetail;
+                            var sd = [];
+                            if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                for (var i = 0; i < shipmentDetails.length; i++) {
+                                    var shipmentDetail = shipmentDetails[i].pa + " - " + shipmentDetails[i].qty + " - " + getLabelText(shipmentDetails[i].status, this.state.lang) + "\n";
+                                    sd.push(shipmentDetail);
+                                }
+                                plannedErpShipmentsTotalDataJson.shipmentDetail = sd;
+                            }
+                            plannedErpShipmentsTotalData.push(plannedErpShipmentsTotalDataJson);
+                            inventoryTotalData.push(jsonList[0].adjustmentQty);
+                            totalExpiredStockArr.push(jsonList[0].expiredStockArr);
+                            suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
+                            monthsOfStockArray.push(jsonList[0].mos);
+                            amcTotalData.push(jsonList[0].amc)
+                            minStockMoS.push(jsonList[0].minStockMoS)
+                            maxStockMoS.push(jsonList[0].maxStockMoS)
+                            unmetDemand.push(jsonList[0].unmetDemand)
+                            closingBalanceArray.push(jsonList[0].closingBalance)
+                            consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
+                            inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
+                            lastClosingBalance = jsonList[0].closingBalance
+                            var json = {
+                                month: m[n].month,
+                                consumption: jsonList[0].consumptionJson.consumptionQty,
+                                stock: jsonList[0].closingBalance,
+                                planned: jsonList[0].plannedShipmentsTotalData.qty + jsonList[0].plannedErpShipmentsTotalData.qty,
+                                delivered: jsonList[0].deliveredShipmentsTotalData.qty + jsonList[0].deliveredErpShipmentsTotalData.qty,
+                                shipped: jsonList[0].shippedShipmentsTotalData.qty + jsonList[0].shippedErpShipmentsTotalData.qty,
+                                ordered: jsonList[0].orderedShipmentsTotalData.qty + jsonList[0].orderedErpShipmentsTotalData.qty,
+                                mos: jsonList[0].mos,
+                                minMos: jsonList[0].minStockMoS,
+                                maxMos: jsonList[0].maxStockMoS
+                            }
+                            jsonArrForGraph.push(json);
+                        } else {
+                            openingBalanceArray.push(lastClosingBalance);
+                            consumptionTotalData.push(0);
+                            shipmentsTotalData.push(0);
+                            suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
+                            manualShipmentsTotalData.push(0);
+                            deliveredShipmentsTotalData.push("");
+                            shippedShipmentsTotalData.push("");
+                            orderedShipmentsTotalData.push("");
+                            plannedShipmentsTotalData.push("");
+                            erpShipmentsTotalData.push(0);
+                            deliveredErpShipmentsTotalData.push("");
+                            shippedErpShipmentsTotalData.push("");
+                            orderedErpShipmentsTotalData.push("");
+                            plannedErpShipmentsTotalData.push("");
+                            inventoryTotalData.push("");
+                            totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
+                            monthsOfStockArray.push("")
+                            amcTotalData.push("");
+                            minStockMoS.push("");
+                            maxStockMoS.push("")
+                            unmetDemand.push("");
+                            closingBalanceArray.push(lastClosingBalance);
+                            consumptionArrayForRegion = consumptionArrayForRegion.concat([])
+                            inventoryArrayForRegion = inventoryArrayForRegion.concat([]);
+                            var json = {
+                                month: m[n].month,
+                                consumption: 0,
+                                stock: lastClosingBalance,
+                                planned: 0,
+                                delivered: 0,
+                                shipped: 0,
+                                ordered: 0,
+                                mos: "",
+                                minMos: "",
+                                maxMos: ""
+                            }
+                            jsonArrForGraph.push(json);
+                        }
+                    }
+                    this.setState({
+                        openingBalanceArray: openingBalanceArray,
+                        consumptionTotalData: consumptionTotalData,
+                        expiredStockArr: totalExpiredStockArr,
+                        shipmentsTotalData: shipmentsTotalData,
+                        suggestedShipmentsTotalData: suggestedShipmentsTotalData,
+                        manualShipmentsTotalData: manualShipmentsTotalData,
+                        deliveredShipmentsTotalData: deliveredShipmentsTotalData,
+                        shippedShipmentsTotalData: shippedShipmentsTotalData,
+                        orderedShipmentsTotalData: orderedShipmentsTotalData,
+                        plannedShipmentsTotalData: plannedShipmentsTotalData,
+                        erpShipmentsTotalData: erpShipmentsTotalData,
+                        deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
+                        shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
+                        orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
+                        plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
+                        inventoryTotalData: inventoryTotalData,
+                        monthsOfStockArray: monthsOfStockArray,
+                        amcTotalData: amcTotalData,
+                        minStockMoS: minStockMoS,
+                        maxStockMoS: maxStockMoS,
+                        unmetDemand: unmetDemand,
+                        inventoryFilteredArray: inventoryArrayForRegion,
+                        regionListFiltered: regionListFiltered,
+                        consumptionFilteredArray: consumptionArrayForRegion,
+                        planningUnitName: planningUnitName,
+                        lastActualConsumptionDate: moment(Date.now()).format("YYYY-MM-DD"),
+                        lastActualConsumptionDateArr: supplyPlanData[0].lastActualConsumptionDate,
+                        paColors: supplyPlanData[supplyPlanData.length - 1].paColors,
+                        jsonArrForGraph: jsonArrForGraph,
+                        closingBalanceArray: closingBalanceArray
+                    })
+                } else {
+                    calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                }
             }.bind(this)
         }.bind(this)
 

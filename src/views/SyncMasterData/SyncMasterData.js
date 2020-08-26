@@ -19,7 +19,6 @@ import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
-import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 
 export default class SyncMasterData extends Component {
 
@@ -29,7 +28,8 @@ export default class SyncMasterData extends Component {
             totalMasters: TOTAL_NO_OF_MASTERS_IN_SYNC,
             syncedMasters: 0,
             syncedPercentage: 0,
-            message: ""
+            message: "",
+            loading: true
         }
         this.syncMasters = this.syncMasters.bind(this);
         this.retryClicked = this.retryClicked.bind(this);
@@ -49,7 +49,12 @@ export default class SyncMasterData extends Component {
         UserService.getUserByUserId(decryptedCurUser).then(response => {
             console.log("user----------------------", response.data);
             localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data).toString(), `${SECRET_KEY}`));
-            this.syncMasters();
+            // this.syncMasters();
+            setTimeout(function() { //Start the timer
+                // this.setState({render: true}) //After 1 second, set render to true
+                this.syncMasters();
+            }.bind(this), 500)
+           
         })
 
 
@@ -81,7 +86,7 @@ export default class SyncMasterData extends Component {
             <div className="animated fadeIn">
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
-                <div className="col-md-12">
+                <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col xs="12" sm="12">
                         <Card>
                             {/* // <div className="app flex-row align-items-center">
@@ -112,6 +117,17 @@ export default class SyncMasterData extends Component {
                             </CardFooter>
                         </Card>
                     </Col>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {/* </Container>
                 </div> */}
@@ -188,8 +204,6 @@ export default class SyncMasterData extends Component {
                                     })
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
-                                    console.log("in succes");
-                                    calculateSupplyPlan(prog.id, 0, "programData");
                                 }
                             }
                         } else {
@@ -256,6 +270,7 @@ export default class SyncMasterData extends Component {
 
 
     syncMasters() {
+        this.setState({ loading: false })
         if (navigator.onLine) {
             var db1;
             var storeOS;
