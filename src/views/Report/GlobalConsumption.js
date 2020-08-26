@@ -249,7 +249,9 @@ class GlobalConsumption extends Component {
     return x1 + x2;
   }
 
-
+  roundN = num => {
+     return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+   }
 
   exportPDF = () => {
     const addFooters = doc => {
@@ -506,7 +508,7 @@ class GlobalConsumption extends Component {
               let json = {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
-                "planningUnitQty": countryConsumption[j].forecastedConsumption + countryConsumption[j].actualConsumption,
+                "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption==0?(countryConsumption[j].forecastedConsumption/ 1000000 ): (countryConsumption[j].actualConsumption/ 1000000))),
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YYYY')
               }
               console.log("json--->", json);
