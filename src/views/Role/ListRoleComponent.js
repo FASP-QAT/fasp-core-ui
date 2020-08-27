@@ -227,6 +227,7 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -247,6 +248,82 @@ class ListRoleComponent extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+    }
+    buildJexcel() {
+
+        let roleList = this.state.selSource;
+        // console.log("langaugeList---->", langaugeList);
+        let roleArray = [];
+        let count = 0;
+
+        for (var j = 0; j < roleList.length; j++) {
+            data = [];
+            data[0] = roleList[j].roleId
+            data[1] = roleList[j].roleId;
+            data[2] = getLabelText(roleList[j].label, this.state.lang)
+            roleArray[count] = data;
+            count++;
+        }
+        // if (roleList.length == 0) {
+        //     data = [];
+        //     roleArray[0] = data;
+        // }
+        // console.log("roleArray---->", roleArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = roleArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'roleId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.role.roleid'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.role.role'),
+                    type: 'text',
+                    readOnly: true
+                }
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false
+        };
+        var roleEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = roleEl;
+        this.setState({
+            roleEl: roleEl, loading: false
+        })
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -275,6 +352,20 @@ class ListRoleComponent extends Component {
         }
     }
 
+    selected = function (instance, cell, x, y, value) {
+        if (x == 0 && value != 0) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            if (this.state.selSource.length != 0) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                    this.props.history.push({
+                        pathname: `/role/editRole/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { role }
+                    });
+                }
+            }
+        }
+    }.bind(this);
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -287,84 +378,7 @@ class ListRoleComponent extends Component {
                     this.setState({
                         roleList: response.data, selSource: response.data, loading: false
                     },
-                        () => {
-
-                            let roleList = this.state.roleList;
-                            // console.log("langaugeList---->", langaugeList);
-                            let roleArray = [];
-                            let count = 0;
-
-                            for (var j = 0; j < roleList.length; j++) {
-                                data = [];
-                                data[0] = roleList[j].roleId
-                                data[1] = roleList[j].roleId;
-                                data[2] = getLabelText(roleList[j].label, this.state.lang)
-                                roleArray[count] = data;
-                                count++;
-                            }
-                            // if (roleList.length == 0) {
-                            //     data = [];
-                            //     roleArray[0] = data;
-                            // }
-                            // console.log("roleArray---->", roleArray);
-                            this.el = jexcel(document.getElementById("tableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = roleArray;
-
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                colHeaderClasses: ["Reqasterisk"],
-                                columns: [
-                                    {
-                                        title: 'roleId',
-                                        type: 'hidden',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: i18n.t('static.role.roleid'),
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: i18n.t('static.role.role'),
-                                        type: 'text',
-                                        readOnly: true
-                                    }
-                                ],
-                                text: {
-                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                    show: '',
-                                    entries: '',
-                                },
-                                onload: this.loaded,
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onselection: this.selected,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                allowExport: false,
-                                paginationOptions: [10, 25, 50],
-                                position: 'top',
-                                contextMenu: false
-                            };
-                            var roleEl = jexcel(document.getElementById("tableDiv"), options);
-                            this.el = roleEl;
-                            this.setState({
-                                roleEl: roleEl, loading: false
-                            })
-
-
-
-                        })
+                        () => { this.buildJexcel() })
                 }
                 else {
                     this.setState({
@@ -433,7 +447,11 @@ class ListRoleComponent extends Component {
 
         return (
             <div className="animated">
-
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -447,8 +465,8 @@ class ListRoleComponent extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-md-0">
-                        <div  className="">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                        <div className="">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
                         </div>
                     </CardBody>
                 </Card>

@@ -2291,7 +2291,7 @@ export default class SupplyPlanComponent extends React.Component {
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                                <span onClick={this.openPopup}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                         </div>
                     </div>
@@ -2518,4 +2518,5 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionBatchError: ""
         })
     }
+   
 }

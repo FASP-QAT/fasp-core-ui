@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback,InputGroupAddon, InputGroupText, InputGroup,CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback, InputGroupAddon, InputGroupText, InputGroup, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -60,7 +60,8 @@ class ResetPasswordComponent extends Component {
         this.state = {
             message: '',
             emailId: this.props.match.params.emailId,
-            token: this.props.match.params.token
+            token: this.props.match.params.token,
+            display: 1
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -129,6 +130,7 @@ class ResetPasswordComponent extends Component {
                 })
             }).catch(
                 error => {
+                    console.log("error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -136,6 +138,7 @@ class ResetPasswordComponent extends Component {
                             case 500:
                             case 401:
                             case 403:
+                                this.setState({ display: 0 })
                             case 404:
                             case 406:
                             case 412:
@@ -163,7 +166,7 @@ class ResetPasswordComponent extends Component {
                             </Col>
                             <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
                                 <h5 style={{ color: "red" }} id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
-                                <Card className="mx-4">
+                                {this.state.display == 1 && <Card className="mx-4">
                                     <CardHeader>
                                         <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
                                     </CardHeader>
@@ -244,6 +247,7 @@ class ResetPasswordComponent extends Component {
                                                 setTouched
                                             }) => (
                                                     <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
+
                                                         <CardBody>
                                                             <Input type="text"
                                                                 name="username"
@@ -293,9 +297,10 @@ class ResetPasswordComponent extends Component {
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>
+
                                                     </Form>
                                                 )} />
-                                </Card>
+                                </Card>}
                             </Col>
                         </Row>
                     </Container>

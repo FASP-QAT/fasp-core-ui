@@ -1,4 +1,5 @@
 import React, { Component, lazy ,useState} from 'react';
+import { Link } from 'react-router-dom';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
@@ -1688,11 +1689,16 @@ class StockStatusOverTime extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
+                    <div className="card-header-actions">
+                                 <a className="card-header-action">
+                                 <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                                 </a>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong> */}
                         {
                             this.state.matricsList.length > 0 &&
-                            <div className="card-header-actions">
+                         
                                 <a className="card-header-action">
+                               
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
                                     {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
@@ -1702,10 +1708,11 @@ class StockStatusOverTime extends Component {
 
  }
  </Pdf>*/}
-                                </a>
+                               
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                            </div>
+                                </a>
                         }
+                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
 

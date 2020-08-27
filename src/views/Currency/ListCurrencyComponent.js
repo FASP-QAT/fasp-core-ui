@@ -552,6 +552,8 @@ export default class CurrencyListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -567,7 +569,7 @@ export default class CurrencyListComponent extends Component {
                     </div>
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv"  className="jexcelremoveReadonlybackground"></div>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

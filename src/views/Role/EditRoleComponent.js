@@ -6,6 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -66,6 +67,7 @@ class EditRoleComponent extends Component {
                     label_en: ''
                 }
             },
+            loading: true,
             businessFunctionId: '',
             businessFunctionList: [],
             canCreateRoleId: '',
@@ -79,7 +81,11 @@ class EditRoleComponent extends Component {
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
     }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
+        }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -171,7 +177,7 @@ class EditRoleComponent extends Component {
                         businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        businessFunctionList
+                        businessFunctionList,loading: false
                     })
                 } else {
                     this.setState({
@@ -282,8 +288,9 @@ class EditRoleComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -298,6 +305,9 @@ class EditRoleComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                        })
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -419,6 +429,17 @@ class EditRoleComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

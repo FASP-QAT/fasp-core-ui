@@ -716,11 +716,11 @@ export default class ProgramOnboarding extends Component {
                                 </div>
                                 <div id="stepFive">
                                     {/* <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData}></StepFive> */}
-                                    <FormGroup>
+                                    <FormGroup className="col-md-4 pl-0">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             onChange={(e) => { this.updateFieldData(e) }}
-                                            className="col-md-4 ml-field"
+                                            // className="col-md-4 ml-field"
                                             bsSize="sm"
                                             name="regionId"
                                             id="regionId"
