@@ -206,7 +206,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.updateState = this.updateState.bind(this)
         this.updateFieldData = this.updateFieldData.bind(this);
-        this.openPopup = this.openPopup.bind(this);
+        // this.openPopup = this.openPopup.bind(this);
     }
 
     roundN = num => {
