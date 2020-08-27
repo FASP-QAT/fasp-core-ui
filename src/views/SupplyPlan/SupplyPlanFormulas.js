@@ -56,13 +56,13 @@ class SupplyPlanFormulas extends Component {
   render() {
     return (
       <div className="animated fadeIn">
-
+{/* 
         <Row>
           <Col sm="12" xl="12">
             <h5></h5>
             <Card>
               <CardBody>
-              <Button onClick={this.toggle} className="mr-1">Launch demo modal</Button>
+              <Button onClick={this.toggle} className="mr-1">Launch demo modal</Button> */}
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                   <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
                   <ModalBody>
@@ -482,10 +482,10 @@ Months Of Stock = 3.54</p>
 
                   
                 </ListGroup> */}
-              </CardBody>
+              {/* </CardBody>
             </Card>
           </Col>
-        </Row>
+        </Row> */}
       </div>
     );
   }
