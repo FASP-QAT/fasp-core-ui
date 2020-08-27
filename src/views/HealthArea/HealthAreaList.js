@@ -420,7 +420,7 @@ export default class HealthAreaListComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('healthAreaCode'),
+                    title: i18n.t('static.healtharea.healthareacode'),
                     type: 'text',
                     readOnly: true
                 },
