@@ -3088,8 +3088,12 @@ border-radius: 2em;
   visibility: hidden !important;
 }
 .go626121005 span {
-  display: inline!important;
-  padding-left: 5px;
+  // display: inline!important;
+  // padding-left: 5px;
+  padding-left:19px!important;
+  text-align: left;
+    display: table!important;
+    margin-top: -18px!important;
 }
 .go2139093995 * {
   z-index: unset;
@@ -3099,6 +3103,9 @@ border-radius: 2em;
 // }
 .go355775859 .gray svg{
   visibility: hidden !important;
+}
+.go3973839879{
+  padding: 5px!important;
 }
 .go2139093995 .gray {
   color: #697069!important;
