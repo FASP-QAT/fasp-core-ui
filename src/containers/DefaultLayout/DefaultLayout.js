@@ -419,7 +419,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
-                            name: 'Shipment De-linking',
+                            name: 'Shipment Delinking',
                             url: '/shipment/delinking',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }

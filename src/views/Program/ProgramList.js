@@ -551,7 +551,8 @@ export default class ProgramList extends Component {
 
   selected = function (instance, cell, x, y, value) {
 
-    if (x == 0 && value != 0) {
+    // if (x == 0 && value != 0) {
+    if ((x == 0 && value != 0) || (y == 0)) {
       // console.log("HEADER SELECTION--------------------------");
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
