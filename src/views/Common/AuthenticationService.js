@@ -931,12 +931,12 @@ class AuthenticationService {
                     break;
 
                 case "/report/addProblem":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
                         return true;
                     }
                     break;
                 case "/report/editProblem/:problemReportId/:programId/:index/:problemStatusId/:problemTypeId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
                         return true;
                     }
                     break;
@@ -1097,13 +1097,25 @@ class AuthenticationService {
                 case "/logout":
                     return true;
                     break;
-                case "/problem/editProblem": return true
+                case "/problem/editProblem": 
+                if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
+                    return true;
+                } 
+                // return true
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
-                case "/report/problemList/:color/:message": return true
+                case "/report/problemList/:color/:message":
+                    if(bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")){
+                        return true;
+                    } 
+                    // return true
                     break;
-                case "/report/addProblem/:color/:message": return true
+                case "/report/addProblem/:color/:message":
+                if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
+                    return true;
+                }
+                //  return true
                     break;
                 default:
                     console.log("Inside default-");

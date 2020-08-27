@@ -10,7 +10,7 @@ import 'react-select/dist/react-select.min.css';
 import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { LABEL_WITH_SPECIAL_SYMBOL_REGEX } from '../../Constants.js';
+import { SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     label: ""
@@ -19,8 +19,8 @@ const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .matches(LABEL_WITH_SPECIAL_SYMBOL_REGEX, i18n.t('static.message.alphaspespacetext'))
-            .required('Please enter diamension type')
+            .matches(SPACE_REGEX, i18n.t('static.message.spacetext'))
+            .required('Please enter Dimension')
     })
 }
 

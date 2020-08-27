@@ -86,7 +86,8 @@ export default class EditOrganisationComponent extends Component {
             message: '',
             lang: localStorage.getItem('lang'),
             realmCountryId: '',
-            realmCountryList: []
+            realmCountryList: [],
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -95,6 +96,7 @@ export default class EditOrganisationComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
         // initialValues = {
         //     // label: this.props.location.state.healthArea.label.label_en,
         //     organisationName: getLabelText(this.state.organisation.label, lang),
@@ -105,6 +107,9 @@ export default class EditOrganisationComponent extends Component {
 
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -163,7 +168,7 @@ export default class EditOrganisationComponent extends Component {
         OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    organisation: response.data
+                    organisation: response.data, loading: false
                 })
             }
             else {
@@ -186,7 +191,7 @@ export default class EditOrganisationComponent extends Component {
                 .then(response => {
                     console.log("realm list---", response.data);
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 })
 
@@ -201,7 +206,8 @@ export default class EditOrganisationComponent extends Component {
                             regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
-                            realmCountryList: regList
+                            realmCountryList: regList,
+                            loading: false
                         })
                     } else {
                         this.setState({
@@ -253,9 +259,9 @@ export default class EditOrganisationComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -273,6 +279,9 @@ export default class EditOrganisationComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     // console.log("-------------------->" + this.state.healthArea);
                                     OrganisationService.editOrganisation(this.state.organisation)
                                         .then(response => {
@@ -419,6 +428,17 @@ export default class EditOrganisationComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -443,7 +463,7 @@ export default class EditOrganisationComponent extends Component {
                 .then(response => {
                     console.log("realm list---", response.data);
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 })
 
@@ -457,7 +477,7 @@ export default class EditOrganisationComponent extends Component {
                             regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
-                            realmCountryList: regList
+                            realmCountryList: regList, loading: false
                         })
                     } else {
                         this.setState({

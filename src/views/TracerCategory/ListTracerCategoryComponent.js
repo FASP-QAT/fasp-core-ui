@@ -38,7 +38,91 @@ class ListTracerCategoryComponent extends Component {
 
     }
     buildJexcel() {
-        let supplierList = this.state.selSource;
+        let tracerCategoryList = this.state.selTracerCategory;
+        // console.log("tracerCategoryList---->", tracerCategoryList);
+        let tracerCategory = [];
+        let count = 0;
+
+        for (var j = 0; j < tracerCategoryList.length; j++) {
+            data = [];
+            data[0] = tracerCategoryList[j].tracerCategoryId
+            data[1] = getLabelText(tracerCategoryList[j].realm.label, this.state.lang)
+            data[2] = getLabelText(tracerCategoryList[j].label, this.state.lang)
+            data[3] = tracerCategoryList[j].active;
+            tracerCategory[count] = data;
+            count++;
+        }
+        // if (tracerCategoryList.length == 0) {
+        //     data = [];
+        //     tracerCategory[0] = data;
+        // }
+        // console.log("tracerCategory---->", tracerCategory);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = tracerCategory;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'tracerCategoryId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.realm.realm'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.tracercategory.tracercategory'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
+            ],
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: 10,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+
+
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: [10, 25, 50],
+            position: 'top',
+            contextMenu: false
+        };
+        var tracerCategoryEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = tracerCategoryEl;
+        this.setState({
+            tracerCategoryEl: tracerCategoryEl, loading: false
+        })
+
     }
 
     hideFirstComponent() {
@@ -62,14 +146,18 @@ class ListTracerCategoryComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
+            console.log("this.state.tracerCategoryList---", this.state.tracerCategoryList);
             const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.id == realmId)
+            console.log("selTracerCategory---", selTracerCategory);
             this.setState({
                 selTracerCategory
-            });
+            },
+                () => { this.buildJexcel() });
         } else {
             this.setState({
                 selTracerCategory: this.state.tracerCategoryList
-            });
+            },
+                () => { this.buildJexcel() });
         }
     }
     editTracerCategory(tracerCategory) {
@@ -123,7 +211,7 @@ class ListTracerCategoryComponent extends Component {
                 },
                     () => {
 
-                        let tracerCategoryList = this.state.tracerCategoryList;
+                        let tracerCategoryList = this.state.selTracerCategory;
                         // console.log("tracerCategoryList---->", tracerCategoryList);
                         let tracerCategory = [];
                         let count = 0;
