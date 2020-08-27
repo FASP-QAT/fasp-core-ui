@@ -226,7 +226,7 @@ class RealmCountry extends Component {
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
-                                                paginationOptions: [10, 25, 50, 100],
+                                                paginationOptions: [10, 25, 50],
                                                 position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -237,7 +237,8 @@ class RealmCountry extends Component {
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 text: {
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                     show: '',
                                                     entries: '',
                                                 },
@@ -633,10 +634,10 @@ class RealmCountry extends Component {
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
-                                <div className="table-responsive">
-                                    <div id="paputableDiv" >
-                                    </div>
+
+                                <div id="paputableDiv" >
                                 </div>
+
                             </Col>
                         </CardBody>
                         <CardFooter>

@@ -810,7 +810,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [10,10,50,50,10,10,10,50,200,200,50,50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1087,12 +1087,14 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     editProblem(problem, index) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
         let problemStatusId = document.getElementById('problemStatusId').value;
         let problemTypeId = document.getElementById('problemTypeId').value;
         this.props.history.push({
             pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
             // state: { language }
         });
+    }
 
     }
 
@@ -1339,7 +1341,8 @@ export default class ConsumptionDetails extends React.Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                                
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>

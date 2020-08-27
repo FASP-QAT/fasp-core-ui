@@ -32,6 +32,7 @@ import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import InventoryInSupplyPlanComponent from "./InventoryInSupplyPlan";
 import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+import SupplyPlanFormulas from "./SupplyPlanFormulas";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -205,6 +206,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.updateState = this.updateState.bind(this)
         this.updateFieldData = this.updateFieldData.bind(this);
+        this.openPopup = this.openPopup.bind(this);
     }
 
     roundN = num => {
@@ -2285,13 +2287,13 @@ export default class SupplyPlanComponent extends React.Component {
                 }} />
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className="red">{this.state.supplyPlanError}</h5>
-
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card>
                     <div className="Card-header-reporticon">
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                                <span onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                         </div>
                     </div>
@@ -2518,4 +2520,5 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionBatchError: ""
         })
     }
+    
 }

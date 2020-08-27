@@ -8,7 +8,7 @@ import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import {LABEL_REGEX,ALPHABETS_REGEX} from '../../Constants.js';
+import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.currency.currencyMaster');
@@ -81,7 +81,8 @@ export default class UpdateCurrencyComponent extends Component {
                 isSync: 'true'
             },
             message: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -89,7 +90,11 @@ export default class UpdateCurrencyComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
 
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -158,7 +163,7 @@ export default class UpdateCurrencyComponent extends Component {
             console.log(JSON.stringify(response.data))
             if (response.status == 200) {
                 this.setState({
-                    currency: response.data
+                    currency: response.data, loading: false
                 });
             }
             else {
@@ -191,9 +196,9 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -210,7 +215,9 @@ export default class UpdateCurrencyComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                                    this.setState({
+                                        loading: true
+                                    })
                                     CurrencyService.editCurrency(this.state.currency)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -362,6 +369,17 @@ export default class UpdateCurrencyComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
