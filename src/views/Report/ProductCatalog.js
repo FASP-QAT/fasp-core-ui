@@ -1938,7 +1938,8 @@ class ProductCatalog extends Component {
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            ProgramService.getProgramByRealmId(realmId)
+            // ProgramService.getProgramByRealmId(realmId)
+            ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
@@ -2037,8 +2038,8 @@ class ProductCatalog extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log(response.data);
-                    var list=response.data.slice(1);
-                    console.log("my list=======",list);
+                    var list=response.data;
+                    // console.log("my list=======",list);
                     
                     this.setState({
                         productCategories: list
@@ -2086,7 +2087,7 @@ class ProductCatalog extends Component {
                 };
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
-                    myResult = getRequest.result.slice(1);
+                    myResult = getRequest.result;
                     // alert("hi---");
                     console.log("offline result==>",myResult);
                     
@@ -2505,6 +2506,8 @@ class ProductCatalog extends Component {
         let programId = document.getElementById("programId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
+
+        // alert(productCategoryId);
         // let plannedShipments = document.getElementById("shipmentStatusId").value;
         // let planningUnitIds = this.state.planningUnitValues;
         // let procurementAgentIds = this.state.procurementAgenttValues;
@@ -2513,7 +2516,7 @@ class ProductCatalog extends Component {
 
         let json = {
             "programId": parseInt(document.getElementById("programId").value),
-            "productCategoryId": parseInt(document.getElementById("productCategoryId").value),
+            "productCategoryId": parseInt(document.getElementById("productCategoryId").value) == 0 ? -1 : parseInt(document.getElementById("productCategoryId").value),
             "tracerCategoryId": parseInt(document.getElementById("tracerCategoryId").value),
 
         }
@@ -2996,7 +2999,7 @@ class ProductCatalog extends Component {
                                                 onChange={this.fetchData}
                                             // onChange={(e) => { this.getPlanningUnit(); }}
                                             >
-                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
                                                 {productCategories.length > 0
                                                     && productCategories.map((item, i) => {
                                                         return (
