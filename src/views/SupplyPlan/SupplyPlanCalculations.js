@@ -197,6 +197,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         for (var b = 0; b < batchListForShipments.length; b++) {
                                             var batchNo = batchListForShipments[b].batch.batchNo;
                                             var index = myArray.findIndex(c => c.batchNo == batchNo);
+                                            console.log("My Array", myArray);
+                                            console.log("Index", index);
                                             myArray[index].remainingBatchQty = parseInt(myArray[index].remainingBatchQty) + batchListForShipments[b].shipmentQty;
                                             console.log("Btach No", batchNo, "B", b, "Qty", batchListForShipments[b].shipmentQty)
                                         }
@@ -989,6 +991,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             putRequest.onerror = function (event) {
                             }.bind(this);
                             putRequest.onsuccess = function (event) {
+                                console.log("Time taken",performance.now())
                                 if (page == "consumption") {
                                     console.log("After save")
                                     props.updateState("message", i18n.t('static.message.consumptionSaved'));
@@ -1004,7 +1007,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         } else {
                                             props.formSubmit(props.items.monthCount);
                                         }
+
                                     }
+                                    console.log("Start date", new Date());
                                 } else if (page == "inventory") {
                                     console.log("After save")
                                     // this.showInventoryData();
