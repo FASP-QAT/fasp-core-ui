@@ -693,7 +693,7 @@ export default class ManualTagging extends Component {
             .then(response => {
                 console.log("link response===", response);
                 this.setState({
-                    message : i18n.t('static.shipment.linkingsuccess')
+                    message: i18n.t('static.shipment.linkingsuccess')
                 })
                 this.toggleLarge();
                 this.filterData();
@@ -940,7 +940,7 @@ export default class ManualTagging extends Component {
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
