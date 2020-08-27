@@ -691,6 +691,8 @@ export default class ForecastingUnitListComponent extends Component {
 
     filterDataForRealm() {
         let realmId = document.getElementById("realmId").value;
+        console.log("realmId---",realmId)
+        this.getProductCategories();
         ForecastingUnitService.getForcastingUnitByRealmId(realmId).then(response => {
             if (response.status == 200) {
                 console.log("response------->" + response);
@@ -788,8 +790,6 @@ export default class ForecastingUnitListComponent extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 console.log("product category list---", JSON.stringify(response.data))
-
-
                 this.setState({
                     productCategories: response.data
                 })
@@ -806,25 +806,25 @@ export default class ForecastingUnitListComponent extends Component {
                         realms: response.data,
                         realmId: response.data[0].realmId, loading: false
                     })
-                    this.getProductCategories();
-                    ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
-                        console.log("response------->" + response);
-                        if (response.status == 200) {
-                            this.setState({
-                                forecastingUnitList: response.data,
-                                selSource: response.data
-                            })
-                        } else {
-                            this.setState({
-                                message: response.data.messageCode
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                        }
+                    // this.getProductCategories();
+                    // ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
+                    //     console.log("response------->" + response);
+                    //     if (response.status == 200) {
+                    //         this.setState({
+                    //             forecastingUnitList: response.data,
+                    //             selSource: response.data
+                    //         })
+                    //     } else {
+                    //         this.setState({
+                    //             message: response.data.messageCode
+                    //         },
+                    //             () => {
+                    //                 this.hideSecondComponent();
+                    //             })
+                    //     }
 
 
-                    })
+                    // })
 
                 } else {
 
