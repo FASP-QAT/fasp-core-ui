@@ -1105,6 +1105,7 @@ class ForecastMetrics extends Component {
 
 
     this.state = {
+    
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -1126,6 +1127,7 @@ class ForecastMetrics extends Component {
 
 
     };
+    
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1144,7 +1146,7 @@ class ForecastMetrics extends Component {
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
   }
-
+ 
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
@@ -1913,6 +1915,7 @@ class ForecastMetrics extends Component {
           <div className="card-header-actions">
           <a className="card-header-action">
                                 <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                               
                             </a>
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong> */}
             {this.state.consumptions.length > 0 && 
@@ -2082,6 +2085,7 @@ class ForecastMetrics extends Component {
                       </div>
           </CardBody>
         </Card>
+        
 
       </div>
     );
