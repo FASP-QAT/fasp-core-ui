@@ -616,7 +616,7 @@ class ListBudgetComponent extends Component {
       data[6] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       data[7] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
       data[8] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[9] = budgetList[j].active;
+      data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       data[10] = budgetList[j].budgetAmt;
       data[11] = budgetList[j].usedUsdAmt;
       data[12] = budgetList[j].stopDate;
@@ -687,13 +687,13 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
-          type: 'dropdown',
+          type: 'text',
           title: i18n.t('static.common.status'),
           // readOnly: true,
-          source: [
-            { id: true, name: i18n.t('static.common.active') },
-            { id: false, name: i18n.t('static.common.disabled') }
-          ]
+          // source: [
+          //   { id: true, name: i18n.t('static.common.active') },
+          //   { id: false, name: i18n.t('static.common.disabled') }
+          // ]
         },
         {
           title: i18n.t('static.budget.budgetamount'),
