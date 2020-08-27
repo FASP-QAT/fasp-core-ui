@@ -349,6 +349,7 @@
     "static.procurementagent.procurementagentapprovetoshippedtime": "Lead time from order approval to order shipped (Months)",
     "static.currency.currencyMaster": "Currency",
     "static.currency.conversionrateNumber": "Please enter positive integer or decimal Number.",
+    "static.currency.conversionrateNumberDecimalPlaces": "Please enter decimal numbers upto 4 decimal places.",
     "static.currency.conversionrateMin": "Please enter number greater then 0.",
     "static.program.programMaster": "Program",
     "static.language.languageCode": "Language Code",
