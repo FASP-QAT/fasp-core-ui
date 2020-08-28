@@ -51,6 +51,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import RealmCountryService from '../../api/RealmCountryService';
 import ReportService from '../../api/ReportService';
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -944,13 +945,14 @@ PercentageFormatter=num=>{
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
+        <SupplyPlanFormulas ref="formulaeChild" />
         <Row>
           <Col lg="12">
             <Card>
               <div className="Card-header-reporticon">
               <div className="card-header-actions">
               <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+              <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                 {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong> */}
                 

@@ -1034,6 +1034,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
@@ -1105,6 +1106,7 @@ class ForecastMetrics extends Component {
 
 
     this.state = {
+    
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -1126,6 +1128,7 @@ class ForecastMetrics extends Component {
 
 
     };
+    
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1144,7 +1147,7 @@ class ForecastMetrics extends Component {
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
   }
-
+ 
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
@@ -1907,12 +1910,13 @@ class ForecastMetrics extends Component {
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
-
+        <SupplyPlanFormulas ref="formulaeChild" />
         <Card>
           <div className="Card-header-reporticon">
           <div className="card-header-actions">
           <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+          <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>           
+                               
                             </a>
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong> */}
             {this.state.consumptions.length > 0 && 
@@ -2082,6 +2086,7 @@ class ForecastMetrics extends Component {
                       </div>
           </CardBody>
         </Card>
+        
 
       </div>
     );

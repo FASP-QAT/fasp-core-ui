@@ -562,9 +562,10 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </div>
 
                     </CardHeader> */}
-                    <CardBody className="mt-3">
+                    <CardBody className="">
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                       
+                            <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.realmcountry')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -584,8 +585,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
+                           
                         </Col>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground SearchMarginTop">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground ">
                         </div>
 
                     </CardBody>

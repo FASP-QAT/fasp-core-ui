@@ -147,7 +147,7 @@ class ChangePasswordComponent extends Component {
                 <h5 style={{ color: "red" }} id="div1">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card className="mt-2">
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.dashboard.changepassword')}</strong>{' '}
                             </CardHeader> */}

@@ -275,6 +275,7 @@ export default class PlanningUnitCapacityList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             planningUnits: [],
             planningUnitCapacityList: [],
             message: '',
@@ -285,7 +286,7 @@ export default class PlanningUnitCapacityList extends Component {
         this.formatLabel = this.formatLabel.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
-  buildJexcel() {
+    buildJexcel() {
 
         // let supplierList = this.state.selSource;
 
@@ -303,7 +304,7 @@ export default class PlanningUnitCapacityList extends Component {
             data[4] = (planningUnitCapacityList[j].stopDate ? moment(planningUnitCapacityList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null)
             data[5] = planningUnitCapacityList[j].capacity
             data[6] = planningUnitCapacityList[j].active;
-             planningUnitCapacityArray[count] = data;
+            planningUnitCapacityArray[count] = data;
             count++;
         }
         if (planningUnitCapacityList.length == 0) {
@@ -387,15 +388,15 @@ export default class PlanningUnitCapacityList extends Component {
             position: 'top',
             contextMenu: false
         };
-        var languageEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = languageEl;
+        var planningUnitCapacityEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = planningUnitCapacityEl;
         this.setState({
-            languageEl: languageEl, loading: false
+            planningUnitCapacityEl: planningUnitCapacityEl, loading: false
         })
 
-    
+
     }
-    
+
 
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
@@ -410,7 +411,7 @@ export default class PlanningUnitCapacityList extends Component {
             this.setState({
                 planningUnitCapacityList: this.state.selSource
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         }
 
     }
@@ -429,7 +430,7 @@ export default class PlanningUnitCapacityList extends Component {
                 planningUnitCapacityList: response.data,
                 selSource: response.data
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         })
     }
 
@@ -488,10 +489,12 @@ export default class PlanningUnitCapacityList extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.capacitylist')}</strong> */}
                         <div className="card-header-actions">
@@ -522,11 +525,22 @@ export default class PlanningUnitCapacityList extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
-                            </div>
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

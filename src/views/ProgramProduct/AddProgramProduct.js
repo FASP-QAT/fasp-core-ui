@@ -210,12 +210,12 @@ class AddprogramPlanningUnit extends Component {
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: 'Reorder frequency in months',
+                                                        title: 'Reorder Frequency In Months',
                                                         type: 'number',
 
                                                     },
                                                     {
-                                                        title: 'Min month of stock',
+                                                        title: 'Min Month Of Stock',
                                                         type: 'number'
                                                     },
                                                     {
