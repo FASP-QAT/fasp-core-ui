@@ -6,7 +6,7 @@ class SupplyPlanFormulas extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
+    // this.toggle = this.toggle.bind(this);
     this.state = {
       activeTab: 1,
       accordion: [true, true, true],
@@ -63,10 +63,11 @@ class SupplyPlanFormulas extends Component {
             <Card>
               <CardBody>
               <Button onClick={this.toggle} className="mr-1">Launch demo modal</Button> */}
-                <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                  <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
-                  <ModalBody>
-                  <ListGroup>
+             
+                <Modal isOpen={this.state.modal}  className={'modal-lg ' + this.props.className} >
+                  <ModalHeader toggle={this.toggle}>Formulae</ModalHeader>
+                  <ModalBody >
+                  <ListGroup style={{height:'490px',overflowY:'scroll'}}>
                 <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Opening Balance</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
@@ -263,7 +264,7 @@ Months Of Stock = 3.54</p>
 
                    */}
                 </ListGroup>
-                <ListGroup>
+                {/* <ListGroup>
                 <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
@@ -274,12 +275,9 @@ Months Of Stock = 3.54</p>
                   </ListGroupItem>
 
                   
-                </ListGroup>
+                </ListGroup> */}
                   </ModalBody>
-                  <ModalFooter>
-                    <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-                    <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                  </ModalFooter>
+                
                 </Modal>
 
                 {/* <ListGroup>
