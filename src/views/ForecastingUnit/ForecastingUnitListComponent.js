@@ -589,7 +589,7 @@ export default class ForecastingUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 60, 100,60,60,60,100,60],
+            colWidths: [150, 60, 100, 60, 60, 60, 100, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -690,15 +690,17 @@ export default class ForecastingUnitListComponent extends Component {
     }
 
     filterDataForRealm() {
+        this.setState({ loading: true })
         let realmId = document.getElementById("realmId").value;
-        console.log("realmId---",realmId)
+        console.log("realmId---", realmId)
         this.getProductCategories();
         ForecastingUnitService.getForcastingUnitByRealmId(realmId).then(response => {
             if (response.status == 200) {
                 console.log("response------->" + response);
                 this.setState({
                     forecastingUnitList: response.data,
-                    selSource: response.data
+                    selSource: response.data,
+                    loading: false
                 },
                     () => {
                         this.buildJexcel();
@@ -707,7 +709,7 @@ export default class ForecastingUnitListComponent extends Component {
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -743,9 +745,11 @@ export default class ForecastingUnitListComponent extends Component {
         //     });
         // } else 
         if (productCategoryId != 0 && tracerCategoryId != 0) {
+            this.setState({ loading: true })
             const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
             this.setState({
-                selSource
+                selSource,
+                loading: false
             },
                 () => {
                     this.buildJexcel();
@@ -829,7 +833,7 @@ export default class ForecastingUnitListComponent extends Component {
                 } else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -846,7 +850,7 @@ export default class ForecastingUnitListComponent extends Component {
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -860,11 +864,12 @@ export default class ForecastingUnitListComponent extends Component {
             if (response.status == 200) {
                 this.setState({
                     forecastingUnitList: response.data,
-                    selSource: response.data
+                    selSource: response.data,
+                    loading: false
                 })
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -950,6 +955,8 @@ export default class ForecastingUnitListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1"><strong></strong>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

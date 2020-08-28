@@ -598,6 +598,7 @@ export default class ProgramList extends Component {
         console.log("response--->", response.data);
         this.setState({
           countryList: response.data,
+          // loading: false
         })
       } else {
         this.setState({ message: response.data.messageCode })
@@ -649,6 +650,8 @@ export default class ProgramList extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>

@@ -854,6 +854,7 @@ export default class DataSourceListComponent extends Component {
             });
         }
     }
+    
     selected = function (instance, cell, x, y, value) {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
