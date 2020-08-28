@@ -402,6 +402,7 @@ export default class HealthAreaListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
+            colWidths: [100,100,200],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

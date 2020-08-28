@@ -639,7 +639,7 @@ class ListBudgetComponent extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100],
+      colWidths: [150, 60, 60,60,100,],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {

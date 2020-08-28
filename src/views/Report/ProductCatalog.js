@@ -1532,7 +1532,8 @@ class ProductCatalog extends Component {
             procurementAgentLabels: [],
             outPutList: [],
             productCategories: [],
-            tracerCategories: []
+            tracerCategories: [],
+            loading: true
         };
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -1932,7 +1933,7 @@ class ProductCatalog extends Component {
         }
     }
 
-   
+
 
     getPrograms() {
         if (navigator.onLine) {
@@ -2021,7 +2022,7 @@ class ProductCatalog extends Component {
                 }, () => {
                     this.getProductCategories()
                 }
-                    )
+                )
 
             }.bind(this);
 
@@ -2031,16 +2032,16 @@ class ProductCatalog extends Component {
     getProductCategories() {
 
         // alert(navigator.onLine);
-        
+
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log(response.data);
-                    var list=response.data;
+                    var list = response.data;
                     // console.log("my list=======",list);
-                    
+
                     this.setState({
                         productCategories: list
                     })
@@ -2089,8 +2090,8 @@ class ProductCatalog extends Component {
                     var myResult = [];
                     myResult = getRequest.result;
                     // alert("hi---");
-                    console.log("offline result==>",myResult);
-                    
+                    console.log("offline result==>", myResult);
+
                     // for (var i = 0; i < myResult.length; i++) {
                     //     var databytes = CryptoJS.AES.decrypt(myResult[i].productCategory, SECRET_KEY);
                     //     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -2524,6 +2525,8 @@ class ProductCatalog extends Component {
         if (programId > 0) {
 
             if (navigator.onLine) {
+
+                this.setState({ loading: true })
                 console.log("json---", json);
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.programProductCatalog(json)
@@ -2533,13 +2536,15 @@ class ProductCatalog extends Component {
                         // var responseData = response.data;
                         this.setState({
                             outPutList: outPutList,
-                            message: ''
+                            message: '',
+                            loading: false
                         },
                             () => { this.buildJexcel() })
                     }).catch(
                         error => {
                             this.setState({
-                                outPutList: []
+                                outPutList: [],
+                                loading: false
                             },
                                 () => {
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -2547,7 +2552,7 @@ class ProductCatalog extends Component {
                                 })
 
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -2555,10 +2560,10 @@ class ProductCatalog extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ loading: false, message: 'static.unkownError' });
                                         break;
                                 }
                             }
@@ -2715,6 +2720,10 @@ class ProductCatalog extends Component {
         // alert("in component did mount");
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
+        setTimeout(function() { //Start the timer
+            // this.setState({render: true}) //After 1 second, set render to true
+            this.setState({ loading: false })
+        }.bind(this), 500)
         // this.getProcurementAgent();
         // this.getProductCategories();
     }
@@ -2942,6 +2951,8 @@ class ProductCatalog extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
@@ -3050,6 +3061,17 @@ class ProductCatalog extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );
