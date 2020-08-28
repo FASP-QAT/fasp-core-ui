@@ -271,7 +271,7 @@ export default class ShipmentDetails extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardBody className="pb-lg-2 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
                                 ({
@@ -312,13 +312,13 @@ export default class ShipmentDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <Col xs="12" sm="12" className="p-0">
+                        <div className="ReportSearchMarginTop">
                             {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} shipmentPage="shipmentDataEntry" />}
                             <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
                             </div>
-                        </Col>
+                        </div>
                     </CardBody>
                     <CardFooter>
                         <FormGroup>

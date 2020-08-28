@@ -26,6 +26,7 @@ import {
     Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Table
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 
 const options = {
     title: {
@@ -1687,11 +1688,12 @@ class StockStatusOverTime extends Component {
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card>
                     <div className="Card-header-reporticon">
                     <div className="card-header-actions">
                                  <a className="card-header-action">
-                                 <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                                 <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatusOverTime() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                                  </a>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong> */}
                         {

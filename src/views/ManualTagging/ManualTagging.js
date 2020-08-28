@@ -1253,10 +1253,10 @@ export default class ManualTagging extends Component {
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card >
-                    <CardBody className="">
+                    <CardBody className="pb-lg-5">
                         <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                <FormGroup className="col-md-3 pl-0">
+                            <div className="row">
+                                <FormGroup className="col-md-3 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1333,8 +1333,9 @@ export default class ManualTagging extends Component {
                                 )
                             }
                         </ToolkitProvider> */}
-
+                         <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
                         {/* Consumption modal */}

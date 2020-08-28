@@ -1341,18 +1341,18 @@ export default class syncPage extends Component {
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
-              <CardHeader>
+              {/* <CardHeader>
                 <strong>{i18n.t('static.dashboard.commitVersion')}</strong>
-              </CardHeader>
+              </CardHeader> */}
               <CardBody>
 
                 <Form name='simpleForm'>
                   <Col md="12 pl-0">
 
-                    <div className="d-md-flex">
-                      <FormGroup className="col-md-2 comparebtntext">
+                    <div className="row">
+                      <FormGroup className="col-md-3 ">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                        <div className="controls SelectGo ">
+                        <div className="controls  ">
                           <InputGroup>
                             <Input type="select"
                               bsSize="sm"
@@ -1367,7 +1367,9 @@ export default class syncPage extends Component {
                         </div>
 
                       </FormGroup>
-                      <div className="col-md-10">
+                      
+                    </div>
+                    <div className="col-md-12 pl-0 pb-3">
                         <ul class="legendcommitversion">
                           <li><span class="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.differenceBetweenVersions')}</span></li>
                           <li><span class=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.newDataCurrentVersion')} </span></li>
@@ -1378,7 +1380,6 @@ export default class syncPage extends Component {
 
                         </ul>
                       </div>
-                    </div>
                   </Col>
                 </Form>
                 <div id="detailsDiv">

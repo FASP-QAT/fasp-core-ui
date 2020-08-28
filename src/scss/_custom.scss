@@ -3125,7 +3125,7 @@ border-radius: 2em;
   bottom: 0;
   color: #aaa;
   left: 0;
-  line-height: 28px!important;
+  line-height: 29px!important;
   padding-left: 10px;
   padding-right: 10px;
   position: absolute;
@@ -3138,6 +3138,7 @@ border-radius: 2em;
 }
 .Select-input {
   height: 27px!important;
+  // margin-bottom: -5px!important;
   
 }
 .Select-control {

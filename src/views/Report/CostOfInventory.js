@@ -965,6 +965,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 
 
 const entityname = i18n.t('static.dashboard.costOfInventory');
@@ -1813,14 +1814,14 @@ export default class CostOfInventory extends Component {
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.costOfInventory')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                            <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.togglecostOfInventory() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                             <a className="card-header-action">
                                 {this.state.costOfInventory.length > 0 && <div className="card-header-actions">

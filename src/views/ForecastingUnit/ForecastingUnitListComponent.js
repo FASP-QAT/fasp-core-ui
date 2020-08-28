@@ -589,7 +589,7 @@ export default class ForecastingUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [50, 50, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
