@@ -693,7 +693,7 @@ export default class ManualTagging extends Component {
             .then(response => {
                 console.log("link response===", response);
                 this.setState({
-                    message : i18n.t('static.shipment.linkingsuccess')
+                    message: i18n.t('static.shipment.linkingsuccess')
                 })
                 this.toggleLarge();
                 this.filterData();
@@ -940,7 +940,7 @@ export default class ManualTagging extends Component {
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -1253,10 +1253,10 @@ export default class ManualTagging extends Component {
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card >
-                    <CardBody className="">
+                    <CardBody className="pb-lg-5">
                         <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                <FormGroup className="col-md-3 pl-0">
+                            <div className="row">
+                                <FormGroup className="col-md-3 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1333,8 +1333,9 @@ export default class ManualTagging extends Component {
                                 )
                             }
                         </ToolkitProvider> */}
-
+                         <div className="ReportSearchMarginTop">
                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
                         </div>
 
                         {/* Consumption modal */}

@@ -962,7 +962,7 @@ class SupplyPlanVersionAndReview extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            // colWidths: [150, 150, 100],
+            colWidths: [100, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1654,11 +1654,11 @@ class SupplyPlanVersionAndReview extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-0">
 
                         <div>
                             <Form >
-                                <Col md="12 pl-0">
+                                <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1742,21 +1742,16 @@ class SupplyPlanVersionAndReview extends Component {
                                                 </InputGroup>    </div></FormGroup>
 
                                     </div>
-                                </Col>
+                                </div>
                             </Form>
-                            <Col md="12 pl-0">
-
-                                <div className="row">
-                                    <div className="col-md-12">
+                        </div>
+                        <div className="ReportSearchMarginTop">
                                         <div id="tableDiv" className="jexcelremoveReadonlybackground">
                                         </div>
+                                        </div>
 
-                                    </div>
-                                </div>
-                            </Col>
-
-                        </div>
-                    </CardBody></Card>
+                    </CardBody>
+                    </Card>
             </div>
 
 

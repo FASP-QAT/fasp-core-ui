@@ -2592,7 +2592,7 @@ class ProcurementAgentExport extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [150, 70, 150],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 obj1,
