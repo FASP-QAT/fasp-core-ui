@@ -671,6 +671,7 @@ class Program extends Component {
                         )
 
                 } else {
+                    this.setState({ loading: false })
                     alert(i18n.t('static.common.online'))
                 }
             }

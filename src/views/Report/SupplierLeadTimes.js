@@ -1328,7 +1328,8 @@ class SupplierLeadTimes extends Component {
 
             procurementAgenttValues: [],
             procurementAgentLabels: [],
-            outPutList: []
+            outPutList: [],
+            loading: true
         };
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -1601,7 +1602,7 @@ class SupplierLeadTimes extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                   
+
                 }
 
             }
@@ -1613,34 +1614,34 @@ class SupplierLeadTimes extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
-         doc.setTextColor("#002f6c");
+        doc.setTextColor("#002f6c");
         var y = 110;
         var planningText = doc.splitTextToSize(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width * 3 / 4);
         //doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
-      
+                doc.addPage();
+                y = 80;
+
             }
             doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
             y = y + 10;
             console.log(y)
-          }
+        }
         planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
         //doc.text(doc.internal.pageSize.width / 8, 130, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-            doc.addPage();
-            y = 80;
-    
-          }
-          doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
-          y = y + 10;
-          console.log(y)
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
         }
-     
+
         doc.setFontSize(8);
         const title = i18n.t('static.report.procurmentAgentLeadTimeReport');
         // var canvas = document.getElementById("cool-canvas");
@@ -1657,11 +1658,11 @@ class SupplierLeadTimes extends Component {
         console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
-          doc.addPage()
+            doc.addPage()
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
         doc.setTextColor("#fff");
-       
+
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
@@ -1681,10 +1682,10 @@ class SupplierLeadTimes extends Component {
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
         ]);
-       // let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
-      
+        // let startY=150+(this.state.planningUnitLabels.length*3)+(this.state.procurementAgentLabels.length*3)
+
         let content = {
-            margin: { top: 110 ,bottom:95},
+            margin: { top: 110, bottom: 95 },
             startY: startYtable,
             head: [headers],
             body: data,
@@ -1741,6 +1742,7 @@ class SupplierLeadTimes extends Component {
         setTimeout('', 10000);
         let programIds = this.state.programValues;
         if (programIds.length > 0) {
+            this.setState({ loading: true })
             AuthenticationService.setupAxiosInterceptors();
 
             ReportService.getProcurementAgentExportData(programIds)
@@ -1748,16 +1750,18 @@ class SupplierLeadTimes extends Component {
                     console.log(JSON.stringify(response.data));
                     this.setState({
                         procurementAgents: response.data,
-                        message: ''
+                        message: '',
+                        loading: false
                     })
                 }).catch(
                     error => {
                         this.setState({
-                            procurementAgents: []
+                            procurementAgents: [],
+                            loading: false
                         })
 
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1765,10 +1769,10 @@ class SupplierLeadTimes extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -1792,15 +1796,15 @@ class SupplierLeadTimes extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1808,10 +1812,10 @@ class SupplierLeadTimes extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -1819,6 +1823,7 @@ class SupplierLeadTimes extends Component {
                 );
         } else {
             console.log('offline')
+            this.setState({ loading: false })
             this.consolidatedProgramList()
         }
     }
@@ -2053,15 +2058,15 @@ class SupplierLeadTimes extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        procurementAgents: response.data
+                        procurementAgents: response.data, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
                         this.setState({
-                            procurementAgents: []
+                            procurementAgents: [], loading: false
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -2069,10 +2074,10 @@ class SupplierLeadTimes extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -2081,6 +2086,7 @@ class SupplierLeadTimes extends Component {
 
         } else {
             console.log('offline')
+            this.setState({ loading: false })
             this.consolidatedProcurementAgentList()
         }
 
@@ -2589,11 +2595,13 @@ class SupplierLeadTimes extends Component {
             <div className="animated" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
                         {/* <i className="icon-menu"></i><strong>Procurement Agent Lead Times</strong> */}
@@ -2691,8 +2699,8 @@ class SupplierLeadTimes extends Component {
                         </div>
                         {/* </Form> */}
                         <div className="ReportSearchMarginTop">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                        </div>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
                         </div>
 
 
@@ -2700,6 +2708,17 @@ class SupplierLeadTimes extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );

@@ -1972,6 +1972,7 @@ class ProductCatalog extends Component {
         } else {
             console.log('offline')
             this.consolidatedProgramList()
+            this.setState({ loading: false })
         }
     }
 
@@ -2720,7 +2721,7 @@ class ProductCatalog extends Component {
         // alert("in component did mount");
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
-        setTimeout(function() { //Start the timer
+        setTimeout(function () { //Start the timer
             // this.setState({render: true}) //After 1 second, set render to true
             this.setState({ loading: false })
         }.bind(this), 500)
