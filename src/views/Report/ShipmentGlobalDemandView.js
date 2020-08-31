@@ -1441,6 +1441,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
 import MultiSelect from 'react-multi-select-component';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 const ref = React.createRef();
 
@@ -1585,7 +1586,7 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+            loading: true
         };
 
 
@@ -1753,7 +1754,7 @@ class ShipmentGlobalDemandView extends Component {
 
             // var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 200, statusText)
-           
+
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                 align: 'left'
@@ -1765,53 +1766,53 @@ class ShipmentGlobalDemandView extends Component {
 
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
             //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-           /* let y = 150
-            console.log(doc.internal.pageSize.height)
-            var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
-            for (var i = 0; i < fundingSourceText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
-                y = y + 10;
-                console.log(y)
-            }
-            var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-            //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
-            // 
-            y = y + 10;
-            for (var i = 0; i < statusText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
-                y = y + 10;
-                console.log(y)
-            }
-            y = y + 10;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
-                y = y + 10;
-                console.log(y)
-            }
-*/
+            /* let y = 150
+             console.log(doc.internal.pageSize.height)
+             var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+             // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
+             for (var i = 0; i < fundingSourceText.length; i++) {
+                 if (y > doc.internal.pageSize.height - 100) {
+                     doc.addPage();
+                     y = 80;
+ 
+                 }
+                 doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+                 y = y + 10;
+                 console.log(y)
+             }
+             var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+             //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
+             // 
+             y = y + 10;
+             for (var i = 0; i < statusText.length; i++) {
+                 if (y > doc.internal.pageSize.height - 100) {
+                     doc.addPage();
+                     y = 80;
+ 
+                 }
+                 doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
+                 y = y + 10;
+                 console.log(y)
+             }
+             y = y + 10;
+             for (var i = 0; i < planningText.length; i++) {
+                 if (y > doc.internal.pageSize.height - 100) {
+                     doc.addPage();
+                     y = 80;
+ 
+                 }
+                 doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+                 y = y + 10;
+                 console.log(y)
+             }
+ */
         }
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
-      
+
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-        let y =navigator.onLine? 130:150
+        let y = navigator.onLine ? 130 : 150
         console.log(doc.internal.pageSize.height)
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
@@ -1820,7 +1821,7 @@ class ShipmentGlobalDemandView extends Component {
                 doc.addPage();
                 y = 80;
 
-            } ;
+            };
             doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
             y = y + 10
             console.log(y)
@@ -1868,9 +1869,9 @@ class ShipmentGlobalDemandView extends Component {
             doc.addPage()
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
-        if(startYtable>height - 500){
+        if (startYtable > height - 500) {
             doc.addPage()
-            startYtable=80
+            startYtable = 80
         }
         console.log(startYtable)
         doc.addImage(canvasImg, 'png', 50, startYtable, 300, 200, 'a', 'CANVAS');
@@ -1950,7 +1951,7 @@ class ShipmentGlobalDemandView extends Component {
 
             if (realmId > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
-                    message: ''
+                    message: '', loading: true
                 })
 
                 // let realmId = AuthenticationService.getRealmId();
@@ -1979,6 +1980,7 @@ class ShipmentGlobalDemandView extends Component {
                             planningUnitSplit: response.data.planningUnitSplit,
                             procurementAgentSplit: response.data.procurementAgentSplit,
                             table1Headers: table1Headers,
+                            loading: false
                         }, () => {
 
                         })
@@ -2235,9 +2237,9 @@ class ShipmentGlobalDemandView extends Component {
                                     a[fundingSource.id].amount += amount;
                                 return a;
                             }, {}));
-
+                            console.log("procurementAgentSplit->", procurementAgentSplit);
                             var table1Headers = [];
-                            table1Headers = Object.keys(procurementAgentSplit[0].procurementAgentQty);
+                            table1Headers = (procurementAgentSplit.length == 0) ? [] : Object.keys(procurementAgentSplit[0].procurementAgentQty);
                             table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
                             table1Headers.push(i18n.t('static.report.totalUnit'));
 
@@ -2331,6 +2333,7 @@ class ShipmentGlobalDemandView extends Component {
             this.getShipmentStatusList();
             this.getRelamList();
         } else {
+            this.setState({ loading: false })
             this.getPrograms();
             this.getShipmentStatusList();
             this.getFundingSource();
@@ -2344,17 +2347,17 @@ class ShipmentGlobalDemandView extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
+                        realmList: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response.status) {
                             case 500:
@@ -2362,10 +2365,10 @@ class ShipmentGlobalDemandView extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 console.log("Error code unkown");
                                 break;
                         }
@@ -2381,7 +2384,7 @@ class ShipmentGlobalDemandView extends Component {
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     this.setState({
-                        shipmentStatuses: response.data
+                        shipmentStatuses: response.data, loading: false
                     })
                 }).catch(
                     error => {
@@ -2389,7 +2392,7 @@ class ShipmentGlobalDemandView extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -2397,10 +2400,10 @@ class ShipmentGlobalDemandView extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -2436,7 +2439,7 @@ class ShipmentGlobalDemandView extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        fundingSources: response.data
+                        fundingSources: response.data, loading: false
                     }, () => { this.consolidatedFundingSourceList() })
                 }).catch(
                     error => {
@@ -2444,7 +2447,7 @@ class ShipmentGlobalDemandView extends Component {
                             fundingSources: []
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -2452,10 +2455,10 @@ class ShipmentGlobalDemandView extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -2660,15 +2663,15 @@ class ShipmentGlobalDemandView extends Component {
             .then(response => {
                 // console.log(response.data)
                 this.setState({
-                    productCategories: response.data
+                    productCategories: response.data, loading: false
                 })
             }).catch(
                 error => {
                     this.setState({
-                        productCategories: []
+                        productCategories: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -2676,10 +2679,10 @@ class ShipmentGlobalDemandView extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -2997,10 +3000,15 @@ class ShipmentGlobalDemandView extends Component {
 
         return (
             <div className="animated fadeIn" >
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {(this.state.fundingSourceSplit.length > 0 || this.state.planningUnitSplit.length > 0 || this.state.procurementAgentSplit.length > 0) &&
                             <div className="card-header-actions">
@@ -3295,6 +3303,17 @@ class ShipmentGlobalDemandView extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div >
         );

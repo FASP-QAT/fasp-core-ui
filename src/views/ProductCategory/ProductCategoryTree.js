@@ -71,7 +71,8 @@ export default class ProductCategoryTree extends Component {
             duplicate: 0,
             searchQuery: null,
             searchFocusIndex: 0,
-            searchFoundCount: null
+            searchFoundCount: null,
+            loading: true
             // searchFocusIndex: 0
 
 
@@ -102,23 +103,28 @@ export default class ProductCategoryTree extends Component {
     }
 
     componentDidMount() {
+        // setTimeout(function () { //Start the timer
+        //     this.setState({ loading: false })
+        // }.bind(this), 500)
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realmList: response.data
+                        realmList: response.data,
+                        loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     })
                     this.hideSecondComponent();
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                         this.hideSecondComponent();
                     } else {
                         switch (error.response.status) {
@@ -127,11 +133,11 @@ export default class ProductCategoryTree extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 this.hideSecondComponent();
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 this.hideSecondComponent();
                                 console.log("Error code unkown");
                                 break;
@@ -163,13 +169,15 @@ export default class ProductCategoryTree extends Component {
         } else {
             this.setState({
                 message: '',
+                loading: true
             });
             AuthenticationService.setupAxiosInterceptors();
             ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
                 .then(response => {
                     if (response.status == 200) {
                         this.setState({
-                            productCategoryList: response.data
+                            productCategoryList: response.data,
+                            loading: false
                         });
 
                         var treeData = getTreeFromFlatData({
@@ -192,14 +200,14 @@ export default class ProductCategoryTree extends Component {
                         document.getElementById("treeDiv").style.display = "block";
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                         })
                         this.hideSecondComponent();
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                             this.hideSecondComponent();
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -208,11 +216,11 @@ export default class ProductCategoryTree extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({ message: error.response.data.messageCode, loading: false });
                                     this.hideSecondComponent();
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     this.hideSecondComponent();
                                     console.log("Error code unkown");
                                     break;
@@ -405,6 +413,7 @@ export default class ProductCategoryTree extends Component {
 
     }
     getSortedFaltTreeData() {
+        this.setState({ loading: true })
         let unsortedFlatTreeData = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
@@ -440,12 +449,14 @@ export default class ProductCategoryTree extends Component {
                     this.props.history.push(`/productCategory/productCategoryTree/` + 'green/' + i18n.t('static.productCategory.success'))
                     this.setState({
                         message: i18n.t('static.productCategory.success'),
-                        color: 'green'
+                        color: 'green',
+                        loading: false
                     })
                     this.hideSecondComponent();
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     })
                     this.hideSecondComponent();
                 }
@@ -453,7 +464,7 @@ export default class ProductCategoryTree extends Component {
             .catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                         this.hideSecondComponent();
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -462,11 +473,11 @@ export default class ProductCategoryTree extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 this.hideSecondComponent();
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 this.hideSecondComponent();
                                 break;
                         }
@@ -596,7 +607,7 @@ export default class ProductCategoryTree extends Component {
 
                 <Row id="treeDiv" style={{ display: "none" }}>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card>
+                        <Card style={{ display: this.state.loading ? "none" : "block" }}>
                             <CardBody>
                                 <Formik
                                     enableReinitialize={true}
@@ -625,7 +636,7 @@ export default class ProductCategoryTree extends Component {
                                             handleReset
                                         }) => (
                                                 <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm'>
-                                                   
+
                                                     <FormGroup>
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                             <Row>
@@ -646,7 +657,7 @@ export default class ProductCategoryTree extends Component {
                                                                     <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
                                                                 </Col>
                                                             </Row>}
-                                                    </FormGroup> 
+                                                    </FormGroup>
                                                     {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                         // <CardFooter>
                                                         <FormGroup className="mr-4">
@@ -657,17 +668,17 @@ export default class ProductCategoryTree extends Component {
                                                     } */}
                                                 </Form>
                                             )} />
-                                         <div className="col-md-12 ">
-                                             <Col md="3 float-right" >
-                                                <InputGroup>
-                                                    <input type="search" bsSize="sm" placeholder="Search" onChange={this.handleSearchOnChange} className="form-control form-control-sm" />
-                                                     <InputGroupAddon addonType="append">
-                                                         <button type="button"  className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount}  onClick={selectPrevMatch}> <i class="fa fa-angle-left btn-Icon-productTreeNextPre"></i></button>
-                                                         <button  type="submit"  className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount}  onClick={selectNextMatch}><i class="fa fa-angle-right btn-Icon-productTreeNextPre" ></i></button>
-                                                     </InputGroupAddon>
-                                                </InputGroup>
-                                             </Col>
-                                             </div>
+                                <div className="col-md-12 ">
+                                    <Col md="3 float-right" >
+                                        <InputGroup>
+                                            <input type="search" bsSize="sm" placeholder="Search" onChange={this.handleSearchOnChange} className="form-control form-control-sm" />
+                                            <InputGroupAddon addonType="append">
+                                                <button type="button" className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount} onClick={selectPrevMatch}> <i class="fa fa-angle-left btn-Icon-productTreeNextPre"></i></button>
+                                                <button type="submit" className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount} onClick={selectNextMatch}><i class="fa fa-angle-right btn-Icon-productTreeNextPre" ></i></button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </Col>
+                                </div>
                                 <FormGroup>
                                     <Label for="product category">{i18n.t('static.productCategory.productCategoryTree')}</Label>
                                     <div style={{ height: 450 }}>
@@ -760,6 +771,17 @@ export default class ProductCategoryTree extends Component {
                                 }
                             </CardFooter>
                         </Card>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </Col>
                 </Row>
             </div>

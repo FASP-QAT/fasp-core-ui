@@ -86,7 +86,8 @@ export default class AddForecastingUnitComponent extends Component {
                 productCategory: { id: '' },
                 tracerCategory: { id: '' }
             },
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            loading: true,
         }
 
         this.dataChange = this.dataChange.bind(this);
@@ -163,12 +164,12 @@ export default class AddForecastingUnitComponent extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 this.setState({
-                    units: response.data
+                    units: response.data, loading: false
                 })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response.status) {
                             case 500:
@@ -176,10 +177,10 @@ export default class AddForecastingUnitComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -188,14 +189,16 @@ export default class AddForecastingUnitComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data
+                    realms: response.data,
+                    loading: false
                 })
             })
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 this.setState({
-                    tracerCategories: response.data
+                    tracerCategories: response.data,
+                    loading: false
                 })
             })
 
@@ -266,9 +269,11 @@ export default class AddForecastingUnitComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -278,14 +283,18 @@ export default class AddForecastingUnitComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     console.log(stringify(this.state.forecastingUnit))
                                     ForecastingUnitService.addForecastingUnit(this.state.forecastingUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode,
+                                                    loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -432,6 +441,17 @@ export default class AddForecastingUnitComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>

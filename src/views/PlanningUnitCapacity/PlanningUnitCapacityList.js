@@ -406,7 +406,8 @@ export default class PlanningUnitCapacityList extends Component {
             const planningUnitCapacityList = this.state.selSource.filter(c => c.planningUnit.id == planningUnitId)
             this.setState({
                 planningUnitCapacityList
-            });
+            },
+                () => { this.buildJexcel() })
         } else {
             this.setState({
                 planningUnitCapacityList: this.state.selSource

@@ -748,7 +748,7 @@
     "static.dashboard.aggregateShipmentByProduct": "Aggregate Shipment By Product",
     "static.dashboard.shipmentGlobalView": "Shipment Global View",
     "static.dashboard.shipmentGlobalViewheader": "Global Demand - Single Product",
-    "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
+    "static.procurementAgent.localProcurementAgent": "Is local Procurement Agent?",
     "static.user.accessControlText": "Access Control",
     "static.dashboard.supplyPlan": "Supply Plan",
     "static.supplyPlan.index": "Index",
@@ -1106,5 +1106,6 @@
     "static.pipelineProgram.importDate": "Import Date",
     "static.program.fileinputjson": "File Input(File must be .json format)",
     "static.report.procurmentAgentLeadTimeReport": "Procurement Agent Lead Times",
-    "static.dashboard.linkShipment": "Link shipment"
+    "static.dashboard.linkShipment": "Link shipment",
+    "static.program.zipfilereaderror":"Error occured while reading zip file"
 }

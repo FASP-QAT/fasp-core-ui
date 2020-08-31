@@ -1883,7 +1883,7 @@ class ProcurementAgentExport extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            loading: false
+            loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1905,15 +1905,15 @@ class ProcurementAgentExport extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1921,10 +1921,10 @@ class ProcurementAgentExport extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -1934,6 +1934,7 @@ class ProcurementAgentExport extends Component {
         } else {
             console.log('offline')
             this.consolidatedProgramList()
+            this.setState({ loading: false })
         }
 
     }
@@ -2000,15 +2001,15 @@ class ProcurementAgentExport extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        procurementAgents: response.data
+                        procurementAgents: response.data, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
                         this.setState({
-                            procurementAgents: []
+                            procurementAgents: [], loading: false
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -2016,10 +2017,10 @@ class ProcurementAgentExport extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -2029,6 +2030,7 @@ class ProcurementAgentExport extends Component {
         } else {
             console.log('offline')
             this.consolidatedProcurementAgentList()
+            this.setState({ loading: false })
         }
 
     }
@@ -2655,7 +2657,7 @@ class ProcurementAgentExport extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -2792,7 +2794,8 @@ class ProcurementAgentExport extends Component {
                     }.bind(this)
                 } else {
                     this.setState({
-                        message: ''
+                        message: '',
+                        loading: true
                     })
                     let includePlannedShipments = true;
                     if (isPlannedShipmentId == 1) {
@@ -2824,7 +2827,7 @@ class ProcurementAgentExport extends Component {
                         }).catch(
                             error => {
                                 this.setState({
-                                    data: []
+                                    data: [], loading: false
                                 }, () => {
                                     this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
@@ -2832,7 +2835,7 @@ class ProcurementAgentExport extends Component {
                                     this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -2840,10 +2843,10 @@ class ProcurementAgentExport extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             break;
                                     }
                                 }
@@ -2993,7 +2996,8 @@ class ProcurementAgentExport extends Component {
                     }.bind(this)
                 } else {
                     this.setState({
-                        message: ''
+                        message: '',
+                        loading: true
                     })
                     let includePlannedShipments = true;
                     if (isPlannedShipmentId == 1) {
@@ -3024,7 +3028,7 @@ class ProcurementAgentExport extends Component {
                         }).catch(
                             error => {
                                 this.setState({
-                                    data: []
+                                    data: [], loading: false
                                 }, () => {
                                     this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
@@ -3033,7 +3037,7 @@ class ProcurementAgentExport extends Component {
 
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -3041,10 +3045,10 @@ class ProcurementAgentExport extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             break;
                                     }
                                 }
@@ -3181,15 +3185,15 @@ class ProcurementAgentExport extends Component {
                                     data: data
                                     , message: ''
                                 }, () => {
-                                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    this.buildJExcel();
                                 })
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
                 } else {
                     this.setState({
-                        message: ''
+                        message: '',
+                        loading: true
                     })
                     let includePlannedShipments = true;
                     if (isPlannedShipmentId == 1) {
@@ -3218,7 +3222,7 @@ class ProcurementAgentExport extends Component {
                         }).catch(
                             error => {
                                 this.setState({
-                                    data: []
+                                    data: [], loading: false
                                 }, () => {
                                     this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
@@ -3226,7 +3230,7 @@ class ProcurementAgentExport extends Component {
                                     this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -3234,10 +3238,10 @@ class ProcurementAgentExport extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             break;
                                     }
                                 }
@@ -3339,15 +3343,15 @@ class ProcurementAgentExport extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        fundingSources: response.data
+                        fundingSources: response.data, loading: false
                     }, () => { this.consolidatedFundingSourceList() })
                 }).catch(
                     error => {
                         this.setState({
-                            fundingSources: []
+                            fundingSources: [], loading: false
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -3355,10 +3359,10 @@ class ProcurementAgentExport extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -3368,6 +3372,7 @@ class ProcurementAgentExport extends Component {
         } else {
             console.log('offline')
             this.consolidatedFundingSourceList()
+            this.setState({ loading: false })
         }
 
     }
@@ -3626,10 +3631,12 @@ class ProcurementAgentExport extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card >
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
 
                         {/* <div className="card-header-actions">
@@ -3844,11 +3851,22 @@ class ProcurementAgentExport extends Component {
                             </div>
                         </div>
                         <div className="ReportSearchMarginTop">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                        </div>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

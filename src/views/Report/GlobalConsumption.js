@@ -170,7 +170,7 @@ class GlobalConsumption extends Component {
       realmList: [],
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+      loading: true
 
 
     };
@@ -250,8 +250,8 @@ class GlobalConsumption extends Component {
   }
 
   roundN = num => {
-     return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-   }
+    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+  }
 
   exportPDF = () => {
     const addFooters = doc => {
@@ -484,6 +484,7 @@ class GlobalConsumption extends Component {
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
     if (realmId > 0 && this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
+      this.setState({ loading: true })
       // let realmId = AuthenticationService.getRealmId();
       var inputjson = {
         "realmId": realmId,
@@ -508,7 +509,7 @@ class GlobalConsumption extends Component {
               let json = {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
-                "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption==0?(countryConsumption[j].forecastedConsumption/ 1000000 ): (countryConsumption[j].actualConsumption/ 1000000))),
+                "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YYYY')
               }
               console.log("json--->", json);
@@ -596,7 +597,8 @@ class GlobalConsumption extends Component {
             //   },
             // ],
             consumptions: consumptions,
-            message: ''
+            message: '',
+            loading: false
           }, () => {
 
           });
@@ -719,15 +721,15 @@ class GlobalConsumption extends Component {
       .then(response => {
         console.log(JSON.stringify(response.data))
         this.setState({
-          programs: response.data
+          programs: response.data, loading: false
         })
       }).catch(
         error => {
           this.setState({
-            programs: []
+            programs: [], loading: false
           })
           if (error.message === "Network Error") {
-            this.setState({ message: error.message });
+            this.setState({ message: error.message, loading: false });
           } else {
             switch (error.response ? error.response.status : "") {
               case 500:
@@ -735,10 +737,10 @@ class GlobalConsumption extends Component {
               case 404:
               case 406:
               case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                 break;
               default:
-                this.setState({ message: 'static.unkownError' });
+                this.setState({ message: 'static.unkownError', loading: false });
                 break;
             }
           }
@@ -795,17 +797,17 @@ class GlobalConsumption extends Component {
       .then(response => {
         if (response.status == 200) {
           this.setState({
-            realmList: response.data
+            realmList: response.data, loading: false
           })
         } else {
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode, loading: false
           })
         }
       }).catch(
         error => {
           if (error.message === "Network Error") {
-            this.setState({ message: error.message });
+            this.setState({ message: error.message, loading: false });
           } else {
             switch (error.response.status) {
               case 500:
@@ -813,10 +815,10 @@ class GlobalConsumption extends Component {
               case 404:
               case 406:
               case 412:
-                this.setState({ message: error.response.data.messageCode });
+                this.setState({ message: error.response.data.messageCode, loading: false });
                 break;
               default:
-                this.setState({ message: 'static.unkownError' });
+                this.setState({ message: 'static.unkownError', loading: false });
                 console.log("Error code unkown");
                 break;
             }
@@ -1000,11 +1002,13 @@ class GlobalConsumption extends Component {
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-        <Card>
+        <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
@@ -1021,7 +1025,7 @@ class GlobalConsumption extends Component {
             <div ref={ref}>
 
               <Form >
-                <Col md="12 pl-0">
+                <div className="pl-0">
                   <div className="row">
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1141,7 +1145,7 @@ class GlobalConsumption extends Component {
                     </FormGroup>
 
                   </div>
-                </Col>
+                </div>
               </Form>
               <Col md="12 pl-0">
                 <div className="globalviwe-scroll">
@@ -1214,6 +1218,17 @@ class GlobalConsumption extends Component {
 
           </CardBody>
         </Card>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     );
