@@ -1612,7 +1612,7 @@ class ShipmentSummery extends Component {
             return parseInt(a.value) - parseInt(b.value);
           })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -1917,7 +1917,7 @@ class ShipmentSummery extends Component {
                 let hold = 0
                 for (var k = 0; k < result.length; k++) {
                     if (moment(dateArray[j], 'MM-YYYY').isSame(moment(result[k].expectedDeliveryDate, 'MM-YYYY'))) {
-                        hold = viewById == 1 ? result[k].totalCost : result[k].forecastCost;
+                        hold = viewById == 1 ? result[k].freightCost+result[k].productCost : result[k].forecastCost;
                         k = result.length;
                     } else {
                         hold = 0;
@@ -2358,7 +2358,7 @@ class ShipmentSummery extends Component {
                                                                     <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].freightCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}
