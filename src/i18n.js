@@ -40,16 +40,18 @@ i18n
     react: {
       wait: true
     }, debug: true,
-    useSuspense: false
+    useSuspense: false,
+    wait:          true,
   }, (err, t) => {
     if (err) return console.log('something went wrong loading', err);
     t('key'); // -> same as i18next.t
   }
   )
 i18n.loadNamespaces('translations', (err, t) => { console.log('something went wrong loading', err); /* ... */ });
-i18n.on('initialized', () => {
-  if (i18n.options && i18n.options.second) {
-    // seems 2nd init was done
-  }
+i18n.on('languageChanged initialized', () => {
+  if (!i18n.isInitialized) return;
+  // if (i18n.options && i18n.options.second) {
+  //   // seems 2nd init was done
+  // }
 });
 export default i18n;
