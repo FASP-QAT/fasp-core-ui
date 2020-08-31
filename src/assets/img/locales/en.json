@@ -748,7 +748,7 @@
     "static.dashboard.aggregateShipmentByProduct": "Aggregate Shipment By Product",
     "static.dashboard.shipmentGlobalView": "Shipment Global View",
     "static.dashboard.shipmentGlobalViewheader": "Global Demand - Single Product",
-    "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
+    "static.procurementAgent.localProcurementAgent": "Is local Procurement Agent?",
     "static.user.accessControlText": "Access Control",
     "static.dashboard.supplyPlan": "Supply Plan",
     "static.supplyPlan.index": "Index",
