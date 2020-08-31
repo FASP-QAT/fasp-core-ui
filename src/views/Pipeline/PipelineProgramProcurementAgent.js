@@ -221,8 +221,8 @@ export default class PipelineProgramProcurementAgent extends Component {
                                             show: '',
                                             entries: '',
                                         },
-                                        onload: this.loadedJexcelCommonFunction,
-                                        // onload: this.loaded
+                                        // onload: this.loadedJexcelCommonFunction,
+                                        onload: this.loaded
 
                                     };
                                     var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);

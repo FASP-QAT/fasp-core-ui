@@ -297,7 +297,7 @@ import RealmCountryService from '../../api/RealmCountryService';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 const entityname = i18n.t('static.dashboad.planningunitcountry');
 export default class RealmCountryPlanningUnitList extends Component {
 
@@ -307,7 +307,8 @@ export default class RealmCountryPlanningUnitList extends Component {
             realmCountrys: [],
             realmCountryPlanningUnitList: [],
             message: '',
-            selSource: []
+            selSource: [],
+            loading: true
 
         }
         this.filterData = this.filterData.bind(this);
@@ -474,7 +475,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             console.log(response.data)
 
             this.setState({
-                realmCountrys: response.data,
+                realmCountrys: response.data,loading: false
             },
                 () => { this.buildJexcel() })
         })
@@ -552,9 +553,14 @@ export default class RealmCountryPlanningUnitList extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     {/* <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
@@ -564,7 +570,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     </CardHeader> */}
                     <CardBody className="">
                         <Col md="3 pl-0">
-                       
+
                             <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.realmcountry')}</Label>
                                 <div className="controls SelectGo">
@@ -585,13 +591,24 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                           
+
                         </Col>
                         <div id="tableDiv" className="jexcelremoveReadonlybackground ">
                         </div>
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
