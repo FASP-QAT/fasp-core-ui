@@ -1911,8 +1911,8 @@ class ProductCatalog extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log(response.data);
-                    var list = response.data;
-                    // console.log("my list=======",list);
+                    var list = response.data.slice(1);
+                    console.log("my list=======", list);
 
                     this.setState({
                         productCategories: list
@@ -2329,6 +2329,7 @@ class ProductCatalog extends Component {
         }.bind(this), 500)
         // this.getProcurementAgent();
         // this.getProductCategories();
+
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
