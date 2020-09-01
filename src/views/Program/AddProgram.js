@@ -208,67 +208,69 @@ export default class AddProgram extends Component {
         }, 8000);
     }
     getDependentLists(e) {
-        console.log(e.target.value)
+        if (e.target.value != 0) {
+            ProgramService.getProgramManagerList(e.target.value)
+                .then(response => {
+                    console.log("manager list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            programManagerList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
 
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramManagerList(e.target.value)
-            .then(response => {
-                console.log("manager list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        programManagerList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
+            ProgramService.getRealmCountryList(e.target.value)
+                .then(response => {
+                    console.log("realm list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            realmCountryList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+            ProgramService.getOrganisationList(e.target.value)
+                .then(response => {
+                    console.log("organisation list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            organisationList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+
+            ProgramService.getHealthAreaList(e.target.value)
+                .then(response => {
+                    console.log("health area list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            healthAreaList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+        } else {
+            this.setState({
+                programManagerList: [],
+                healthAreaList: [],
+                organisationList: [],
+                realmCountryList: []
             })
-
-        ProgramService.getRealmCountryList(e.target.value)
-            .then(response => {
-                console.log("realm list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountryList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(e.target.value)
-            .then(response => {
-                console.log("organisation list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        organisationList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
-
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(e.target.value)
-            .then(response => {
-                console.log("health area list---", response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        healthAreaList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+        }
     }
 
     getRegionList(e) {
@@ -515,7 +517,7 @@ export default class AddProgram extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.program.realm.realmId}
                                                             type="select" name="realmId" id="realmId">
-                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realms}
                                                         </Input>
 
