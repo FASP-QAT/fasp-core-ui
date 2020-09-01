@@ -1351,6 +1351,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
@@ -1526,7 +1527,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                     break;
                                 default:
                                     this.setState({ message: 'static.unkownError', loading: false });
@@ -1949,7 +1950,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -1997,6 +1998,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             // Handle errors!
                         };
                         planningunitRequest.onsuccess = function (e) {
+                            // this.setState({ loading: true })
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -2499,7 +2501,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                data: []
+                                data: [], loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 this.el.destroy();
@@ -2507,7 +2509,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             });
 
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -2515,10 +2517,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -2717,13 +2719,15 @@ class StockStatusAcrossPlanningUnits extends Component {
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon pb-2">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong> */}
 
                         <div className="card-header-actions">
-
+                        <a className="card-header-action">
+                                 <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatusAcrossPlaningUnit() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                 </a>
                             <a className="card-header-action">
                                 {this.state.data.length > 0 && <div className="card-header-actions">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />

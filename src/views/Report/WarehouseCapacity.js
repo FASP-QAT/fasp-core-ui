@@ -582,7 +582,6 @@ class warehouseCapacity extends Component {
             this.getCountrylist();
             this.getPrograms();
         } else {
-            this.setState({ loading: false })
             this.getPrograms();
         }
     }
@@ -782,15 +781,15 @@ class warehouseCapacity extends Component {
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data,loading:false
+                    countries: response.data, loading: false
                 })
             }).catch(
                 error => {
                     this.setState({
-                        countries: [],loading:false
+                        countries: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({loading:false,message: error.message });
+                        this.setState({ loading: false, message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -798,10 +797,10 @@ class warehouseCapacity extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ loading:false,message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                                 break;
                             default:
-                                this.setState({loading:false, message: 'static.unkownError' });
+                                this.setState({ loading: false, message: 'static.unkownError' });
                                 break;
                         }
                     }
@@ -862,10 +861,10 @@ class warehouseCapacity extends Component {
                 }).catch(
                     error => {
                         this.setState({
-                            programs: [],loading:false
+                            programs: [], loading: false
                         })
                         if (error.message === "Network Error") {
-                            this.setState({loading:false, message: error.message });
+                            this.setState({ loading: false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -884,6 +883,7 @@ class warehouseCapacity extends Component {
                 );
         } else {
             console.log('offline Program list')
+            this.setState({ loading: false })
             this.consolidatedProgramList()
         }
     }
@@ -928,7 +928,7 @@ class warehouseCapacity extends Component {
 
     fetchData(e) {
         if (navigator.onLine) {
-         
+
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let countryId = document.getElementById("countryId").value;
 
@@ -954,7 +954,7 @@ class warehouseCapacity extends Component {
                                 data: [], loading: false
                             })
                             if (error.message === "Network Error") {
-                                this.setState({loading: false, message: error.message });
+                                this.setState({ loading: false, message: error.message });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -995,6 +995,7 @@ class warehouseCapacity extends Component {
                     var programRequest = programTransaction.get(programId);
 
                     programRequest.onsuccess = function (event) {
+                        // this.setState({ loading: true })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -1030,13 +1031,14 @@ class warehouseCapacity extends Component {
                         console.log("offlineData--4-", offlineData);
                         console.log("final wareHouseCapacity Report---", regionList);
                         this.setState({
-                            data: offlineData
+                            data: offlineData, loading: false
                         });
                     }.bind(this)
                 }.bind(this)
             } else {
                 this.setState({
-                    data: []
+                    data: [],
+                    loading: false
                 });
             }
 

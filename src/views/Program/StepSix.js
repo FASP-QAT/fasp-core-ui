@@ -303,7 +303,7 @@ export default class StepSix extends Component {
 
 
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company"> Arrived to deliver Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company"> Arrived to Received Lead Time<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}

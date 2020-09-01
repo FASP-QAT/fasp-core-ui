@@ -19,6 +19,8 @@ class SupplyPlanFormulas extends Component {
       forecastmatrix:false,
       stockstatusovertime:false,
       inventoryturns:false,
+      stockstatus:false,
+      stockstatusacrossplaningunit:false,
     };
     this.toggle = this.toggle.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
@@ -28,6 +30,8 @@ class SupplyPlanFormulas extends Component {
     this.toggleForecastMatrix = this.toggleForecastMatrix.bind(this);
     this.toggleStockStatusOverTime = this.toggleStockStatusOverTime.bind(this);
     this.toggleInventoryTurns = this.toggleInventoryTurns.bind(this);
+    this.toggleStockStatus = this.toggleStockStatus.bind(this);
+    this.toggleStockStatusAcrossPlaningUnit = this.toggleStockStatusAcrossPlaningUnit.bind(this);
   }
 
   toggle(tab) {
@@ -79,6 +83,16 @@ class SupplyPlanFormulas extends Component {
       inventoryturns: !this.state.inventoryturns,
     });
   }
+  toggleStockStatus(){
+    this.setState({
+      stockstatus: !this.state.stockstatus,
+    });
+  }
+  toggleStockStatusAcrossPlaningUnit(){
+    this.setState({
+      stockstatusacrossplaningunit: !this.state.stockstatusacrossplaningunit,
+    });
+  }
 
   render() {
     return (
@@ -92,7 +106,7 @@ class SupplyPlanFormulas extends Component {
               <Button onClick={this.toggle} className="mr-1">Launch demo modal</Button> */}
              {/*Supply plan formuale */} 
                 <Modal isOpen={this.state.modal}  className={'modal-lg ' + this.props.className} >
-                  <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong>Formulae</strong></ModalHeader>
+                  <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >Formulae</strong></ModalHeader>
                   <ModalBody >
                   <ListGroup style={{height:'490px',overflowY:'scroll'}}>
                 <ListGroupItem >
@@ -269,7 +283,7 @@ Months Of Stock = 3.54</p>
                 </Modal>
  {/*Cost Of Inventory formuale */} 
           <Modal isOpen={this.state.costofinventory}  className={'modal-lg ' + this.props.className} >
-                  <ModalHeader toggle={this.togglecostOfInventory} className="ModalHead modal-info-Headher"><strong>Formulae</strong></ModalHeader>
+                  <ModalHeader toggle={this.togglecostOfInventory} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup>
                       <ListGroupItem >
@@ -301,7 +315,7 @@ Months Of Stock = 3.54</p>
                   </Modal>
  {/*Forcast Matrix formuale */} 
  <Modal isOpen={this.state.forecastmatrix}  className={'modal-lg ' + this.props.className} >
-                  <ModalHeader toggle={this.toggleForecastMatrix} className="ModalHead modal-info-Headher"><strong>Formulae</strong></ModalHeader>
+                  <ModalHeader toggle={this.toggleForecastMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup>
                       <ListGroupItem >
@@ -317,7 +331,7 @@ Months Of Stock = 3.54</p>
                   </Modal>
  {/*Stock Status Over Time formuale */} 
  <Modal isOpen={this.state.stockstatusovertime}  className={'modal-lg ' + this.props.className} >
-                  <ModalHeader toggle={this.toggleStockStatusOverTime} className="ModalHead modal-info-Headher"><strong>Formulae</strong></ModalHeader>
+                  <ModalHeader toggle={this.toggleStockStatusOverTime} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
                   <ModalBody >
                       <ListGroup style={{height:'300px',overflowY:'scroll'}}>
                       <ListGroupItem >
@@ -358,6 +372,138 @@ Months Of Stock = 22,642 / 6,392<br></br>
 Months Of Stock = 3.54</p>
                     </ListGroupItemText>
                   </ListGroupItem>
+                      </ListGroup>
+                  </ModalBody>
+                  </Modal>
+{/*Stock Status formuale */} 
+<Modal isOpen={this.state.stockstatus}  className={'modal-lg ' + this.props.className} >
+                  <ModalHeader toggle={this.toggleStockStatus} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+                  <ModalBody >
+                      <ListGroup style={{height:'300px',overflowY:'scroll'}}>
+                      <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <p>* Consider only non zero values. Also future months include current month</p>
+                    <p><span className="formulastext-p">Example :</span><br></br>
+                    Months in past = 3(Based on program planning unit)<br></br>
+                    Months in future = 3(Based on program planning unit)<br></br>
+                    Current month = May 2020<br></br>
+Consumption in Feb 2020 = 5,000<br></br>
+Consumption in Mar 2020 = 6,890<br></br>
+Consumption in Apr 2020 = 6,907<br></br>
+Consumption in May 2020 = 7,087<br></br>
+Consumption in Jun 2020 = 5,678<br></br>
+Consumption in Jul 2020 = 6,789<br></br>
+
+<br></br>
+AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
+AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
+AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
+AMC = 6,392</p>
+                    {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                  <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <p><span className="formulastext-p">Example :</span><br></br>
+                     Ending Balance = 22,642<br></br>
+AMC = 6,392<br></br>
+<br></br>
+Months Of Stock = Ending Balance / AMC<br></br>
+Months Of Stock = 22,642 / 6,392<br></br>
+Months Of Stock = 3.54</p>
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                  <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Max-Formula.png"/>
+                    <p><span className="formulastext-p">Example :</span><br></br>
+                    MIN MONTH OF STOCK = 4<br></br>
+                    REORDER FREQUENCY = 3<br></br>
+                    AMC = 6,392<br></br>
+                    Max MoS Guardrail = 18(Based on realm)<br></br>
+                    Min MoS Guardrail = 3(Based on realm)<br></br>
+<br></br>
+Max = AMC * MIN ([ MAX(MIN MONTH OF STOCK ,Min MoS Guardrail) + REORDER FREQUENCY ] ,Max MoS Guardrail)<br></br>
+Max = 6,392 * MIN ([ MAX(4,3)+3 ] ,18) <br></br>
+Max = 6,392 * MIN ([ 4+3 ] ,18)<br></br>
+Max = 6,392 * MIN (7,18 )<br></br>
+Max = 6,392 * 7<br></br>
+Max = 44,744</p>
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                      </ListGroup>
+                  </ModalBody>
+                  </Modal>
+
+
+                  {/*Stock Status Across Planning Units formuale */} 
+<Modal isOpen={this.state.stockstatusacrossplaningunit}  className={'modal-lg ' + this.props.className} >
+                  <ModalHeader toggle={this.toggleStockStatusAcrossPlaningUnit} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+                  <ModalBody >
+                      <ListGroup style={{height:'300px',overflowY:'scroll'}}>
+                      <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/AMC-Formula.png"/><br></br>
+                    <p>* Consider only non zero values. Also future months include current month</p>
+                    <p><span className="formulastext-p">Example :</span><br></br>
+                    Months in past = 3(Based on program planning unit)<br></br>
+                    Months in future = 3(Based on program planning unit)<br></br>
+                    Current month = May 2020<br></br>
+Consumption in Feb 2020 = 5,000<br></br>
+Consumption in Mar 2020 = 6,890<br></br>
+Consumption in Apr 2020 = 6,907<br></br>
+Consumption in May 2020 = 7,087<br></br>
+Consumption in Jun 2020 = 5,678<br></br>
+Consumption in Jul 2020 = 6,789<br></br>
+
+<br></br>
+AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
+AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
+AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
+AMC = 6,392</p>
+                    {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                  <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    
+                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Month0fstock-Formula.png"/>
+                     <p><span className="formulastext-p">Example :</span><br></br>
+                     Ending Balance = 22,642<br></br>
+AMC = 6,392<br></br>
+<br></br>
+Months Of Stock = Ending Balance / AMC<br></br>
+Months Of Stock = 22,642 / 6,392<br></br>
+Months Of Stock = 3.54</p>
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                  <ListGroupItem >
+                    <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
+                    <ListGroupItemText className="formulastext">
+                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Formulas/Ending balance-formula.png"/><br></br>
+                    <p><span className="formulastext-p">Example :</span><br></br>
+                    Opening balance = 10,653<br></br>
+Adjustments = -100<br></br>
+Shipments = 19,176<br></br>
+Consumption =7,087<br></br>
+Expired stock = 642<br></br>
+<br></br>
+Ending balance = Opening balance + Adjustments + Shipments in account - Consumptions - Expired stock<br></br>
+Ending balance = 10,653 + (-100) + 19,176 - 7,087 - 642<br></br>
+Ending balance = 22,000</p><br></br>
+                    {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    </ListGroupItemText>
+                  </ListGroupItem>
+        
                       </ListGroup>
                   </ModalBody>
                   </Modal>

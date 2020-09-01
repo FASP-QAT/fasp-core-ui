@@ -1253,6 +1253,7 @@ import "jspdf-autotable";
 import RealmCountryService from '../../api/RealmCountryService';
 import ReportService from '../../api/ReportService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1633,6 +1634,7 @@ class ForcastMatrixOverTime extends Component {
     } else {
       console.log('offline')
       this.consolidatedProgramList()
+      this.setState({ loading: false })
     }
 
   }
@@ -1905,6 +1907,7 @@ class ForcastMatrixOverTime extends Component {
           var programRequest = programTransaction.get(program);
 
           programRequest.onsuccess = function (event) {
+            // this.setState({ loading: true })
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
@@ -1924,7 +1927,7 @@ class ForcastMatrixOverTime extends Component {
                 var absvalue = 0;
                 var currentActualconsumption = 0;
                 var currentForcastConsumption = 0;
-                for (var i = month, j = 0; j <= monthInCalc; i--, j++) {
+                for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
                   if (i == 0) {
                     i = 12;
                     year = year - 1
@@ -1969,7 +1972,8 @@ class ForcastMatrixOverTime extends Component {
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     matricsList: data,
-                    message: ''
+                    message: '',
+                    loading: false
                   })
 
                   return;
@@ -2150,6 +2154,11 @@ class ForcastMatrixOverTime extends Component {
 
     return (
       <div className="animated fadeIn" >
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
+        }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />

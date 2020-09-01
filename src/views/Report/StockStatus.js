@@ -1932,6 +1932,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 
@@ -2269,6 +2270,7 @@ class StockStatus extends Component {
           var programRequest = programTransaction.get(program);
 
           programRequest.onsuccess = function (event) {
+            // this.setState({ loading: true })
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
@@ -2934,11 +2936,12 @@ class StockStatus extends Component {
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     stockStatusList: data,
-                    message: ''
+                    message: '', loading: false
                   })
 
                   return;
                 }
+                this.setState({ loading: false })
 
               }
               monthstartfrom = 1
@@ -3004,16 +3007,16 @@ class StockStatus extends Component {
             console.log(JSON.stringify(response.data));
             this.setState({
               stockStatusList: response.data,
-              message: '',loading:false
+              message: '', loading: false
             })
           }).catch(
             error => {
               this.setState({
-                stockStatusList: [],loading:false
+                stockStatusList: [], loading: false
               })
 
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({ message: error.message, loading: false });
               } else {
                 switch (error.response ? error.response.status : "") {
                   case 500:
@@ -3021,10 +3024,10 @@ class StockStatus extends Component {
                   case 404:
                   case 406:
                   case 412:
-                    this.setState({ loading:false,message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                     break;
                   default:
-                    this.setState({loading:false, message: 'static.unkownError' });
+                    this.setState({ loading: false, message: 'static.unkownError' });
                     break;
                 }
               }
@@ -3080,6 +3083,7 @@ class StockStatus extends Component {
 
     } else {
       console.log('offline')
+      this.setState({ loading: false })
       this.consolidatedProgramList()
     }
 
@@ -3567,11 +3571,16 @@ class StockStatus extends Component {
         }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
+        <SupplyPlanFormulas ref="formulaeChild" />
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
             {/* <i className="icon-menu"></i><strong>Stock Status Report</strong> */}
             <div className="card-header-actions">
+            <a className="card-header-action">
+                                 <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                 </a>
               <a className="card-header-action">
+              {/* <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                 {this.state.stockStatusList.length > 0 && <div className="card-header-actions">
                   <img style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
                   <img style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
@@ -3756,19 +3765,19 @@ class StockStatus extends Component {
 
                   </Table>}
                 </Col>
-                
+
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                  <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                    <div class="align-items-center">
+                      <div ><h4> <strong>Loading...</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
+                      <div class="spinner-border blue ml-4" role="status">
 
-                            </div>
-                        </div>
+                      </div>
                     </div>
+                  </div>
                 </div>
-                </div></div>
+              </div></div>
 
 
 
