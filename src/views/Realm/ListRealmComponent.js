@@ -338,7 +338,6 @@ export default class ReactListComponent extends Component {
                 this.setState({
                     realmList: response.data,
                     selRealm: response.data,
-                    loading: false
                 },
                     () => {
                         let realmList = this.state.selRealm;
@@ -454,7 +453,7 @@ export default class ReactListComponent extends Component {
                         var languageEl = jexcel(document.getElementById("tableDiv"), options);
                         this.el = languageEl;
                         this.setState({
-                            languageEl: languageEl
+                            languageEl: languageEl, loading: false
                         })
 
 
@@ -462,7 +461,7 @@ export default class ReactListComponent extends Component {
 
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();

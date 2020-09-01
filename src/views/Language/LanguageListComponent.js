@@ -442,7 +442,7 @@ export default class LanguageListComponent extends Component {
                         })
                 } else {
                     this.setState({
-                        message: response.data.messageCode,
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();

@@ -523,7 +523,7 @@ export default class CountryListComponent extends Component {
                 // })
                 this.setState({
                     countryList: response.data,
-                    selCountry: response.data, loading: false
+                    selCountry: response.data
                 },
                     () => {
                         this.buildJExcel();
@@ -533,7 +533,7 @@ export default class CountryListComponent extends Component {
             } else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();

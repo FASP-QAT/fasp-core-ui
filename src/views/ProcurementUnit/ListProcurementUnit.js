@@ -540,7 +540,7 @@ export default class ListProcurementUnit extends Component {
         });
       } else {
         this.setState({
-          message: response.data.messageCode
+          message: response.data.messageCode, loading: false
         },
           () => {
             this.hideSecondComponent();
@@ -555,7 +555,7 @@ export default class ListProcurementUnit extends Component {
           planningUnitList: response.data,
         })
       } else {
-        this.setState({ message: response.data.messageCode })
+        this.setState({ message: response.data.messageCode, loading: false })
       }
     })
 
