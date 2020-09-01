@@ -1250,6 +1250,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
     if (realmId > 0 && this.state.countryValues.length > 0 && tracercategory != 0) {
+      this.setState({ loading: true })
       var inputjson = {
         "realmCountryIds": countrysId,
         "tracerCategoryId": tracercategory,
@@ -1294,7 +1295,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             })
 
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({ message: error.message, loading: false });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -1476,7 +1477,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             <div ref={ref}>
 
               <Form >
-                <Col md="12 pl-0">
+                <div className="pl-0">
                   <div className="row">
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1567,7 +1568,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                       </ul>
                     </FormGroup>
                   </div>
-                </Col>
+                </div>
               </Form>
               <Col md="12 pl-0">
                 <div className="globalviwe-scroll">

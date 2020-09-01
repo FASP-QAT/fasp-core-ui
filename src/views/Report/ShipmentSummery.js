@@ -1632,7 +1632,7 @@ class ShipmentSummery extends Component {
         let programId = document.getElementById("programId").value;
         let viewById = document.getElementById("viewById").value;
 
-        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value));
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -1644,7 +1644,8 @@ class ShipmentSummery extends Component {
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
-                planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
+                planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value));
+                console.log("planninuit ids====>", planningUnitIds);
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -1671,6 +1672,7 @@ class ShipmentSummery extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
+                        // this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1751,7 +1753,7 @@ class ShipmentSummery extends Component {
                             this.setState({
                                 data: data,
                                 message: '',
-                                viewById: viewById,
+                                viewById: viewById, loading: false
                             })
                         }.bind(this)
                     }.bind(this);
@@ -1921,7 +1923,7 @@ class ShipmentSummery extends Component {
                 let hold = 0
                 for (var k = 0; k < result.length; k++) {
                     if (moment(dateArray[j], 'MM-YYYY').isSame(moment(result[k].expectedDeliveryDate, 'MM-YYYY'))) {
-                        hold = viewById == 1 ? result[k].freightCost+result[k].productCost : result[k].forecastCost;
+                        hold = viewById == 1 ? result[k].freightCost + result[k].productCost : result[k].forecastCost;
                         k = result.length;
                     } else {
                         hold = 0;
@@ -2087,7 +2089,8 @@ class ShipmentSummery extends Component {
                         <div className="" >
                             <div ref={ref}>
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    {/* <Col md="12 pl-0"> */}
+                                    <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
@@ -2190,7 +2193,8 @@ class ShipmentSummery extends Component {
                                                 </div>
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                        {/* </Col> */}
+                                    </div>
                                 </Form>
 
                                 <Col md="12 pl-0">
@@ -2364,7 +2368,7 @@ class ShipmentSummery extends Component {
                                                                     <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].freightCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost + this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}

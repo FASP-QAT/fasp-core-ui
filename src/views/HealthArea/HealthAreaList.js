@@ -504,12 +504,12 @@ export default class HealthAreaListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     },
-                        () => { this.buildJexcel() })
+                        () => {  })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -524,14 +524,14 @@ export default class HealthAreaListComponent extends Component {
 
                     this.setState({
                         healthAreas: response.data,
-                        selSource: response.data, loading: false
+                        selSource: response.data
                     },
                         () => { this.buildJexcel() })
                 }
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();

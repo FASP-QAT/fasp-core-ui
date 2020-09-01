@@ -1535,7 +1535,7 @@ class ProductCatalog extends Component {
             tracerCategories: [],
             loading: true
         };
-        
+
         this.getPrograms = this.getPrograms.bind(this);
         this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
         this.fetchData = this.fetchData.bind(this);
@@ -1815,15 +1815,15 @@ class ProductCatalog extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1831,10 +1831,10 @@ class ProductCatalog extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -2148,7 +2148,7 @@ class ProductCatalog extends Component {
                         this.setState({
                             outPutList: outPutList,
                             message: '',
-                            loading: false
+                            // loading: false
                         },
                             () => { this.buildJexcel() })
                     }).catch(
@@ -2241,6 +2241,7 @@ class ProductCatalog extends Component {
                                 }.bind(this);
 
                                 ppuRequest.onsuccess = function (e) {
+                                    // this.setState({ loading: true })
                                     var result3 = ppuRequest.result;
                                     result3 = result3.filter(c => c.program.id == programId);
                                     console.log("4------>", result3);
@@ -2323,10 +2324,10 @@ class ProductCatalog extends Component {
     }
     componentDidMount() {
         this.getPrograms();
-        setTimeout(function () { //Start the timer
-            // this.setState({render: true}) //After 1 second, set render to true
-            this.setState({ loading: false })
-        }.bind(this), 500)
+        // setTimeout(function () { //Start the timer
+        //     // this.setState({render: true}) //After 1 second, set render to true
+        //     this.setState({ loading: false })
+        // }.bind(this), 500)
         // this.getProcurementAgent();
         // this.getProductCategories();
 
@@ -2352,7 +2353,7 @@ class ProductCatalog extends Component {
         const { productCategories } = this.state;
         const { tracerCategories } = this.state;
 
-      
+
         const columns = [
             {
                 dataField: 'program.label',
@@ -2431,7 +2432,7 @@ class ProductCatalog extends Component {
                     return getLabelText(cell, this.state.lang);
                 }
             },
-          
+
 
             {
                 dataField: 'pUnit.label',
@@ -2443,7 +2444,7 @@ class ProductCatalog extends Component {
                     return getLabelText(cell, this.state.lang);
                 }
             },
-         
+
             {
                 dataField: 'minMonthsOfStock',
                 text: i18n.t('static.report.min'),

@@ -2723,6 +2723,7 @@ class ProcurementAgentExport extends Component {
                             var programOs = programTransaction.objectStore('program');
                             var program1Request = programOs.getAll();
                             program1Request.onsuccess = function (event) {
+                                // this.setState({ loading: true })
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -2923,6 +2924,7 @@ class ProcurementAgentExport extends Component {
                             var programOs = programTransaction.objectStore('program');
                             var program1Request = programOs.getAll();
                             program1Request.onsuccess = function (event) {
+                                // this.setState({ loading: true })
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -3126,6 +3128,7 @@ class ProcurementAgentExport extends Component {
                             var programOs = programTransaction.objectStore('program');
                             var program1Request = programOs.getAll();
                             program1Request.onsuccess = function (event) {
+                                // this.setState({ loading: true })
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;

@@ -495,11 +495,11 @@ export default class OrganisationListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
-                    }, () => { this.buildJexcel() })
+                        realms: response.data
+                    }, () => {  })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();

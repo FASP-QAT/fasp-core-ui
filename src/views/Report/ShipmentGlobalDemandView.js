@@ -1893,7 +1893,7 @@ class ShipmentGlobalDemandView extends Component {
             startY: startYtable,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 70 },
+                // 0: { cellWidth: 70 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
                 // 3: { cellWidth: 100 },
@@ -3024,7 +3024,8 @@ class ShipmentGlobalDemandView extends Component {
                         <div ref={ref}>
 
                             <Form >
-                                <Col md="12 pl-0">
+                                {/* <Col md="12 pl-0"> */}
+                                <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -3208,7 +3209,8 @@ class ShipmentGlobalDemandView extends Component {
 
 
                                     </div>
-                                </Col>
+                                {/* </Col> */}
+                                </div>
                             </Form>
                             <Col md="12 pl-0  ">
                                 <div className="row grid-divider ">

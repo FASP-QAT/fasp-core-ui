@@ -1961,7 +1961,9 @@ class SupplierLeadTimes extends Component {
     }
 
     getPlanningUnit = () => {
+
         let programId = document.getElementById("programId").value;
+        alert(programId);
         // let versionId = document.getElementById("versionId").value;
         if (programId > 0) {
             this.setState({
@@ -2154,6 +2156,7 @@ class SupplierLeadTimes extends Component {
 
         if (programId > 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgenttValues.length > 0) {
             if (navigator.onLine) {
+                this.setState({ loading: true })
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),
                     planningUnitIds: planningUnitIds,
@@ -2174,14 +2177,14 @@ class SupplierLeadTimes extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                outPutList: []
+                                outPutList: [], loading: false
                             },
                                 () => {
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
                                 })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -2189,10 +2192,10 @@ class SupplierLeadTimes extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -2288,7 +2291,7 @@ class SupplierLeadTimes extends Component {
                                 paRequest.onsuccess = function (e) {
                                     var result3 = paRequest.result;
                                     console.log("4------>", result3);
-
+                                    // this.setState({ loading: true })
                                     var outPutList = [];
                                     for (var i = 0; i < result1.length; i++) {
                                         var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
@@ -2344,7 +2347,7 @@ class SupplierLeadTimes extends Component {
                                         }
                                     }
                                     console.log("outPutList------>", outPutList);
-                                    this.setState({ outPutList: outPutList, message: '' }, () => { this.buildJexcel() })
+                                    this.setState({ outPutList: outPutList, message: '', loading: false }, () => { this.buildJexcel() })
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
