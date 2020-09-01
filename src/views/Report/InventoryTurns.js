@@ -946,7 +946,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 export const PSM_PROCUREMENT_AGENT_ID = 1
 export const CANCELLED_SHIPMENT_STATUS = 8
 
@@ -976,6 +976,7 @@ export default class InventoryTurns extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            loading: true
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -1003,15 +1004,15 @@ export default class InventoryTurns extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data, message: ''
+                        programs: response.data, message: '', loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ loading: false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1019,10 +1020,10 @@ export default class InventoryTurns extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ loading: false, message: 'static.unkownError' });
                                     break;
                             }
                         }
@@ -1668,23 +1669,25 @@ export default class InventoryTurns extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
+                this.setState({ loading: true })
+
                 AuthenticationService.setupAxiosInterceptors();
                 ReportService.inventoryTurns(this.state.CostOfInventoryInput).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: response.data, message: ''
+                        costOfInventory: response.data, message: '', loading: false
                     }, () => {
                         this.buildJExcel();
                     });
                 });
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
-            this.setState({ costOfInventory: [], message: i18n.t('static.common.selectProgram') }, () => {
+            this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.common.selectProgram') }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
             });
         } else {
-            this.setState({ costOfInventory: [], message: i18n.t('static.program.validversion') }, () => {
+            this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.program.validversion') }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
             });
@@ -1806,16 +1809,21 @@ export default class InventoryTurns extends Component {
         }
         return (
             <div className="animated fadeIn" >
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.inventoryTurns')}</strong> */}
 
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                            <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleInventoryTurns() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleInventoryTurns() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                             <a className="card-header-action">
                                 {this.state.costOfInventory.length > 0 && <div className="card-header-actions">
@@ -1917,6 +1925,17 @@ export default class InventoryTurns extends Component {
 
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div >
 

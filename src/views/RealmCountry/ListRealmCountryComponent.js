@@ -429,6 +429,7 @@ import i18n from '../../i18n'
 import RealmService from "../../api/RealmService";
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -789,6 +790,11 @@ class ListRealmCountryComponent extends Component {
 
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -822,11 +828,11 @@ class ListRealmCountryComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                      
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
-                            </div>
 
-                      
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground ">
+                        </div>
+
+
 
                     </CardBody>
                 </Card>

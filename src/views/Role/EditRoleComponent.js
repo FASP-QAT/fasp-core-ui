@@ -314,7 +314,7 @@ class EditRoleComponent extends Component {
                                                 this.props.history.push(`/role/listRole/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode,loadig:false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -333,10 +333,10 @@ class EditRoleComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({loadig:false, message: error.response.data.messageCode });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({loadig:false, message: 'static.unkownError' });
                                                             break;
                                                     }
                                                 }
