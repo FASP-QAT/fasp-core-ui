@@ -164,9 +164,9 @@ class AnnualShipmentCost extends Component {
                                 console.log("5----", reportbaseValue);
                                 var list = [];
                                 if (reportbaseValue == 1) {
-                                    list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >= moment(startDate).format('YYYY-MM-DD') && c.shippedDate <= moment(endDate).format('YYYY-MM-DD')));
+                                    list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.shippedDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.shippedDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
                                 } else {
-                                    list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.deliveredDate >= moment(startDate).format('YYYY-MM-DD') && c.deliveredDate <= moment(endDate).format('YYYY-MM-DD')));
+                                    list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (moment(c.deliveredDate).format('YYYY-MM-DD') >= moment(startDate).format('YYYY-MM-DD') && moment(c.deliveredDate).format('YYYY-MM-DD') <= moment(endDate).format('YYYY-MM-DD')));
                                 }
                                 // var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId && (c.shippedDate >=moment(startDate).format('YYYY-MM-DD') && c.shippedDate <= moment(endDate).format('YYYY-MM-DD')));
                                 var procurementAgentId = document.getElementById("procurementAgentId").value;
