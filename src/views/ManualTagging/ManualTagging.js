@@ -846,7 +846,7 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [30, 30, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -915,6 +915,7 @@ export default class ManualTagging extends Component {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                 var outputListAfterSearch = [];
                                 let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
+                                console.log("row-------------",row);
                                 outputListAfterSearch.push(row);
 
                                 this.setState({
@@ -1129,7 +1130,7 @@ export default class ManualTagging extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'fundingSource.label.label_en',
+                dataField: 'fundingSource.code',
                 text: 'Funding Source',
                 sort: true,
                 align: 'center',
