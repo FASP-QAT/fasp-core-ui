@@ -1827,8 +1827,8 @@ export default class InventoryTurns extends Component {
                             </a>
                             <a className="card-header-action">
                                 {this.state.costOfInventory.length > 0 && <div className="card-header-actions">
-                                    <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                    <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>}
                             </a>
                         </div>
@@ -1838,7 +1838,7 @@ export default class InventoryTurns extends Component {
                             <div ref={ref}>
 
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
@@ -1916,7 +1916,7 @@ export default class InventoryTurns extends Component {
 
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
                             </div>
                         </div>

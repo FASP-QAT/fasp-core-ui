@@ -1253,7 +1253,7 @@ class AnnualShipmentCost extends Component {
                         <div className="TableCust" >
                             <div ref={ref}>
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.reportbase')}</Label>
@@ -1433,7 +1433,7 @@ class AnnualShipmentCost extends Component {
 
 
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
                                 <Col md="12 pl-0">
 
