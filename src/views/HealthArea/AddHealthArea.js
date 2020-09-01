@@ -193,27 +193,34 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    AuthenticationService.setupAxiosInterceptors();
-    HealthAreaService.getRealmCountryList(e.target.value)
-      .then(response => {
-        console.log("Realm Country List list---", response.data);
-        if (response.status == 200) {
-          var json = response.data;
-          var regList = [];
-          for (var i = 0; i < json.length; i++) {
-            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+    if (e.target.value != 0) {
+      HealthAreaService.getRealmCountryList(e.target.value)
+        .then(response => {
+          console.log("Realm Country List list---", response.data);
+          if (response.status == 200) {
+            var json = response.data;
+            var regList = [];
+            for (var i = 0; i < json.length; i++) {
+              regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+            }
+            this.setState({
+              realmCountryId: '',
+              realmCountryList: regList,
+              loading: false
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            })
           }
-          this.setState({
-            realmCountryId: '',
-            realmCountryList: regList,
-            loading: false
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode
-          })
-        }
+        })
+    } else {
+      this.setState({
+        realmCountryId: '',
+        realmCountryList: [],
+        loading: false
       })
+    }
   }
 
   Capitalize(str) {
