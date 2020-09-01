@@ -226,8 +226,10 @@ class Program extends Component {
         } else {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
-                message: i18n.t('static.common.realmtext')
+                message: i18n.t('static.common.realmtext'),
+                color:"red"
             })
+            this.hideFirstComponent()
         }
     }
 
