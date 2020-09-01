@@ -376,13 +376,13 @@ class ListRoleComponent extends Component {
                     // this.setState({ roleList: response.data, selSource: response.data, loading: false })
 
                     this.setState({
-                        roleList: response.data, selSource: response.data, loading: false
+                        roleList: response.data, selSource: response.data
                     },
                         () => { this.buildJexcel() })
                 }
                 else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();

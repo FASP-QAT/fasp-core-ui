@@ -3568,7 +3568,7 @@ class StockStatus extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <div className="Card-header-reporticon">
+          <div className="Card-header-reporticon pb-2">
             {/* <i className="icon-menu"></i><strong>Stock Status Report</strong> */}
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -3584,7 +3584,7 @@ class StockStatus extends Component {
               <div ref={ref}>
 
                 <Form >
-                  <Col md="12 pl-0">
+                  <div className=" pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">Select Period</Label>
@@ -3665,7 +3665,7 @@ class StockStatus extends Component {
                         </div>
                       </FormGroup>
                     </div>
-                  </Col>
+                  </div>
                 </Form>
                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }} >
                   <div className="row">

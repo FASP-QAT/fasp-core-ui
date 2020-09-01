@@ -432,20 +432,21 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
 
     filterData() {
+        this.setState({ loading: true })
         let realmCountryId = document.getElementById("realmCountryId").value;
         AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCountryId).then(response => {
             console.log(response.data)
             this.setState({
                 realmCountryPlanningUnitList: response.data,
-                selSource: response.data
+                selSource: response.data,
             },
                 () => { this.buildJexcel() })
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -453,10 +454,10 @@ export default class RealmCountryPlanningUnitList extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -475,14 +476,14 @@ export default class RealmCountryPlanningUnitList extends Component {
             console.log(response.data)
 
             this.setState({
-                realmCountrys: response.data,loading: false
+                realmCountrys: response.data
             },
                 () => { this.buildJexcel() })
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -490,10 +491,10 @@ export default class RealmCountryPlanningUnitList extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }

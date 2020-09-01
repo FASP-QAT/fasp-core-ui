@@ -639,7 +639,7 @@ class ListBudgetComponent extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 60, 60,60,100,],
+      colWidths: [150, 60, 60, 60, 100,],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -763,7 +763,7 @@ class ListBudgetComponent extends Component {
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
     this.setState({
-      languageEl: languageEl
+      languageEl: languageEl, loading: false
     })
   }
 
@@ -804,7 +804,7 @@ class ListBudgetComponent extends Component {
           });
         } else {
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode, loading: false
           },
             () => {
               this.hideSecondComponent();
@@ -820,7 +820,7 @@ class ListBudgetComponent extends Component {
             fundingSourceList: response.data
           })
         } else {
-          this.setState({ message: response.data.messageCode })
+          this.setState({ message: response.data.messageCode, loading: false })
         }
       })
   }

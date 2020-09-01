@@ -800,12 +800,12 @@ export default class UpdateCountryComponent extends Component {
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    country: response.data,loading: false
+                    country: response.data, loading: false
                 });
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -853,11 +853,11 @@ export default class UpdateCountryComponent extends Component {
             CurrencyService.getCurrencyListActive().then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        currencyList: response.data
+                        currencyList: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     })
                 }
             })
@@ -953,14 +953,14 @@ export default class UpdateCountryComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
-                                        })
+                                    })
                                     CountryService.editCountry(this.state.country)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/country/listCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();

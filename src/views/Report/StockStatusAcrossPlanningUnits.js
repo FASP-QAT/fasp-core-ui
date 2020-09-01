@@ -2719,7 +2719,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <div className="Card-header-reporticon">
+                    <div className="Card-header-reporticon pb-2">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong> */}
 
                         <div className="card-header-actions">
@@ -2732,12 +2732,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 CardBodyTop">
+                    <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div className="TableCust" >
                             <div ref={ref}>
 
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
 
                                             <FormGroup className="col-md-3">
@@ -2815,7 +2815,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
                             </div>
                         </div>

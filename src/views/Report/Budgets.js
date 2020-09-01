@@ -226,9 +226,12 @@ class Budgets extends Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 60 },
             columnStyles: {
-                0: { cellWidth: 74.89 },
+                0: { cellWidth: 90 },
                 2: { cellWidth: 73.5 },
                 4: { cellWidth: 73.5 },
+                5: { cellWidth: 90 },
+                6: { cellWidth: 90 },
+                7: { cellWidth: 90 },
             }
 
         };

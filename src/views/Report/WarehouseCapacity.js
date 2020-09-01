@@ -1117,7 +1117,7 @@ class warehouseCapacity extends Component {
                         <div className="" >
                             <div>
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
                                             <Online>
                                                 <FormGroup className="col-md-3">
@@ -1215,7 +1215,7 @@ class warehouseCapacity extends Component {
                                             </Offline>
 
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
 
                                 <Col md="12 pl-0">
