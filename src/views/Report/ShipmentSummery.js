@@ -1614,7 +1614,7 @@ class ShipmentSummery extends Component {
             return parseInt(a.value) - parseInt(b.value);
         })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -1632,7 +1632,7 @@ class ShipmentSummery extends Component {
         let programId = document.getElementById("programId").value;
         let viewById = document.getElementById("viewById").value;
 
-        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value));
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -1644,7 +1644,8 @@ class ShipmentSummery extends Component {
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
-                planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
+                planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value));
+                console.log("planninuit ids====>",planningUnitIds);
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -2087,7 +2088,8 @@ class ShipmentSummery extends Component {
                         <div className="" >
                             <div ref={ref}>
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    {/* <Col md="12 pl-0"> */}
+                                    <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
@@ -2190,7 +2192,8 @@ class ShipmentSummery extends Component {
                                                 </div>
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                    {/* </Col> */}
+                                    </div>
                                 </Form>
 
                                 <Col md="12 pl-0">

@@ -1961,7 +1961,9 @@ class SupplierLeadTimes extends Component {
     }
 
     getPlanningUnit = () => {
+        
         let programId = document.getElementById("programId").value;
+        alert(programId);
         // let versionId = document.getElementById("versionId").value;
         if (programId > 0) {
             this.setState({
