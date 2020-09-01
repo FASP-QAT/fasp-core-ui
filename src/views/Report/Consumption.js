@@ -1952,7 +1952,7 @@ class Consumption extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-
+            // this.setState({ loading: true })
             // var shipmentList = (programJson.shipmentList);
             console.log("consumptionList----*********----", (programJson.consumptionList));
 
@@ -2089,7 +2089,7 @@ class Consumption extends Component {
               offlineConsumptionList: finalOfflineConsumption,
               consumptions: finalOfflineConsumption,
               message: '',
-
+              loading: false
             },
               () => {
                 this.storeProduct(planningUnitId);

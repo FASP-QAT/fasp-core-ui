@@ -1526,7 +1526,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                     break;
                                 default:
                                     this.setState({ message: 'static.unkownError', loading: false });
@@ -1949,7 +1949,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -1997,6 +1997,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             // Handle errors!
                         };
                         planningunitRequest.onsuccess = function (e) {
+                            // this.setState({ loading: true })
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -2499,7 +2500,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                data: []
+                                data: [], loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 this.el.destroy();
@@ -2507,7 +2508,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             });
 
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -2515,10 +2516,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }

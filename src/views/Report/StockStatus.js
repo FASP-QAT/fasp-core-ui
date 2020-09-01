@@ -2269,6 +2269,7 @@ class StockStatus extends Component {
           var programRequest = programTransaction.get(program);
 
           programRequest.onsuccess = function (event) {
+            // this.setState({ loading: true })
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
@@ -2934,11 +2935,12 @@ class StockStatus extends Component {
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     stockStatusList: data,
-                    message: ''
+                    message: '', loading: false
                   })
 
                   return;
                 }
+                this.setState({ loading: false })
 
               }
               monthstartfrom = 1
@@ -3004,16 +3006,16 @@ class StockStatus extends Component {
             console.log(JSON.stringify(response.data));
             this.setState({
               stockStatusList: response.data,
-              message: '',loading:false
+              message: '', loading: false
             })
           }).catch(
             error => {
               this.setState({
-                stockStatusList: [],loading:false
+                stockStatusList: [], loading: false
               })
 
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({ message: error.message, loading: false });
               } else {
                 switch (error.response ? error.response.status : "") {
                   case 500:
@@ -3021,10 +3023,10 @@ class StockStatus extends Component {
                   case 404:
                   case 406:
                   case 412:
-                    this.setState({ loading:false,message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                     break;
                   default:
-                    this.setState({loading:false, message: 'static.unkownError' });
+                    this.setState({ loading: false, message: 'static.unkownError' });
                     break;
                 }
               }
@@ -3080,6 +3082,7 @@ class StockStatus extends Component {
 
     } else {
       console.log('offline')
+      this.setState({ loading: false })
       this.consolidatedProgramList()
     }
 
@@ -3756,19 +3759,19 @@ class StockStatus extends Component {
 
                   </Table>}
                 </Col>
-                
+
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>Loading...</strong></h4></div>
+                  <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                    <div class="align-items-center">
+                      <div ><h4> <strong>Loading...</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
+                      <div class="spinner-border blue ml-4" role="status">
 
-                            </div>
-                        </div>
+                      </div>
                     </div>
+                  </div>
                 </div>
-                </div></div>
+              </div></div>
 
 
 

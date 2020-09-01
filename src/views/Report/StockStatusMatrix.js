@@ -182,6 +182,7 @@ export default class StockStatusMatrix extends React.Component {
             var programJson = JSON.parse(programData);
 
             planningUnitIds.map(planningUnitId => {
+              // this.setState({ loading: true })
               var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
               var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
               for (var ma = 0; ma < myArray.length; ma++) {
@@ -826,7 +827,7 @@ export default class StockStatusMatrix extends React.Component {
               }
               this.setState({
                 data: data,
-                message: ''
+                message: '', loading: false
               }, () => { console.log(this.state.data) })
             })
           }.bind(this)
@@ -884,7 +885,7 @@ export default class StockStatusMatrix extends React.Component {
               })
 
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({ message: error.message, loading: false });
               } else {
                 switch (error.response ? error.response.status : "") {
                   case 500:
@@ -1049,6 +1050,7 @@ export default class StockStatusMatrix extends React.Component {
         );
 
     } else {
+      this.setState({ loading: false })
       this.consolidatedProgramList()
     }
 

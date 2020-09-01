@@ -1622,6 +1622,7 @@ class StockAdjustmentComponent extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
+                        // this.setState({ loading: true })
                         console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
