@@ -2575,7 +2575,7 @@ class Consumption extends Component {
     if (navigator.onLine) {
       bar = {
 
-        labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YYYY'))),
+        labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
         datasets: [
           {
             type: "line",
@@ -2613,7 +2613,7 @@ class Consumption extends Component {
 
       bar = {
 
-        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YYYY'))),
+        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
         datasets: [
           {
             type: "line",
@@ -2976,7 +2976,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YYYY')}
+                                        {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
                                       </td>
                                     )
                                   }
@@ -3025,7 +3025,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YYYY')}
+                                        {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
                                       </td>
                                     )
                                   }
