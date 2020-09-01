@@ -859,7 +859,9 @@ label.arrow_label:after {
 .AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
   height: 30px;
 }
-
+.RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
+  height: 30px;
+}
 
 // Multiselect z-index going behind table 
 .go2139093995 * {
@@ -1799,7 +1801,8 @@ input::placeholder {
 }
 .progressbartext7 {
   // left: 94.95%;
-  left: 100%;
+  width: 100px;
+  left: 102%;
   transform: translateX(-99%) scale(1);
 }
 ////pipelinesetup progress bar

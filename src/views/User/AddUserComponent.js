@@ -103,7 +103,7 @@ class AddUserComponent extends Component {
                 emailId: '',
                 phoneNumber: '',
             },
-            loading: false,
+            loading: true,
             roleId: '',
             roleList: [],
             message: '',
