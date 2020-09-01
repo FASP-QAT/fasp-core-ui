@@ -87,7 +87,8 @@ export default class EditHealthAreaComponent extends Component {
             message: '',
             lang: localStorage.getItem('lang'),
             realmCountryId: '',
-            realmCountryList: []
+            realmCountryList: [],
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -109,6 +110,9 @@ export default class EditHealthAreaComponent extends Component {
 
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -169,14 +173,14 @@ export default class EditHealthAreaComponent extends Component {
         HealthAreaService.getHealthAreaById(this.props.match.params.healthAreaId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    healthArea: response.data
+                    healthArea: response.data, loading: false
                 })
 
             }
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -193,7 +197,7 @@ export default class EditHealthAreaComponent extends Component {
                 .then(response => {
                     console.log("realm list---", response.data);
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 })
 
@@ -207,11 +211,11 @@ export default class EditHealthAreaComponent extends Component {
                             regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
-                            realmCountryList: regList
+                            realmCountryList: regList, loading: false
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                         })
                     }
                 })
@@ -259,7 +263,7 @@ export default class EditHealthAreaComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -276,6 +280,9 @@ export default class EditHealthAreaComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     console.log("-------------------->" + this.state.healthArea);
                                     HealthAreaService.editHealthArea(this.state.healthArea)
                                         .then(response => {
@@ -283,7 +290,7 @@ export default class EditHealthAreaComponent extends Component {
                                                 this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();

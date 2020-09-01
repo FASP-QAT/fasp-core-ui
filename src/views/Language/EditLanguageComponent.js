@@ -136,7 +136,7 @@ export default class EditLanguageComponent extends Component {
                 });
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -183,7 +183,7 @@ export default class EditLanguageComponent extends Component {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();

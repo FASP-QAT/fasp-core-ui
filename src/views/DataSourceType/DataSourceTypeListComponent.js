@@ -514,11 +514,11 @@ export default class DataSourceTypeListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -532,7 +532,7 @@ export default class DataSourceTypeListComponent extends Component {
                 console.log(response.data)
                 this.setState({
                     dataSourceList: response.data,
-                    selSource: response.data
+                    selSource: response.data, 
                 }, () => {
                     this.buildJexcel();
                 });
@@ -540,7 +540,7 @@ export default class DataSourceTypeListComponent extends Component {
             else {
 
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();

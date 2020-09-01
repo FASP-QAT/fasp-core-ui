@@ -602,7 +602,7 @@ class AddRoleComponent extends Component {
                 }
                 else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -640,11 +640,12 @@ class AddRoleComponent extends Component {
                         canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        canCreateRoleList
+                        canCreateRoleList,
+                        loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -707,7 +708,7 @@ class AddRoleComponent extends Component {
 
                                             else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();

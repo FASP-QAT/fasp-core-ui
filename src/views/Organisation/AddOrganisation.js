@@ -250,18 +250,19 @@ export default class AddOrganisationComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    this.setState({
-                                        loading: true
-                                    })
+
                                     // console.log("-------------------->" + this.state.organisation.organisationCode);
                                     if (this.state.organisation.organisationCode != '') {
+                                        this.setState({
+                                            loading: true
+                                        })
                                         OrganisationService.addOrganisation(this.state.organisation)
                                             .then(response => {
                                                 if (response.status == 200) {
                                                     this.props.history.push(`/organisation/listOrganisation/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                 } else {
                                                     this.setState({
-                                                        message: response.data.messageCode
+                                                        message: response.data.messageCode, loading: false
                                                     })
                                                 }
                                             })

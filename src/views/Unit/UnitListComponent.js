@@ -560,11 +560,11 @@ export default class UnitListComponent extends Component {
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    dimensions: response.data, loading: false
+                    dimensions: response.data
                 })
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -586,7 +586,7 @@ export default class UnitListComponent extends Component {
                     })
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();

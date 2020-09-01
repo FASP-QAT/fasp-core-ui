@@ -218,14 +218,19 @@ export default class AddForecastingUnitComponent extends Component {
 
     getProductCategoryByRealmId() {
         let realmId = document.getElementById("realmId").value;
-        console.log("realmId---------------- > ", realmId);
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    productcategories: response.data
+        if (realmId != 0) {
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    console.log(JSON.stringify(response.data))
+                    this.setState({
+                        productcategories: response.data
+                    })
                 })
+        } else {
+            this.setState({
+                productcategories: []
             })
+        }
     }
 
     render() {
@@ -334,7 +339,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             required
                                                             value={this.state.forecastingUnit.realm.id}
                                                         >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
