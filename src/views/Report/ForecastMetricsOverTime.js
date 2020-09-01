@@ -1462,6 +1462,7 @@ class ForcastMatrixOverTime extends Component {
 
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.timeWindow')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.report.version')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("versionId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
@@ -1534,13 +1535,16 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.report.timeWindow') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
             align: 'left'
           })
         }
@@ -2152,7 +2156,7 @@ class ForcastMatrixOverTime extends Component {
         <Row>
           <Col lg="12">
             <Card style={{ display: this.state.loading ? "none" : "block" }}>
-              <div className="Card-header-reporticon">
+              <div className="Card-header-reporticon pb-3">
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
@@ -2174,7 +2178,7 @@ class ForcastMatrixOverTime extends Component {
                 <div className="TableCust" >
                   <div ref={ref}>
                     <Form >
-                      <Col md="12 pl-0">
+                      <div className=" pl-0">
                         <div className="row">
                           <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">Select Period</Label>
@@ -2319,7 +2323,7 @@ class ForcastMatrixOverTime extends Component {
                             </div>
                           </FormGroup>
                         </div>
-                      </Col>
+                      </div>
                     </Form>
                     <Col md="12 pl-0">
                       <div className="row">

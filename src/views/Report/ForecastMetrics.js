@@ -1176,6 +1176,8 @@ class ForecastMetrics extends Component {
 
     var csvRow = [];
     csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.timeWindow')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("viewById").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    
     this.state.countryLabels.map(ele =>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.programLabels.map(ele =>
@@ -1260,15 +1262,10 @@ class ForecastMetrics extends Component {
           doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+          doc.text(i18n.t('static.report.timeWindow') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+            align: 'left'
+          })
 
-          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
-
-          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-
-          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 3 ? 180 : 150, planningText)
         }
 
       }
@@ -1279,21 +1276,72 @@ class ForecastMetrics extends Component {
 
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
-
     doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor("#002f6c");
+
+
+    var y = 130;
+    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+    planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
+    planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
 
 
     var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    let startY = y
+    console.log('startY', startY)
+    let pages = Math.ceil(startY / height)
+    for (var j = 1; j < pages; j++) {
+      doc.addPage()
+    }
+    let startYtable = startY - ((height - h1) * (pages - 1))
     const headers = [[i18n.t('static.program.program'), i18n.t('static.dashboard.planningunit'),
     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
     //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
     elt.monthCount == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError) + '%', elt.monthCount]);
-    let startY = 170 + (this.state.planningUnitLabels.length * 3)
     let content = {
       margin: { top: 80, bottom: 50 },
-      startY: startY,
+      startY: startYtable,
       head: headers,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
@@ -1331,8 +1379,7 @@ class ForecastMetrics extends Component {
 
 
   handleChange(countrysId) {
-    console.log(countrysId)
-    countrysId = countrysId.sort(function (a, b) {
+   countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
     this.setState({
@@ -1357,7 +1404,9 @@ class ForecastMetrics extends Component {
 
   }
 
+ 
   handlePlanningUnitChange(planningUnitIds) {
+    console.log(planningUnitIds)
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
@@ -1783,7 +1832,7 @@ class ForecastMetrics extends Component {
       && planningUnits.map((item, i) => {
         return (
 
-          { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+          { label: getLabelText(item.label, this.state.lang), value: item.id }
 
         )
       }, this);
@@ -2035,6 +2084,7 @@ class ForecastMetrics extends Component {
 
                       </div>
                     </FormGroup>
+
 
                   </div>
                 </div>
