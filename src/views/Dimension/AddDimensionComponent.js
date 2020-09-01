@@ -147,14 +147,14 @@ export default class AddDimensionComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
-                                        })
+                                    })
                                     console.log(this.state.dimension)
                                     DimensionService.addDimension(this.state.dimension).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/dimension/listDimension/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();
@@ -165,7 +165,7 @@ export default class AddDimensionComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
+                                                    this.setState({ message: error.message, loading: false });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
                                                         case 500:
@@ -173,10 +173,10 @@ export default class AddDimensionComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ message: 'static.unkownError', loading: false });
                                                             break;
                                                     }
 

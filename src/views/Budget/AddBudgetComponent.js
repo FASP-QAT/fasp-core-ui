@@ -286,7 +286,7 @@ class AddBudgetComponent extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -298,17 +298,17 @@ class AddBudgetComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    fundingSources: response.data
+                    fundingSources: response.data, loading: false
                 })
             })
 
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
                 this.setState({
-                    currencyList: response.data,
+                    currencyList: response.data, loading: false
                 })
             } else {
-                this.setState({ message: response.data.messageCode })
+                this.setState({ message: response.data.messageCode, loading: false })
             }
         })
     }
@@ -360,9 +360,7 @@ class AddBudgetComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    this.setState({
-                                        loading: true
-                                    })
+
                                     console.log("this.state--->", this.state);
                                     let { budget } = this.state;
                                     var getCurrencyId = this.state.budget.currency.currencyId;
@@ -380,7 +378,9 @@ class AddBudgetComponent extends Component {
 
                                     // alert("hiiiiii");
                                     // this.setState({ budget: budget });
-
+                                    this.setState({
+                                        loading: true
+                                    })
                                     console.log("this.state.budget--->", budget);
                                     BudgetService.addBudget(budget)
                                         .then(response => {
@@ -388,7 +388,7 @@ class AddBudgetComponent extends Component {
                                                 this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -398,7 +398,7 @@ class AddBudgetComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
+                                                    this.setState({ message: error.message, loading: false });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
                                                         case 500:
@@ -406,10 +406,10 @@ class AddBudgetComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ message: 'static.unkownError', loading: false });
                                                             break;
                                                     }
                                                 }

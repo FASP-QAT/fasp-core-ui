@@ -105,7 +105,7 @@ export default class EditForecastingUnitComponent extends Component {
                 },
             },
             lang: localStorage.getItem('lang'),
-            loading: false
+            loading: true
         }
 
         this.dataChange = this.dataChange.bind(this);

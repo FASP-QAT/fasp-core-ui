@@ -155,7 +155,7 @@ export default class AddHealthAreaComponent extends Component {
         else {
 
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode, loading: false
           },
             () => {
               this.hideSecondComponent();
@@ -259,18 +259,19 @@ export default class AddHealthAreaComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  this.setState({
-                    loading: true
-                  })
+
                   console.log("-------------------->" + this.state.healthArea);
                   if (this.state.healthArea.label.label_en != '') {
+                    this.setState({
+                      loading: true
+                    })
                     HealthAreaService.addHealthArea(this.state.healthArea)
                       .then(response => {
                         if (response.status == 200) {
                           this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         } else {
                           this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                           },
                             () => {
                               this.hideSecondComponent();
