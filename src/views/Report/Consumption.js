@@ -2666,7 +2666,7 @@ class Consumption extends Component {
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <div className="Card-header-reporticon">
+          <div className="Card-header-reporticon pb-2">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong> */}
             {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
             <Online>
@@ -2715,7 +2715,7 @@ class Consumption extends Component {
             <div className="TableCust" >
               <div ref={ref}>
                 <Form >
-                  <Col md="12 pl-0">
+                  <div className="pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
@@ -2909,7 +2909,7 @@ class Consumption extends Component {
 
 
                     </div>
-                  </Col>
+                  </div>
                 </Form>
 
                 <Col md="12 pl-0">

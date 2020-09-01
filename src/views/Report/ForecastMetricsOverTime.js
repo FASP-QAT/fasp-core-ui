@@ -2152,7 +2152,7 @@ class ForcastMatrixOverTime extends Component {
         <Row>
           <Col lg="12">
             <Card style={{ display: this.state.loading ? "none" : "block" }}>
-              <div className="Card-header-reporticon">
+              <div className="Card-header-reporticon pb-3">
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
@@ -2174,7 +2174,7 @@ class ForcastMatrixOverTime extends Component {
                 <div className="TableCust" >
                   <div ref={ref}>
                     <Form >
-                      <Col md="12 pl-0">
+                      <div className=" pl-0">
                         <div className="row">
                           <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">Select Period</Label>
@@ -2319,7 +2319,7 @@ class ForcastMatrixOverTime extends Component {
                             </div>
                           </FormGroup>
                         </div>
-                      </Col>
+                      </div>
                     </Form>
                     <Col md="12 pl-0">
                       <div className="row">

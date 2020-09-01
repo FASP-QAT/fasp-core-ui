@@ -1740,7 +1740,7 @@ export default class StockStatusMatrix extends React.Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <div className="Card-header-reporticon">
+          <div className="Card-header-reporticon pb-2">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
             {this.state.data.length > 0 && <div className="card-header-actions">
               <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
@@ -1748,7 +1748,7 @@ export default class StockStatusMatrix extends React.Component {
             </div>}
           </div>
           <CardBody className="pb-md-3 pb-lg-2 pt-lg-0">
-            <Col md="12 pl-0">
+            <div className="pl-0">
               <div className="row">
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1835,7 +1835,7 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
               </div>
-            </Col>
+            </div>
             <div class="TableCust">
               {this.state.data.length > 0 &&
                 <Table striped bordered hover responsive="md" style={{ width: "100%" }}>

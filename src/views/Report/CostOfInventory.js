@@ -1840,13 +1840,13 @@ export default class CostOfInventory extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
-                        <div className="TableCust" >
+                    <CardBody className="pb-lg-2 pt-lg-1 ">
+                        <div className="" >
                             <div ref={ref}>
 
                                 <Form >
-                                    <Col md="12 pl-0">
-                                        <div className="row">
+                                <Col md="12 pl-0">
+                                        <div className="row ">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
                                                 <div className="controls ">
