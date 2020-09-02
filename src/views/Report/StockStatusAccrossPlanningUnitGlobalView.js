@@ -1168,7 +1168,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
 
-          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.countryLabels.size > 10 ? 170 : 150, {
+          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130+(this.state.countryValues.length ), {
             align: 'left'
           })
         }
@@ -1190,9 +1190,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
+    var startY = 130 + (this.state.countryValues.length * 2)+20
     let content = {
       margin: { top: 80, bottom: 50 },
-      startY: 180,
+      startY: startY,
       head: headers,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 80 },
