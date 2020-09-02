@@ -671,7 +671,8 @@ export default class ManualTagging extends Component {
             outputListAfterSearch: [],
             artmisList: [],
             shipmentId: '',
-            reason: "1"
+            reason: "1",
+            loading: true
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -693,7 +694,7 @@ export default class ManualTagging extends Component {
             .then(response => {
                 console.log("link response===", response);
                 this.setState({
-                    message : i18n.t('static.shipment.linkingsuccess')
+                    message: i18n.t('static.shipment.linkingsuccess')
                 })
                 this.toggleLarge();
                 this.filterData();
@@ -737,6 +738,7 @@ export default class ManualTagging extends Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
 
         if (programId != -1 && planningUnitId != 0) {
+            this.setState({ loading: true })
             console.log("1-programId------>", programId);
             ManualTaggingService.getShipmentListForManualTagging(programId, planningUnitId)
                 .then(response => {
@@ -793,13 +795,15 @@ export default class ManualTagging extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        programs: response.data
+                        programs: response.data,
+                        loading: false
                     })
                 }
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -842,7 +846,7 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [30, 30, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -911,6 +915,7 @@ export default class ManualTagging extends Component {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                 var outputListAfterSearch = [];
                                 let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
+                                console.log("row-------------",row);
                                 outputListAfterSearch.push(row);
 
                                 this.setState({
@@ -930,7 +935,7 @@ export default class ManualTagging extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -940,7 +945,7 @@ export default class ManualTagging extends Component {
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -1125,7 +1130,7 @@ export default class ManualTagging extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'fundingSource.label.label_en',
+                dataField: 'fundingSource.code',
                 text: 'Funding Source',
                 sort: true,
                 align: 'center',
@@ -1248,15 +1253,17 @@ export default class ManualTagging extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
-                <Card >
-                    <CardBody className="">
-                        <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                <FormGroup className="col-md-3 pl-0">
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <CardBody className="pb-lg-5">
+                        <Col md="10 pl-0">
+                            <div className="row">
+                                <FormGroup className="col-md-4 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1273,7 +1280,7 @@ export default class ManualTagging extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1333,8 +1340,9 @@ export default class ManualTagging extends Component {
                                 )
                             }
                         </ToolkitProvider> */}
-
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className="ReportSearchMarginTop">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
                         </div>
 
                         {/* Consumption modal */}
@@ -1442,7 +1450,7 @@ export default class ManualTagging extends Component {
                         {/* Consumption modal */}
                     </CardBody>
                 </Card>
-                {/* <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>Loading...</strong></h4></div>
@@ -1452,7 +1460,7 @@ export default class ManualTagging extends Component {
                             </div>
                         </div>
                     </div>
-                </div> */}
+                </div>
             </div>
         );
     }

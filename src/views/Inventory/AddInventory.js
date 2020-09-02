@@ -363,7 +363,7 @@ export default class AddInventory extends Component {
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} inventoryPage="inventoryDataEntry" />}
                             <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
                             <div className="table-responsive">
-                                <div id="adjustmentsTable" className="table-responsive" />
+                                <div id="adjustmentsTable" />
                             </div>
                         </Col>
                     </CardBody>

@@ -370,7 +370,7 @@ class SupplierListComponent extends Component {
         jExcelLoadedFunction(instance);
     }
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
@@ -492,11 +492,11 @@ class SupplierListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -529,7 +529,7 @@ class SupplierListComponent extends Component {
                 console.log(response.data)
                 this.setState({
                     supplierList: response.data,
-                    selSource: response.data
+                    selSource: response.data, 
                 },
                     () => { this.buildJexcel() })
             })

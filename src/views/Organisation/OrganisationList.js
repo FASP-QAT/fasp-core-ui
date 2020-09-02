@@ -495,11 +495,11 @@ export default class OrganisationListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
-                    }, () => { this.buildJexcel() })
+                        realms: response.data
+                    }, () => {  })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -654,7 +654,7 @@ export default class OrganisationListComponent extends Component {
         }
     }
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {

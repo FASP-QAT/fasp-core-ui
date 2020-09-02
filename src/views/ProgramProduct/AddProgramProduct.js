@@ -45,7 +45,8 @@ class AddprogramPlanningUnit extends Component {
             lang: localStorage.getItem('lang'),
             batchNoRequired: false,
             localProcurementLeadTime: '',
-            isValidData: true
+            isValidData: true,
+            loading: true
 
         }
         // this.addRow = this.addRow.bind(this);
@@ -60,7 +61,7 @@ class AddprogramPlanningUnit extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
-         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.dropdownFilter = this.dropdownFilter.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -151,7 +152,7 @@ class AddprogramPlanningUnit extends Component {
                                             var data = [];
                                             if (myReasponse.length != 0) {
                                                 for (var j = 0; j < myReasponse.length; j++) {
-                                                    console.log("myReasponse[j]---",myReasponse[j]);
+                                                    console.log("myReasponse[j]---", myReasponse[j]);
                                                     data = [];
                                                     data[0] = myReasponse[j].productCategory.id;
                                                     data[1] = myReasponse[j].planningUnit.id;
@@ -210,12 +211,12 @@ class AddprogramPlanningUnit extends Component {
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: 'Reorder frequency in months',
+                                                        title: 'Reorder Frequency In Months',
                                                         type: 'number',
 
                                                     },
                                                     {
-                                                        title: 'Min month of stock',
+                                                        title: 'Min Month Of Stock',
                                                         type: 'number'
                                                     },
                                                     {
@@ -443,17 +444,17 @@ class AddprogramPlanningUnit extends Component {
                                             };
                                             var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                             this.el = elVar;
-                                            this.setState({ mapPlanningUnitEl: elVar });
+                                            this.setState({ mapPlanningUnitEl: elVar, loading: false });
                                             // }
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             })
                                         }
                                     }).catch(
                                         error => {
                                             if (error.message === "Network Error") {
-                                                this.setState({ message: error.message });
+                                                this.setState({ message: error.message, loading: false });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
                                                     case 500:
@@ -461,10 +462,10 @@ class AddprogramPlanningUnit extends Component {
                                                     case 404:
                                                     case 406:
                                                     case 412:
-                                                        this.setState({ message: error.response.data.messageCode });
+                                                        this.setState({ message: error.response.data.messageCode, loading: false });
                                                         break;
                                                     default:
-                                                        this.setState({ message: 'static.unkownError' });
+                                                        this.setState({ message: 'static.unkownError', loading: false });
                                                         console.log("Error code unkown");
                                                         break;
                                                 }
@@ -474,12 +475,14 @@ class AddprogramPlanningUnit extends Component {
 
                             } else {
                                 list = [];
+                                this.setState({ loading: false });
                             }
                         });
                 } else {
                     productCategoryList = []
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     })
                 }
             });
@@ -503,7 +506,7 @@ class AddprogramPlanningUnit extends Component {
         data[11] = 1;
         data[12] = this.props.match.params.programId;
         this.el.insertRow(
-            data,0,1
+            data, 0, 1
         );
     }
 
@@ -956,6 +959,7 @@ class AddprogramPlanningUnit extends Component {
         var validation = this.checkValidation();
         // var validation = this.state.isValidData;
         if (validation == true) {
+            this.setState({ loading: true })
             // console.log("validation---true-->");
 
             var json = this.el.getJson();
@@ -1000,7 +1004,7 @@ class AddprogramPlanningUnit extends Component {
                         this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode,loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1010,7 +1014,7 @@ class AddprogramPlanningUnit extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message,loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1018,10 +1022,10 @@ class AddprogramPlanningUnit extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({ message: error.response.data.messageCode,loading: false });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError',loading: false });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -1046,7 +1050,7 @@ class AddprogramPlanningUnit extends Component {
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
 
                 <div style={{ flexBasis: 'auto' }}>
-                    <Card>
+                    <Card style={{ display: this.state.loading ? "none" : "block" }}>
                         {/* <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader> */}
@@ -1069,6 +1073,17 @@ class AddprogramPlanningUnit extends Component {
                                 </FormGroup>
                         </CardFooter>
                     </Card>
+                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                                <div ><h4> <strong>Loading...</strong></h4></div>
+
+                                <div class="spinner-border blue ml-4" role="status">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

@@ -1222,7 +1222,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             onchange: this.batchInfoChangedShipment,
                                                             allowExport: false,
                                                             text: {
-                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                                                                 show: '',
                                                                 entries: '',
                                                             },

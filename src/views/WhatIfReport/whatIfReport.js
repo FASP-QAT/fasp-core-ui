@@ -34,6 +34,8 @@ import 'react-select/dist/react-select.min.css';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan.js";
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "../SupplyPlan/SupplyPlanCalculations";
+import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
+// import SupplyPlanFormulas from "./SupplyPlanFormulas";
 
 const entityname = i18n.t('static.dashboard.whatIf')
 
@@ -3277,13 +3279,14 @@ export default class WhatIfReportComponent extends React.Component {
                 }} />
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className="red">{this.state.supplyPlanError}</h5>
-
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card>
                     <div className="Card-header-reporticon">
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
+                            <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                             </a>
                         </div>
                     </div>

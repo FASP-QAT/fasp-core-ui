@@ -708,7 +708,7 @@ class ListProcurementAgentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [100,100,200,100,100,100,100,100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -829,7 +829,7 @@ class ListProcurementAgentComponent extends Component {
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -852,11 +852,11 @@ class ListProcurementAgentComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -890,14 +890,13 @@ class ListProcurementAgentComponent extends Component {
                     this.setState({
                         procurementAgentList: response.data,
                         selProcurementAgent: response.data,
-                        loading: false
                     },
                         () => {
                             this.buildJExcel();
                         })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();

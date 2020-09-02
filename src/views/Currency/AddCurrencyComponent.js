@@ -355,7 +355,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { SPACE_REGEX, ALPHABETS_REGEX, DECIMAL_NO_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.currency.currencyMaster');
 const initialValues = {
@@ -378,9 +378,10 @@ const validationSchema = function (values) {
         //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
+            .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
     })
 }
@@ -518,7 +519,7 @@ export default class AddCurrencyComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
-                                        })
+                                    })
                                     CurrencyService.addCurrency(this.state)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -526,7 +527,7 @@ export default class AddCurrencyComponent extends Component {
                                                 this.props.history.push(`/currency/listCurrency/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();

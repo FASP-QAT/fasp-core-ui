@@ -2653,7 +2653,7 @@ export default class SupplyPlanComponent extends React.Component {
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <span onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                         </div>
                     </div>

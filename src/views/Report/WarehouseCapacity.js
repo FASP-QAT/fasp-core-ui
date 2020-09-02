@@ -564,6 +564,7 @@ class warehouseCapacity extends Component {
             lang: localStorage.getItem('lang'),
             programValues: [],
             programLabels: [],
+            loading: true
 
         };
         this.getCountrylist = this.getCountrylist.bind(this);
@@ -729,7 +730,7 @@ class warehouseCapacity extends Component {
         doc.setFontSize(8);
 
         let content = {
-            margin: { top: 40,left:100  ,bottom:50},
+            margin: { top: 40, left: 100, bottom: 50 },
             startY: 150,
             // head: [headers],
             // body: data,
@@ -780,15 +781,15 @@ class warehouseCapacity extends Component {
         RealmCountryService.getRealmCountryrealmIdById(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data
+                    countries: response.data, loading: false
                 })
             }).catch(
                 error => {
                     this.setState({
-                        countries: []
+                        countries: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ loading: false, message: error.message });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -796,10 +797,10 @@ class warehouseCapacity extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ loading: false, message: 'static.unkownError' });
                                 break;
                         }
                     }
@@ -811,30 +812,32 @@ class warehouseCapacity extends Component {
         let countryId = document.getElementById("countryId").value;
         this.setState({
             programLst: [],
-            programValues:[],
-            programLabels:[]
-        }, () => { if (countryId != 0) {
-            const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
-            if (programLst.length > 0) {
+            programValues: [],
+            programLabels: []
+        }, () => {
+            if (countryId != 0) {
+                const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
+                if (programLst.length > 0) {
 
-                this.setState({
-                    programLst: programLst
-                }, () => {
-                    // this.fetchData() 
-                });
-            } else {
-                this.setState({
-                    programLst: []
-                });
+                    this.setState({
+                        programLst: programLst
+                    }, () => {
+                        // this.fetchData() 
+                    });
+                } else {
+                    this.setState({
+                        programLst: []
+                    });
+                }
             }
-        }
-        this.fetchData();})
+            this.fetchData();
+        })
     }
 
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
-          })
+        })
         this.setState({
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
@@ -853,15 +856,15 @@ class warehouseCapacity extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false,
                     })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ loading: false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -869,10 +872,10 @@ class warehouseCapacity extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ loading: false, message: 'static.unkownError' });
                                     break;
                             }
                         }
@@ -880,6 +883,7 @@ class warehouseCapacity extends Component {
                 );
         } else {
             console.log('offline Program list')
+            this.setState({ loading: false })
             this.consolidatedProgramList()
         }
     }
@@ -924,12 +928,14 @@ class warehouseCapacity extends Component {
 
     fetchData(e) {
         if (navigator.onLine) {
+
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let countryId = document.getElementById("countryId").value;
 
             console.log("programId---", programId);
             console.log("countryId---", countryId);
             if (this.state.programValues.length > 0 && countryId > 0) {
+                this.setState({ loading: true })
                 AuthenticationService.setupAxiosInterceptors();
                 let inputjson = {
                     realmCountryId: countryId,
@@ -940,15 +946,15 @@ class warehouseCapacity extends Component {
                         console.log("RESP-------->>", response.data)
                         this.setState({
                             data: response.data,
-                            message: ''
+                            message: '', loading: false
                         })
                     }).catch(
                         error => {
                             this.setState({
-                                data: []
+                                data: [], loading: false
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ loading: false, message: error.message });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -956,10 +962,10 @@ class warehouseCapacity extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ loading: false, message: 'static.unkownError' });
                                         break;
                                 }
                             }
@@ -989,6 +995,7 @@ class warehouseCapacity extends Component {
                     var programRequest = programTransaction.get(programId);
 
                     programRequest.onsuccess = function (event) {
+                        // this.setState({ loading: true })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -1024,13 +1031,14 @@ class warehouseCapacity extends Component {
                         console.log("offlineData--4-", offlineData);
                         console.log("final wareHouseCapacity Report---", regionList);
                         this.setState({
-                            data: offlineData
+                            data: offlineData, loading: false
                         });
                     }.bind(this)
                 }.bind(this)
             } else {
                 this.setState({
-                    data: []
+                    data: [],
+                    loading: false
                 });
             }
 
@@ -1074,11 +1082,13 @@ class warehouseCapacity extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.warehouseCapacity')}</strong> */}
 
@@ -1109,7 +1119,7 @@ class warehouseCapacity extends Component {
                         <div className="" >
                             <div>
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
                                             <Online>
                                                 <FormGroup className="col-md-3">
@@ -1158,21 +1168,21 @@ class warehouseCapacity extends Component {
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                        <MultiSelect
+                                                    <MultiSelect
 
-                                                            bsSize="sm"
-                                                            name="programId"
-                                                            id="programId"
-                                                            value={this.state.programValues}
-                                                            onChange={(e) => { this.handleChangeProgram(e) }}
-                                                            options={programList && programList.length > 0 ? programList : []}
+                                                        bsSize="sm"
+                                                        name="programId"
+                                                        id="programId"
+                                                        value={this.state.programValues}
+                                                        onChange={(e) => { this.handleChangeProgram(e) }}
+                                                        options={programList && programList.length > 0 ? programList : []}
 
-                                                        />
-                                                        {!!this.props.error &&
-                                                            this.props.touched && (
-                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                            )}
-                                                   
+                                                    />
+                                                    {!!this.props.error &&
+                                                        this.props.touched && (
+                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                        )}
+
                                                 </FormGroup>
                                             </Online>
 
@@ -1207,7 +1217,7 @@ class warehouseCapacity extends Component {
                                             </Offline>
 
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
 
                                 <Col md="12 pl-0">
@@ -1260,6 +1270,17 @@ class warehouseCapacity extends Component {
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div >
         );
     }

@@ -931,6 +931,7 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import MultiSelect from 'react-multi-select-component';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1060,7 +1061,7 @@ class ShipmentSummery extends Component {
             message: '',
             viewById: 1,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+            loading: true
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1252,7 +1253,7 @@ class ShipmentSummery extends Component {
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
 
-                   
+
                 }
 
             }
@@ -1275,12 +1276,12 @@ class ShipmentSummery extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 100;
         var aspectwidth1 = (width - h1);
-        let startY=170+(this.state.planningUnitLabels.length*3)
+        let startY = 170 + (this.state.planningUnitLabels.length * 3)
         doc.addImage(canvasImg, 'png', 50, startY, 750, 260, 'CANVAS');
 
         //Table1
         let content1 = {
-            margin: { top: 80 ,bottom:70},
+            margin: { top: 80, bottom: 70 },
             startY: height,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 190.5, halign: 'center' },
             columnStyles: {
@@ -1302,7 +1303,7 @@ class ShipmentSummery extends Component {
 
         //Table2
         let content2 = {
-            margin: { top: 80 ,bottom:50},
+            margin: { top: 80, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },
@@ -1343,15 +1344,15 @@ class ShipmentSummery extends Component {
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data
+                        programs: response.data, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: []
+                            programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({ message: error.message, loading: false });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1359,10 +1360,10 @@ class ShipmentSummery extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({ message: 'static.unkownError', loading: false });
                                     break;
                             }
                         }
@@ -1371,6 +1372,7 @@ class ShipmentSummery extends Component {
 
         } else {
             console.log('offline')
+            this.setState({ loading: false })
             this.consolidatedProgramList()
         }
 
@@ -1610,9 +1612,9 @@ class ShipmentSummery extends Component {
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
-          })
+        })
         this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
+            planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
@@ -1630,7 +1632,7 @@ class ShipmentSummery extends Component {
         let programId = document.getElementById("programId").value;
         let viewById = document.getElementById("viewById").value;
 
-        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value));
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -1642,7 +1644,8 @@ class ShipmentSummery extends Component {
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
-                planningUnitIds= this.state.planningUnitValues.map(ele => (ele.value).toString())
+                planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value));
+                console.log("planninuit ids====>", planningUnitIds);
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -1669,6 +1672,7 @@ class ShipmentSummery extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
+                        // this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1749,12 +1753,13 @@ class ShipmentSummery extends Component {
                             this.setState({
                                 data: data,
                                 message: '',
-                                viewById: viewById,
+                                viewById: viewById, loading: false
                             })
                         }.bind(this)
                     }.bind(this);
                 }.bind(this)
             } else {
+                this.setState({ loading: true })
                 var inputjson = {
                     programId: programId,
                     versionId: versionId,
@@ -1771,16 +1776,17 @@ class ShipmentSummery extends Component {
                         this.setState({
                             data: response.data,
                             viewById: viewById,
-                            message: ''
+                            message: '',
+                            loading: false
                         }
                         )
                     }).catch(
                         error => {
                             this.setState({
-                                data: []
+                                data: [], loading: false
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -1788,10 +1794,10 @@ class ShipmentSummery extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -1917,7 +1923,7 @@ class ShipmentSummery extends Component {
                 let hold = 0
                 for (var k = 0; k < result.length; k++) {
                     if (moment(dateArray[j], 'MM-YYYY').isSame(moment(result[k].expectedDeliveryDate, 'MM-YYYY'))) {
-                        hold = viewById == 1 ? result[k].totalCost : result[k].forecastCost;
+                        hold = viewById == 1 ? result[k].freightCost + result[k].productCost : result[k].forecastCost;
                         k = result.length;
                     } else {
                         hold = 0;
@@ -2026,13 +2032,15 @@ class ShipmentSummery extends Component {
 
         return (
             <div className="animated fadeIn" >
-                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
-                }} /> */}
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
 
                         <Online>
@@ -2081,7 +2089,8 @@ class ShipmentSummery extends Component {
                         <div className="" >
                             <div ref={ref}>
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    {/* <Col md="12 pl-0"> */}
+                                    <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
@@ -2153,17 +2162,17 @@ class ShipmentSummery extends Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
-                                                    
-                                                        <MultiSelect
-                                                            name="planningUnitId"
-                                                            id="planningUnitId"
-                                                            bsSize="md"
-                                                            value={this.state.planningUnitValues}
-                                                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                        />
 
-                                                   
+                                                    <MultiSelect
+                                                        name="planningUnitId"
+                                                        id="planningUnitId"
+                                                        bsSize="md"
+                                                        value={this.state.planningUnitValues}
+                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                    />
+
+
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
@@ -2184,7 +2193,8 @@ class ShipmentSummery extends Component {
                                                 </div>
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                        {/* </Col> */}
+                                    </div>
                                 </Form>
 
                                 <Col md="12 pl-0">
@@ -2358,7 +2368,7 @@ class ShipmentSummery extends Component {
                                                                     <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].freightCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost + this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}
@@ -2374,6 +2384,17 @@ class ShipmentSummery extends Component {
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div >
         );
     }

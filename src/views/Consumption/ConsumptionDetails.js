@@ -297,7 +297,7 @@ export default class ConsumptionDetails extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <Col md="10 pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -336,7 +336,7 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} consumptionPage="consumptionDataEntry" />}
                             <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                             <div className="table-responsive">
-                                <div id="consumptionTable" className="table-responsive" />
+                                <div id="consumptionTable"  />
                             </div>
                         </Col>
                     </CardBody>

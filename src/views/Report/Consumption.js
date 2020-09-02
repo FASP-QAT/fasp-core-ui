@@ -1394,7 +1394,7 @@ class Consumption extends Component {
       show: false,
       message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-
+      loading: true
 
 
     };
@@ -1473,7 +1473,7 @@ class Consumption extends Component {
       var db1;
       var storeOS;
       getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
         var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
@@ -1922,7 +1922,7 @@ class Consumption extends Component {
         var storeOS;
         getDatabase();
         var regionList = [];
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext')
@@ -1952,7 +1952,7 @@ class Consumption extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-
+            // this.setState({ loading: true })
             // var shipmentList = (programJson.shipmentList);
             console.log("consumptionList----*********----", (programJson.consumptionList));
 
@@ -2089,7 +2089,7 @@ class Consumption extends Component {
               offlineConsumptionList: finalOfflineConsumption,
               consumptions: finalOfflineConsumption,
               message: '',
-
+              loading: false
             },
               () => {
                 this.storeProduct(planningUnitId);
@@ -2103,7 +2103,8 @@ class Consumption extends Component {
 
       } else {
         this.setState({
-          message: ''
+          message: '',
+          loading: true
         })
 
         let realmId = AuthenticationService.getRealmId();
@@ -2122,7 +2123,8 @@ class Consumption extends Component {
             console.log("RESP---------->", response.data);
             this.setState({
               consumptions: response.data,
-              message: ''
+              message: '',
+              loading: false
             },
               () => {
                 this.storeProduct(planningUnitId);
@@ -2154,15 +2156,15 @@ class Consumption extends Component {
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
-            programs: response.data
+            programs: response.data, loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
             this.setState({
-              programs: []
+              programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({ message: error.message, loading: false });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -2170,10 +2172,10 @@ class Consumption extends Component {
                 case 404:
                 case 406:
                 case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({ loading: false, emessage: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                   break;
                 default:
-                  this.setState({ message: 'static.unkownError' });
+                  this.setState({ message: 'static.unkownError', loading: false });
                   break;
               }
             }
@@ -2182,6 +2184,7 @@ class Consumption extends Component {
 
     } else {
       this.consolidatedProgramList()
+      this.setState({ loading: false })
     }
   }
 
@@ -2192,7 +2195,7 @@ class Consumption extends Component {
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
@@ -2283,7 +2286,7 @@ class Consumption extends Component {
       var db1;
       var storeOS;
       getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -2449,7 +2452,7 @@ class Consumption extends Component {
 
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
@@ -2572,7 +2575,7 @@ class Consumption extends Component {
     if (navigator.onLine) {
       bar = {
 
-        labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YYYY'))),
+        labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
         datasets: [
           {
             type: "line",
@@ -2610,7 +2613,7 @@ class Consumption extends Component {
 
       bar = {
 
-        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YYYY'))),
+        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
         datasets: [
           {
             type: "line",
@@ -2656,12 +2659,14 @@ class Consumption extends Component {
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-        <Card>
-          <div className="Card-header-reporticon">
+        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+          <div className="Card-header-reporticon pb-2">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong> */}
             {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
             <Online>
@@ -2710,7 +2715,7 @@ class Consumption extends Component {
             <div className="TableCust" >
               <div ref={ref}>
                 <Form >
-                  <Col md="12 pl-0">
+                  <div className="pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
@@ -2904,7 +2909,7 @@ class Consumption extends Component {
 
 
                     </div>
-                  </Col>
+                  </div>
                 </Form>
 
                 <Col md="12 pl-0">
@@ -2971,7 +2976,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.consumptions.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YYYY')}
+                                        {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
                                       </td>
                                     )
                                   }
@@ -3020,7 +3025,7 @@ class Consumption extends Component {
                                     &&
                                     this.state.offlineConsumptionList.map((item, idx) =>
                                       <td id="addr0" key={idx}>
-                                        {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YYYY')}
+                                        {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
                                       </td>
                                     )
                                   }
@@ -3064,6 +3069,17 @@ class Consumption extends Component {
             </div>
           </CardBody>
         </Card>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>Loading...</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
+        </div>
       </div >
     );
   }

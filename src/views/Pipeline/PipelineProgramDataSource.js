@@ -16,6 +16,7 @@ export default class PipelineProgramDataSource extends Component {
         this.state = {
             dataSourceList: [],
             mapDataSourceEl: '',
+            loading:false
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -294,21 +295,24 @@ export default class PipelineProgramDataSource extends Component {
                                             var elVar = jexcel(document.getElementById("mapDataSource"), options);
                                             this.el = elVar;
                                             this.loaded();
+                                            this.setState({
+                                                loading: false
+                                            })
 
                                         }
                                     } else {
-                                        this.setState({ message: response.data.messageCode })
+                                        this.setState({ message: response.data.messageCode, loading: false })
                                     }
                                 });
 
                         } else {
-                            this.setState({ message: response.data.messageCode })
+                            this.setState({ message: response.data.messageCode, loading: false })
                         }
 
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -316,10 +320,10 @@ export default class PipelineProgramDataSource extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: error.response.data.messageCode });
+                                        this.setState({ message: error.response.data.messageCode, loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ loading: false, message: 'static.unkownError' });
                                         break;
                                 }
                             }
@@ -340,9 +344,20 @@ export default class PipelineProgramDataSource extends Component {
         return (
             <>
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" >
+                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="mapDataSource">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

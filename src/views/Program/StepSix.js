@@ -49,11 +49,11 @@ const validationSchemaSix = function (values) {
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext')),
         shippedToArrivedByAirLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.shippedToArrivedByAirLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.arrivedToDeliveredLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
 
     })
 }
@@ -303,7 +303,7 @@ export default class StepSix extends Component {
 
 
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company"> Arrived to deliver Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company"> Arrived to Received Lead Time<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}

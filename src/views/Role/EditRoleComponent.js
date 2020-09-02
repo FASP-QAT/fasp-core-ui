@@ -10,7 +10,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import {LABEL_REGEX} from '../../Constants.js';
+import { LABEL_REGEX } from '../../Constants.js';
 
 const initialValues = {
     roleName: "",
@@ -85,7 +85,7 @@ class EditRoleComponent extends Component {
     }
     changeLoading(loading) {
         this.setState({ loading: loading })
-        }
+    }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -177,11 +177,11 @@ class EditRoleComponent extends Component {
                         businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        businessFunctionList,loading: false
+                        businessFunctionList, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -190,7 +190,7 @@ class EditRoleComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -198,10 +198,10 @@ class EditRoleComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -215,11 +215,12 @@ class EditRoleComponent extends Component {
                         canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        canCreateRoleList
+                        canCreateRoleList,
+                        loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -228,7 +229,7 @@ class EditRoleComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -236,10 +237,10 @@ class EditRoleComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -250,14 +251,14 @@ class EditRoleComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        role: response.data
+                        role: response.data, loading: false
                     },
                         () => {
                             console.log("ROLE****************> ", this.state.role)
                         });
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -266,7 +267,7 @@ class EditRoleComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -274,10 +275,10 @@ class EditRoleComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -307,14 +308,14 @@ class EditRoleComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
-                                        })
+                                    })
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/role/listRole/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loadig: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -333,10 +334,10 @@ class EditRoleComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ loadig: false, message: error.response.data.messageCode });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ loadig: false, message: 'static.unkownError' });
                                                             break;
                                                     }
                                                 }

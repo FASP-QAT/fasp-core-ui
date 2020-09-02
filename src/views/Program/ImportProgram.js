@@ -88,7 +88,7 @@ export default class ImportProgram extends Component {
                 var selectedPrgArr = this.state.programId;
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     console.log("in success");
                     db1 = e.target.result;
@@ -215,7 +215,7 @@ export default class ImportProgram extends Component {
                 var file = document.querySelector('input[type=file]').files[0];
                 var fileName = file.name;
                 var fileExtenstion = fileName.split(".");
-                if (fileExtenstion[1] == "zip") {
+                if (fileExtenstion[fileExtenstion.length - 1] == "zip") {
                     const lan = 'en'
                     JSZip.loadAsync(file).then(function (zip) {
                         var i = 0;
@@ -228,7 +228,14 @@ export default class ImportProgram extends Component {
                         Object.keys(zip.files).forEach(function (filename) {
                             zip.files[filename].async('string').then(function (fileData) {
 
-                                var programDataJson = JSON.parse(fileData);
+                                var programDataJson;
+
+                                try {
+                                    programDataJson = JSON.parse(fileData);
+                                }
+                                catch (err) {
+                                    this.setState({ message: i18n.t('static.program.zipfilereaderror') })
+                                }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
                                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);
                                 var programDataJsonDecrypted = JSON.parse(plaintext);
@@ -303,6 +310,8 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
+                <h5 style={{ color: "red" }} id="div2">
+                    {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />

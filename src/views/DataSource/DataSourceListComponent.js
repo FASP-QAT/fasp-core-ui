@@ -743,7 +743,7 @@ export default class DataSourceListComponent extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -779,7 +779,7 @@ export default class DataSourceListComponent extends Component {
                         realms: response.data, loading: false
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({ message: response.data.messageCode, loading: false })
                 }
             })
         // .catch(
@@ -837,7 +837,7 @@ export default class DataSourceListComponent extends Component {
             //     selSource: response.data
             // })
             this.setState({
-                dataSourceList: response.data, selSource: response.data
+                dataSourceList: response.data, selSource: response.data, loading: false
             }, () => { this.buildJexcel() })
         })
 
@@ -854,8 +854,9 @@ export default class DataSourceListComponent extends Component {
             });
         }
     }
+    
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {

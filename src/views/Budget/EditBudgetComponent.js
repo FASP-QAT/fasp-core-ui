@@ -70,6 +70,7 @@ class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             // budget: this.props.location.state.budget,
             budget: {
                 label: {
@@ -127,6 +128,10 @@ class EditBudgetComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addMonths = this.addMonths.bind(this);
         this.CommaFormatted = this.CommaFormatted.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
 
     CommaFormatted(cell) {
@@ -188,13 +193,13 @@ class EditBudgetComponent extends Component {
                     response.data.budgetAmt = getBudgetAmount;
 
                     this.setState({
-                        budget: response.data
+                        budget: response.data, loading: false
                     });
                 }
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -281,9 +286,9 @@ class EditBudgetComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -300,6 +305,9 @@ class EditBudgetComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
                                     let { budget } = this.state;
 
                                     var amount = this.state.budget.budgetAmt.replace(/,/g, '');
@@ -319,7 +327,7 @@ class EditBudgetComponent extends Component {
                                                 this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -609,6 +617,17 @@ class EditBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>

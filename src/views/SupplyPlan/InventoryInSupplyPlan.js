@@ -194,8 +194,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         columns: [
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: 'MM-YYYY' }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
-                            { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
-                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
+                            { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180 },
+                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 180 },
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80 },
@@ -203,7 +203,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 50 },
+                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 }
@@ -221,7 +221,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         allowExport: false,
                         copyCompatibility: true,
                         text: {
-                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
                             show: '',
                             entries: '',
                         },

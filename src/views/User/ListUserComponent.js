@@ -424,6 +424,7 @@ import moment from 'moment';
 import { DATE_FORMAT_CAP } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 const entityname = i18n.t('static.user.user')
@@ -651,13 +652,13 @@ class ListUserComponent extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -682,11 +683,11 @@ class ListUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -695,7 +696,7 @@ class ListUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -703,10 +704,10 @@ class ListUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -725,7 +726,8 @@ class ListUserComponent extends Component {
                     });
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -735,7 +737,7 @@ class ListUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -743,10 +745,10 @@ class ListUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -801,6 +803,11 @@ class ListUserComponent extends Component {
 
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>

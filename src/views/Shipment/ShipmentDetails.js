@@ -272,13 +272,13 @@ export default class ShipmentDetails extends React.Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardBody className="pb-lg-2 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <Col md="10 pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>

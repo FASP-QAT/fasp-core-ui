@@ -402,6 +402,7 @@ export default class HealthAreaListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
+            colWidths: [100,100,200],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -487,12 +488,12 @@ export default class HealthAreaListComponent extends Component {
             this.setState({
                 selSource
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         } else {
             this.setState({
                 selSource: this.state.healthAreas
             },
-            () => { this.buildJexcel()})
+                () => { this.buildJexcel() })
         }
     }
 
@@ -503,12 +504,12 @@ export default class HealthAreaListComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data
                     },
-                        () => { this.buildJexcel() })
+                        () => {  })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -523,14 +524,14 @@ export default class HealthAreaListComponent extends Component {
 
                     this.setState({
                         healthAreas: response.data,
-                        selSource: response.data, loading: false
+                        selSource: response.data
                     },
                         () => { this.buildJexcel() })
                 }
                 else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -672,10 +673,10 @@ export default class HealthAreaListComponent extends Component {
         }
     }
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if( this.state.selSource.length != 0 ){
+            if (this.state.selSource.length != 0) {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
                     this.props.history.push({
                         pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,

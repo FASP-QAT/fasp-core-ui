@@ -353,7 +353,7 @@ class ListRoleComponent extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
@@ -376,13 +376,13 @@ class ListRoleComponent extends Component {
                     // this.setState({ roleList: response.data, selSource: response.data, loading: false })
 
                     this.setState({
-                        roleList: response.data, selSource: response.data, loading: false
+                        roleList: response.data, selSource: response.data
                     },
                         () => { this.buildJexcel() })
                 }
                 else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -414,7 +414,7 @@ class ListRoleComponent extends Component {
     }
     selected = function (instance, cell, x, y, value) {
 
-        if (x == 0 && value != 0) {
+        if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {

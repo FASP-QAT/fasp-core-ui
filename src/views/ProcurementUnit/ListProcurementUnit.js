@@ -507,7 +507,7 @@ export default class ListProcurementUnit extends Component {
 
   selected = function (instance, cell, x, y, value) {
 
-    if (x == 0 && value != 0) {
+    if ((x == 0 && value != 0) || (y == 0)) {
       // console.log("HEADER SELECTION--------------------------");
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
@@ -540,7 +540,7 @@ export default class ListProcurementUnit extends Component {
         });
       } else {
         this.setState({
-          message: response.data.messageCode
+          message: response.data.messageCode, loading: false
         },
           () => {
             this.hideSecondComponent();
@@ -555,7 +555,7 @@ export default class ListProcurementUnit extends Component {
           planningUnitList: response.data,
         })
       } else {
-        this.setState({ message: response.data.messageCode })
+        this.setState({ message: response.data.messageCode, loading: false })
       }
     })
 
@@ -678,6 +678,8 @@ export default class ListProcurementUnit extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
+        }} loading={(loading) => {
+          this.setState({ loading: loading })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
