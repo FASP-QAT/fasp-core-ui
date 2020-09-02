@@ -396,7 +396,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           },
                           {
-                            name: 'Inventory Details',
+                            name: i18n.t('static.inventory.inventorydetils'),
                             url: '/inventory/addInventory',
                             icon: 'fa fa-cube',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
@@ -407,7 +407,7 @@ class DefaultLayout extends Component {
                           //   icon: 'fa fa-list',
                           // },
                           {
-                            name: 'Shipment Details',
+                            name: i18n.t('static.report.shipmentDetailReport'),
                             url: '/shipment/shipmentDetails',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }

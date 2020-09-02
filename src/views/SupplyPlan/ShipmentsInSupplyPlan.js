@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX } from "../../Constants";
 import moment from "moment";
 import { paddingZero, generateRandomAplhaNumericCode } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -40,9 +40,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.saveShipmentsDate = this.saveShipmentsDate.bind(this);
         this.saveShipments = this.saveShipments.bind(this);
         this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
+        this.showShipmentData = this.showShipmentData.bind(this);
     }
 
     componentDidMount() {
+
+    }
+
+    showShipmentData() {
         console.log("shipment List", this.props.items);
         var planningUnitId = document.getElementById("planningUnitId").value;
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
@@ -282,7 +287,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             { type: erpType, readOnly: true, title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
                                             { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
                                             { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
-                                            { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+                                            { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.' },
                                             { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
                                             { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
                                             { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
@@ -291,7 +296,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             { type: 'hidden', title: i18n.t('static.supplyPlan.erpFlag'), width: 0 },
                                             { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentStatus'), width: 0 },
                                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
-                                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                            { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 200 },
                                             { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0 },
                                             { type: 'hidden', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 0 },
                                             { type: 'hidden', title: i18n.t('static.common.accountFlag'), width: 0 },
@@ -306,7 +311,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         wordWrap: true,
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
-                                        allowDeleteRow: false,
+                                        allowDeleteRow: true,
                                         allowInsertRow: true,
                                         allowManualInsertRow: false,
                                         copyCompatibility: true,
@@ -349,13 +354,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     data[5] = "";
                                                     data[6] = "";
                                                     data[7] = "";
-                                                    data[8] = "";
+                                                    data[8] = 0;
                                                     data[9] = "";
                                                     data[10] = "";
                                                     data[11] = `=ROUND(K${parseInt(json.length) + 1}*I${parseInt(json.length) + 1},2)`;
                                                     data[12] = "";
                                                     data[13] = "";
-                                                    data[14] = "false";
+                                                    data[14] = false;
                                                     data[15] = ""
                                                     data[16] = -1;
                                                     data[17] = "";
@@ -364,6 +369,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     data[20] = true;
                                                     data[21] = "";
                                                     data[22] = 0;
+
                                                     obj.insertRow(data);
                                                 }.bind(this)
                                             });
@@ -415,7 +421,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         var data = [];
                                                         data[0] = 2;//A
                                                         data[1] = rowData[22];//B
-                                                        data[2] = rowData[8];//C
+                                                        data[2] = rowData[8] != "" ? rowData[8] : 0;//C
                                                         data[3] = 5;//D
                                                         data[4] = "";//E
                                                         data[5] = `=IF(
@@ -461,11 +467,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             columnDrag: true,
                                                             columns: [
                                                                 { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: adjustedOrderQty, width: 120 },
-                                                                { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
-                                                                { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', mask: '#,##', width: 120 },
+                                                                { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                                                                { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120 },
                                                                 { type: 'dropdown', title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
                                                                 { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
-                                                                { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', readOnly: true, mask: '#,##', width: 120 },
+                                                                { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', readOnly: true, mask: '#,##.00', decimal: '.', width: 120 },
                                                                 { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                                                                 { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
                                                                 { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },
@@ -508,6 +514,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             }
 
                                                         }
+                                                        console.log("Options", options)
                                                         var elVar = jexcel(document.getElementById("qtyCalculatorTable"), options);
                                                         this.el = elVar;
                                                         this.setState({ qtyCalculatorTableEl: elVar });
@@ -529,10 +536,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 data: json1,
                                                                 columnDrag: true,
                                                                 columns: [
-                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##', width: 120 },
-                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##', width: 120 },
-                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##', width: 120 },
-                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
+                                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120 },
                                                                     { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
                                                                     { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
                                                                     { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
@@ -1183,7 +1190,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 {
                                                                     title: i18n.t('static.supplyPlan.shipmentQty'),
                                                                     type: 'numeric',
-                                                                    mask: '#,##'
+                                                                    mask: '#,##.00', decimal: '.'
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
@@ -1206,7 +1213,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             wordWrap: true,
                                                             allowInsertColumn: false,
                                                             allowManualInsertColumn: false,
-                                                            allowDeleteRow: false,
+                                                            allowDeleteRow: true,
                                                             oneditionend: this.onedit,
                                                             copyCompatibility: true,
                                                             allowInsertRow: true,
@@ -1254,6 +1261,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             }
                                                                         });
                                                                     }
+                                                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                                        // region id
+                                                                        if (obj.getRowData(y)[5] == -1) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                onclick: function () {
+                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
                                                                 }
                                                                 return items;
                                                             }.bind(this)
@@ -1264,7 +1282,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     }.bind(this)
                                                 });
                                             }
-                                            if (rowData[19].toString() == "true") {
+                                            if (rowData[19].toString() == "true" && rowData[14].toString() == "false") {
                                                 items.push({
                                                     title: i18n.t('static.supplyPlan.doNotConsideAsEmergencyOrder'),
                                                     onclick: function () {
@@ -1296,6 +1314,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         obj.setValueFromCoords(20, y, true, true);
                                                     }.bind(this)
                                                 });
+                                            }
+                                            if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                // region id
+                                                if (obj.getRowData(y)[16] == -1) {
+                                                    items.push({
+                                                        title: obj.options.text.deleteSelectedRows,
+                                                        onclick: function () {
+                                                            obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                        }
+                                                    });
+                                                }
                                             }
                                             return items;
                                         }.bind(this)
@@ -1517,20 +1546,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = this.state.qtyCalculatorTableEl;
         var elInstance1 = this.state.qtyCalculatorTableEl1;
         var rowData = elInstance.getRowData(y);
+        console.log("elInstance 1", elInstance1);
         if (x == 0) {
-            if (elInstance1 != undefined) {
+            if (elInstance1 != undefined && elInstance1 != "") {
                 elInstance1.setValueFromCoords(7, 0, value, true);
             }
         }
 
         if (x == 1) {
-            if (elInstance1 != undefined) {
+            if (elInstance1 != undefined && elInstance1 != "") {
                 elInstance1.setValueFromCoords(8, 0, value, true);
             }
         }
 
         if (x == 2) {
-            if (elInstance1 != undefined) {
+            if (elInstance1 != undefined && elInstance1 != "") {
                 elInstance1.setValueFromCoords(9, 0, value, true);
             }
             console.log("x===2 value", elInstance.getRowData(0)[2]);
@@ -1582,8 +1612,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge();
             }
-            elInstance.destroy();
-            elInstance1.destroy();
+            if (elInstance != undefined && elInstance != "") {
+                elInstance.destroy();
+            }
+            if (elInstance1 != undefined && elInstance1 != undefined) {
+                elInstance1.destroy();
+            }
+
         } else {
             this.props.updateState("qtyCalculatorValidationError", i18n.t('static.supplyPlan.validationFailed'));
         }
@@ -1615,6 +1650,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 0) {
             this.props.updateState("shipmentBatchInfoDuplicateError", "");
             positiveValidation("A", y, elInstance);
+            if (value != "") {
+                if (value.length > 23) {
+                    inValid("A", y, i18n.t('static.common.max23digittext'), elInstance);
+                } else if (!ALPHABET_NUMBER_REGEX.test(value)) {
+                    inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+                } else {
+                    positiveValidation("A", y, elInstance);
+                }
+            } else {
+                positiveValidation("A", y, elInstance);
+            }
         }
 
         if (x == 1) {
@@ -1660,7 +1706,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     positiveValidation(colArr[c], y, elInstance);
                 }
 
+
+
                 var rowData = elInstance.getRowData(y);
+                var value = rowData[0];
+                if (value != "") {
+                    if (value.length > 23) {
+                        inValid("A", y, i18n.t('static.common.max23digittext'), elInstance);
+                        valid = false;
+                    } else if (!ALPHABET_NUMBER_REGEX.test(value)) {
+                        inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("A", y, elInstance);
+                    }
+                } else {
+                    positiveValidation("A", y, elInstance);
+                }
                 var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                 if (validation.toString() == "false") {
                     valid = false;
@@ -2725,14 +2787,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("16"))].emergencyOrder = map.get("19");
                             shipmentDataList[parseInt(map.get("16"))].currency.currencyId = map.get("9");
                             shipmentDataList[parseInt(map.get("16"))].currency.conversionRateToUsd = (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("9"))[0]).conversionRateToUsd));
-                            if (map.get("17").length != 0) {
+                            if (map.get("17") != "" && map.get("17").length != 0) {
                                 shipmentDataList[parseInt(map.get("16"))].batchInfoList = map.get("17");
                             }
 
 
                             if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                                 var shipmentBatchInfoList = map.get("17");
-                                if (shipmentBatchInfoList.length == 0) {
+                                console.log("shipment baych info list", shipmentBatchInfoList);
+                                if (shipmentBatchInfoList != "" && shipmentBatchInfoList.length == 0) {
                                     var programId = (document.getElementById("programId").value).split("_")[0];
                                     var planningUnitId = document.getElementById("planningUnitId").value;
                                     var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -2823,13 +2886,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 batchInfoList: []
                             }
                             console.log("shipmentJson", shipmentJson);
-                            if (map.get("17").length != 0) {
+                            if (map.get("17") != "" && map.get("17").length != 0) {
                                 shipmentJson.batchInfoList = map.get("17");
                             }
 
                             if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                                 var shipmentBatchInfoList = map.get("17");
-                                if (shipmentBatchInfoList.length == 0) {
+                                console.log("shipment baych uinfo list", shipmentBatchInfoList);
+                                if (shipmentBatchInfoList != "" && shipmentBatchInfoList.length == 0) {
                                     var programId = (document.getElementById("programId").value).split("_")[0];
                                     var planningUnitId = document.getElementById("planningUnitId").value;
                                     var batchNo = (paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -2864,7 +2928,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,
                                         batchNo: shipmentBatchInfoList[bi].batch.batchNo,
                                         planningUnitId: parseInt(document.getElementById("planningUnitId").value),
-                                        expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
+                                        expiryDate: moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM-DD"),
                                         createdDate: moment(Date.now()).format("YYYY-MM-DD"),
                                         autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
                                     }
