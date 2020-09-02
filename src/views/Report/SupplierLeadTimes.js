@@ -2669,7 +2669,7 @@ class SupplierLeadTimes extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
                                     {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label> */}
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} <span className="reportsmalldropdown-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')} </Label>
 
                                     <div className="controls">
                                         <MultiSelect
@@ -2685,7 +2685,7 @@ class SupplierLeadTimes extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
                                     {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} <span className="reportdown-box-icon fa fa-sort-desc ml-0"></span></Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} </Label>
 
                                     <div className="controls">
                                         <MultiSelect

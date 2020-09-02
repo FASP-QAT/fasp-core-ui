@@ -1261,9 +1261,9 @@ export default class ManualTagging extends Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-5">
-                        <Col md="12 pl-0">
+                        <Col md="10 pl-0">
                             <div className="row">
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-4 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1280,7 +1280,7 @@ export default class ManualTagging extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
