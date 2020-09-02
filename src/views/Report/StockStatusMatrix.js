@@ -183,7 +183,8 @@ export default class StockStatusMatrix extends React.Component {
             var programJson = JSON.parse(programData);
 
             planningUnitIds.map(planningUnitId => {
-  var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+              var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
               for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
                 var monthlydata = [];

@@ -606,7 +606,6 @@ class StockStatusOverTime extends Component {
                         planningUnitIds.map(planningUnitId => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
                             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
-
                             var monthstartfrom = this.state.rangeValue.from.month
                             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                                 var monthlydata = [];
@@ -638,7 +637,6 @@ class StockStatusOverTime extends Component {
                                                         } else {
 
                                                         }
-
                                                     }
 
                                                     if (count == 0) {
@@ -691,8 +689,6 @@ class StockStatusOverTime extends Component {
                                         for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
                                             sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
                                         }
-
-
                                         var amcCalcualted = 0
                                         var mos = 0
                                         if (countAMC > 0 && sumOfConsumptions > 0) {
