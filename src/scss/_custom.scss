@@ -878,6 +878,17 @@ label.arrow_label:after {
 
 // .realmcountrypUnitTd{text-align: right !important;}
 
+.jexcel > thead.resizable > tr > .AsteriskTheadtrTd::after {
+ position: relative;
+  width: 3px;
+  height: 100%;
+  color: red; 
+  top: 5px;
+  left: 25px;
+  cursor: col-resize;
+  content: "*" !important; 
+font-size: 20px;
+}
 
 
 // css by junaid last line
