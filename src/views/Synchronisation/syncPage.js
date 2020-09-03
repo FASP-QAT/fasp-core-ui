@@ -2375,9 +2375,6 @@ export default class syncPage extends Component {
         programJson.versionType = { id: document.getElementById("versionType").value };
         programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
         programJson.notes = document.getElementById("notes").value;
-        let array3 = this.state.oldProgramDataBatchInfo.concat(this.state.latestProgramDataBatchInfo);
-        array3 = [...new Set([...this.state.oldProgramDataBatchInfo, ...this.state.latestProgramDataBatchInfo])]
-        programJson.batchInfoList = array3;
         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY);
         
         var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');

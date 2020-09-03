@@ -1374,6 +1374,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var budgetList = this.state.budgetListAll;
             console.log("budgetList", this.state.budgetListAll);
             mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
+            mylist.push({ id: 0, name: i18n.t('static.common.select') })
         }
         console.log("mylist", mylist);
         return mylist;
