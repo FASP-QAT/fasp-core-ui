@@ -129,6 +129,10 @@ export default class DatabaseTranslations extends React.Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     saveData = function () {
@@ -190,7 +194,7 @@ export default class DatabaseTranslations extends React.Component {
             <div className="animated fadeIn">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
-                      <Col xs="12" sm="12">
+                    <Col xs="12" sm="12">
                         <Card>
                             {/* <CardHeader>
 
@@ -242,15 +246,12 @@ export default class DatabaseTranslations extends React.Component {
         } else if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         }
 
         var labelList = this.state.labelList;

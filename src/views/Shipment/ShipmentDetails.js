@@ -23,6 +23,7 @@ export default class ShipmentDetails extends React.Component {
         super(props);
         this.options = props.options;
         this.state = {
+            loading: true,
             message: '',
             lang: localStorage.getItem("lang"),
             programList: [],
@@ -98,7 +99,8 @@ export default class ShipmentDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList,
+                    loading: false
                 })
 
                 var programIdd = this.props.match.params.programId;
@@ -122,7 +124,8 @@ export default class ShipmentDetails extends React.Component {
             programSelect: value,
             programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
             planningUnit: "",
-            planningUnitId: ""
+            planningUnitId: "",
+            loading: true
         })
         var db1;
         var storeOS;
@@ -166,7 +169,8 @@ export default class ShipmentDetails extends React.Component {
                 console.log("proList---" + proList);
                 this.setState({
                     planningUnitList: proList,
-                    planningUnitListAll: myResult
+                    planningUnitListAll: myResult,
+                    loading: false
                 })
                 var planningUnitIdProp = this.props.match.params.planningUnitId;
                 console.log("planningUnitIdProp===>", planningUnitIdProp);
@@ -183,6 +187,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     formSubmit(value) {
+        this.setState({ loading: true })
         var programId = document.getElementById('programId').value;
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
@@ -268,10 +273,12 @@ export default class ShipmentDetails extends React.Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
@@ -368,6 +375,17 @@ export default class ShipmentDetails extends React.Component {
                     </ModalFooter>
                 </Modal>
                 {/* Shipments modal */}
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
