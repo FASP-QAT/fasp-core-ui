@@ -29,6 +29,7 @@ import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
 import MultiSelect from "react-multi-select-component";
+import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -182,336 +183,9 @@ export default class StockStatusMatrix extends React.Component {
             var programJson = JSON.parse(programData);
 
             planningUnitIds.map(planningUnitId => {
-              var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnitId);
-              var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
-              for (var ma = 0; ma < myArray.length; ma++) {
-                var shipmentList = programJson.shipmentList;
-                var shipmentBatchArray = [];
-                for (var ship = 0; ship < shipmentList.length; ship++) {
-                  var batchInfoList = shipmentList[ship].batchInfoList;
-                  for (var bi = 0; bi < batchInfoList.length; bi++) {
-                    shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
-                  }
-                }
-                var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
-                var totalStockForBatchNumber = stockForBatchNumber.qty;
-                var consumptionList = programJson.consumptionList;
-                var consumptionBatchArray = [];
 
-                for (var con = 0; con < consumptionList.length; con++) {
-                  var batchInfoList = consumptionList[con].batchInfoList;
-                  for (var bi = 0; bi < batchInfoList.length; bi++) {
-                    consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
-                  }
-                }
-                var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
-                if (consumptionForBatchNumber == undefined) {
-                  consumptionForBatchNumber = [];
-                }
-                var consumptionQty = 0;
-                for (var b = 0; b < consumptionForBatchNumber.length; b++) {
-                  consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
-                }
-                var inventoryList = programJson.inventoryList;
-                var inventoryBatchArray = [];
-                for (var inv = 0; inv < inventoryList.length; inv++) {
-                  var batchInfoList = inventoryList[inv].batchInfoList;
-                  for (var bi = 0; bi < batchInfoList.length; bi++) {
-                    inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
-                  }
-                }
-                var inventoryForBatchNumber = [];
-                if (inventoryBatchArray.length > 0) {
-                  inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
-                }
-                if (inventoryForBatchNumber == undefined) {
-                  inventoryForBatchNumber = [];
-                }
-                var adjustmentQty = 0;
-                for (var b = 0; b < inventoryForBatchNumber.length; b++) {
-                  adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
-                }
-                var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-                myArray[ma].remainingQty = remainingBatchQty;
-              }
               var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
-              var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
-              var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
-              var shipmentList = []
-              if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
-                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-              } else {
-                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
-
-              }
-              // calculate openingBalance
-
-
-
-
-              var minDate = moment(FIRST_DATA_ENTRY_DATE);
-              var openingBalance = 0;
-              console.log('minDate', minDate, 'startDate', startDate)
-              let startDate = moment(new Date(this.state.startYear + '-01-01'));
-
-              if (minDate.isBefore(startDate.format('YYYY-MM-DD')) && !minDate.isSame(startDate.format('YYYY-MM-DD'))) {
-
-
-                for (i = 1; ; i++) {
-                  var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
-                  var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
-                  console.log(dtstr, ' ', enddtStr)
-                  var dt = dtstr
-                  var consumptionQty = 0;
-                  var unallocatedConsumptionQty = 0;
-
-                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-
-                  var actualFlag = false
-                  for (var i = 0; i < programJson.regionList.length; i++) {
-
-                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                    console.log(list)
-                    if (list.length > 1) {
-                      for (var l = 0; l < list.length; l++) {
-                        if (list[l].actualFlag.toString() == 'true') {
-                          actualFlag = true;
-                          consumptionQty = consumptionQty + list[l].consumptionQty
-                          var qty = 0;
-                          if (list[l].batchInfoList.length > 0) {
-                            for (var a = 0; a < list[l].batchInfoList.length; a++) {
-                              qty += parseInt((list[l].batchInfoList)[a].consumptionQty);
-                            }
-                          }
-                          var remainingQty = parseInt((list[l].consumptionQty)) - parseInt(qty);
-                          unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
-                        }
-                      }
-                    } else {
-                      consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
-                      unallocatedConsumptionQty = list.length == 0 ? unallocatedConsumptionQty : unallocatedConsumptionQty = unallocatedConsumptionQty + parseInt(list[0].consumptionQty);
-                    }
-                  }
-                  var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(dtstr).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
-                  console.log("--------------------------------------------------------------");
-                  console.log("Start date", startDate);
-                  for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
-                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
-                    console.log("Unallocated consumption", unallocatedConsumptionQty);
-                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
-                    if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
-                      myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
-                      unallocatedConsumptionQty = 0
-                    } else {
-                      var rq = batchDetailsForParticularPeriod[ua].remainingQty;
-                      myArray[index].remainingQty = 0;
-                      unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
-                    }
-                  }
-
-
-                  var adjustmentQty = 0;
-                  var unallocatedAdjustmentQty = 0;
-
-                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-
-                  for (var i = 0; i < programJson.regionList.length; i++) {
-
-                    var list = invlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-
-                    for (var l = 0; l < list.length; l++) {
-
-                      adjustmentQty += parseFloat((list[l].adjustmentQty * list[l].multiplier));
-                      var qty1 = 0;
-                      if (list[l].batchInfoList.length > 0) {
-                        for (var a = 0; a < list[l].batchInfoList.length; a++) {
-                          qty1 += parseFloat(parseInt((list[l].batchInfoList)[a].adjustmentQty) * list[l].multiplier);
-                        }
-                      }
-                      var remainingQty = parseFloat((list[l].adjustmentQty * list[l].multiplier)) - parseFloat(qty1);
-                      unallocatedAdjustmentQty = parseFloat(remainingQty);
-                      if (unallocatedAdjustmentQty < 0) {
-                        for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-                            unallocatedAdjustmentQty = 0
-                          } else {
-                            var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-                            myArray[index].remainingQty = 0;
-                            unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-                          }
-                        }
-                      } else {
-                        if (batchDetailsForParticularPeriod.length > 0) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-                          unallocatedAdjustmentQty = 0;
-
-
-                        }
-
-                      }
-                    }
-                    var list1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
-                    for (var j = 0; j < list1.length; j++) {
-                      adjustmentQty += parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-                      unallocatedAdjustmentQty = parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-                      if (unallocatedAdjustmentQty < 0) {
-                        for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-                            unallocatedAdjustmentQty = 0
-                          } else {
-                            var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-                            myArray[index].remainingQty = 0;
-                            unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-                          }
-                        }
-                      } else {
-                        if (batchDetailsForParticularPeriod.length > 0) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-                          unallocatedAdjustmentQty = 0;
-                        }
-                      }
-                    }
-
-                  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                  var expiredStockArr = myArray;
-                  console.log(openingBalance)
-                  console.log(inventoryList)
-                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                  var adjustment = 0;
-                  invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-
-
-
-
-
-
-                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                  var consumption = 0;
-
-                  console.log(programJson.regionList)
-                  var actualFlag = false
-                  for (var i = 0; i < programJson.regionList.length; i++) {
-
-                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                    console.log(list)
-                    if (list.length > 1) {
-                      for (var l = 0; l < list.length; l++) {
-                        if (list[l].actualFlag.toString() == 'true') {
-                          actualFlag = true;
-                          consumption = consumption + list[l].consumptionQty
-                        }
-                      }
-                    } else {
-                      consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                    }
-                  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                  var shipment = 0;
-                  shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-
-
-
-
-                  var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(enddtStr).format("YYYY-MM-DD"))));
-                  var expiredStockQty = 0;
-                  for (var j = 0; j < expiredStock.length; j++) {
-                    expiredStockQty += parseInt((expiredStock[j].remainingQty));
-                  }
-
-
-
-
-                  console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                  var endingBalance = openingBalance + adjustment + shipment - consumption - expiredStockQty
-                  console.log('endingBalance', endingBalance)
-
-                  endingBalance = endingBalance < 0 ? 0 : endingBalance
-                  openingBalance = endingBalance
-                  minDate = minDate.add(1, 'month')
-
-                  if (minDate.startOf('month').isAfter(startDate)) {
-                    break;
-                  }
-                }
-              }
-
-
-              /*   var totalConsumption = 0;
-                var totalAdjustments = 0;
-                var totalShipments = 0;
-                console.log('startDate', startDate)
-                console.log('programJson', programJson)
-                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < startDate);
-                console.log('consumptionRemainingList', consumptionRemainingList)
-                for (var j = 0; j < consumptionRemainingList.length; j++) {
-                  var count = 0;
-                  for (var k = 0; k < consumptionRemainingList.length; k++) {
-                    if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
-                      count++;
-                    } else {
-  
-                    }
-                  }
-                  if (count == 0) {
-                    totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                  } else {
-                    if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
-                      totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
-                    }
-                  }
-                }
-  
-                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < startDate);
-                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
-                  totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
-                }
-  
-                var shipmentsRemainingList = shipmentList.filter(c => c.expectedDeliveryDate < startDate && c.accountFlag == true);
-                for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                  totalShipments += parseInt((shipmentsRemainingList[j].shipmentQty));
-                }
-                openingBalance = totalAdjustments - totalConsumption + totalShipments;
-  */
               for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
                 var monthlydata = [];
                 for (var month = 1; month <= 12; month++) {
@@ -519,286 +193,21 @@ export default class StockStatusMatrix extends React.Component {
                   var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
                   console.log(dtstr, ' ', enddtStr)
                   var dt = dtstr
-                  console.log(openingBalance)
-                  var consumptionQty = 0;
-                  var unallocatedConsumptionQty = 0;
-
-                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-
-                  var actualFlag = false
-                  for (var i = 0; i < programJson.regionList.length; i++) {
-
-                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                    console.log(list)
-                    if (list.length > 1) {
-                      for (var l = 0; l < list.length; l++) {
-                        if (list[l].actualFlag.toString() == 'true') {
-                          actualFlag = true;
-                          consumptionQty = consumptionQty + list[l].consumptionQty
-                          var qty = 0;
-                          if (list[l].batchInfoList.length > 0) {
-                            for (var a = 0; a < list[l].batchInfoList.length; a++) {
-                              qty += parseInt((list[l].batchInfoList)[a].consumptionQty);
-                            }
-                          }
-                          var remainingQty = parseInt((list[l].consumptionQty)) - parseInt(qty);
-                          unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
-                        }
-                      }
-                    } else {
-                      consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
-                      unallocatedConsumptionQty = list.length == 0 ? unallocatedConsumptionQty : unallocatedConsumptionQty = unallocatedConsumptionQty + parseInt(list[0].consumptionQty);
+                  var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
+                  console.log(list)
+                  if (list.length > 0) {
+                    if (includePlannedShipments == true) {
+                      monthlydata.push(list[0].mos)
                     }
-                  }
-                  var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(dtstr).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
-                  console.log("--------------------------------------------------------------");
-                  console.log("Start date", startDate);
-                  for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
-                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
-                    console.log("Unallocated consumption", unallocatedConsumptionQty);
-                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
-                    if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
-                      myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
-                      unallocatedConsumptionQty = 0
-                    } else {
-                      var rq = batchDetailsForParticularPeriod[ua].remainingQty;
-                      myArray[index].remainingQty = 0;
-                      unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
+                    else {
+                      var mos = 0
+                      if (list[0].amc > 0) { mos = list[0].closingBalanceWps /list[0].amc }
+
+                      monthlydata.push(mos)
                     }
+                  } else {
+                    monthlydata.push('0')
                   }
-
-
-                  var adjustmentQty = 0;
-                  var unallocatedAdjustmentQty = 0;
-
-                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-
-                  for (var i = 0; i < programJson.regionList.length; i++) {
-
-                    var list = invlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-
-                    for (var l = 0; l < list.length; l++) {
-
-                      adjustmentQty += parseFloat((list[l].adjustmentQty * list[l].multiplier));
-                      var qty1 = 0;
-                      if (list[l].batchInfoList.length > 0) {
-                        for (var a = 0; a < list[l].batchInfoList.length; a++) {
-                          qty1 += parseFloat(parseInt((list[l].batchInfoList)[a].adjustmentQty) * list[l].multiplier);
-                        }
-                      }
-                      var remainingQty = parseFloat((list[l].adjustmentQty * list[l].multiplier)) - parseFloat(qty1);
-                      unallocatedAdjustmentQty = parseFloat(remainingQty);
-                      if (unallocatedAdjustmentQty < 0) {
-                        for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-                            unallocatedAdjustmentQty = 0
-                          } else {
-                            var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-                            myArray[index].remainingQty = 0;
-                            unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-                          }
-                        }
-                      } else {
-                        if (batchDetailsForParticularPeriod.length > 0) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-                          unallocatedAdjustmentQty = 0;
-
-
-                        }
-
-                      }
-                    }
-                    var list1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
-                    for (var j = 0; j < list1.length; j++) {
-                      adjustmentQty += parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-                      unallocatedAdjustmentQty = parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-                      if (unallocatedAdjustmentQty < 0) {
-                        for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-                          if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-                            unallocatedAdjustmentQty = 0
-                          } else {
-                            var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-                            myArray[index].remainingQty = 0;
-                            unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-                          }
-                        }
-                      } else {
-                        if (batchDetailsForParticularPeriod.length > 0) {
-                          console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-                          console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                          batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-                          unallocatedAdjustmentQty = 0;
-                        }
-                      }
-                    }
-
-                  }
-
-
-
-
-
-
-
-
-
-
-
-
-                  var expiredStockArr = myArray;
-
-                  console.log(openingBalance)
-                  console.log(inventoryList)
-                  var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                  var adjustment = 0;
-                  invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-
-
-
-
-
-
-                  var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                  var consumption = 0;
-
-                  console.log(programJson.regionList)
-                  var actualFlag = false
-                  for (var i = 0; i < programJson.regionList.length; i++) {
-
-                    var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                    console.log(list)
-                    if (list.length > 1) {
-                      for (var l = 0; l < list.length; l++) {
-                        if (list[l].actualFlag.toString() == 'true') {
-                          actualFlag = true;
-                          consumption = consumption + list[l].consumptionQty
-                        }
-                      }
-                    } else {
-                      consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                    }
-                  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                  var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                  var shipment = 0;
-                  shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-                  console.log('shiplist', shiplist)
-
-
-
-
-                  var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(enddtStr).format("YYYY-MM-DD"))));
-                  var expiredStockQty = 0;
-                  for (var j = 0; j < expiredStock.length; j++) {
-                    expiredStockQty += parseInt((expiredStock[j].remainingQty));
-                  }
-                  console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                  var endingBalance = openingBalance + adjustment + shipment - consumption - expiredStockQty
-                  console.log('endingBalance', endingBalance)
-
-
-                  endingBalance = endingBalance < 0 ? 0 : endingBalance
-                  openingBalance = endingBalance
-                  var amcBeforeArray = [];
-                  var amcAfterArray = [];
-
-
-                  for (var c = 0; c < pu.monthsInPastForAmc; c++) {
-
-                    var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
-                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
-                    if (consumptionListForAMC.length > 0) {
-                      var consumptionQty = 0;
-                      for (var j = 0; j < consumptionListForAMC.length; j++) {
-                        var count = 0;
-                        for (var k = 0; k < consumptionListForAMC.length; k++) {
-                          if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                            count++;
-                          } else {
-
-                          }
-                        }
-
-                        if (count == 0) {
-                          consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                        } else {
-                          if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                          }
-                        }
-                      }
-                      amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                      var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-
-                    }
-                  }
-                  for (var c = 0; c < pu.monthsInFutureForAmc; c++) {
-                    var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
-                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
-                    if (consumptionListForAMC.length > 0) {
-                      var consumptionQty = 0;
-                      for (var j = 0; j < consumptionListForAMC.length; j++) {
-                        var count = 0;
-                        for (var k = 0; k < consumptionListForAMC.length; k++) {
-                          if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                            count++;
-                          } else {
-
-                          }
-                        }
-
-                        if (count == 0) {
-                          consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                        } else {
-                          if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                          }
-                        }
-                      }
-                      amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                      amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-
-                    }
-
-                  }
-
-                  var amcArray = amcBeforeArray.concat(amcAfterArray);
-                  var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
-                  var countAMC = amcArrayFilteredForMonth.length;
-                  var sumOfConsumptions = 0;
-                  for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
-                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
-                  }
-                  var amcCalcualted = 0
-                  var mos = 0
-                  if (countAMC != 0) {
-                    amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
-                    console.log('amcCalcualted', amcCalcualted)
-                    mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
-                  }
-                  monthlydata.push(mos)
 
                 }
                 console.log(monthlydata)
@@ -826,7 +235,7 @@ export default class StockStatusMatrix extends React.Component {
               }
               this.setState({
                 data: data,
-                message: ''
+                message: '', loading: false
               }, () => { console.log(this.state.data) })
             })
           }.bind(this)
@@ -884,7 +293,7 @@ export default class StockStatusMatrix extends React.Component {
               })
 
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({ message: error.message, loading: false });
               } else {
                 switch (error.response ? error.response.status : "") {
                   case 500:
@@ -1049,6 +458,7 @@ export default class StockStatusMatrix extends React.Component {
         );
 
     } else {
+      this.setState({ loading: false })
       this.consolidatedProgramList()
     }
 
@@ -1739,16 +1149,22 @@ export default class StockStatusMatrix extends React.Component {
         }} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
+        <SupplyPlanFormulas ref="formulaeChild" />
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-          <div className="Card-header-reporticon">
+          <div className="Card-header-reporticon pb-2">
+          <div className="card-header-actions">
+          <a className="card-header-action">
+                                 <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatusOverTime() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                 </a>
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
             {this.state.data.length > 0 && <div className="card-header-actions">
               <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
               <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
             </div>}
+            </div>
           </div>
           <CardBody className="pb-md-3 pb-lg-2 pt-lg-0">
-            <Col md="12 pl-0">
+            <div className="pl-0">
               <div className="row">
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1835,7 +1251,7 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
               </div>
-            </Col>
+            </div>
             <div class="TableCust">
               {this.state.data.length > 0 &&
                 <Table striped bordered hover responsive="md" style={{ width: "100%" }}>

@@ -2818,7 +2818,6 @@ class ShipmentGlobalView extends Component {
                                         </FormGroup>
 
                                     </div>
-                                {/* </Col> */}
                                 </div>
                             </Form>
                             <Col md="12 pl-0">

@@ -374,14 +374,14 @@ export default class DimensionListComponent extends Component {
                 // })
                 this.setState({
                     dimensionList: response.data,
-                    selSource: response.data, loading: false
+                    selSource: response.data
                 },
                     () => { this.buildJexcel() })
 
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();

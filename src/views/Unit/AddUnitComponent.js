@@ -145,7 +145,7 @@ class AddUnitComponent extends Component {
                 } else {
 
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -198,7 +198,7 @@ class AddUnitComponent extends Component {
                                             this.props.history.push(`/unit/listUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();

@@ -166,7 +166,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
-                                        loading: false
+                                        loading: true
                                     })
                                     DataSourceTypeService.addDataSourceType(this.state.dataSourceType)
                                         .then(response => {
@@ -174,7 +174,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                 this.props.history.push(`/dataSourceType/listDataSourceType/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();

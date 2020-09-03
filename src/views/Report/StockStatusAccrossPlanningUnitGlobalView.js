@@ -1168,7 +1168,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 130, planningText)
 
-          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.countryLabels.size > 10 ? 170 : 150, {
+          doc.text(i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130+(this.state.countryValues.length ), {
             align: 'left'
           })
         }
@@ -1190,9 +1190,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
+    var startY = 130 + (this.state.countryValues.length * 2)+20
     let content = {
       margin: { top: 80, bottom: 50 },
-      startY: 180,
+      startY: startY,
       head: headers,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 80 },
@@ -1250,6 +1251,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let realmId = document.getElementById('realmId').value
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
     if (realmId > 0 && this.state.countryValues.length > 0 && tracercategory != 0) {
+      this.setState({ loading: true })
       var inputjson = {
         "realmCountryIds": countrysId,
         "tracerCategoryId": tracercategory,
@@ -1294,7 +1296,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             })
 
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({ message: error.message, loading: false });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -1476,7 +1478,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             <div ref={ref}>
 
               <Form >
-                <Col md="12 pl-0">
+                <div className="pl-0">
                   <div className="row">
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -1567,7 +1569,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                       </ul>
                     </FormGroup>
                   </div>
-                </Col>
+                </div>
               </Form>
               <Col md="12 pl-0">
                 <div className="globalviwe-scroll">

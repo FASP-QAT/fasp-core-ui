@@ -545,7 +545,7 @@ export default class ProgramList extends Component {
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
     this.setState({
-      languageEl: languageEl
+      languageEl: languageEl, loading: false
     })
   }
 
@@ -578,14 +578,14 @@ export default class ProgramList extends Component {
         this.setState({
           programList: response.data,
           selProgram: response.data,
-          loading: false
+          // loading: false
         },
           () => {
             this.buildJExcel();
           })
       } else {
         this.setState({
-          message: response.data.messageCode
+          message: response.data.messageCode, loading: false
         },
           () => {
             this.hideSecondComponent();
@@ -601,7 +601,7 @@ export default class ProgramList extends Component {
           // loading: false
         })
       } else {
-        this.setState({ message: response.data.messageCode })
+        this.setState({ message: response.data.messageCode, loading: false })
       }
     })
 

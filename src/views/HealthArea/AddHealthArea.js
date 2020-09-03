@@ -155,7 +155,7 @@ export default class AddHealthAreaComponent extends Component {
         else {
 
           this.setState({
-            message: response.data.messageCode
+            message: response.data.messageCode, loading: false
           },
             () => {
               this.hideSecondComponent();
@@ -193,27 +193,34 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    AuthenticationService.setupAxiosInterceptors();
-    HealthAreaService.getRealmCountryList(e.target.value)
-      .then(response => {
-        console.log("Realm Country List list---", response.data);
-        if (response.status == 200) {
-          var json = response.data;
-          var regList = [];
-          for (var i = 0; i < json.length; i++) {
-            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+    if (e.target.value != 0) {
+      HealthAreaService.getRealmCountryList(e.target.value)
+        .then(response => {
+          console.log("Realm Country List list---", response.data);
+          if (response.status == 200) {
+            var json = response.data;
+            var regList = [];
+            for (var i = 0; i < json.length; i++) {
+              regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+            }
+            this.setState({
+              realmCountryId: '',
+              realmCountryList: regList,
+              loading: false
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            })
           }
-          this.setState({
-            realmCountryId: '',
-            realmCountryList: regList,
-            loading: false
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode
-          })
-        }
+        })
+    } else {
+      this.setState({
+        realmCountryId: '',
+        realmCountryList: [],
+        loading: false
       })
+    }
   }
 
   Capitalize(str) {
@@ -259,18 +266,19 @@ export default class AddHealthAreaComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  this.setState({
-                    loading: true
-                  })
+
                   console.log("-------------------->" + this.state.healthArea);
                   if (this.state.healthArea.label.label_en != '') {
+                    this.setState({
+                      loading: true
+                    })
                     HealthAreaService.addHealthArea(this.state.healthArea)
                       .then(response => {
                         if (response.status == 200) {
                           this.props.history.push(`/healthArea/listHealthArea/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         } else {
                           this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode, loading: false
                           },
                             () => {
                               this.hideSecondComponent();

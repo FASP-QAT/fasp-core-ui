@@ -148,7 +148,7 @@ export default class EditUnitComponent extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -196,7 +196,7 @@ export default class EditUnitComponent extends Component {
                                             this.props.history.push(`/unit/listUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
-                                                message: response.data.messageCode
+                                                message: response.data.messageCode, loading: false
                                             },
                                                 () => {
                                                     this.hideSecondComponent();

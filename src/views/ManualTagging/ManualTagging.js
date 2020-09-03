@@ -654,6 +654,8 @@ import PlanningUnitService from '../../api/PlanningUnitService.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 
@@ -663,6 +665,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            result: '',
             message: '',
             outputList: [],
             loading: true,
@@ -705,18 +708,24 @@ export default class ManualTagging extends Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var orderNo = document.getElementById("orderNo").value;
         var primeLineNo = document.getElementById("primeLineNo").value;
-        ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(programId, planningUnitId, orderNo, primeLineNo)
-            .then(response => {
-                console.log("artmis response===", response.data);
-                var artmisList = [];
-                artmisList.push(response.data);
-                console.log("--------->>", response.data);
-                // console.log("--------->",response.data[0].reason);
-                this.setState({
-                    reason: response.data.reason,
-                    artmisList
+        if (orderNo != "" && primeLineNo != "") {
+            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(programId, planningUnitId, orderNo, primeLineNo)
+                .then(response => {
+                    console.log("artmis response===", response.data);
+                    var artmisList = [];
+                    artmisList.push(response.data);
+                    console.log("--------->>", response.data);
+                    // console.log("--------->",response.data[0].reason);
+                    this.setState({
+                        reason: response.data.reason,
+                        artmisList
+                    })
                 })
+        } else {
+            this.setState({
+                result: "Please enter order no. and prime line no."
             })
+        }
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -846,7 +855,7 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [30, 30, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -915,6 +924,7 @@ export default class ManualTagging extends Component {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                 var outputListAfterSearch = [];
                                 let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
+                                console.log("row-------------", row);
                                 outputListAfterSearch.push(row);
 
                                 this.setState({
@@ -1129,7 +1139,7 @@ export default class ManualTagging extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'fundingSource.label.label_en',
+                dataField: 'fundingSource.code',
                 text: 'Funding Source',
                 sort: true,
                 align: 'center',
@@ -1260,9 +1270,9 @@ export default class ManualTagging extends Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-5">
-                        <Col md="12 pl-0">
+                        <Col md="10 pl-0">
                             <div className="row">
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-4 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1279,7 +1289,7 @@ export default class ManualTagging extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1438,8 +1448,11 @@ export default class ManualTagging extends Component {
                                     </ToolkitProvider>
                                 </div>
                                 {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {this.state.reason}</div>}
+                                <div style={{ color: 'red' }} >
+                                    {this.state.result}</div>
                             </ModalBody>
                             <ModalFooter>
+                                
                                 {this.state.reason == "" &&
                                     <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i> Link</Button>
                                 }

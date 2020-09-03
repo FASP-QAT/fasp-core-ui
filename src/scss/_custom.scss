@@ -416,6 +416,7 @@ label.arrow_label:after {
   //  color: #f86c6b !important;
 
   color: red !important;
+  font-size: 14px !important;
 }
 .blue{color: 20a8d8 !important;}
 .green {
@@ -859,7 +860,9 @@ label.arrow_label:after {
 .AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
   height: 30px;
 }
-
+.RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
+  height: 30px;
+}
 
 // Multiselect z-index going behind table 
 .go2139093995 * {
@@ -1799,7 +1802,8 @@ input::placeholder {
 }
 .progressbartext7 {
   // left: 94.95%;
-  left: 100%;
+  width: 100px;
+  left: 102%;
   transform: translateX(-99%) scale(1);
 }
 ////pipelinesetup progress bar
@@ -3181,3 +3185,10 @@ border-radius: 2em;
 .ReportSearchMarginTop{
   margin-top: -51px;
 }
+.TextWhite{
+  color:#fff!important;
+}
+
+// Select.is-searchable.is-open >.Select-control{
+//   cursor: pointer!important;
+// }

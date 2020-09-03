@@ -1246,7 +1246,7 @@ class SupplyPlanVersionAndReview extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        matricsList: response.data, loading: false,
+                        matricsList: response.data,
                         message: ''
                     }, () => { this.buildJexcel() })
                 }).catch(

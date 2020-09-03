@@ -1032,6 +1032,7 @@ export default class InventoryTurns extends Component {
 
         } else {
             console.log('offline')
+            this.setState({ loading: false })
             this.consolidatedProgramList()
         }
 
@@ -1482,7 +1483,7 @@ export default class InventoryTurns extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -1523,6 +1524,7 @@ export default class InventoryTurns extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
+                        // this.setState({ loading: true })
                         console.log(programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1675,7 +1677,7 @@ export default class InventoryTurns extends Component {
                 ReportService.inventoryTurns(this.state.CostOfInventoryInput).then(response => {
                     console.log("costOfInentory=====>", response.data);
                     this.setState({
-                        costOfInventory: response.data, message: '', loading: false
+                        costOfInventory: response.data, message: ''
                     }, () => {
                         this.buildJExcel();
                     });
@@ -1827,8 +1829,8 @@ export default class InventoryTurns extends Component {
                             </a>
                             <a className="card-header-action">
                                 {this.state.costOfInventory.length > 0 && <div className="card-header-actions">
-                                    <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>}
                             </a>
                         </div>
@@ -1838,7 +1840,7 @@ export default class InventoryTurns extends Component {
                             <div ref={ref}>
 
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
@@ -1916,7 +1918,7 @@ export default class InventoryTurns extends Component {
 
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
                             </div>
                         </div>

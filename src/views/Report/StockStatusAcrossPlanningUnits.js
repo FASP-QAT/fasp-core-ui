@@ -1351,6 +1351,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
@@ -1361,7 +1362,10 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-
+const legendcolor = [
+{ text: "Excess stock", color: '#f48521' },
+{ text: "Low stock", color: '#edb944' },
+{ text: "Okay", color: '#118b70' }];
 
 class StockStatusAcrossPlanningUnits extends Component {
     constructor(props) {
@@ -1404,7 +1408,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [headers]
-        this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc), (new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20')]));
+        this.state.data.map(ele => A.push([(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))).replaceAll(' ', '%20'), this.roundN(ele.mos), ele.minMos, ele.maxMos, ele.stock, this.round(ele.amc),ele.lastStockCount!=null?(new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'):'']));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1483,7 +1487,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc), new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`)]);
+        const data = this.state.data.map(ele => [getLabelText(ele.planningUnit.label), (ele.mos < ele.minMos ? i18n.t('static.report.low') : (ele.mos > ele.maxMos ? i18n.t('static.report.excess') : i18n.t('static.report.ok'))), this.formatterDouble(ele.mos), this.formatterDouble(ele.minMos), this.formatterDouble(ele.maxMos), this.formatter(ele.stock), this.formatter(ele.amc),ele.lastStockCount!=null? new moment(ele.lastStockCount).format(`${DATE_FORMAT_CAP}`):''  ]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1526,7 +1530,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                     break;
                                 default:
                                     this.setState({ message: 'static.unkownError', loading: false });
@@ -1849,59 +1853,63 @@ class StockStatusAcrossPlanningUnits extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
 
                 var elInstance = el.jexcel;
-                var colArrB = ['B'];
+                var colArrB = ['B','C'];
                 var colArrC = ['C'];
                 var colArrD = ['D'];
                 var colArrE = ['E'];
                 var rowData = elInstance.getRowData(y);
 
-                var mos = rowData[2];
-                var minMos = rowData[3];
-                var maxMos = rowData[4];
-
+                var mos = parseFloat(rowData[2]);
+                var minMos = parseFloat(rowData[3]);
+                var maxMos = parseFloat(rowData[4]);
                 //------------B--------------
                 if (mos < minMos) {
+                    console.log('1')
                     for (var i = 0; i < colArrB.length; i++) {
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[1].color);
+                        let textColor = contrast(legendcolor[1].color);
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else if (mos > maxMos) {
+                    console.log('2')
                     for (var i = 0; i < colArrB.length; i++) {
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
-                        let textColor = contrast('#f3d679');
+                        elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[0].color);
+                        let textColor = contrast(legendcolor[0].color);
                         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                     }
                 } else {
+                    console.log('3')
+                    for (var i = 0; i < colArrB.length; i++) {
                     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
-                    let textColor = contrast('#00c596');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color',legendcolor[2].color);
+                    let textColor = contrast(legendcolor[2].color);
                     elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
+                    }
                 }
 
-                //-------------C----------------
-                if (mos < minMos) {
-                    for (var i = 0; i < colArrC.length; i++) {
-                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else if (mos > maxMos) {
-                    for (var i = 0; i < colArrC.length; i++) {
-                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
-                        let textColor = contrast('#f3d679');
-                        elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else {
-                    elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
-                    let textColor = contrast('#00c596');
-                    elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
-                }
+                // //-------------C----------------
+                // if (mos < minMos) {
+                //     for (var i = 0; i < colArrC.length; i++) {
+                //         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+                //         let textColor = contrast('#f48282');
+                //         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
+                //     }
+                // } else if (mos > maxMos) {
+                //     for (var i = 0; i < colArrC.length; i++) {
+                //         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#f3d679');
+                //         let textColor = contrast('#f3d679');
+                //         elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
+                //     }
+                // } else {
+                //     elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+                //     elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'background-color', '#00c596');
+                //     let textColor = contrast('#00c596');
+                //     elInstance.setStyle(`${colArrC[i]}${parseInt(y) + 1}`, 'color', textColor);
+                // }
 
                 // //-------------D----------------
                 // if (mos < minMos) {
@@ -1949,7 +1957,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -1997,6 +2005,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             // Handle errors!
                         };
                         planningunitRequest.onsuccess = function (e) {
+                            // this.setState({ loading: true })
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -2008,432 +2017,41 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            
                             proList.map(planningUnit => {
-                                var batchInfoForPlanningUnit = programJson.batchInfoList.filter(c => c.planningUnitId == planningUnit.planningUnit.id);
-                                var myArray = batchInfoForPlanningUnit.sort(function (a, b) { return new Date(a.expiryDate) - new Date(b.expiryDate) })
-                                for (var ma = 0; ma < myArray.length; ma++) {
-                                    var shipmentList = programJson.shipmentList;
-                                    var shipmentBatchArray = [];
-                                    for (var ship = 0; ship < shipmentList.length; ship++) {
-                                        var batchInfoList = shipmentList[ship].batchInfoList;
-                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
-                                            shipmentBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].shipmentQty })
-                                        }
-                                    }
-                                    var stockForBatchNumber = shipmentBatchArray.filter(c => c.batchNo == myArray[ma].batchNo)[0];
-                                    var totalStockForBatchNumber = stockForBatchNumber.qty;
-                                    var consumptionList = programJson.consumptionList;
-                                    var consumptionBatchArray = [];
 
-                                    for (var con = 0; con < consumptionList.length; con++) {
-                                        var batchInfoList = consumptionList[con].batchInfoList;
-                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
-                                            consumptionBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].consumptionQty })
-                                        }
-                                    }
-                                    var consumptionForBatchNumber = consumptionBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
-                                    if (consumptionForBatchNumber == undefined) {
-                                        consumptionForBatchNumber = [];
-                                    }
-                                    var consumptionQty = 0;
-                                    for (var b = 0; b < consumptionForBatchNumber.length; b++) {
-                                        consumptionQty += parseInt(consumptionForBatchNumber[b].qty);
-                                    }
-                                    var inventoryList = programJson.inventoryList;
-                                    var inventoryBatchArray = [];
-                                    for (var inv = 0; inv < inventoryList.length; inv++) {
-                                        var batchInfoList = inventoryList[inv].batchInfoList;
-                                        for (var bi = 0; bi < batchInfoList.length; bi++) {
-                                            inventoryBatchArray.push({ batchNo: batchInfoList[bi].batch.batchNo, qty: batchInfoList[bi].adjustmentQty * inventoryList[inv].multiplier })
-                                        }
-                                    }
-                                    var inventoryForBatchNumber = [];
-                                    if (inventoryBatchArray.length > 0) {
-                                        inventoryForBatchNumber = inventoryBatchArray.filter(c => c.batchNo == myArray[ma].batchNo);
-                                    }
-                                    if (inventoryForBatchNumber == undefined) {
-                                        inventoryForBatchNumber = [];
-                                    }
-                                    var adjustmentQty = 0;
-                                    for (var b = 0; b < inventoryForBatchNumber.length; b++) {
-                                        adjustmentQty += parseFloat(inventoryForBatchNumber[b].qty);
-                                    }
-                                    var remainingBatchQty = parseInt(totalStockForBatchNumber) - parseInt(consumptionQty) + parseFloat(adjustmentQty);
-                                    myArray[ma].remainingQty = remainingBatchQty;
-                                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnit.planningUnit.id && c.active == true);
-                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
-                                var shipmentList = []
-                                // if (document.getElementById("includePlanningShipments").selectedOptions[0].value.toString() == 'true') {
-                                shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
-                                // } else {
-                                //   shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.shipmentStatus.id != 1 && c.shipmentStatus.id != 2 && c.shipmentStatus.id != 9 && c.accountFlag == true);
-
-                                // }
-                                // calculate openingBalance
-
-                                // let invmin=moment.min(inventoryList.map(d => moment(d.inventoryDate)))
-                                // let shipmin = moment.min(shipmentList.map(d => moment(d.expectedDeliveryDate)))
-                                // let conmin =  moment.min(consumptionList.map(d => moment(d.consumptionDate)))
-                                // var minDate = invmin.isBefore(shipmin)&&invmin.isBefore(conmin)?invmin:shipmin.isBefore(invmin)&& shipmin.isBefore(conmin)?shipmin:conmin
-                                var minDate = moment(FIRST_DATA_ENTRY_DATE);
+                               var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
                                 let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
                                 var maxDate = moments.length > 0 ? moment.max(moments) : ''
-                                var openingBalance = 0;
-                                console.log('minDate', minDate, 'startDate', startDate, ' maxDate', maxDate)
-
-                                var endingBalance = 0
-                                for (i = 1; ; i++) {
-                                    var dtstr = minDate.startOf('month').format('YYYY-MM-DD')
-                                    var enddtStr = minDate.endOf('month').format('YYYY-MM-DD')
-                                    console.log(dtstr, ' ', enddtStr)
-                                    var dt = dtstr
-                                    var consumptionQty = 0;
-                                    var unallocatedConsumptionQty = 0;
-
-                                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-
-                                    var actualFlag = false
-                                    for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                        console.log(list)
-                                        if (list.length > 1) {
-                                            for (var l = 0; l < list.length; l++) {
-                                                if (list[l].actualFlag.toString() == 'true') {
-                                                    actualFlag = true;
-                                                    consumptionQty = consumptionQty + list[l].consumptionQty
-                                                    var qty = 0;
-                                                    if (list[l].batchInfoList.length > 0) {
-                                                        for (var a = 0; a < list[l].batchInfoList.length; a++) {
-                                                            qty += parseInt((list[l].batchInfoList)[a].consumptionQty);
-                                                        }
-                                                    }
-                                                    var remainingQty = parseInt((list[l].consumptionQty)) - parseInt(qty);
-                                                    unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) + parseInt(remainingQty);
-                                                }
-                                            }
-                                        } else {
-                                            consumptionQty = list.length == 0 ? consumptionQty : consumptionQty = consumptionQty + parseInt(list[0].consumptionQty)
-                                            unallocatedConsumptionQty = list.length == 0 ? unallocatedConsumptionQty : unallocatedConsumptionQty = unallocatedConsumptionQty + parseInt(list[0].consumptionQty);
-                                        }
-                                    }
-                                    var batchDetailsForParticularPeriod = myArray.filter(c => (moment(c.createdDate).format("YYYY-MM-DD") <= moment(dtstr).format("YYYY-MM-DD")) && ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && (c.remainingQty > 0));
-                                    console.log("--------------------------------------------------------------");
-                                    console.log("Start date", startDate);
-                                    for (var ua = 0; unallocatedConsumptionQty != 0 && batchDetailsForParticularPeriod.length > 0 && ua < batchDetailsForParticularPeriod.length; ua++) {
-                                        console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua].batchNo);
-                                        console.log("Unallocated consumption", unallocatedConsumptionQty);
-                                        var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua].batchNo);
-                                        if (parseInt(batchDetailsForParticularPeriod[ua].remainingQty) >= parseInt(unallocatedConsumptionQty)) {
-                                            myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua].remainingQty) - parseInt(unallocatedConsumptionQty);
-                                            unallocatedConsumptionQty = 0
-                                        } else {
-                                            var rq = batchDetailsForParticularPeriod[ua].remainingQty;
-                                            myArray[index].remainingQty = 0;
-                                            unallocatedConsumptionQty = parseInt(unallocatedConsumptionQty) - parseInt(rq);
-                                        }
-                                    }
-
-
-                                    var adjustmentQty = 0;
-                                    var unallocatedAdjustmentQty = 0;
-
-                                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-
-                                    for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                        var list = invlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-
-                                        for (var l = 0; l < list.length; l++) {
-
-                                            adjustmentQty += parseFloat((list[l].adjustmentQty * list[l].multiplier));
-                                            var qty1 = 0;
-                                            if (list[l].batchInfoList.length > 0) {
-                                                for (var a = 0; a < list[l].batchInfoList.length; a++) {
-                                                    qty1 += parseFloat(parseInt((list[l].batchInfoList)[a].adjustmentQty) * list[l].multiplier);
-                                                }
-                                            }
-                                            var remainingQty = parseFloat((list[l].adjustmentQty * list[l].multiplier)) - parseFloat(qty1);
-                                            unallocatedAdjustmentQty = parseFloat(remainingQty);
-                                            if (unallocatedAdjustmentQty < 0) {
-                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-                                                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-                                                    console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-                                                        unallocatedAdjustmentQty = 0
-                                                    } else {
-                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-                                                        myArray[index].remainingQty = 0;
-                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-                                                    }
-                                                }
-                                            } else {
-                                                if (batchDetailsForParticularPeriod.length > 0) {
-                                                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-                                                    console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-                                                    unallocatedAdjustmentQty = 0;
-
-
-                                                }
-
-                                            }
-                                        }
-                                        var list1 = inventoryList.filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.region == null);
-                                        for (var j = 0; j < list1.length; j++) {
-                                            adjustmentQty += parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-                                            unallocatedAdjustmentQty = parseFloat((list1[j].adjustmentQty * list1[j].multiplier));
-                                            if (unallocatedAdjustmentQty < 0) {
-                                                for (var ua = batchDetailsForParticularPeriod.length; unallocatedAdjustmentQty != 0 && batchDetailsForParticularPeriod.length > 0; ua--) {
-                                                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty), "Batch no", batchDetailsForParticularPeriod[ua - 1].batchNo);
-                                                    console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                                                    var index = myArray.findIndex(c => c.batchNo == batchDetailsForParticularPeriod[ua - 1].batchNo);
-                                                    if (parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty) > 0) {
-                                                        myArray[index].remainingQty = parseInt(batchDetailsForParticularPeriod[ua - 1].remainingQty) + parseInt(unallocatedAdjustmentQty);
-                                                        unallocatedAdjustmentQty = 0
-                                                    } else {
-                                                        var rq = batchDetailsForParticularPeriod[ua - 1].remainingQty;
-                                                        myArray[index].remainingQty = 0;
-                                                        unallocatedAdjustmentQty = parseInt(unallocatedAdjustmentQty) + parseInt(rq);
-                                                    }
-                                                }
-                                            } else {
-                                                if (batchDetailsForParticularPeriod.length > 0) {
-                                                    console.log("Remaining Qty", parseInt(batchDetailsForParticularPeriod[0].remainingQty), "Batch no", batchDetailsForParticularPeriod[0].batchNo);
-                                                    console.log("Unallocated adjustments", unallocatedAdjustmentQty);
-                                                    batchDetailsForParticularPeriod[0].remainingQty = batchDetailsForParticularPeriod[0].remainingQty + unallocatedAdjustmentQty;
-                                                    unallocatedAdjustmentQty = 0;
-                                                }
-                                            }
-                                        }
-
-                                    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                    var expiredStockArr = myArray;
-                                    console.log(openingBalance)
-                                    console.log(inventoryList)
-                                    var invlist = inventoryList.filter(c => c.inventoryDate === enddtStr)
-                                    var adjustment = 0;
-                                    invlist.map(ele => adjustment = adjustment + (ele.adjustmentQty * ele.multiplier));
-
-
-
-
-
-
-                                    var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                    var consumption = 0;
-
-                                    console.log(programJson.regionList)
-                                    var actualFlag = false
-                                    for (var i = 0; i < programJson.regionList.length; i++) {
-
-                                        var list = conlist.filter(c => c.region.id == programJson.regionList[i].regionId)
-                                        console.log(list)
-                                        if (list.length > 1) {
-                                            for (var l = 0; l < list.length; l++) {
-                                                if (list[l].actualFlag.toString() == 'true') {
-                                                    actualFlag = true;
-                                                    consumption = consumption + list[l].consumptionQty
-                                                }
-                                            }
-                                        } else {
-                                            consumption = list.length == 0 ? consumption : consumption = consumption + parseInt(list[0].consumptionQty)
-                                        }
-                                    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                    var shiplist = shipmentList.filter(c => c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr)
-                                    var shipment = 0;
-                                    shiplist.map(ele => shipment = shipment + ele.shipmentQty);
-
-
-
-
-
-                                    var expiredStock = expiredStockArr.filter(c => ((moment(c.expiryDate).format("YYYY-MM-DD")) >= (moment(dtstr).format("YYYY-MM-DD"))) && ((moment(c.expiryDate).format("YYYY-MM-DD")) <= (moment(enddtStr).format("YYYY-MM-DD"))));
-                                    var expiredStockQty = 0;
-                                    for (var j = 0; j < expiredStock.length; j++) {
-                                        expiredStockQty += parseInt((expiredStock[j].remainingQty));
-                                    }
-
-
-
-
-                                    console.log('openingBalance', openingBalance, 'adjustment', adjustment, ' shipment', shipment, ' consumption', consumption)
-                                    var endingBalance = openingBalance + adjustment + shipment - consumption - expiredStockQty
-                                    console.log('endingBalance', endingBalance)
-
-
-                                    endingBalance = endingBalance < 0 ? 0 : endingBalance
-                                    openingBalance = endingBalance
-                                    minDate = minDate.add(1, 'month')
-
-                                    if (minDate.startOf('month').isAfter(startDate)) {
-                                        break;
-                                    }
-                                }
-                                var amcBeforeArray = [];
-                                var amcAfterArray = [];
-
-
-                                for (var c = 0; c < planningUnit.monthsInPastForAmc; c++) {
-
-                                    var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
-                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
-                                    if (consumptionListForAMC.length > 0) {
-                                        var consumptionQty = 0;
-                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                                            var count = 0;
-                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
-                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                                                    count++;
-                                                } else {
-
-                                                }
-                                            }
-
-                                            if (count == 0) {
-                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                            } else {
-                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                                }
-                                            }
-                                        }
-                                        amcBeforeArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                                        var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
-                                        /*if (amcArrayForMonth.length == programJson.monthsInPastForAmc) {
-                                            c = 12;
-                                        }*/
-                                    }
-                                }
-                                for (var c = 0; c < planningUnit.monthsInFutureForAmc; c++) {
-                                    var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
-                                    var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
-                                    if (consumptionListForAMC.length > 0) {
-                                        var consumptionQty = 0;
-                                        for (var j = 0; j < consumptionListForAMC.length; j++) {
-                                            var count = 0;
-                                            for (var k = 0; k < consumptionListForAMC.length; k++) {
-                                                if (consumptionListForAMC[j].consumptionDate == consumptionListForAMC[k].consumptionDate && consumptionListForAMC[j].region.id == consumptionListForAMC[k].region.id && j != k) {
-                                                    count++;
-                                                } else {
-
-                                                }
-                                            }
-
-                                            if (count == 0) {
-                                                consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                            } else {
-                                                if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                    consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
-                                                }
-                                            }
-                                        }
-                                        amcAfterArray.push({ consumptionQty: consumptionQty, month: dtstr });
-                                        amcArrayForMonth = amcAfterArray.filter(c => c.month == dtstr);
-                                        /* if (amcArrayForMonth.length == programJson.monthsInFutureForAmc) {
-                                             c = 12;
-                                         }*/
-                                    }
-
-                                }
-
-                                var amcArray = amcBeforeArray.concat(amcAfterArray);
-                                var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
-                                console.log('amcArrayFilteredForMonth' + JSON.stringify(amcArrayFilteredForMonth))
-                                var countAMC = amcArrayFilteredForMonth.length;
-                                var sumOfConsumptions = 0;
-                                for (var amcFilteredArray = 0; amcFilteredArray < amcArrayFilteredForMonth.length; amcFilteredArray++) {
-                                    sumOfConsumptions += amcArrayFilteredForMonth[amcFilteredArray].consumptionQty
-                                }
-
-
-                                var amcCalcualted = 0;
-                                var mos = 0;
-                                if (countAMC > 0) {
-                                    amcCalcualted = Math.ceil((sumOfConsumptions) / countAMC);
-                                    console.log('amcCalcualted', amcCalcualted)
-                                    mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
-                                }
-                                var maxForMonths = 0;
-                                if (DEFAULT_MIN_MONTHS_OF_STOCK > planningUnit.minMonthsOfStock) {
-                                    maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                                } else {
-                                    maxForMonths = planningUnit.minMonthsOfStock
-                                }
-                                var minMOS = maxForMonths;
-                                var minForMonths = 0;
-                                if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + planningUnit.reorderFrequencyInMonths)) {
-                                    minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                                } else {
-                                    minForMonths = (maxForMonths + planningUnit.reorderFrequencyInMonths);
-                                }
-                                var maxMOS = minForMonths;
-
+                                var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
+                                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
+                                if (list.length > 0) {
                                 var json = {
                                     planningUnit: planningUnit.planningUnit,
                                     lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                    mos: this.roundN(mos),//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-                                    minMos: minMOS,
-                                    maxMos: maxMOS,
-                                    stock: endingBalance,
-                                    amc: amcCalcualted
+                                    mos: includePlanningShipments == true ?this.roundN(list[0].mos): (list[0].amc > 0)?(list[0].closingBalanceWps /list[0].amc):0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
+                                    minMos: list[0].minStockMoS,
+                                    maxMos:  list[0].maxStockMoS,
+                                    stock: includePlanningShipments == true ?list[0].closingBalance:list[0].closingBalanceWps,
+                                    amc: list[0].amc
                                 }
                                 data.push(json)
 
-
+                            }else{
+                                var json = {
+                                    planningUnit: planningUnit.planningUnit,
+                                    lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
+                                    mos: '',
+                                    minMos: '',
+                                    maxMos: '',
+                                    stock: 0,
+                                    amc: 0
+                                }
+                                data.push(json) 
+                            }
 
                             })
+                            console.log(data)
                             this.setState({
                                 data: data,
                                 message: ''
@@ -2499,7 +2117,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                data: []
+                                data: [], loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 this.el.destroy();
@@ -2507,7 +2125,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             });
 
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({ message: error.message, loading: false });
                             } else {
                                 switch (error.response ? error.response.status : "") {
                                     case 500:
@@ -2515,10 +2133,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     case 404:
                                     case 406:
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({ message: 'static.unkownError', loading: false });
                                         break;
                                 }
                             }
@@ -2717,13 +2335,15 @@ class StockStatusAcrossPlanningUnits extends Component {
                 }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <div className="Card-header-reporticon">
+                    <div className="Card-header-reporticon pb-2">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusacrossplanningunit')}</strong> */}
 
                         <div className="card-header-actions">
-
+                        <a className="card-header-action">
+                                 <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatusAcrossPlaningUnit() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                 </a>
                             <a className="card-header-action">
                                 {this.state.data.length > 0 && <div className="card-header-actions">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
@@ -2732,12 +2352,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 CardBodyTop">
+                    <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div className="TableCust" >
                             <div ref={ref}>
 
                                 <Form >
-                                    <Col md="12 pl-0">
+                                    <div className="pl-0">
                                         <div className="row">
 
                                             <FormGroup className="col-md-3">
@@ -2812,10 +2432,19 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
+                      <ul className="legendcommitversion list-group">
+                        {
+                          legendcolor.map(item1 => (
+                            <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                          ))
+                        }
+                      </ul>
+                    </FormGroup>
 
 
                                         </div>
-                                    </Col>
+                                    </div>
                                 </Form>
                             </div>
                         </div>

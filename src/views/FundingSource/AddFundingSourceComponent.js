@@ -131,7 +131,7 @@ class AddFundingSourceComponent extends Component {
         if (response.status == 200) {
           this.setState({ realms: response.data, loading: false })
         } else {
-          this.setState({ message: response.data.messageCode })
+          this.setState({ message: response.data.messageCode, loading: false })
         }
       })
   }
@@ -180,7 +180,7 @@ class AddFundingSourceComponent extends Component {
                         this.props.history.push(`/fundingSource/listFundingSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
-                          message: response.data.messageCode
+                          message: response.data.messageCode, loading: false
                         },
                           () => {
                             this.hideSecondComponent();

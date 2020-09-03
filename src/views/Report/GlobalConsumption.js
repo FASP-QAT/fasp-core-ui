@@ -387,6 +387,10 @@ class GlobalConsumption extends Component {
     }
     let startYtable = startY - ((height - h1) * (pages - 1))
     doc.setTextColor("#fff");
+    if (startYtable > height - 500) {
+      doc.addPage()
+      startYtable = 80
+  }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
 
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
@@ -510,7 +514,7 @@ class GlobalConsumption extends Component {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
                 "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
-                "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YYYY')
+                "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY')
               }
               console.log("json--->", json);
               consumptions.push(json);

@@ -674,7 +674,7 @@ export default class AddCountryComponent extends Component {
                 })
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 })
             }
         })
@@ -754,7 +754,7 @@ export default class AddCountryComponent extends Component {
                                             }
                                             else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -765,7 +765,7 @@ export default class AddCountryComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
+                                                    this.setState({ message: error.message, loading: false });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
                                                         case 500:
@@ -773,10 +773,10 @@ export default class AddCountryComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ message: 'static.unkownError', loading: false });
                                                             break;
                                                     }
                                                 }

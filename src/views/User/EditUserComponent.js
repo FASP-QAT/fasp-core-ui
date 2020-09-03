@@ -11,7 +11,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import {LABEL_REGEX} from '../../Constants.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { LABEL_REGEX } from '../../Constants.js';
 
 const initialValues = {
     username: "",
@@ -91,12 +92,14 @@ class EditUserComponent extends Component {
             },
             message: '',
             roleId: '',
-            roleList: []
+            roleList: [],
+            loading: true
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
@@ -104,6 +107,10 @@ class EditUserComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+
+    changeLoading(loading) {
+        this.setState({ loading: loading })
     }
 
     dataChange(event) {
@@ -182,8 +189,8 @@ class EditUserComponent extends Component {
         UserService.getUserByUserId(this.props.match.params.userId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    user: response.data
-
+                    user: response.data,
+                    loading: false
                 }, (
                 ) => {
                     // console.log("state after update---", this.state.user);
@@ -191,7 +198,7 @@ class EditUserComponent extends Component {
                 });
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -205,11 +212,11 @@ class EditUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        languages: response.data
+                        languages: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -219,7 +226,7 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -227,10 +234,10 @@ class EditUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -241,11 +248,11 @@ class EditUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data, loading: false
                     })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -254,7 +261,7 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -262,10 +269,10 @@ class EditUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -280,12 +287,13 @@ class EditUserComponent extends Component {
                         roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
-                        roleList
+                        roleList,
+                        loading: false
                     })
                 }
                 else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode, loading: false
                     },
                         () => {
                             this.hideSecondComponent();
@@ -295,7 +303,7 @@ class EditUserComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({ message: error.message, loading: false });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -303,10 +311,10 @@ class EditUserComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: error.response.data.messageCode, loading: false });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -339,6 +347,7 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -361,7 +370,8 @@ class EditUserComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     console.log(JSON.stringify(this.state.user))
                                     this.setState({
-                                        message: ''
+                                        message: '',
+                                        loading: true
                                     })
                                     UserService.editUser(this.state.user)
                                         .then(response => {
@@ -371,7 +381,7 @@ class EditUserComponent extends Component {
 
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                    message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
                                                         this.hideSecondComponent();
@@ -382,7 +392,7 @@ class EditUserComponent extends Component {
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
+                                                    this.setState({ message: error.message, loading: false });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
                                                         case 500:
@@ -390,10 +400,10 @@ class EditUserComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message: error.response.data.messageCode, loading: false });
                                                             break;
                                                         default:
-                                                            this.setState({ message: 'static.unkownError' });
+                                                            this.setState({ message: 'static.unkownError', loading: false });
                                                             break;
                                                     }
                                                 }
