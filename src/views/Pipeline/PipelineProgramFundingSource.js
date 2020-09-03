@@ -15,6 +15,7 @@ export default class PipelineProgramFundingSource extends Component {
         this.state = {
             fundingSourceList: [],
             mapFundingSourceEl: '',
+            loading:true
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -228,10 +229,13 @@ export default class PipelineProgramFundingSource extends Component {
                                             var elVar = jexcel(document.getElementById("mapFundingSource"), options);
                                             this.el = elVar;
                                             this.loaded();
+                                            this.setState({
+                                                loading: false
+                                            })
 
                                         }
                                     } else {
-                                        this.setState({ message: response.data.messageCode })
+                                        this.setState({ message: response.data.messageCode,loading:false  })
                                     }
                                 });
 
@@ -251,9 +255,20 @@ export default class PipelineProgramFundingSource extends Component {
         return (
             <>
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" >
+                <div className="table-responsive"style={{ display: this.state.loading ? "none" : "block" }} >
 
                     <div id="mapFundingSource">
+                    </div>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

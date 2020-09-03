@@ -307,7 +307,7 @@ export default class QatProblemActions extends Component {
                                             for (var r = 0; r < regionList.length; r++) {
                                                 //2 inventory  ====================
                                                 var inventoryList = programList[pp].inventoryList;
-                                                inventoryList = inventoryList.filter(c => c.region != null && c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                inventoryList = inventoryList.filter(c => c.region != null && c.region.id !=0 && c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                 var numberOfMonthsInventory = parseInt(problemList[prob].data1);
                                                 // for (var mi = 1; mi <= numberOfMonthsInventory; mi++) {
                                                 var myStartDateInventory = moment(Date.now()).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2194,7 +2194,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2393,7 +2393,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2592,7 +2592,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2795,7 +2795,7 @@ export default class QatProblemActions extends Component {
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2994,7 +2994,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -3195,7 +3195,7 @@ export default class QatProblemActions extends Component {
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";

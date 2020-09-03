@@ -120,9 +120,9 @@ export default class ShipmentDetails extends React.Component {
         document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value.value,
-            planningUnit:"",
-            planningUnitId:""
+            programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
+            planningUnit: "",
+            planningUnitId: ""
         })
         var db1;
         var storeOS;
@@ -150,7 +150,7 @@ export default class ShipmentDetails extends React.Component {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 console.log("myResult", myResult);
-                var programId = (value.value).split("_")[0];
+                var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                 console.log('programId----->>>', programId)
                 console.log(myResult);
                 var proList = []
@@ -184,8 +184,8 @@ export default class ShipmentDetails extends React.Component {
 
     formSubmit(value) {
         var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value.value, planningUnit: value });
-        var planningUnitId = value.value;
+        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+        var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
@@ -218,7 +218,8 @@ export default class ShipmentDetails extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
                 })
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == value.value);
+                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0));
+                console.log("Shipment list", shipmentList);
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
                     programJson: programJson,
@@ -226,7 +227,7 @@ export default class ShipmentDetails extends React.Component {
                     shipmentList: shipmentList,
                     showShipments: 1,
                 })
-
+                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
@@ -277,7 +278,7 @@ export default class ShipmentDetails extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <Col md="10 pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -312,13 +313,13 @@ export default class ShipmentDetails extends React.Component {
                                         </Form>
                                     )} />
 
-                        <div className="ReportSearchMarginTop">
-                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} shipmentPage="shipmentDataEntry" />}
+                        <Col xs="12" sm="12" className="p-0">
+                            {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} shipmentPage="shipmentDataEntry" />}
                             <h6 className="red">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError || this.state.supplyPlanError}</h6>
                             <div className="table-responsive">
                                 <div id="shipmentsDetailsTable" />
                             </div>
-                        </div>
+                        </Col>
                     </CardBody>
                     <CardFooter>
                         <FormGroup>

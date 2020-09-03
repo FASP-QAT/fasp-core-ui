@@ -132,7 +132,7 @@ export default class ConsumptionDetails extends React.Component {
         document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value.value
+            programId: value != "" && value != undefined ? value.value : 0
         })
         var db1;
         var storeOS;
@@ -149,7 +149,7 @@ export default class ConsumptionDetails extends React.Component {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(value.value);
+            var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -182,7 +182,7 @@ export default class ConsumptionDetails extends React.Component {
                     var myResult = [];
                     myResult = planningunitRequest.result;
                     console.log("myResult", myResult);
-                    var programId = (value.value).split("_")[0];
+                    var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                     console.log('programId----->>>', programId)
                     console.log(myResult);
                     var proList = []
@@ -219,8 +219,8 @@ export default class ConsumptionDetails extends React.Component {
 
     formSubmit(value) {
         var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId, planningUnitId: value.value, planningUnit: value });
-        var planningUnitId = value.value;
+        this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
+        var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
@@ -250,7 +250,7 @@ export default class ConsumptionDetails extends React.Component {
                 var consumptionListUnFiltered = (programJson.consumptionList);
                 var consumptionList = (programJson.consumptionList).filter(c =>
                     c.planningUnit.id == planningUnitId &&
-                    c.region != null);
+                    c.region != null && c.region.id !=0);
                 this.setState({
                     batchInfoList: batchInfoList,
                     programJson: programJson,
@@ -297,7 +297,7 @@ export default class ConsumptionDetails extends React.Component {
                                 ({
                                 }) => (
                                         <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
+                                            <Col md="10 pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -333,7 +333,7 @@ export default class ConsumptionDetails extends React.Component {
                                     )} />
 
                         <Col xs="12" sm="12" className="p-0">
-                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} consumptionPage="consumptionDataEntry" />}
+                            {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} consumptionPage="consumptionDataEntry" />}
                             <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                             <div className="table-responsive">
                                 <div id="consumptionTable"  />
@@ -363,10 +363,10 @@ export default class ConsumptionDetails extends React.Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                        </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                            {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
+                        </div>
                     </ModalFooter>
                 </Modal>
                 {/* Consumption modal */}
