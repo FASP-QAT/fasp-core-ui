@@ -6,6 +6,16 @@ export function jExcelLoadedFunction(instance) {
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
     console.log("In loaded function hide method");
+    
+    // Astersik
+    
+    // var asterisk = document.getElementsByClassName("resizable")[0];
+    // var tr = asterisk.firstChild;
+    // tr.children[2].classList.add('AsteriskTheadtrTd');
+
+    // Need to add AsteriskTheadtrTd class in TD  and remove these 3 lines
+    
+    
     var pagignation = document.getElementsByClassName('jexcel_pagination')[0];
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[0];
