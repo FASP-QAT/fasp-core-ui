@@ -155,7 +155,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         } else {
                             console.log("inventoryListUnFiltered", inventoryListUnFiltered);
                             console.log("Adjustment Type", adjustmentType);
-                            index = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region != null && c.region.id == inventoryList[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryList[j].inventoryDate).format("MMM YY") && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id && (adjustmentType == 1 ? c.actualQty > 0 : c.adjustmentQty > 0));
+                            index = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region != null && c.region.id != 0 && c.region.id == inventoryList[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryList[j].inventoryDate).format("MMM YY") && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id && (adjustmentType == 1 ? c.actualQty > 0 : c.adjustmentQty > 0));
                         }
                         data[14] = index;
                         inventoryDataArr[j] = data;
@@ -198,10 +198,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 180 },
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', width: 80 },
-                            { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##', width: 80, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##', width: 80, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80 },
+                            { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
@@ -216,7 +216,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         wordWrap: true,
                         allowInsertColumn: false,
                         allowManualInsertColumn: false,
-                        allowDeleteRow: false,
+                        allowDeleteRow: true,
                         allowManualInsertRow: false,
                         allowExport: false,
                         copyCompatibility: true,
@@ -265,6 +265,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         }
                                         var batchList = [];
                                         var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
+                                        console.log("this.props.items.batchInfoList", this.props.items.batchInfoList);
                                         var batchInfoList = this.props.items.batchInfoList.filter(c => (moment(c.expiryDate).format("YYYY-MM-DD") > date && moment(c.createdDate).format("YYYY-MM-DD") <= date));
                                         console.log("Batch info list", batchInfoList);
                                         batchList.push({
@@ -276,7 +277,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             if (batchInfoList[k].planningUnitId == planningUnitId) {
                                                 var batchJson = {
                                                     name: batchInfoList[k].batchNo,
-                                                    id: batchInfoList[k].batchId
+                                                    id: batchInfoList[k].batchId.toString()
                                                 }
                                                 batchList.push(batchJson);
                                             }
@@ -359,7 +360,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
                                                 { title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true },
                                                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 80 },
-                                                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', width: 80 },
+                                                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80 },
                                                 { title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'), type: 'hidden', width: 0 },
                                                 { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 }
                                             ],
@@ -370,7 +371,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             wordWrap: true,
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
-                                            allowDeleteRow: false,
+                                            allowDeleteRow: true,
                                             oneditionend: this.onedit,
                                             copyCompatibility: true,
                                             allowInsertRow: true,
@@ -409,6 +410,18 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                                 obj.insertRow(data);
                                                             }
                                                         });
+                                                    }
+
+                                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                        // region id
+                                                        if (obj.getRowData(y)[5] == 0) {
+                                                            items.push({
+                                                                title: obj.options.text.deleteSelectedRows,
+                                                                onclick: function () {
+                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                }
+                                                            });
+                                                        }
                                                     }
                                                 }
                                                 return items;
@@ -449,7 +462,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 data[6] = ""; //G
                                                 data[7] = ""; //H
                                                 data[8] = `=F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //I
-                                                data[9] = `=G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //J
+                                                data[9] = `=G${parseInt(0) + 1}*H${parseInt(0) + 1}`; //J
                                                 data[10] = "";
                                                 data[11] = true;
                                                 if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -462,6 +475,18 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 obj.insertRow(data);
                                             }.bind(this)
                                         });
+                                    }
+
+                                    if (obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                        // region id
+                                        if (obj.getRowData(y)[14] == -1) {
+                                            items.push({
+                                                title: obj.options.text.deleteSelectedRows,
+                                                onclick: function () {
+                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                }
+                                            });
+                                        }
                                     }
                                 }
                             }
@@ -512,7 +537,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 5) {
             if (rowData[4] == 2) {
-                checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 1);
+                checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
             }
         }
 
@@ -693,7 +718,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[2] == 2) {
-                    validation = checkValidtion("number", "D", y, rowData[3], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 1);
+                    validation = checkValidtion("number", "D", y, rowData[3], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
                     if (validation == false) {
                         valid = false;
                     }
@@ -733,7 +758,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         batch: {
                             batchId: map.get("0"),
                             batchNo: elInstance.getCell(`A${parseInt(i) + 1}`).innerText,
-                            expiryDate: map.get("1")
+                            expiryDate: moment(map.get("1")).format("YYYY-MM-DD")
                         },
                         adjustmentQty: map.get("3").toString().replaceAll("\,", ""),
                         actualQty: map.get("4").toString().replaceAll("\,", "")
@@ -837,7 +862,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[4] == 2) {
-                    var validation = checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 1);
+                    var validation = checkValidtion("number", "F", y, rowData[5], elInstance, NEGATIVE_INTEGER_NO_REGEX, 0, 0);
                     if (validation == false) {
                         valid = false;
                     }
@@ -916,8 +941,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("6")).toString().replaceAll("\,", "");
                             inventoryDataList[parseInt(map.get("14"))].notes = map.get("10");
                             inventoryDataList[parseInt(map.get("14"))].active = map.get("11");
-                            inventoryDataList[parseInt(map.get("14"))].batchInfoList = map.get("13");
+                            if (map.get("13") != "") {
+                                inventoryDataList[parseInt(map.get("14"))].batchInfoList = map.get("13");
+                            } else {
+                                inventoryDataList[parseInt(map.get("14"))].batchInfoList = [];
+                            }
                         } else {
+                            var batchInfoList = [];
+                            if (map.get("13") != "") {
+                                batchInfoList = map.get("13");
+                            }
                             var inventoryJson = {
                                 inventoryId: 0,
                                 dataSource: {
@@ -938,7 +971,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     id: planningUnitId
                                 },
                                 notes: map.get("10"),
-                                batchInfoList: map.get("13")
+                                batchInfoList: batchInfoList
                             }
                             console.log("inventioryJson", inventoryJson);
                             inventoryDataList.push(inventoryJson);

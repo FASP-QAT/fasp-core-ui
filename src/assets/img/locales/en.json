@@ -1102,5 +1102,12 @@
     "static.program.fileinputjson": "File Input(File must be .json format)",
     "static.report.procurmentAgentLeadTimeReport": "Procurement Agent Lead Times",
     "static.dashboard.linkShipment": "Link shipment",
-    "static.program.zipfilereaderror":"Error occured while reading zip file"
+    "static.commitVersion.conflicts": "Conflicts",
+    "static.commitVersion.changedInCurrentVersion": "Changed in current version",
+    "static.commitVersion.changedInLatestVersion": "Changed in latest version",
+    "static.commitVersion.resolveConflicts": "Resolve conflicts",
+    "static.commitVersion.acceptCurrentVersion": " Accept current version",
+    "static.commitVersion.acceptLatestVersion": " Accept latest version",
+    "static.common.max23digittext": "Maximum 23 characters only",
+    "static.program.zipfilereaderror": "Error occured while reading zip file"
 }

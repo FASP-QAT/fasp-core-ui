@@ -19,6 +19,7 @@ import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
+import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 
 export default class SyncMasterData extends Component {
 
@@ -50,11 +51,11 @@ export default class SyncMasterData extends Component {
             console.log("user----------------------", response.data);
             localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data).toString(), `${SECRET_KEY}`));
             // this.syncMasters();
-            setTimeout(function() { //Start the timer
+            setTimeout(function () { //Start the timer
                 // this.setState({render: true}) //After 1 second, set render to true
                 this.syncMasters();
             }.bind(this), 500)
-           
+
         })
 
 
@@ -161,7 +162,12 @@ export default class SyncMasterData extends Component {
                             console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
                             var batchArray = response.data.batchInfoList;
+                            var planningUnitList = [];
                             for (var j = 0; j < shipArray.length; j++) {
+                                console.log("In planning unit list", shipArray[j].planningUnit.id);
+                                if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
+                                    planningUnitList.push(shipArray[j].planningUnit.id);
+                                }
                                 var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
                                 if (index == -1) {
                                     shipmentDataList.push(shipArray[j]);
@@ -204,6 +210,8 @@ export default class SyncMasterData extends Component {
                                     })
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
+                                    console.log("Planning unit list", planningUnitList);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', '', planningUnitList);
                                 }
                             }
                         } else {
