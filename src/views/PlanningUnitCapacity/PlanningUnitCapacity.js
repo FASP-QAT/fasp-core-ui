@@ -688,7 +688,7 @@ import AuthenticationService from "../Common/AuthenticationService";
 import PlanningUnitService from "../../api/PlanningUnitService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -720,6 +720,7 @@ class PlanningUnitCapacity extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading:true,
             lang: localStorage.getItem('lang'),
             planningUnitCapacity: {},
             planningUnitCapacityId: '',
@@ -1156,12 +1157,14 @@ class PlanningUnitCapacity extends Component {
                                             };
 
                                             this.el = jexcel(document.getElementById("paputableDiv"), options);
-
+                                            this.setState({
+                                                loading: false
+                                            })
                                         })
 
                                 } else {
                                     this.setState({
-                                        message: response.data.messageCode
+                                        message: response.data.messageCode,loading:false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1179,10 +1182,10 @@ class PlanningUnitCapacity extends Component {
                                             case 404:
                                             case 406:
                                             case 412:
-                                                this.setState({ message: error.response.messageCode });
+                                                this.setState({loading:false, message: error.response.messageCode });
                                                 break;
                                             default:
-                                                this.setState({ message: 'static.unkownError' });
+                                                this.setState({loading:false, message: 'static.unkownError' });
                                                 break;
                                         }
                                     }
@@ -1191,7 +1194,7 @@ class PlanningUnitCapacity extends Component {
 
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode,loading:false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1201,7 +1204,7 @@ class PlanningUnitCapacity extends Component {
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({loading:false, message: error.message });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1209,10 +1212,10 @@ class PlanningUnitCapacity extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
-                                    this.setState({ message: error.response.data.messageCode });
+                                    this.setState({loading:false, message: error.response.data.messageCode });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({loading:false, message: 'static.unkownError' });
                                     console.log("Error code unkown");
                                     break;
                             }
@@ -1490,6 +1493,11 @@ class PlanningUnitCapacity extends Component {
         return (
 
             <div className="animated fadeIn">
+                   <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} /> */}
@@ -1504,10 +1512,19 @@ class PlanningUnitCapacity extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <div className="table-responsive">
+                            <div className="table-responsive"style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="paputableDiv" >
                                 </div>
                             </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                         </Col>
                     </CardBody>
                     <CardFooter>
