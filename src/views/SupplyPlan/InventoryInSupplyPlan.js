@@ -265,6 +265,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         }
                                         var batchList = [];
                                         var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
+                                        console.log("this.props.items.batchInfoList", this.props.items.batchInfoList);
                                         var batchInfoList = this.props.items.batchInfoList.filter(c => (moment(c.expiryDate).format("YYYY-MM-DD") > date && moment(c.createdDate).format("YYYY-MM-DD") <= date));
                                         console.log("Batch info list", batchInfoList);
                                         batchList.push({

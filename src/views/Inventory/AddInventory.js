@@ -253,10 +253,11 @@ export default class AddInventory extends Component {
                 var programJson = JSON.parse(programData);
                 var batchList = []
                 var batchInfoList = programJson.batchInfoList;
+                console.log("Batch info list from program json", batchInfoList);
                 var inventoryListUnFiltered = (programJson.inventoryList);
                 var inventoryList = (programJson.inventoryList).filter(c =>
                     c.planningUnit.id == planningUnitId &&
-                    c.region != null  && c.region.id !=0);
+                    c.region != null && c.region.id != 0);
                 if (this.state.inventoryType == 1) {
                     inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != 0 && c.actualQty != null);
                 } else {

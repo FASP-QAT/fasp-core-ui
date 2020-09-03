@@ -1374,6 +1374,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var budgetList = this.state.budgetListAll;
             console.log("budgetList", this.state.budgetListAll);
             mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
+            mylist.push({ id: 0, name: i18n.t('static.common.select') })
         }
         console.log("mylist", mylist);
         return mylist;
@@ -1523,7 +1524,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 12) {
-            checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 0);
+            checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 1);
         }
 
         if (x == 18) {
@@ -2676,7 +2677,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 0);
+                var validation = checkValidtion("number", "M", y, rowData[12], elInstance, DECIMAL_NO_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
                 }
