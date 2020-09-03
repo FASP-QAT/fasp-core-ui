@@ -499,7 +499,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -851,7 +851,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -1060,7 +1060,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -1270,7 +1270,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -1480,7 +1480,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -2271,10 +2271,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                            region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
-                                                            },
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
                                                                 label: planningUnitList[p].planningUnit.label,
@@ -2468,10 +2465,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                            region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
-                                                            },
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
                                                                 label: planningUnitList[p].planningUnit.label,
@@ -2872,10 +2866,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                            region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
-                                                            },
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
                                                                 label: planningUnitList[p].planningUnit.label,
@@ -3070,10 +3061,7 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                            region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
-                                                            },
+                                                            region: null,
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
                                                                 label: planningUnitList[p].planningUnit.label,
