@@ -2370,8 +2370,8 @@ export default class syncPage extends Component {
         programJson.consumptionList = consumptionData;
         programJson.inventoryList = inventoryData;
         programJson.shipmentList = shipmentData;
-        // programJson.problemReportList = problemReportList;
-        programJson.problemReportList = [];
+        programJson.problemReportList = problemReportList;
+        // programJson.problemReportList = [];
         programJson.versionType = { id: document.getElementById("versionType").value };
         programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
         programJson.notes = document.getElementById("notes").value;
