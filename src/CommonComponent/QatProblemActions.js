@@ -56,7 +56,8 @@ export default class QatProblemActions extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
-                })
+                });
+                this.props.updateState(false);
             };
             getRequest.onsuccess = function (event) {
 
@@ -106,6 +107,7 @@ export default class QatProblemActions extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
+                    this.props.updateState(false);
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
 
@@ -117,6 +119,7 @@ export default class QatProblemActions extends Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
+                        this.props.updateState(false);
                     }.bind(this);
                     problemRequest.onsuccess = function (e) {
 
@@ -140,6 +143,7 @@ export default class QatProblemActions extends Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
+                            this.props.updateState(false);
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
                             // console.log("+++++++++++++", puRequest.result);
@@ -3543,6 +3547,7 @@ export default class QatProblemActions extends Component {
                                         message: i18n.t('static.program.errortext'),
                                         color: 'red'
                                     })
+                                    this.props.updateState(false);
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     // this.setState({executionStatus:1});

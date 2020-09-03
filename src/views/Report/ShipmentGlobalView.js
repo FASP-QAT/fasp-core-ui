@@ -1674,30 +1674,30 @@ class ShipmentGlobalView extends Component {
                         align: 'left'
                     })
 
-                    var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+                    var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
 
-                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
                         align: 'left'
                     })
                     var viewby = document.getElementById("viewById").value;
                     if (viewby == 1) {
 
                         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 190, fundingSourceText)
+                        doc.text(doc.internal.pageSize.width / 8, 210, fundingSourceText)
 
                     } else {
 
                         var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 190, procurementAgentText)
+                        doc.text(doc.internal.pageSize.width / 8, 210, procurementAgentText)
                     }
 
                 }
@@ -1739,7 +1739,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 70, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -1765,12 +1765,12 @@ class ShipmentGlobalView extends Component {
             margin: { top: 80, left: 100, bottom: 50 },
             startY: doc.autoTableEndPosY() + 50,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 100, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
                 // 2: { cellWidth: 200 },
-                // 3: { cellWidth: 100 },
+                3: { cellWidth: 250 },
                 // 4: { cellWidth: 100 },
             },
             html: '#mytable2',
@@ -2289,7 +2289,32 @@ class ShipmentGlobalView extends Component {
                         // console.log("DATA--1---", this.state.table1Headers);
                         // console.log("DATA---2--", this.state.table1Body);
                     })
-                })
+                }).catch(
+                    error => {
+                        this.setState({
+                            // programs: []
+                            loading:false
+                        }, () => { 
+                            // this.consolidatedProgramList() 
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
 
         } else if (realmId <= 0) {
             this.setState({
@@ -2626,7 +2651,7 @@ class ShipmentGlobalView extends Component {
                         <div ref={ref}>
 
                             <Form >
-                                <Col md="12 pl-0">
+                                <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -2793,7 +2818,8 @@ class ShipmentGlobalView extends Component {
                                         </FormGroup>
 
                                     </div>
-                                </Col>
+                                {/* </Col> */}
+                                </div>
                             </Form>
                             <Col md="12 pl-0">
                                 <div className="row grid-divider">

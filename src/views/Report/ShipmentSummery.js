@@ -1308,7 +1308,7 @@ class ShipmentSummery extends Component {
             pageBreak: 'auto',
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 69.75, halign: 'center' },
             columnStyles: {
-                // 0: { cellWidth: 100 },
+                10: { cellWidth: 100 },
             },
             html: '#mytable2',
 
@@ -1679,8 +1679,10 @@ class ShipmentSummery extends Component {
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                        // const activeFilter = shipmentList;
 
-                        let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
+                        // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
+                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate==null || c.receivedDate=="") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
 
                         let data = [];
                         let planningUnitFilter = [];
@@ -1748,7 +1750,7 @@ class ShipmentSummery extends Component {
 
                             }
 
-                            console.log("data----->", data);
+                            console.log("data ofline----->", data);
                             this.setState({
                                 data: data,
                                 message: '',
@@ -1869,26 +1871,34 @@ class ShipmentSummery extends Component {
 
         const backgroundColor = [
             '#002f6c',
+            '#20a8d8',
             '#118b70',
             '#EDB944',
-            '#20a8d8',
             '#d1e3f5',
         ]
 
         //Graph start
         let shipmentStatus = [...new Set(this.state.data.map(ele => (getLabelText(ele.shipmentStatus.label, this.state.lang))))];
-
+        console.log("shipmentStatus=======>>>",shipmentStatus.sort());
+       
         let shipmentSummerydata = [];
         let data = [];
         var mainData = this.state.data;
         mainData = mainData.sort(function (a, b) {
             return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate);
         });
+        console.log("mainData=======>>>>",mainData);
         let dateArray = [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
+
+        console.log("dateArray=====>",dateArray);
 
         for (var i = 0; i < shipmentStatus.length; i++) {
 
-            let data1 = mainData.filter(c => shipmentStatus[i].localeCompare(getLabelText(c.shipmentStatus.label, this.state.lang)) == 0).map((item) => { return { shipmentId: item.shipmentId, expectedDeliveryDate: (moment(item.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY')), totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
+            let data1 = mainData.filter(c => shipmentStatus[i].localeCompare(getLabelText(c.shipmentStatus.label, this.state.lang)) == 0).map((item) => { return { 
+                shipmentId: item.shipmentId, 
+                expectedDeliveryDate: (moment(item.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY')), 
+                totalCost: item.totalCost, 
+                forecastCost: item.totalCost * item.multiplier } });
 
             //logic for add same date data
             // let result = Object.values(data1.reduce((a, { shipmentId, totalCost, expectedDeliveryDate, forecastCost }) => {
@@ -1914,15 +1924,13 @@ class ShipmentSummery extends Component {
             var result = result1.filter(function (itm, i, a) {
                 return i == a.indexOf(itm);
             });
-
-
-
+            console.log("result====>",result);
             let tempdata = [];
             for (var j = 0; j < dateArray.length; j++) {
                 let hold = 0
                 for (var k = 0; k < result.length; k++) {
                     if (moment(dateArray[j], 'MM-YYYY').isSame(moment(result[k].expectedDeliveryDate, 'MM-YYYY'))) {
-                        hold = viewById == 1 ? result[k].freightCost+result[k].productCost : result[k].forecastCost;
+                        hold = viewById == 1 ? result[k].totalCost : result[k].forecastCost;
                         k = result.length;
                     } else {
                         hold = 0;
@@ -1932,11 +1940,12 @@ class ShipmentSummery extends Component {
                 tempdata.push(hold);
 
             }
-
+            console.log("tempdata==>",tempdata);
             shipmentSummerydata.push(tempdata);
 
         }
 
+        console.log("shipmentSummeryData===>",shipmentSummerydata);
         const bar = {
             labels: [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
             datasets: shipmentSummerydata.map((item, index) => ({ label: shipmentStatus[index], data: item, backgroundColor: backgroundColor[index] })),
@@ -1945,9 +1954,14 @@ class ShipmentSummery extends Component {
 
         //Table-1 start
 
-        let tempDataTable = mainData.map((item) => { return { shipmentId: item.shipmentId, fundingSource: item.fundingSource, shipmentQty: item.shipmentQty, totalCost: item.totalCost, forecastCost: item.totalCost * item.multiplier } });
+        let tempDataTable = mainData.map((item) => { return { 
+            shipmentId: item.shipmentId, 
+            fundingSource: item.fundingSource, 
+            shipmentQty: item.shipmentQty, 
+            totalCost: item.totalCost, 
+            forecastCost: item.totalCost * item.multiplier } });
 
-        // console.log("tempDataTable------>>", tempDataTable);
+        console.log("tempDataTable------>>", tempDataTable);
 
         var result1 = tempDataTable.reduce(function (tempDataTable, val) {
             var o = tempDataTable.filter(function (obj) {
@@ -1964,7 +1978,7 @@ class ShipmentSummery extends Component {
             return i == a.indexOf(itm);
         });
 
-        // console.log("RESULT------->", result);
+        console.log("RESULT------->", result);
 
         // let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
         //     if (!a[fundingSource.id])
@@ -2367,7 +2381,8 @@ class ShipmentSummery extends Component {
                                                                     <td>{moment(this.state.data[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].productCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].freightCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.data[idx].totalCost * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    {/* <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].productCost+this.state.data[idx].freightCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> */}
+                                                                    <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].totalCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{this.state.data[idx].notes}</td>
                                                                 </tr>
                                                             )}
