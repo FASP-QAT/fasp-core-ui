@@ -57,3 +57,6 @@ export const FORCASTED_CONSUMPTION_TYPE = 2;
 export const LATEST_VERSION_COLOUR="#e5edf5"
 export const LOCAL_VERSION_COLOUR="#86cd99"
 export const CONFLICTS_COLOUR="yellow"
+export const JIRA_PROJECT_KEY="QAT"
+export const JIRA_PROJECT_ISSUE_TYPE_BUG_REPORT="Report a bug"
+export const JIRA_PROJECT_ISSUE_TYPE_EMAIL_REQUEST="Email request"

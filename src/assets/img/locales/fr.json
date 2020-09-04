@@ -698,9 +698,15 @@
     "static.dashboard.qatProblem":"Problème QAT",
     "static.dashboard.add.problem":"Ajouter un problème",
     "static.jexcel.showing": "Montrant",
-    "static.jexcel.of": "de"
-    
-
-    
-
+    "static.jexcel.of": "de",
+    "static.common.summary": "Résumé",
+    "static.common.description": "La description",
+    "static.common.summarytext": "Veuillez saisir un résumé",
+    "static.common.descriptiontext": "Veuillez saisir une description",
+    "static.dimension.dimensiontext": "Veuillez saisir la dimension",
+    "static.technicalArea.technicalAreaCode": "Indicatif régional technique",
+    "static.technicalArea.technicalAreaCodeText": "Veuillez saisir le code de zone technique",
+    "static.technicalArea.productcategorynametext": "Veuillez saisir le nom de la catégorie de produit",
+    "static.common.notes": "Remarques",
+    "static.common.bugreport": "Rapport d'erreur"
 }

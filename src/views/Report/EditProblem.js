@@ -20,6 +20,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT } from '../../Constants.js';
+// import AuthenticationService from '../../views/Common/AuthenticationService.js'
 
 
 let initialValues = {
@@ -475,7 +476,25 @@ export default class EditLanguageComponent extends Component {
                     };
                     problemStatusRequest.onsuccess = function (e) {
                         var myResult = [];
-                        myResult = problemStatusRequest.result;
+                        // myResult = problemStatusRequest.result;
+                        var roleList=AuthenticationService.getLoggedInUserRole();
+                        // console.log("user Role====>",roleList);
+                        var roleArray=[]
+                        for(var r=0 ;r<roleList.length;r++){
+                            roleArray.push(roleList[r].roleId)
+                        }
+                        // console.log("user Role array====>",roleArray);
+                        if(roleArray.includes("ROLE_PROGRAM_ADMIN") || roleArray.includes("ROLE_REALM_ADMIN")){
+                            // console.log("in if=======>");
+                            myResult=problemStatusRequest.result;
+                        }else{
+                            var filterList=problemStatusRequest.result;
+                            // console.log("in else======>");
+                            for(var l =0 ; l< 2;l++){
+                            var filterList=problemStatusRequest.result;
+                                myResult.push(filterList[l]);
+                            }
+                        }
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             var Json = {

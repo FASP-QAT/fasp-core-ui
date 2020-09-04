@@ -7,7 +7,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService'
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 export default class PipelineProgramProcurementAgent extends Component {
     constructor(props) {
@@ -207,7 +207,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         columnSorting: true,
                                         tableOverflow: true,
                                         wordWrap: true,
-                                        paginationOptions: [10, 25, 50, 100],
+                                        paginationOptions: [10, 25, 50],
                                         // position: 'top',
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
@@ -221,8 +221,8 @@ export default class PipelineProgramProcurementAgent extends Component {
                                             show: '',
                                             entries: '',
                                         },
-                                        // onload: this.loadedJexcelCommonFunction,
-                                        onload: this.loaded
+                                        onload: this.loadedJexcelCommonFunction,
+                                        // onload: this.loaded
 
                                     };
                                     var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);
@@ -245,7 +245,7 @@ export default class PipelineProgramProcurementAgent extends Component {
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionPipeline(instance,0);
     }
 
     render() {
