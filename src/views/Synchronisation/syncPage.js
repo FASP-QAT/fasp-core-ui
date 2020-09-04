@@ -2110,19 +2110,20 @@ export default class syncPage extends Component {
                           />
                         </div>
                       </FormGroup>
-                      <div className="col-md-10">
+                     
+                    </div>
+                    <div className="col-md-12">
                         <ul className="legendcommitversion">
                           <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
                           <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
                           <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
                         </ul>
                       </div>
-                    </div>
                   </Col>
                 </Form>
                 <div id="detailsDiv">
                   <div className="animated fadeIn">
-                    <Col md="12 pl-0">
+                    <Col md="12 pl-0 pt-3">
                       <div className="d-md-flex">
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
@@ -2400,11 +2401,13 @@ export default class syncPage extends Component {
   }
 
   cancelClicked() {
-    this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   redirectToDashbaord() {
-    this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t('static.message.commitSuccess'))
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
   }
 
   hideSecondComponent() {

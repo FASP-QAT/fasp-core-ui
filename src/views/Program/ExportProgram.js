@@ -19,6 +19,7 @@ import FileSaver from 'file-saver';
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationService from '../Common/AuthenticationService';
 
 const initialValues = {
     programId: ''
@@ -147,7 +148,8 @@ export default class ExportProgram extends Component {
                                 type: "blob"
                             }).then(function (content) {
                                 FileSaver.saveAs(content, "download.zip");
-                                this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t('static.program.dataexportsuccess'))
+                                let id = AuthenticationService.displayDashboardBasedOnRole();
+                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
 
                             }.bind(this));
                         }
@@ -255,7 +257,8 @@ export default class ExportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

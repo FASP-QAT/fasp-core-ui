@@ -22,6 +22,7 @@ import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import bsCustomFileInput from 'bs-custom-file-input'
+import AuthenticationService from '../Common/AuthenticationService';
 
 const initialValues = {
     programId: ''
@@ -193,7 +194,8 @@ export default class ImportProgram extends Component {
                                             this.setState({
                                                 message: i18n.t('static.program.actioncancelled')
                                             })
-                                            this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.program.actioncancelled'))
+                                            let id = AuthenticationService.displayDashboardBasedOnRole();
+                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.program.actioncancelled'))
                                         }
                                     }
                                 ]
@@ -376,7 +378,8 @@ export default class ImportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

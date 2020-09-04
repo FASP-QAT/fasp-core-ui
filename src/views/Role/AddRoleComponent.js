@@ -810,7 +810,7 @@ class AddRoleComponent extends Component {
                                                             options={this.state.businessFunctionList}
                                                             value={this.state.businessFunctionId}
                                                         />
-                                                        {errors.businessFunctions && touched.businessFunctions && (<span className="red" style={{ fontSize: 10 }}>{errors.businessFunctions}</span>)}
+                                                        {errors.businessFunctions && touched.businessFunctions && (<span className="red" style={{ fontSize:'12px' }}>{errors.businessFunctions}</span>)}
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
@@ -839,7 +839,7 @@ class AddRoleComponent extends Component {
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
                                                         />
-                                                        {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: 10 }}>{errors.canCreateRoles}</span>)}
+                                                        {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: '12px' }}>{errors.canCreateRoles}</span>)}
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

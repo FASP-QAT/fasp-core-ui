@@ -15,6 +15,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from "../Common/AuthenticationService.js";
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -135,8 +136,9 @@ export default class ConsumptionDetails extends React.Component {
         document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0
-
+            programId: value != "" && value != undefined ? value.value : 0,
+            planningUnit: "",
+            showConsumption: 0,
         })
         var db1;
         var storeOS;
@@ -274,7 +276,8 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {
@@ -382,7 +385,7 @@ export default class ConsumptionDetails extends React.Component {
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         );
     }

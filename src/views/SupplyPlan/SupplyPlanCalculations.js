@@ -750,6 +750,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == "inventory") {
                                     console.log("After save")
                                     // this.showInventoryData();
+                                    console.log("props.items.inventoryDataType", props.items.inventoryDataType);
                                     props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
                                     props.updateState("color", 'green');
                                     props.updateState("inventoryChangedFlag", 0);

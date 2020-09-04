@@ -14,6 +14,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from '../Common/AuthenticationService';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
@@ -419,7 +420,8 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {
