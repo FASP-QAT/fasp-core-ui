@@ -155,7 +155,8 @@ export default class DatabaseTranslations extends React.Component {
             var json = this.state.labelList;
             LabelsService.saveStaticLabels(json).then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t(response.data.messageCode))
+                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                    this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/green/' + i18n.t(response.data.messageCode))
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -230,7 +231,8 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     changed = function (instance, cell, x, y, value) {

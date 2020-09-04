@@ -115,6 +115,7 @@ export default class SupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             monthsArray: [],
             programList: [],
             planningUnitList: [],
@@ -1423,6 +1424,7 @@ export default class SupplyPlanComponent extends React.Component {
                 console.log("ProList", proList);
                 this.setState({
                     programList: proList,
+                    loading: false
                 })
                 var programIdd = this.props.match.params.programId;
                 console.log("programIdd", programIdd);
@@ -1445,6 +1447,7 @@ export default class SupplyPlanComponent extends React.Component {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         this.setState({
+            loading: true,
             display: 'none',
             planningUnitChange: false,
             programSelect: value,
@@ -1552,7 +1555,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 regionList: regionList,
                                 programJson: programJson,
                                 dataSourceListAll: dataSourceListAll,
-                                planningUnitListForConsumption: planningUnitListForConsumption
+                                planningUnitListForConsumption: planningUnitListForConsumption,
+                                loading: false
                             })
                             var planningUnitIdProp = this.props.match.params.planningUnitId;
                             console.log("planningUnitIdProp===>", planningUnitIdProp);
@@ -1606,7 +1610,7 @@ export default class SupplyPlanComponent extends React.Component {
                 display: 'none'
             })
         }
-
+        this.setState({ loading: true });
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var planningUnitName = value.label;
@@ -2226,10 +2230,12 @@ export default class SupplyPlanComponent extends React.Component {
                                 lastActualConsumptionDateArr: lastActualConsumptionDate,
                                 paColors: paColors,
                                 jsonArrForGraph: jsonArrForGraph,
-                                closingBalanceArray: closingBalanceArray
+                                closingBalanceArray: closingBalanceArray,
+                                loading: false
                             })
                         } else {
-                            // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                            this.setState({loading: false})
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
                         }
                     }.bind(this)
                 }.bind(this)
@@ -2644,16 +2650,18 @@ export default class SupplyPlanComponent extends React.Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className="red">{this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                         </div>
                     </div>
@@ -2760,6 +2768,17 @@ export default class SupplyPlanComponent extends React.Component {
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
