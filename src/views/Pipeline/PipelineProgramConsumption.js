@@ -6,7 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
-import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions';
 import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 
@@ -512,7 +512,7 @@ console.log('consumptionDataArr',consumptionDataArr)
     });
     }
     loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunctionPipeline(instance,0);
     }
 
     render() {

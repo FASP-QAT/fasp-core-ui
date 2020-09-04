@@ -11,7 +11,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
-
+import classNames from 'classnames';
 const initialValues = {
     roleName: "",
     businessFunctions: [],
@@ -356,7 +356,9 @@ class EditRoleComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody className="pt-2 pb-0">
@@ -378,11 +380,19 @@ class EditRoleComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
-                                                            valid={!errors.businessFunctions}
+                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                         { 'is-valid': !errors.businessFunctions && this.state.role.businessFunctions.length != 0 },
+                                                         { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions) }
+                                                     )}
+                                                            // valid={!errors.businessFunctions}
                                                             bsSize="sm"
-                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                            onChange={(e) => { handleChange(e); this.businessFunctionChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            // invalid={touched.businessFunctions && !!errors.businessFunctions}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("businessFunctions", e);
+                                                                this.businessFunctionChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("businessFunctions", true)}
                                                             name="businessFunctions"
                                                             id="businessFunctions"
                                                             multi
