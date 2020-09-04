@@ -2400,11 +2400,13 @@ export default class syncPage extends Component {
   }
 
   cancelClicked() {
-    this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   redirectToDashbaord() {
-    this.props.history.push(`/ApplicationDashboard/` + 'green/' + i18n.t('static.message.commitSuccess'))
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
   }
 
   hideSecondComponent() {

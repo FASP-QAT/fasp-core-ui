@@ -14,6 +14,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from "../Common/AuthenticationService.js";
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -238,7 +239,8 @@ export default class ShipmentDetails extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     toggleLarge() {
