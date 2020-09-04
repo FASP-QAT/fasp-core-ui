@@ -7,6 +7,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProgramService from '../../api/ProgramService.js';
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList) {
+    console.log("In calculate")
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -744,6 +745,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.consumptionPage == "consumptionDataEntry") {
                                         props.formSubmit(props.items.planningUnit);
                                     }
+                                    props.updateState("loading", false);
                                     console.log("Start date", new Date());
                                 } else if (page == "inventory") {
                                     console.log("After save")
@@ -763,6 +765,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.inventoryPage == "inventoryDataEntry") {
                                         props.formSubmit(props.items.planningUnit);
                                     }
+                                    props.updateState("loading", false);
                                 } else if (page == "shipment") {
                                     props.updateState("message", i18n.t('static.message.shipmentsSaved'));
                                     props.updateState("color", 'green');
@@ -780,6 +783,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.shipmentPage == "shipmentDataEntry") {
                                         props.formSubmit(props.items.planningUnit);
                                     }
+                                    props.updateState("loading", false);
                                 } else if (page == "whatIf") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                 } else if (page == "supplyPlan") {
@@ -794,7 +798,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if (response.status == 200) {
                                             props.redirectToDashbaord();
                                         } else {
-                                            props.updateState("message",response.data.messageCode)
+                                            props.updateState("message", response.data.messageCode)
                                         }
                                     })
                                 }

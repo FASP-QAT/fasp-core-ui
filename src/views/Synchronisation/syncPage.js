@@ -1582,7 +1582,6 @@ export default class syncPage extends Component {
                                   oldProgramDataBatchInfo: oldProgramDataBatchInfo,
                                   latestProgramDataBatchInfo: latestProgramDataBatchInfo
                                 })
-
                               }.bind(this)
                             }.bind(this)
                           }.bind(this)
@@ -1605,7 +1604,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance);
+    jExcelLoadedFunctionWithoutPagination(instance, 0);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -1719,7 +1718,7 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunctionWithoutPagination(instance);
+    jExcelLoadedFunctionWithoutPagination(instance, 1);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -1831,7 +1830,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    // jExcelLoadedFunctionWithoutPagination(instance);
+    jExcelLoadedFunctionWithoutPagination(instance, 2);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -1949,7 +1948,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    // jExcelLoadedFunctionWithoutPagination(instance);
+    jExcelLoadedFunctionWithoutPagination(instance, 3);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -2371,13 +2370,13 @@ export default class syncPage extends Component {
         programJson.consumptionList = consumptionData;
         programJson.inventoryList = inventoryData;
         programJson.shipmentList = shipmentData;
-        // programJson.problemReportList = problemReportList;
-        programJson.problemReportList = [];
+        programJson.problemReportList = problemReportList;
+        // programJson.problemReportList = [];
         programJson.versionType = { id: document.getElementById("versionType").value };
         programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
         programJson.notes = document.getElementById("notes").value;
         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY);
-        
+
         var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
         var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
         var item = {
