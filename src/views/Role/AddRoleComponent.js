@@ -446,28 +446,28 @@ const validationSchema = function (values) {
         roleName: Yup.string()
             .required(i18n.t('static.role.roletext'))
             .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        // businessFunctions: Yup.string()
-        //     .required(i18n.t('static.role.businessfunctiontext')),
-        // canCreateRole: Yup.string()
-        //     .required(i18n.t('static.role.cancreateroletext'))
+        businessFunctions: Yup.string()
+            .required(i18n.t('static.role.businessfunctiontext')),
+        canCreateRoles: Yup.string()
+            .required(i18n.t('static.role.cancreateroletext'))
 
-        businessFunctions: Yup.array()
-            .min(1, i18n.t('static.role.businessfunctiontext'))
-            .of(
-                Yup.object().shape({
-                    label: Yup.string().required(),
-                    value: Yup.string().required(),
-                })
-            ),
+        // businessFunctions: Yup.array()
+        //     .min(1, i18n.t('static.role.businessfunctiontext'))
+        //     .of(
+        //         Yup.object().shape({
+        //             label: Yup.string().required(),
+        //             value: Yup.string().required(),
+        //         })
+        //     ),
 
-        canCreateRoles: Yup.array()
-            .min(1, i18n.t('static.role.cancreateroletext'))
-            .of(
-                Yup.object().shape({
-                    label: Yup.string().required(),
-                    value: Yup.string().required(),
-                })
-            ),
+        // canCreateRoles: Yup.array()
+        //     .min(1, i18n.t('static.role.cancreateroletext'))
+        //     .of(
+        //         Yup.object().shape({
+        //             label: Yup.string().required(),
+        //             value: Yup.string().required(),
+        //         })
+        //     ),
 
 
     })
@@ -787,10 +787,6 @@ class AddRoleComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-invalid': errors.businessFunctions },
-                                                            //     { 'is-valid': (!errors.businessFunctions && this.state.role.businessFunctions.length > 0) }
-                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.businessFunctions && this.state.role.businessFunctions.length != 0 },
                                                                 { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions) }
@@ -810,16 +806,11 @@ class AddRoleComponent extends Component {
                                                             options={this.state.businessFunctionList}
                                                             value={this.state.businessFunctionId}
                                                         />
-                                                        {errors.businessFunctions && touched.businessFunctions && (<span className="red" style={{ fontSize:'12px' }}>{errors.businessFunctions}</span>)}
+                                                        <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
-                                                            // className={classNames('custom-select', 'd-block', 'w-100', 'bg-light', { 'is-invalid': errors.canCreateRoles }, { 'is-valid': (!errors.canCreateRoles && this.state.role.canCreateRoles.length > 0) })}
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-invalid': errors.canCreateRoles },
-                                                            //     { 'is-valid': (!errors.canCreateRoles && this.state.role.canCreateRoles.length > 0) }
-                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },
                                                                 { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles) }
@@ -839,7 +830,8 @@ class AddRoleComponent extends Component {
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
                                                         />
-                                                        {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: '12px' }}>{errors.canCreateRoles}</span>)}
+                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
+                                                        {/* {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: '12px' }}>{errors.canCreateRoles}</span>)} */}
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
