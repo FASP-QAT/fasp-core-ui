@@ -73,7 +73,7 @@ export default class ExportProgram extends Component {
         const lan = 'en'
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             console.log("in success");
             db1 = e.target.result;
@@ -119,7 +119,7 @@ export default class ExportProgram extends Component {
             var db1;
             var storeOS;
             getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var transaction = db1.transaction(['programData'], 'readwrite');
@@ -135,7 +135,10 @@ export default class ExportProgram extends Component {
                         for (var j = 0; j < programId.length; j++) {
                             if (myResult[i].id == programId[j].value) {
                                 var txt = JSON.stringify(myResult[i]);
+                                // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                 var labelName = (programId[j].label).replace("/", "-")
+                                // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
                                 zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
                             }
                         }

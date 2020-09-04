@@ -990,7 +990,7 @@ export default class ConsumptionDetails extends React.Component {
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.data.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     let problemStatusId = document.getElementById('problemStatusId').value;
                     let problemTypeId = document.getElementById('problemTypeId').value;
                     // console.log("problemReportId--------------------------", this.el.getValueFromCoords(0, x));

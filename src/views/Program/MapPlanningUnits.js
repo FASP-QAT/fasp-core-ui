@@ -770,7 +770,7 @@ export default class MapPlanningUnits extends Component {
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" >
 
-                    <div id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" className="RowheightForjexceladdRow">
                     </div>
                 </div>
             </>

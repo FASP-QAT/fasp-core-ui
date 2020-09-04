@@ -56,7 +56,8 @@ export default class QatProblemActions extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
-                })
+                });
+                this.props.updateState(false);
             };
             getRequest.onsuccess = function (event) {
 
@@ -106,6 +107,7 @@ export default class QatProblemActions extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
+                    this.props.updateState(false);
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
 
@@ -117,6 +119,7 @@ export default class QatProblemActions extends Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
+                        this.props.updateState(false);
                     }.bind(this);
                     problemRequest.onsuccess = function (e) {
 
@@ -140,6 +143,7 @@ export default class QatProblemActions extends Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
+                            this.props.updateState(false);
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
                             // console.log("+++++++++++++", puRequest.result);
@@ -218,12 +222,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -243,7 +247,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -277,7 +281,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -307,7 +311,7 @@ export default class QatProblemActions extends Component {
                                             for (var r = 0; r < regionList.length; r++) {
                                                 //2 inventory  ====================
                                                 var inventoryList = programList[pp].inventoryList;
-                                                inventoryList = inventoryList.filter(c => c.region != null && c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                inventoryList = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                 var numberOfMonthsInventory = parseInt(problemList[prob].data1);
                                                 // for (var mi = 1; mi <= numberOfMonthsInventory; mi++) {
                                                 var myStartDateInventory = moment(Date.now()).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
@@ -362,12 +366,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -387,7 +391,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
 
@@ -422,7 +426,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -495,7 +499,9 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: {
+                                                                id: 0
+                                                            },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -520,12 +526,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -545,7 +551,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
 
@@ -588,7 +594,7 @@ export default class QatProblemActions extends Component {
                                                                     userId: userId,
                                                                     username: username
                                                                 },
-                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
@@ -634,7 +640,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -714,12 +720,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -739,7 +745,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -775,7 +781,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -847,7 +853,9 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: {
+                                                                id: 0
+                                                            },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -872,12 +880,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -897,7 +905,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
 
@@ -940,7 +948,7 @@ export default class QatProblemActions extends Component {
                                                                     userId: userId,
                                                                     username: username
                                                                 },
-                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
@@ -984,7 +992,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -1056,7 +1064,9 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: {
+                                                                id: 0
+                                                            },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -1081,12 +1091,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -1106,7 +1116,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
 
@@ -1149,7 +1159,7 @@ export default class QatProblemActions extends Component {
                                                                     userId: userId,
                                                                     username: username
                                                                 },
-                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
@@ -1193,7 +1203,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -1266,7 +1276,9 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: {
+                                                                id:0
+                                                            },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -1291,12 +1303,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -1316,7 +1328,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
 
@@ -1359,7 +1371,7 @@ export default class QatProblemActions extends Component {
                                                                     userId: userId,
                                                                     username: username
                                                                 },
-                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
@@ -1403,7 +1415,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -1476,7 +1488,9 @@ export default class QatProblemActions extends Component {
                                                             realmProblem: problemList[prob],
 
                                                             dt: '',
-                                                            region: '',
+                                                            region: {
+                                                                id:0
+                                                            },
                                                             planningUnit: {
                                                                 id: filteredShipmentList[s].planningUnit.id,
                                                                 label: filteredShipmentList[s].planningUnit.label,
@@ -1501,12 +1515,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -1526,7 +1540,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
 
@@ -1569,7 +1583,7 @@ export default class QatProblemActions extends Component {
                                                                     userId: userId,
                                                                     username: username
                                                                 },
-                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
@@ -1613,7 +1627,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -1719,12 +1733,12 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                                     lastModifiedBy: {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                                     problemTransList: [
                                                                         {
                                                                             problemReportTransId: '',
@@ -1744,7 +1758,7 @@ export default class QatProblemActions extends Component {
                                                                                 userId: userId,
                                                                                 username: username
                                                                             },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                         }
                                                                     ]
                                                                 }
@@ -1778,7 +1792,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
@@ -1911,12 +1925,12 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                                     lastModifiedBy: {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                                     problemTransList: [
                                                                         {
                                                                             problemReportTransId: '',
@@ -1936,7 +1950,7 @@ export default class QatProblemActions extends Component {
                                                                                 userId: userId,
                                                                                 username: username
                                                                             },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                         }
                                                                     ]
                                                                 }
@@ -1970,7 +1984,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
@@ -2088,12 +2102,12 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                                     lastModifiedBy: {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                                     problemTransList: [
                                                                         {
                                                                             problemReportTransId: '',
@@ -2113,7 +2127,7 @@ export default class QatProblemActions extends Component {
                                                                                 userId: userId,
                                                                                 username: username
                                                                             },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                         }
                                                                     ]
                                                                 }
@@ -2147,7 +2161,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
@@ -2194,7 +2208,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2268,8 +2282,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
+                                                                id:0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2294,12 +2307,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -2319,7 +2332,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -2354,7 +2367,7 @@ export default class QatProblemActions extends Component {
                                                             userId: userId,
                                                             username: username
                                                         },
-                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                     }
                                                     transList.push(tempProblemTransObj);
                                                     filterObj.problemTransList = transList;
@@ -2393,7 +2406,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2465,8 +2478,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
+                                                                id:0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2491,12 +2503,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -2516,7 +2528,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -2551,7 +2563,7 @@ export default class QatProblemActions extends Component {
                                                             userId: userId,
                                                             username: username
                                                         },
-                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                     }
                                                     transList.push(tempProblemTransObj);
                                                     filterObj.problemTransList = transList;
@@ -2592,7 +2604,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2694,12 +2706,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -2719,7 +2731,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -2754,7 +2766,7 @@ export default class QatProblemActions extends Component {
                                                             userId: userId,
                                                             username: username
                                                         },
-                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                     }
                                                     transList.push(tempProblemTransObj);
                                                     filterObj.problemTransList = transList;
@@ -2795,7 +2807,7 @@ export default class QatProblemActions extends Component {
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -2869,8 +2881,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
+                                                                id:0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -2895,12 +2906,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -2920,7 +2931,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -2955,7 +2966,7 @@ export default class QatProblemActions extends Component {
                                                             userId: userId,
                                                             username: username
                                                         },
-                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                     }
                                                     transList.push(tempProblemTransObj);
                                                     filterObj.problemTransList = transList;
@@ -2994,7 +3005,7 @@ export default class QatProblemActions extends Component {
                                                 // var regionId = -1;
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -3067,8 +3078,7 @@ export default class QatProblemActions extends Component {
 
                                                             dt: moment(Date.now()).format('YYYY-MM-DD'),
                                                             region: {
-                                                                // id: regionList[r].regionId,
-                                                                // label: regionList[r].label
+                                                                id:0
                                                             },
                                                             planningUnit: {
                                                                 id: planningUnitList[p].planningUnit.id,
@@ -3093,12 +3103,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -3118,7 +3128,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -3153,7 +3163,7 @@ export default class QatProblemActions extends Component {
                                                             userId: userId,
                                                             username: username
                                                         },
-                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                     }
                                                     transList.push(tempProblemTransObj);
                                                     filterObj.problemTransList = transList;
@@ -3195,7 +3205,7 @@ export default class QatProblemActions extends Component {
                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
 
 
-                                                var supplyPlanJson = programList[pp].supplyPlanData.filter(c => c.planningUnitId == planningUnitId && moment(c.startDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
+                                                var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                 var mos = "";
                                                 var maxForMonths = "";
@@ -3295,12 +3305,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -3320,7 +3330,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -3355,7 +3365,7 @@ export default class QatProblemActions extends Component {
                                                             userId: userId,
                                                             username: username
                                                         },
-                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                     }
                                                     transList.push(tempProblemTransObj);
                                                     filterObj.problemTransList = transList;
@@ -3445,12 +3455,12 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             lastModifiedBy: {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD"),
+                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
                                                             problemTransList: [
                                                                 {
                                                                     problemReportTransId: '',
@@ -3470,7 +3480,7 @@ export default class QatProblemActions extends Component {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
-                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                                 }
                                                             ]
                                                         }
@@ -3505,7 +3515,7 @@ export default class QatProblemActions extends Component {
                                                                 userId: userId,
                                                                 username: username
                                                             },
-                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD")
+                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                                                         }
                                                         transList.push(tempProblemTransObj);
                                                         filterObj.problemTransList = transList;
@@ -3543,11 +3553,12 @@ export default class QatProblemActions extends Component {
                                         message: i18n.t('static.program.errortext'),
                                         color: 'red'
                                     })
+                                    this.props.updateState(false);
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     // this.setState({executionStatus:1});
                                     // return executionStatus;
-                                    console.log("time taken in sec===>",performance.now());
+                                    console.log("time taken in sec===>", performance.now());
                                     this.props.updateState(false);
 
                                 }.bind(this);

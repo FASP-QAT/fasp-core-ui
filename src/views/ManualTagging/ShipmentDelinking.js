@@ -290,9 +290,9 @@ export default class ShipmentDelinking extends Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card >
                     <CardBody className="">
-                        <Col md="12 pl-0">
+                        <Col md="10 pl-0">
                             <div className="d-md-flex">
-                                <FormGroup className="col-md-3 pl-0">
+                                <FormGroup className="col-md-4 pl-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -309,7 +309,7 @@ export default class ShipmentDelinking extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">Planning Unit</Label>
                                     <div className="controls ">
                                         <InputGroup>

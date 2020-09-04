@@ -226,8 +226,10 @@ class Program extends Component {
         } else {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
-                message: i18n.t('static.common.realmtext')
+                message: i18n.t('static.common.realmtext'),
+                color:"red"
             })
+            this.hideFirstComponent()
         }
     }
 
@@ -270,7 +272,7 @@ class Program extends Component {
                 }} loading={(loading) => {
                     this.setState({ loading: loading })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>

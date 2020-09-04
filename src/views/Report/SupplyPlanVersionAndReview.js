@@ -1037,6 +1037,26 @@ class SupplyPlanVersionAndReview extends Component {
         })
     }
 
+    selected = function (instance, cell, x, y, value) {
+
+        if ((x == 0 && value != 0) || (y == 0)) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+
+            let programId = document.getElementById("programId").value;
+            // let countryId = document.getElementById("countryId").value;
+            let versionStatusId = document.getElementById("versionStatusId").value;
+            let versionTypeId = document.getElementById("versionTypeId").value;
+            if (versionStatusId == 1 && versionTypeId == 2) {
+                this.props.history.push({
+                    pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+
+                });
+            }
+
+        }
+    }.bind(this);
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
