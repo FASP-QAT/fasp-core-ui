@@ -338,7 +338,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
-                                        <Label for="countryName">{i18n.t('static.supplier.supplier')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label for="countryName">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
                                         <Select name="countryName" id="countryName"
                                             bsSize="sm"
                                             valid={!errors.countryName && this.state.technicalArea.countryName != ''}
