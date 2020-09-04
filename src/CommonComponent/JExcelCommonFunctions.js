@@ -1,30 +1,20 @@
 import i18n from '../../src/i18n';
 
-export function jExcelLoadedFunction(instance) {
+export function jExcelLoadedFunction(instance, number) {
+    if (number == undefined) {
+        number = 0;
+    }
     var obj = {};
     obj.options = {};
     var elInstance = instance.jexcel;
-    elInstance.hideIndex(0);
-    console.log("In loaded function hide method");
-    
-    // Astersik
-    
-    // var asterisk = document.getElementsByClassName("resizable")[0];
-    // var tr = asterisk.firstChild;
-    // tr.children[2].classList.add('AsteriskTheadtrTd');
-
-    // Need to add AsteriskTheadtrTd class in TD  and remove these 3 lines
-    
-    
-    var pagignation = document.getElementsByClassName('jexcel_pagination')[0];
+    elInstance.hideIndex(0);    
+    var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
     pagignation.classList.add('row');
-    var searchContainer = document.getElementsByClassName('jexcel_filter')[0];
-    var searchDiv = (document.getElementsByClassName('jexcel_filter')[0]).childNodes[1];
-    console.log("Search div", searchDiv);
-    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[0]).childNodes[1]).childNodes[0]);
-    document.getElementsByClassName("jexcel_search")[0].placeholder = "Search";
+    var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
+    var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
+    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
     // searchContainer.classList.add('TableCust');
-    console.log('searchContainer', searchContainer);
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
@@ -34,7 +24,7 @@ export function jExcelLoadedFunction(instance) {
     var clarText = document.createTextNode('Clear');
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
-        document.getElementsByClassName("jexcel_search")[0].value = "";
+        document.getElementsByClassName("jexcel_search")[number].value = "";
         elInstance.resetSearch();
     };
     clearBtn.appendChild(clarText);
@@ -57,13 +47,12 @@ export function jExcelLoadedFunction(instance) {
     // obj.pagination.appendChild(paginationPages);
     //  obj.pagination.appendChild(paginationUpdateContainer);
 
-    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[0];
+    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
-    console.log(obj.show, '....................in show');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[0];
+    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
     pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
 
 
@@ -81,23 +70,23 @@ export function jExcelLoadedFunction(instance) {
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
 
-export function jExcelLoadedFunctionWithoutPagination(instance) {
+export function jExcelLoadedFunctionWithoutPagination(instance, number) {
+    if (number == undefined) {
+        number = 0;
+    }
     var obj = {};
     obj.options = {};
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
-    console.log("In loaded function hide method");
-    var searchContainer = document.getElementsByClassName('jexcel_filter')[0];
-    var searchDiv = (document.getElementsByClassName('jexcel_filter')[0]).childNodes[1];
-    console.log("Search div", searchDiv);
-    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[0]).childNodes[1]).childNodes[0]);
-    document.getElementsByClassName("jexcel_search")[0].placeholder = "Search";
+    var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
+    var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
+    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    document.getElementsByClassName("jexcel_search")[number].placeholder = "Search";
     // searchContainer.classList.add('TableCust');
-    console.log('searchContainer', searchContainer);
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.onclick = function () {
-        document.getElementsByClassName("jexcel_search")[0].value = "";
+        document.getElementsByClassName("jexcel_search")[number].value = "";
         elInstance.resetSearch();
     };
     clearBtn.classList.add('btn-default');
@@ -131,7 +120,6 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
     } else if (type == "number") {
         var col = (colName).concat(parseInt(rowNo) + 1);
         value = value.toString().replaceAll("\,", "");
-        console.log("Value", value);
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
@@ -170,7 +158,6 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
     } else if (type == "numberNotRequired") {
         var col = (colName).concat(parseInt(rowNo) + 1);
         value = value.toString().replaceAll("\,", "");
-        console.log("Value", value);
         if (value != "") {
             if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0))) {
                 elInstance.setStyle(col, "background-color", "transparent");

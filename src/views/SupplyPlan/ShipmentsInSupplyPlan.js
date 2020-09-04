@@ -391,6 +391,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.qtyCalculator'),
                                                         onclick: function () {
+                                                            this.props.updateState("loading", true);
                                                             if (this.props.shipmentPage == "shipmentDataEntry") {
                                                                 this.props.updateState("shipmentModalTitle", i18n.t("static.supplyPlan.qtyCalculator"));
                                                                 this.props.toggleLarge();
@@ -590,6 +591,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 this.el = elVar1;
                                                                 this.setState({ qtyCalculatorTableEl1: elVar1 });
                                                             }
+                                                            this.props.updateState("loading", false);
                                                         }.bind(this)
                                                     });
                                                 }
@@ -597,6 +599,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.showShipmentDates'),
                                                         onclick: function () {
+                                                            this.props.updateState("loading", true);
                                                             if (this.props.shipmentPage == "shipmentDataEntry") {
                                                                 this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentDates"));
                                                                 this.props.toggleLarge();
@@ -1134,6 +1137,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             var elVar = jexcel(document.getElementById("shipmentDatesTable"), options);
                                                             this.el = elVar;
                                                             this.setState({ shipmentDatesTableEl: elVar });
+                                                            this.props.updateState("loading", false);
                                                         }.bind(this)
                                                     });
                                                 }
@@ -1146,6 +1150,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     items.push({
                                                         title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                         onclick: function () {
+                                                            this.props.updateState("loading", true);
                                                             if (this.props.shipmentPage == "shipmentDataEntry") {
                                                                 this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
                                                                 this.props.toggleLarge();
@@ -1295,6 +1300,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             var elVar = jexcel(document.getElementById("shipmentBatchInfoTable"), options);
                                                             this.el = elVar;
                                                             this.setState({ shipmentBatchInfoTableEl: elVar });
+                                                            this.props.updateState("loading", false);
                                                         }.bind(this)
                                                     });
                                                 }
@@ -1356,6 +1362,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         for (var i = 0; i < json.length; i++) {
                                             this.calculateLeadTimesOnChange(parseInt(i));
                                         }
+                                        this.props.updateState("loading", false);
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this)
@@ -1372,10 +1379,30 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
+        tr.children[10].classList.add('AsteriskTheadtrTd');
+        tr.children[11].classList.add('AsteriskTheadtrTd');
+        tr.children[12].classList.add('AsteriskTheadtrTd');
+        tr.children[13].classList.add('AsteriskTheadtrTd');
+
     }
 
     loadedQtyCalculator = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[1];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
     }
 
     loadedQtyCalculator1 = function (instance, cell, x, y, value) {
@@ -1541,7 +1568,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 10) {
-            checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 0);
+            checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 1);
         }
 
         if (x == 12) {
@@ -1608,6 +1635,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     saveShipmentQty() {
+        this.props.updateState("loading", true);
         var validation = this.checkValidationForShipmentQty();
         if (validation == true) {
             var elInstance = this.state.qtyCalculatorTableEl;
@@ -1630,6 +1658,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge();
             }
+            this.props.updateState("loading", false);
             if (elInstance != undefined && elInstance != "") {
                 elInstance.destroy();
             }
@@ -1639,6 +1668,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         } else {
             this.props.updateState("qtyCalculatorValidationError", i18n.t('static.supplyPlan.validationFailed'));
+            this.props.updateState("loading", false);
         }
     }
 
@@ -1658,7 +1688,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     loadedBatchInfoShipment = function (instance, cell, x, y, value) {
+        console.log("resizeable", document.getElementsByClassName("resizable"));
         jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[1];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     batchInfoChangedShipment = function (instance, cell, x, y, value) {
@@ -1755,6 +1791,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     saveShipmentBatchInfo() {
+        this.props.updateState("loading", true);
         var validation = this.checkValidationShipmentBatchInfo();
         if (validation == true) {
             var elInstance = this.state.shipmentBatchInfoTableEl;
@@ -1806,14 +1843,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge();
             }
+            this.props.updateState("loading", false);
             elInstance.destroy();
         } else {
             this.props.updateState("shipmentValidationBatchError", i18n.t('static.supplyPlan.validationFailed'));
+            this.props.updateState("loading", false);
         }
     }
 
     loadedShipmentDates = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[1];
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
     }
 
     calculateLeadTimesOnChange(y) {
@@ -2505,6 +2552,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     saveShipmentsDate() {
+        this.props.updateState("loading", true);
         var validation = this.checkValidationForShipmentDates();
         if (validation == true) {
             var elInstance = this.state.shipmentDatesTableEl;
@@ -2535,9 +2583,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge();
             }
+            this.props.updateState("loading", false);
             elInstance.destroy();
         } else {
             this.props.updateState("shipmentDatesError", i18n.t('static.supplyPlan.validationFailed'));
+            this.props.updateState("loading", false);
         }
     }
 
@@ -2657,7 +2707,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 0);
+                var validation = checkValidtion("number", "K", y, rowData[10], elInstance, DECIMAL_NO_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
                 }
@@ -2693,6 +2743,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     saveShipments() {
+        this.props.updateState("loading", true);
         var validation = this.checkValidationForShipments();
         if (validation == true) {
             var inputs = document.getElementsByClassName("submitBtn");
@@ -2942,6 +2993,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }.bind(this)
         } else {
             this.props.updateState("shipmentError", i18n.t('static.supplyPlan.validationFailed'));
+            this.props.updateState("loading", false);
         }
     }
 
