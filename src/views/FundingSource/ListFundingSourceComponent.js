@@ -507,7 +507,7 @@ class FundingSourceListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FUNDING_SOURCE')) {
                 this.props.history.push({
                     pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }

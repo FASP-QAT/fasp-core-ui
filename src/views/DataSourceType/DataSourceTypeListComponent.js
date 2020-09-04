@@ -495,7 +495,7 @@ export default class DataSourceTypeListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE')) {
                 this.props.history.push({
                     pathname: `/dataSourceType/editDataSourceType/${this.el.getValueFromCoords(0, x)}`,
                 });
