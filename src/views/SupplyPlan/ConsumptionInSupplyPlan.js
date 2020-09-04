@@ -58,13 +58,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }.bind(this);
             rcpuRequest.onsuccess = function (event) {
                 var rcpuResult = [];
-                rcpuResult = rcpuRequest.result.filter(c => (c.active).toString() == "true");
+                rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
                     if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
-                            multiplier: rcpuResult[k].multiplier
+                            multiplier: rcpuResult[k].multiplier,
+                            active: rcpuResult[k].active
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -83,12 +84,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && (dataSourceResult[k].active).toString() == "true") {
+                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
                             if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId && (dataSourceResult[k].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || dataSourceResult[k].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)) {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
-                                    dataSourceTypeId: dataSourceResult[k].dataSourceType.id
+                                    dataSourceTypeId: dataSourceResult[k].dataSourceType.id,
+                                    active: dataSourceResult[k].active
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
@@ -187,7 +189,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100, filter: this.filterDataSourceBasedOnConsumptionType },
-                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
+                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80 },
                             { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
@@ -239,7 +241,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                     onclick: function () {
                                         this.props.updateState("loading", true);
-                                        
+
                                         if (this.props.consumptionPage == "consumptionDataEntry") {
                                             this.props.toggleLarge();
                                         }
@@ -462,12 +464,16 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[2];
         if (value == 1) {
-            mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE);
+            mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE && c.active.toString() == "true");
         } else {
-            mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE);
+            mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE && c.active.toString() == "true");
         }
         return mylist;
     }.bind(this)
+
+    filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
+        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true");
+    }.bind(this);
 
     consumptionChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionEl;
