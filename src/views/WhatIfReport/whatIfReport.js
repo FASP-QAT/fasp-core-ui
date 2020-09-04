@@ -35,6 +35,7 @@ import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan.
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "../SupplyPlan/SupplyPlanCalculations";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
+import AuthenticationService from "../Common/AuthenticationService";
 // import SupplyPlanFormulas from "./SupplyPlanFormulas";
 
 const entityname = i18n.t('static.dashboard.whatIf')
@@ -260,6 +261,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.updateState = this.updateState.bind(this)
         this.updateFieldData = this.updateFieldData.bind(this);
         this.saveSupplyPlan = this.saveSupplyPlan.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     roundN = num => {
@@ -3285,7 +3287,7 @@ export default class WhatIfReportComponent extends React.Component {
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                            <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                                 {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                             </a>
                         </div>
@@ -3383,7 +3385,8 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     shipmentsDetailsClicked(supplyPlanType, startDate, endDate) {

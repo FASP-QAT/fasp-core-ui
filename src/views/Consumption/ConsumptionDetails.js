@@ -15,6 +15,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from "../Common/AuthenticationService.js";
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -24,6 +25,7 @@ export default class ConsumptionDetails extends React.Component {
         super(props);
         this.options = props.options;
         this.state = {
+            loading: true,
             programList: [],
             programId: '',
             changedFlag: 0,
@@ -110,11 +112,10 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList, loading: false
                 })
 
                 var programIdd = this.props.match.params.programId;
-                console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -128,11 +129,16 @@ export default class ConsumptionDetails extends React.Component {
     };
 
     getPlanningUnitList(value) {
+        this.setState({
+            loading: true
+        })
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0
+            programId: value != "" && value != undefined ? value.value : 0,
+            planningUnit: "",
+            showConsumption: 0,
         })
         var db1;
         var storeOS;
@@ -181,10 +187,7 @@ export default class ConsumptionDetails extends React.Component {
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    console.log("myResult", myResult);
                     var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                    console.log('programId----->>>', programId)
-                    console.log(myResult);
                     var proList = []
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -195,15 +198,13 @@ export default class ConsumptionDetails extends React.Component {
                             proList.push(productJson)
                         }
                     }
-                    console.log("proList---" + proList);
                     this.setState({
                         planningUnitList: proList,
                         planningUnitListAll: myResult,
-                        regionList: regionList
+                        regionList: regionList, loading: false
                     })
 
                     var planningUnitIdProp = this.props.match.params.planningUnitId;
-                    console.log("planningUnitIdProp===>", planningUnitIdProp);
                     if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                         var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                         this.setState({
@@ -218,6 +219,7 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     formSubmit(value) {
+        this.setState({ loading: true })
         var programId = document.getElementById('programId').value;
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
@@ -250,7 +252,7 @@ export default class ConsumptionDetails extends React.Component {
                 var consumptionListUnFiltered = (programJson.consumptionList);
                 var consumptionList = (programJson.consumptionList).filter(c =>
                     c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id !=0);
+                    c.region != null && c.region.id != 0);
                 this.setState({
                     batchInfoList: batchInfoList,
                     programJson: programJson,
@@ -267,7 +269,6 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
         this.setState({
             [parameterName]: value
         })
@@ -275,7 +276,8 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {
@@ -287,10 +289,12 @@ export default class ConsumptionDetails extends React.Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-1 pt-lg-2">
                         <Formik
                             render={
@@ -336,7 +340,7 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} consumptionPage="consumptionDataEntry" />}
                             <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                             <div className="table-responsive">
-                                <div id="consumptionTable"  />
+                                <div id="consumptionTable" />
                             </div>
                         </Col>
                     </CardBody>
@@ -363,13 +367,25 @@ export default class ConsumptionDetails extends React.Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
                             {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
                         </div>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
                 {/* Consumption modal */}
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         );
     }

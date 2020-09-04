@@ -1,4 +1,5 @@
 import CryptoJS from 'crypto-js';
+
 import { Formik } from 'formik';
 import React, { Component } from 'react';
 import {
@@ -13,12 +14,14 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from '../Common/AuthenticationService';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             programList: [],
             programId: '',
             changedFlag: 0,
@@ -112,7 +115,7 @@ export default class AddInventory extends Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList, loading: false
                 })
 
                 var programIdd = this.props.match.params.programId;
@@ -135,7 +138,8 @@ export default class AddInventory extends Component {
         document.getElementById("planningUnit").value = "";
         this.setState({
             programSelect: value,
-            programId: value != "" && value != undefined ? value.value : 0
+            programId: value != "" && value != undefined ? value.value : 0,
+            loading: true
         })
         var db1;
         var storeOS;
@@ -202,7 +206,8 @@ export default class AddInventory extends Component {
                     this.setState({
                         planningUnitList: proList,
                         planningUnitListAll: myResult,
-                        regionList: regionList
+                        regionList: regionList,
+                        loading: false
                     })
 
                     var planningUnitIdProp = this.props.match.params.planningUnitId;
@@ -222,7 +227,7 @@ export default class AddInventory extends Component {
 
     formSubmit(value) {
         console.log("In form submit");
-
+        this.setState({ loading: true })
         var programId = document.getElementById('programId').value;
         this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
@@ -302,10 +307,12 @@ export default class AddInventory extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
                 }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-1 pt-lg-2" >
                         <Formik
                             render={
@@ -397,12 +404,24 @@ export default class AddInventory extends Component {
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div >
         );
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/`+`${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     actionCanceled() {

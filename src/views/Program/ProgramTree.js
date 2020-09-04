@@ -227,7 +227,7 @@ class Program extends Component {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
                 message: i18n.t('static.common.realmtext'),
-                color:"red"
+                color: "red"
             })
             this.hideFirstComponent()
         }
@@ -387,7 +387,8 @@ class Program extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/ApplicationDashboard/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     downloadClicked() {
