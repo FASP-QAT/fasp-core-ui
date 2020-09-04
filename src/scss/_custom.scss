@@ -3189,6 +3189,29 @@ border-radius: 2em;
   color:#fff!important;
 }
 
-// Select.is-searchable.is-open >.Select-control{
-//   cursor: pointer!important;
+.Select.is-searchable.is-open>.Select-control{
+  cursor: pointer!important;
+  color: transparent!important;
+  outline:none!important;
+}
+
+.Select.is-searchable.is-focused.is-open>.Select-control{
+  cursor: pointer!important;
+  color: transparent!important;
+  outline:none!important;
+}
+.is-focused .Select-input >input
+{
+  cursor: pointer!important;
+}
+
+// .Select-control.form-control-sm:invalid, .form-control-sm.is-invalid {
+//   border-color: #f86c6b!important;
+//   padding-right: calc(1.5em + 0.75rem);
+  
+// }
+// .Select-control .form-control-sm:valid, .form-control-sm.is-valid {
+//   border-color: #4dbd74;
+//   padding-right: calc(1.5em + 0.75rem);
+ 
 // }
