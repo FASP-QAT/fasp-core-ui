@@ -51,3 +51,6 @@ export const ALPHABET_NUMBER_REGEX=/^([a-zA-Z0-9])*[a-zA-Z0-9]+$/
 export const BUDGET_NAME_REGEX=/^([a-zA-Z0-9,-]+\s)*[a-zA-Z0-9,-]+$/
 export const INDEXED_DB_NAME="fasp"
 export const INDEXED_DB_VERSION=1
+export const JIRA_PROJECT_KEY="QAT"
+export const JIRA_PROJECT_ISSUE_TYPE_BUG_REPORT="Report a bug"
+export const JIRA_PROJECT_ISSUE_TYPE_EMAIL_REQUEST="Email request"

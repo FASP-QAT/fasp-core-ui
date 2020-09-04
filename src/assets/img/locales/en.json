@@ -1098,5 +1098,15 @@
     "static.pipelineProgram.user": "USER",
     "static.pipelineProgram.fileName": "File Name",
     "static.pipelineProgram.importDate": "Import Date",
-    "static.program.fileinputjson": "File Input(File must be .json format)"
+    "static.program.fileinputjson": "File Input(File must be .json format)",
+    "static.common.summary": "Summary",
+    "static.common.description": "Description",
+    "static.common.summarytext": "Please enter summary",
+    "static.common.descriptiontext": "Please enter description",
+    "static.dimension.dimensiontext": "Please enter dimension",
+    "static.technicalArea.technicalAreaCode": "Technical area code",
+    "static.technicalArea.technicalAreaCodeText": "Please enter technical area code",
+    "static.technicalArea.productcategorynametext": "Please enter product category name",
+    "static.common.notes": "Notes",
+    "static.common.bugreport": "Bug Report"
 }

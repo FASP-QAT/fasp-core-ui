@@ -689,5 +689,15 @@
     "static.report.error": "Erro de previsão",
     "static.report.selectMonth": "Selecione o mês",
     "static.jexcel.showing": "Mostrando",
-    "static.jexcel.of": "Do"
+    "static.jexcel.of": "Do",
+    "static.common.summary": "Resumen",
+    "static.common.description": "Descrição",
+    "static.common.summarytext": "Por favor, insira o resumo",
+    "static.common.descriptiontext": "Por favor insira a descrição",
+    "static.dimension.dimensiontext": "Por favor, insira a dimensão",
+    "static.technicalArea.technicalAreaCode": "Código de área técnica",
+    "static.technicalArea.technicalAreaCodeText": "Insira o código de área técnico",
+    "static.technicalArea.productcategorynametext": "Insira o nome da categoria do produto",
+    "static.common.notes": "Notas",
+    "static.common.bugreport": "Relatório de erro"
 }
