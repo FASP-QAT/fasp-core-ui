@@ -812,15 +812,16 @@ class AddRoleComponent extends Component {
                                                         />
                                                         {errors.businessFunctions && touched.businessFunctions && (<span className="red" style={{ fontSize:'12px' }}>{errors.businessFunctions}</span>)}
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup >
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                            
                                                         <Select
                                                             // className={classNames('custom-select', 'd-block', 'w-100', 'bg-light', { 'is-invalid': errors.canCreateRoles }, { 'is-valid': (!errors.canCreateRoles && this.state.role.canCreateRoles.length > 0) })}
                                                             // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             //     { 'is-invalid': errors.canCreateRoles },
                                                             //     { 'is-valid': (!errors.canCreateRoles && this.state.role.canCreateRoles.length > 0) }
                                                             // )}
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            className={classNames('form-control','d-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },
                                                                 { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles) }
                                                             )}
@@ -839,6 +840,7 @@ class AddRoleComponent extends Component {
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
                                                         />
+                                                       
                                                         {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: '12px' }}>{errors.canCreateRoles}</span>)}
                                                     </FormGroup>
                                                 </CardBody>
