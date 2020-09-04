@@ -177,7 +177,7 @@ export default class ProductCategoryTree extends Component {
                     if (response.status == 200) {
                         this.setState({
                             productCategoryList: response.data,
-                            loading: false
+                            // loading: false
                         });
 
                         var treeData = getTreeFromFlatData({
@@ -196,7 +196,7 @@ export default class ProductCategoryTree extends Component {
                         });
                         console.log("treeData------>", treeData);
 
-                        this.setState({ treeData: treeData });
+                        this.setState({ treeData: treeData, loading: false });
                         document.getElementById("treeDiv").style.display = "block";
                     } else {
                         this.setState({
@@ -571,6 +571,11 @@ export default class ProductCategoryTree extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5 id="div2" className={this.state.color}>{this.state.message}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>

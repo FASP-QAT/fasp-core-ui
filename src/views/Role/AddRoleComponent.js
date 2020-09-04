@@ -433,10 +433,12 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { LABEL_REGEX } from '../../Constants.js';
+import classNames from 'classnames';
+
 const initialValues = {
     roleName: "",
     businessFunctions: [],
-    canCreateRole: []
+    canCreateRoles: []
 }
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
@@ -448,14 +450,26 @@ const validationSchema = function (values) {
         //     .required(i18n.t('static.role.businessfunctiontext')),
         // canCreateRole: Yup.string()
         //     .required(i18n.t('static.role.cancreateroletext'))
-        // businessFunctions: Yup.array()
-        //     .min(3, 'Pick at least 3 tags')
-        //     .of(
-        //         Yup.object().shape({
-        //             label: Yup.string().required(),
-        //             value: Yup.string().required(),
-        //         })
-        //     ),
+
+        businessFunctions: Yup.array()
+            .min(1, i18n.t('static.role.businessfunctiontext'))
+            .of(
+                Yup.object().shape({
+                    label: Yup.string().required(),
+                    value: Yup.string().required(),
+                })
+            ),
+
+        canCreateRoles: Yup.array()
+            .min(1, i18n.t('static.role.cancreateroletext'))
+            .of(
+                Yup.object().shape({
+                    label: Yup.string().required(),
+                    value: Yup.string().required(),
+                })
+            ),
+
+
     })
 }
 
@@ -699,7 +713,7 @@ class AddRoleComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
-                                        })
+                                    })
                                     UserService.addNewRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -752,6 +766,7 @@ class AddRoleComponent extends Component {
                                         setTouched,
                                         handleReset,
                                         setFieldValue,
+                                        setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
                                                 <CardBody className="pt-2 pb-0">
@@ -772,43 +787,59 @@ class AddRoleComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
-                                                            valid={!errors.businessFunctions}
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-invalid': errors.businessFunctions },
+                                                            //     { 'is-valid': (!errors.businessFunctions && this.state.role.businessFunctions.length > 0) }
+                                                            // )}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.businessFunctions && this.state.role.businessFunctions.length != 0 },
+                                                                { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                            onChange={(e) => { handleChange(e); this.businessFunctionChange(e) }}
-                                                            onBlur={handleBlur}
                                                             name="businessFunctions"
                                                             id="businessFunctions"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("businessFunctions", e);
+                                                                this.businessFunctionChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("businessFunctions", true)}
                                                             multi
                                                             required
                                                             min={1}
                                                             options={this.state.businessFunctionList}
                                                             value={this.state.businessFunctionId}
-                                                            error={errors.businessFunctions}
-                                                            touched={touched.businessFunctions}
                                                         />
-                                                        <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
+                                                        {errors.businessFunctions && touched.businessFunctions && (<span className="red" style={{ fontSize:'12px' }}>{errors.businessFunctions}</span>)}
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
-
                                                         <Select
-                                                            valid={!errors.canCreateRoles}
+                                                            // className={classNames('custom-select', 'd-block', 'w-100', 'bg-light', { 'is-invalid': errors.canCreateRoles }, { 'is-valid': (!errors.canCreateRoles && this.state.role.canCreateRoles.length > 0) })}
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-invalid': errors.canCreateRoles },
+                                                            //     { 'is-valid': (!errors.canCreateRoles && this.state.role.canCreateRoles.length > 0) }
+                                                            // )}
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },
+                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles) }
+                                                            )}
                                                             bsSize="sm"
-                                                            invalid={touched.canCreateRoles && !!errors.canCreateRoles}
-                                                            onChange={(e) => { handleChange(e); this.canCreateRoleChange(e) }}
-                                                            onBlur={handleBlur}
                                                             name="canCreateRoles"
                                                             id="canCreateRoles"
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                setFieldValue("canCreateRoles", e);
+                                                                this.canCreateRoleChange(e);
+                                                            }}
+                                                            onBlur={() => setFieldTouched("canCreateRoles", true)}
                                                             multi
                                                             required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
-                                                            error={errors.canCreateRoles}
-                                                            touched={touched.canCreateRoles}
                                                         />
-                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
+                                                        {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: '12px' }}>{errors.canCreateRoles}</span>)}
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

@@ -12,6 +12,7 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 import CountryService from "../../api/CountryService";
 import AuthenticationService from "../Common/AuthenticationService";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import RealmService from "../../api/RealmService";
 import RealmCountryService from "../../api/RealmCountryService";
 import CurrencyService from "../../api/CurrencyService";
@@ -624,9 +625,11 @@ class RealmCountry extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
-                }} /> */}
+                }} loading={(loading) => {
+                    this.setState({ loading: loading })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -649,6 +652,17 @@ class RealmCountry extends Component {
 </FormGroup>
                         </CardFooter>
                     </Card>
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>Loading...</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         )

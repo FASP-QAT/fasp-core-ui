@@ -416,7 +416,7 @@ label.arrow_label:after {
   //  color: #f86c6b !important;
 
   color: red !important;
-  font-size: 14px !important;
+  font-size: 14px;
 }
 .blue{color: 20a8d8 !important;}
 .green {
@@ -878,6 +878,17 @@ label.arrow_label:after {
 
 // .realmcountrypUnitTd{text-align: right !important;}
 
+.jexcel > thead.resizable > tr > .AsteriskTheadtrTd::after {
+ position: relative;
+  width: 3px;
+  height: 100%;
+  color: red; 
+  top: 0px;
+  left: 6px;
+  cursor: col-resize;
+  content: "*" !important; 
+font-size: 14px;
+}
 
 
 // css by junaid last line
@@ -3135,7 +3146,7 @@ border-radius: 2em;
   bottom: 0;
   color: #aaa;
   left: 0;
-  line-height: 29px!important;
+  line-height: 26px!important;
   padding-left: 10px;
   padding-right: 10px;
   position: absolute;
@@ -3153,10 +3164,25 @@ border-radius: 2em;
 }
 .Select-control {
   border-radius: 0.2rem!important;
-  border: 1px solid #e4e7ea!important;
+  // border: 1px solid #e4e7ea!important;
   color: #697069!important;
   height: 0px!important;
+  border: none!important;
+   background-color:transparent!important;
 }
+.Select.form-control{
+  height: 0%!important;
+  padding: 0px!important;
+}
+.Select.bg-light{
+  background-color:transparent !important;
+}
+.Select-control:hover {
+  box-shadow: none!important;
+}
+// .Select-arrow-zone {
+//   width: 49px!important;
+// }
 //////top header
 
 .HomeIcon{
@@ -3189,6 +3215,29 @@ border-radius: 2em;
   color:#fff!important;
 }
 
-// Select.is-searchable.is-open >.Select-control{
-//   cursor: pointer!important;
+.Select.is-searchable.is-open>.Select-control{
+  cursor: pointer!important;
+  color: transparent!important;
+  outline:none!important;
+}
+
+.Select.is-searchable.is-focused.is-open>.Select-control{
+  cursor: pointer!important;
+  color: transparent!important;
+  outline:none!important;
+}
+.is-focused .Select-input >input
+{
+  cursor: pointer!important;
+}
+
+// .Select-control.form-control-sm:invalid, .form-control-sm.is-invalid {
+//   border-color: #f86c6b!important;
+//   padding-right: calc(1.5em + 0.75rem);
+  
+// }
+// .Select-control .form-control-sm:valid, .form-control-sm.is-valid {
+//   border-color: #4dbd74;
+//   padding-right: calc(1.5em + 0.75rem);
+ 
 // }

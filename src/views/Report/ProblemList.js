@@ -979,7 +979,7 @@ export default class ConsumptionDetails extends React.Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl
+          loading:false,languageEl: languageEl
         })
     }
 
@@ -990,7 +990,7 @@ export default class ConsumptionDetails extends React.Component {
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.data.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     let problemStatusId = document.getElementById('problemStatusId').value;
                     let problemTypeId = document.getElementById('problemTypeId').value;
                     // console.log("problemReportId--------------------------", this.el.getValueFromCoords(0, x));
@@ -1010,7 +1010,7 @@ export default class ConsumptionDetails extends React.Component {
     fetchData() {
         this.setState({
             data: [],
-            message: ''
+            message: '',loading:true
         },
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1029,14 +1029,23 @@ export default class ConsumptionDetails extends React.Component {
             var procurementAgentList = [];
             var fundingSourceList = [];
             var budgetList = [];
+            openRequest.onerror = function (event) {
+                this.setState({ loading:false });
+            };
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
 
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var programTransaction = transaction.objectStore('programData');
                 var programRequest = programTransaction.get(programId);
-
+                programRequest.onerror = function (event) {
+                    this.setState({ loading:false });
+                };
                 programRequest.onsuccess = function (event) {
+                     this.setState({loading:true},
+                        () => {
+                           console.log("callback")
+                        })
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);

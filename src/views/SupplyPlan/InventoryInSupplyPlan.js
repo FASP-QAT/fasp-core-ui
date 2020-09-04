@@ -136,8 +136,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[2] = inventoryList[j].dataSource.id; //C
                         data[3] = inventoryList[j].realmCountryPlanningUnit.id; //D
                         data[4] = adjustmentType; //E
-                        data[5] = inventoryList[j].adjustmentQty; //F
-                        data[6] = inventoryList[j].actualQty; //G
+                        data[5] = parseInt(inventoryList[j].adjustmentQty); //F
+                        data[6] = parseInt(inventoryList[j].actualQty); //G
                         data[7] = inventoryList[j].multiplier; //H
                         data[8] = `=F${parseInt(j) + 1}*H${parseInt(j) + 1}`; //I
                         data[9] = `=G${parseInt(j) + 1}*H${parseInt(j) + 1}`; //J
@@ -260,11 +260,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 items.push({
                                     title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                     onclick: function () {
+                                        this.props.updateState("loading", true);
                                         if (this.props.inventoryPage == "inventoryDataEntry") {
                                             this.props.toggleLarge();
                                         }
                                         var batchList = [];
                                         var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
+                                        console.log("this.props.items.batchInfoList", this.props.items.batchInfoList);
                                         var batchInfoList = this.props.items.batchInfoList.filter(c => (moment(c.expiryDate).format("YYYY-MM-DD") > date && moment(c.createdDate).format("YYYY-MM-DD") <= date));
                                         console.log("Batch info list", batchInfoList);
                                         batchList.push({
@@ -312,8 +314,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             data[0] = batchInfo[sb].batch.batchId; //A
                                             data[1] = moment(batchInfo[sb].batch.expiryDate).format(DATE_FORMAT_CAP);
                                             data[2] = adjustmentType; //B
-                                            data[3] = batchInfo[sb].adjustmentQty; //C
-                                            data[4] = batchInfo[sb].actualQty; //D
+                                            data[3] = parseInt(batchInfo[sb].adjustmentQty); //C
+                                            data[4] = parseInt(batchInfo[sb].actualQty); //D
                                             data[5] = batchInfo[sb].inventoryTransBatchInfoId; //E
                                             data[6] = y; //F
                                             if (adjustmentType == 1) {
@@ -430,6 +432,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         var elVar = jexcel(document.getElementById("inventoryBatchInfoTable"), options);
                                         this.el = elVar;
                                         this.setState({ inventoryBatchInfoTableEl: elVar });
+                                        this.props.updateState("loading", false);
                                     }.bind(this)
                                 });
                             }
@@ -497,7 +500,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.setState({
                         inventoryEl: myVar
                     })
-
+                    this.props.updateState("loading", false);
                 }.bind(this)
             }.bind(this)
         }.bind(this);
@@ -509,6 +512,19 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        console.log("astrrisk", asterisk);
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
+        tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
     inventoryChanged = function (instance, cell, x, y, value) {
@@ -561,6 +577,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
     loadedBatchInfoInventory = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[1];
+        console.log("astrrisk", asterisk);
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
     }
 
     batchInfoChangedInventory = function (instance, cell, x, y, value) {
@@ -737,6 +760,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     saveInventoryBatchInfo() {
+        this.props.updateState("loading", true);
         var validation = this.checkValidationInventoryBatchInfo();
         if (validation == true) {
             var elInstance = this.state.inventoryBatchInfoTableEl;
@@ -794,12 +818,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (this.props.inventoryPage == "inventoryDataEntry") {
                 this.props.toggleLarge();
             }
+            this.props.updateState("loading", false);
             elInstance.destroy();
         } else {
             this.setState({
                 inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
             })
             this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
+            this.props.updateState("loading", false);
         }
     }
 
@@ -881,6 +907,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     // Save adjustments
     saveInventory() {
         this.props.updateState("inventoryError", "");
+        this.props.updateState("loading", true);
         var validation = this.checkValidationInventory();
         console.log("Validation", validation);
         if (validation == true) {
@@ -1002,6 +1029,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }.bind(this)
         } else {
             this.props.updateState("inventoryError", i18n.t('static.supplyPlan.validationFailed'));
+            this.props.updateState("loading", false);
         }
     }
 
